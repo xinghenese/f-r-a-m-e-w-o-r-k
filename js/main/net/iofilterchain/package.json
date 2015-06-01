@@ -1,0 +1,7 @@
+{
+  "name": "iofilterchain",
+  "description": "iofilterchain",
+  "main": "chain.js",
+  "author": "reco",
+  "license": "ISC"
+}

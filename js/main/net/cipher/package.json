@@ -1,0 +1,7 @@
+{
+  "name": "cipher",
+  "description": "cipher",
+  "main": "factory.js",
+  "author": "reco",
+  "license": "ISC"
+}

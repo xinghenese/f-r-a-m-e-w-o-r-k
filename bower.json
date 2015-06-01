@@ -1,0 +1,55 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "authors": [
+    "reco <reco@liao.com>"
+  ],
+  "description": "webchat",
+  "main": "index.js",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "webchat"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.13.3",
+    "requirejs": "~2.1.17",
+    "jsbn": "~1.3.0",
+    "cryptojslib": "~3.1.2",
+    "lodash": "~3.8.0",
+    "q": "1",
+    "gzip-js": "*"
+  },
+  "overrides": {
+    "cryptojslib": {
+      "main": [
+        "./components/core.js",
+        "./components/aes.js",
+        "./components/md5.js",
+        "./components/cipher-core.js",
+        "./components/evpkdf.js",
+        "./components/enc-base64.js",
+        "./components/mode-ecb.js"
+      ]
+    },
+    "jsbn": {
+      "main": [
+        "./jsbn.js",
+        "./jsbn2.js",
+        "./base64.js"
+      ]
+    }
+  }
+}

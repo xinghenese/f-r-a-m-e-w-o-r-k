@@ -1,0 +1,7 @@
+{
+  "name": "connection",
+  "description": "connection",
+  "main": "httpconnection.js",
+  "author": "reco",
+  "license": "ISC"
+}

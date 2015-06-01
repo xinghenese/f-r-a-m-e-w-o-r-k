@@ -1,0 +1,26 @@
+{
+    "description": "The example module to show the structure of the web project.",
+    "repository": {
+        "type": "git",
+        "url": "."
+    },
+    "jshintConfig": ".jshintrc",
+    "scripts": {
+        "test": "jest"
+    },
+    "devDependencies": {
+        "browserify": "*",
+        "del": "*",
+        "flux": "*",
+        "gulp": "*",
+        "gulp-react": "*",
+        "jest-cli": "^0.4.3",
+        "keymirror": "*",
+        "object-assign": "*",
+        "react": "*",
+        "reactify": "*",
+        "run-sequence": "*",
+        "vinyl-source-stream": "*",
+        "watchify": "*"
+    }
+}
