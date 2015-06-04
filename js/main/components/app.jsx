@@ -6,11 +6,24 @@ define(function(require, exports, module){
 
   var Login = require('jsx!./login');
   var React = require('react');
+  var httpconnection = require('../net/connection/httpconnection');
+  var protocolpacket = require('../net/protocolpacket/protocolpacket');
 
   var App = React.createClass({
       _handleLoginSubmit: function(countryCode, phoneNumber) {
         console.log('submit');
           console.log(countryCode, '-', phoneNumber);
+          if(phoneNumber){
+            httpconnection.request(protocolpacket.create({
+              mid: phoneNumber,
+              c: 1122,
+              pf: 1,
+              os: 'PC',
+              dv: '1',
+              di: '1122334455',
+              uuid: '7e9d-501c-dbd816078039'
+            }));
+          }
       },
       _onLoginSuccess: function() {
           console.log('login success');

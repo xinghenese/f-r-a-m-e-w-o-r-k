@@ -69,7 +69,6 @@ define(function(require, exports, module){
       }
       //if neither authorized nor authorizing, hold on the request until authorized
       if(!connection.isAuthorized() && !(PUBLICK_KEY_FIELD in msg.data)){
-        console.log('')
         return handleHandShakeRequest(connection, msg);
       }
       //else start the request directly.
