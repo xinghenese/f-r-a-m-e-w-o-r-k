@@ -12,6 +12,7 @@ define(function(require, exports, module){
   var crypto = require('./filter.crypto');
   var zipper = require('./filter.zipper');
   var wrapper = require('./filter.wrapper');
+  var assembly = require('./filter.assembly');
   var iohandler = require('./filter.iohandler');
 
   //core module to export
@@ -28,6 +29,8 @@ define(function(require, exports, module){
           return crypto;
         case 'wrapper':
           return wrapper;
+        case 'assembly':
+          return assembly;
         case 'iohandler':
           return iohandler;
         default:

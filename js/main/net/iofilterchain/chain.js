@@ -6,12 +6,13 @@ define(function(require, exports, module){
   //dependencies
   var filter = require('./filter');
   var factory = require('./factory');
+  var protocolpacket = require('../protocolpacket/protocolpacket');
   var _ = require('lodash');
   var origin = require('../base/origin');
   var q = require('q');
 
   //private fields
-  var tasks = _.map(['wrapper', 'codec', 'crypto', 'zipper', 'json', 'iohandler'], function(item){
+  var _tasks = _.map(['wrapper', 'crypto', 'zipper', 'json', 'assembly', 'iohandler'], function(item){
     return factory.createFilter(item);
   });
 
@@ -19,39 +20,34 @@ define(function(require, exports, module){
   module.exports = origin.extend({
     /**
      *
-     * @param msg {Object|protocolpacket}
+     * @param msg {protocolpacket}
+     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'filterWrite': function(msg){
-      return _.reduceRight(tasks, function(promise, task){
+    'filterWrite': function(msg, options){
+      return _.reduceRight(this.tasks, function(promise, task, index){
         return promise.then(function(value){
-          return task.write(value);
+          return task.write(value, options);
         })
       }, q(msg));
     },
     /**
      *
-     * @param msg {Object|protocolpacket}
+     * @param msg {protocolpacket}
+     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'filterRead': function(msg){
-      return _.reduce(tasks, function(promise, task){
+    'filterRead': function(msg, options){
+      return _.reduce(this.tasks, function(promise, task, index){
         return promise.then(function(value){
-          return task.read(value);
+          return task.read(value, options);
         })
       }, q(msg));
     },
     /**
-     * @param cfg {Object}
-     * @returns {exports}
+     * filter tasks
      */
-    'config': function(cfg){
-      console.log('chain.cfg: ', cfg);
-      _.forEach(tasks, function(task){
-        task.notifyConfig(cfg);
-      });
-      return this;
-    }
+    'tasks': _tasks
   });
 
 });

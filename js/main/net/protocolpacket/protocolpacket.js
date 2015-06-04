@@ -10,7 +10,9 @@ define(function(require, exports, module){
   module.exports = origin.extend({
     'root': '',
     'url': '',
-    'data': {}
+    'tag': '',
+    'data': {},
+    'result': ''
   });
 
 });

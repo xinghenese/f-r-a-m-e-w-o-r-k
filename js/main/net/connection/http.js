@@ -70,6 +70,7 @@ define(function(require, exports, module){
 
       xhr.open(method,  _root + url);
       xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+//      xhr.setRequestHeader("Content-type","text/plain");
       console.log(data);
 
       xhr.send(data);

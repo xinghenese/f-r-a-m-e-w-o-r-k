@@ -13,19 +13,23 @@ define(function(require, exports, module){
     /**
      * parse the value into a plain object
      * @param value {String}
+     * @param options {Object}
      * @returns {Object}
      */
-    'processReadable': function(value){
+    'processReadable': function(value, options){
       console.log(value);
-      return JSON.parse(value);
+//      return JSON.parse(value);
+      return JSON.parse(('' + value).replace(/^[^{]*?\{/, '{').replace(/[\r\n]/gm, ''));
     },
     /**
      * transfer the value into a string
      * @param value {Object}
+     * @param options {Object}
      * @returns {String}
      */
-    'processWritable': function(value){
-      return JSON.stringify(_.omit(value, userconfigs.configs()));
+    'processWritable': function(value, options){
+      return JSON.stringify(value);
+//      return JSON.stringify(_.omit(value, userconfigs.configs()));
     }
   });
 

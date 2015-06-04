@@ -34,11 +34,9 @@ define(function(require, exports, module){
         .process(function(value){
           return bytes.create(value).toHex();
         })
+        .report('publickKey.beforeEncode')
         .process(codec.encodeHex, codec)
-        .process(function(key){
-          console.log('pbulKey: ', key);
-          return key;
-        })
+        .report('publicKey')
         .done()
       ;
     },
@@ -49,6 +47,7 @@ define(function(require, exports, module){
      * @returns {*} BigInteger recommended
      */
     getSharedKey: function(remotePub){
+      console.log('should never access in');
       return new BigInteger(remotePub, 16, true);
     },
     /**
@@ -61,18 +60,23 @@ define(function(require, exports, module){
       return processible.create(remotePub)
         .process(codec.decodeToHex)
         .process(this.getSharedKey)
+        .report('getSharedKey')
         .process(function(value){
           return value.toByteArray();
         })
+        .report('bytes')
         .process(function(value){
-          return bytes.create(value).toHex();
+//          return bytes.create(value).toHex().replace(/(0d)|(0a)/gm, '');
+          return bytes.create(value).toWordArray();
         })
-        .process(codec.encodeHex)
+        .process(codec.encode)
+//        .process(codec.encodeHex)
+        .process(function(value){
+          return value.replace(/(0d)|(0a)/gm, '');
+        })
+        .report('encode')
         .process(hash.hash, hash)
-        .process(function(key){
-          console.log('encrypt-key: ', key);
-          return key;
-        })
+        .report('encrypt--key')
         .process(CryptoJS.enc.Utf8.parse)
         .done()
       ;

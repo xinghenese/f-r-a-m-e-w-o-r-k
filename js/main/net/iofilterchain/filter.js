@@ -16,39 +16,49 @@ define(function(require, exports, module){
     /**
      * a final method used to read data from the connection and process it.
      * @param value {Object|String}
+     * @param options {Object}
      * @returns {Object|String}
      */
-    'read': function(value){
-      if(this.enableRead){
-        return this.processReadable(value);
+    'read': function(value, options){
+      if(!value){
+        throw new Error('empty data when reading');
+      }
+      if(this.enableRead && options){
+        return this.processReadable(value, options);
       }
       return value;
     },
     /**
      * a final method used to write processed data to the connection.
      * @param value {Object|String}
+     * @param options {Object}
      * @returns {Object|String}
      */
-    'write': function(value){
-      if(this.enableWrite){
-        return this.processWritable(value);
+    'write': function(value, options){
+      if(!value){
+        throw new Error('empty data when writing');
+      }
+      if(this.enableWrite && options){
+        return this.processWritable(value, options);
       }
       return value;
     },
     /**
      * would be overridden to extend the processing logic.
      * @param value
+     * @param options {Object}
      * @returns {*}
      */
-    'processReadable': function(value){
+    'processReadable': function(value, options){
       return value;
     },
     /**
      * would be overridden to extend the processing logic.
      * @param value
+     * @param options {Object}
      * @returns {*}
      */
-    'processWritable': function(value){
+    'processWritable': function(value, options){
       return value;
     },
     /**

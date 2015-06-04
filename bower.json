@@ -30,7 +30,10 @@
     "cryptojslib": "~3.1.2",
     "lodash": "~3.8.0",
     "q": "1",
-    "gzip-js": "*"
+    "gzip-js": "*",
+    "flux": "~2.0.2",
+    "eventEmitter": "~4.2.11",
+    "jsx-requirejs-plugin": "~0.6.2"
   },
   "overrides": {
     "cryptojslib": {

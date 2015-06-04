@@ -30,7 +30,6 @@ define(function(require, exports, module){
       return g.modPow(priv, p);
     },
     getSharedKey: function(remotePub){
-      console.log('remotePub: ', remotePub);
       var wrap = new BigInteger(remotePub, 16, true);
       return wrap.modPow(priv, p);
     }

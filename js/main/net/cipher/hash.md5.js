@@ -13,7 +13,7 @@ define(function(require, exports, module){
   //core module to export
   module.exports = hash.create({
     hashEncode: function(msg){
-      return CryptoJS.enc.Hex.stringify(CryptoJS.MD5(msg));
+      return CryptoJS.MD5(msg).toString();
     }
   })
 

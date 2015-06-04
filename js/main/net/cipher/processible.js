@@ -27,16 +27,17 @@ define(function(require, exports, module){
       }
       return key;
     },
-    'init': function(value){
-      var args = _.toArray(arguments).slice(1);
-      this._value = _.isFunction(value) ? value.apply(this, args) : value;
-    },
     'done': function(){
       return this._value;
+    },
+    'report': function(tag){
+      tag = tag || 'value';
+      console.log(tag + ': ', this._value);
+      return this;
     },
     'valueOf': function(){
       return this._value;
     }
-  }, ['get', 'process', 'done', 'init', 'valueOf']);
+  }, ['get', 'process', 'done', 'init', 'report', 'valueOf']);
 
 });

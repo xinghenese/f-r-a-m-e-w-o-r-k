@@ -10,20 +10,24 @@ define(function(require, exports, module){
 
   //core module to export
   module.exports = filter.create({
-    'processWritable': function(value){
-      if(!value){
-        throw new Error('empty data before wrapping');
+    'processWritable': function(value, options){
+      console.log('options: ', options);
+      if(options.needWrap){
+        return queryStringify(value);
       }
-      return queryStringify(value);
+      return value;
     },
-    'processReadable': function(value){
-      return value.replace(/[\r\n]/gm, '');
+    'processReadable': function(value, options){
+      if(options.needUnwrap){
+        return decodeURIComponent(value.replace(/[\r\n]/gm, ''));
+      }
+      return value;
     }
   });
 
   //private functions.
   function queryStringify(msg){
-    return 'data=' + msg + "&" +
+    return 'data=' + encodeURIComponent(msg) + "&" +
       "ver=" + userconfigs.getVersion() + "&" +
       "uuid=" + userconfigs.getUuid();
   }

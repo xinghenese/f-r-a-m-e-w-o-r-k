@@ -12,23 +12,15 @@ define(function(require, exports, module){
     /**
      * decompress the data.
      * @param value
+     * @param options {Object}
      * @returns {*|utf8}
      */
-    'processReadable': function(value){
-      return compressor.decompress(value);
-    },
-    /**
-     * config the filter to specify whether to compress or decompress
-     * the data.
-     * @param cfg
-     */
-    'notifyConfig': function(cfg){
-      if(!_.isUndefined(cfg.needCompress)){
-        this.enableWrite = !!cfg.needCompress;
+    'processReadable': function(value, options){
+      if(options.needDecompress){
+        console.log('compress: ', value);
+        return compressor.decompress(value);
       }
-      if(!_.isUndefined(cfg.needDecompress)){
-        this.enableRead = !!cfg.needDecompress;
-      }
+      return value;
     }
   });
 

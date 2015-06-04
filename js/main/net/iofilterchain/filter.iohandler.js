@@ -11,22 +11,28 @@ define(function(require, exports, module){
   var codec = factory.createCodec();
   var _ = require('lodash');
   var protocolpacket = require('../protocolpacket/protocolpacket');
+  var connectionProto = require('../connection/connection');
 
   //private const fields
   var PUBLICK_KEY_FIELD = 'pk';
 
-  //private fields
-  var isAuthorized = false;
-  var delayedTask = null;
-
   //core module to export
   module.exports = filter.create({
-    'processReadable': function(msg){
+    'processReadable': function(msg, options){
+      var connection = getConnection(options.connectionType);
+      var result;
+      var data;
+      var tag;
+
       if(!msg){
         throw new Error('empty response');
       }
-      var result = + msg.r;
-      var data = msg.data;
+      if(!protocolpacket.isPrototypeOf(msg)){
+        throw new Error('processed message in non-protocolpacket format');
+      }
+      result = msg.result;
+      data = msg.data;
+      tag = msg.tag;
 
       //should extend the logic here to handle various invalid results.
       if(result != 0){
@@ -38,33 +44,33 @@ define(function(require, exports, module){
       }
       //check whether is a handshake/authentication response and handle it.
       if(PUBLICK_KEY_FIELD in data){
-        isAuthorized = true;
-        handleHandShakeResponse(data[PUBLICK_KEY_FIELD ]);
+//        isAuthorized = true;
+        handleHandShakeResponse(data[PUBLICK_KEY_FIELD ], connection);
+        console.log('opts: ', options);
       }
-      if(delayedTask && protocolpacket.isPrototypeOf(delayedTask)){
-        //if some tasks have been delayed to await authentication,
-        //start these request tasks once authorized. when these request
-        //tasks being handled successfully, clear the delayedTasks.
-        return getConnection()
-          .request(delayedTask)
-          .then(function(value){
-            delayedTask = null;
-            return value;
-          })
-        ;
-      }
-      notify(data);
-      return data;
+      notify(msg);
+      return msg;
     },
-    'processWritable': function(msg){
+    /**
+     *
+     * @param msg {protocolpacket}
+     * @param options
+     * @returns {*}
+     */
+    'processWritable': function(msg, options){
+      var connectionType = options.connectionType;
+      var connection = getConnection(connectionType);
+      var data = msg;
+
+      console.log('iohandler-write.msg: ', msg);
+
+      if(protocolpacket.isPrototypeOf(msg)){
+        data = msg.data;
+      }
       //if neither authorized nor authorizing, hold on the request until authorized
-      if(!isAuthorized && !(PUBLICK_KEY_FIELD in msg)){
-        handleHandShakeRequest()
-          .then(function(value){
-            //cache the request in order to later start the request once authorized.
-            registerDelayedTask(msg);
-            return value;
-          })
+      if(!connection.isAuthorized() && !(PUBLICK_KEY_FIELD in msg.data)){
+        console.log('')
+        return handleHandShakeRequest(connection, msg);
       }
       //else start the request directly.
       return msg;
@@ -72,37 +78,57 @@ define(function(require, exports, module){
   });
 
   //private functions
-  function handleHandShakeRequest(){
-    return getConnection()
-      .disableConfig()
-      .request(protocolpacket.create({
-        'url': "auth/c",
-        'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
-      }))
-      ;
+
+  function handleHandShakeRequest(connection, packet){
+    if(!connectionProto.isPrototypeOf(connection)){
+      throw new Error('invalid connection');
+    }
+    if(protocolpacket.isPrototypeOf(packet)){
+      connection.once('authorize', function(){
+        console.log('authorize');
+        connection.request(packet);
+      });
+    }
+    connection.disableConfig();
+
+    console.log('connection: ', connection);
+
+    return protocolpacket.create({
+      'url': "auth/c",
+      'tag': "HSK",
+      'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
+    });
   }
 
-  function handleHandShakeResponse(key){
+  function handleHandShakeResponse(key, connection){
     //store the encryptKey if successful response of handshake.
-    return getConnection()
+    connection
       .resetConfig()
       .config({
         'encryptKey': keyExchange.getEncryptKey(key)
       })
+      .emit('authorize')
     ;
+    return connection;
   }
 
-  function registerDelayedTask(task){
-    if(task && protocolpacket.isPrototypeOf(task)){
-      delayedTask = task;
+  function getConnection(tag){
+    var connection;
+
+    switch(tag){
+      case 'http':
+        connection = require('../connection/httpconnection');
+        break;
+      case 'socket':
+        connection = require('../connection/socketconnection');
+        break;
+      default:
+        connection = null;
     }
-  }
-
-  function getConnection(){
-    var connection = require('../connection/httpconnection');
     if(!connection){
-      throw new Error('connection error');
+      throw new Error('connection module not initialized yet');
     }
+
     return connection;
   }
 

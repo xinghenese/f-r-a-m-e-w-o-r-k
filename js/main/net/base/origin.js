@@ -6,16 +6,16 @@ define(function(require, exports, module){
   //dependencies
   var _ = require('lodash');
 
+  //private fileds
+  var DEFAULT_CONSTRUCTOR = new Function();
+
   //core module to export
-  module.exports = (function(){
-
-    var Constructor = new Function();
-
-    return {
+  module.exports = {
       /**
        * Creates a new object that inherits from this object.
        * @param adapter {Object}
        * @param finals {Object|Array}
+       * @param constructor {Function}
        * @return {Object} The new object.
        * @example
        *     var MyType = origin.extend({
@@ -24,9 +24,19 @@ define(function(require, exports, module){
        *         }
        *     });
        */
-      extend: function(adapter, finals){
-        Constructor.prototype = this;
-        var subtype = new Constructor();
+      extend: function(adapter, finals, constructor){
+        var subtype;
+        var supertype;
+
+        //modify prototype by adopting constructor.prototype
+        if(_.isFunction(constructor)){
+          supertype = DEFAULT_CONSTRUCTOR.prototype = _.assign({}, this, constructor.prototype);
+          console.log('mixin-proto: ', DEFAULT_CONSTRUCTOR.prototype);
+        }else{
+          supertype = DEFAULT_CONSTRUCTOR.prototype = this;
+        }
+
+        subtype = new DEFAULT_CONSTRUCTOR();
 
         // Augment
         adapter = _.toPlainObject(adapter);
@@ -45,12 +55,20 @@ define(function(require, exports, module){
             subtype.$super.init.apply(this, arguments);
           };
         }
+        //Depend constructor initializer
+        if(_.isFunction(constructor)){
+          var func = subtype.init;
+          subtype.init = function () {
+            constructor.apply(this, arguments);
+            func.apply(this, arguments);
+          };
+        }
 
         // Initializer's prototype is the subtype object
         subtype.init.prototype = subtype;
 
         // Reference supertype
-        subtype.$super = this;
+        subtype.$super = supertype;
 
         return subtype;
       },
@@ -73,7 +91,7 @@ define(function(require, exports, module){
           overrides = {};
         }
 
-        var instance = this.extend(overrides, null);
+        var instance = this.extend(overrides, null, void 0);
         instance.init.apply(instance, initials);
 
         return instance;
@@ -86,11 +104,7 @@ define(function(require, exports, module){
       _mixIn: function(properties){
         var self = this;
         _.forOwn(properties, function(property, propertyname){
-//          if(_.startsWith(propertyname, '_')){
-//            self._privates[_.trimLeft(propertyname, '_')] = property;
-//          }else{
             self[propertyname] = property;
-//          }
         });
 
         // IE won't copy toString using the loop above
@@ -102,15 +116,8 @@ define(function(require, exports, module){
       /**
        * store names of methods which would not be overriden by subtypes.
        */
-      _finals: [],
-
-      /**
-       * store private properties.
-       */
-      _privates: {}
+      _finals: []
 
     }
-
-  })();
 
 });

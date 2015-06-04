@@ -5,6 +5,7 @@ define(function(require, exports, module){
 
   //dependencies
   var chain = require('../iofilterchain/chain');
+  var protocolpacket = require('../protocolpacket/protocolpacket');
   var origin = require('../base/origin');
   var q = require('q');
 
@@ -12,11 +13,12 @@ define(function(require, exports, module){
   module.exports =  origin.extend({
     /**
      * read data from the connection and then process it with filter chain.
-     * @param msg {Object|protocolpacket}
+     * @param msg {protocolpacket}
+     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'read': function(msg){
-      return chain.filterRead(msg)
+    'read': function(msg, options){
+      return chain.filterRead(msg, options)
         .then(function(value){
           console.groupEnd();
           return value;
@@ -28,24 +30,17 @@ define(function(require, exports, module){
     },
     /**
      * write data processed with filter chain to the connection.
-     * @param msg {Object|protocolpacket}
+     * @param msg {protocolpacket}
+     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'write': function(msg){
+    'write': function(msg, options){
       console.group("iosession");
-      return chain.filterWrite(msg)
+      return chain.filterWrite(msg, options)
         .catch(function(err){
           console.error(err);
         })
       ;
-    },
-    /**
-     * @param cfg {Object}
-     * @returns {exports}
-     */
-    'config': function(cfg){
-      chain.config(cfg);
-      return this;
     }
   });
 

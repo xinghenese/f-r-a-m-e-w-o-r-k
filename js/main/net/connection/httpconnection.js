@@ -10,6 +10,8 @@ define(function(require, exports, module){
   var q = require('q');
   var _ = require('lodash');
   var protocolpacket = require('../protocolpacket/protocolpacket');
+  var connection = require('./connection');
+  var State = require('./connectionstate');
 
   //private const fields
   var DEFAULT_CONFIG = {
@@ -18,103 +20,124 @@ define(function(require, exports, module){
     'needCompress': false,
     'needDecompress': true,
     'needEncode': false,
-    'needDecode': true,
+    'needDecode': false,
+    'needWrap': true,
+    'needUnwrap': true,
     'urlRoot': "",
-    'encryptKey': ""
+    'encryptKey': "",
+    'connectionType': "http"
   };
 
   //private fields.
   var tempConfig = _.assign({}, DEFAULT_CONFIG);
+  var state = State.INITIALIZING;
+  var isAuthorized = false;
 
   //core module to export
-  module.exports = origin.extend({
+  var httpconnection = module.exports = connection.extend({
     /**
      * unify the HTTP request interface by means of HTTP GET or HTTP POST
-     * @param arg1
-     * @param arg2
+     * @param packet {protocolpacket}
      * @returns {Q.Promise}
      */
-    'request': function(arg1, arg2){
+    'request': function(packet){
       var url;
       var data;
       var root;
 
-      //if arg1 is a subtype of protocolpacket, then parse it into
-      //three components: root, url and data.
-      if(protocolpacket.isPrototypeOf(arg1)){
-        url = '' + arg1.url;
-        data = arg1.data;
-        root = '' + arg1.root;
-      }else{
-        url = '' + arg1;
-        data = _.toPlainObject(arg2);
-      }
+      if(protocolpacket.isPrototypeOf(packet)){
+        url = '' + packet.url;
+        data = packet.data;
+        root = '' + packet.root;
+        console.log('protocolpacket');
 
-      http.config({
-        'urlRoot': root
-      });
-      if(data && !_.isEmpty(data)){
-        return this.post(url, data);
+        http.config({
+          'urlRoot': root
+        });
+
+        console.log('request-temp-opts: ', tempConfig);
+        if(data && !_.isEmpty(data)){
+          return this.post(url, packet, tempConfig);
+        }
+        return this.get(url, tempConfig);
       }
-      return this.get(url);
     },
     /**
      * HTTP POST
-     * @param url
-     * @param data
+     * @param url {String}
+     * @param packet {Object|protocolpacket}
+     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'post': function(url, data){
-      return session.write(data)
+    'post': function(url, packet, options){
+      console.log('temp-opts: ', tempConfig);
+      options = options ? _.assign({}, tempConfig, options) : tempConfig;
+      console.log('post-opts: ', options);
+
+      if(!protocolpacket.isPrototypeOf(packet)){
+        packet = protocolpacket.create({
+          'url': url,
+          'data': packet
+        });
+      }
+
+      return session.write(packet, options)
         .then(function(value){
           return http.post(url, value);
         })
         .then(function(value){
-          return session.read(value);
+          return session.read(value, options);
         })
       ;
     },
     /**
      * HTTP GET
      * @param url
+     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'get': function(url){
+    'get': function(url, options){
+      options = options ? _.assign({}, tempConfig, options) : tempConfig;
       return http.get(url)
         .then(function(value){
-          return session.read(value);
+          return session.read(value, options);
         })
       ;
     },
-    'config': function(cfg){
-      console.log('connection.cfg: ', cfg);
-      if(cfg){
-        cfg = tempConfig = _.mapValues(tempConfig, function(value, key){
-          return _.isUndefined(cfg[key]) ? value : cfg[key];
-        });
-        console.log('cfg: ', cfg);
-        http.config(cfg);
-        session.config(cfg);
-      }
-      return this;
+
+    'getState': function(){
+      return state;
     },
-    'resetConfig': function(){
-      tempConfig = _.assign({}, DEFAULT_CONFIG);
-      session.config(tempConfig);
-      return this;
+
+    'isAuthorized': function(){
+      return isAuthorized;
     },
-    'disableConfig': function(){
-      tempConfig = {
-        'needEncrypt': false,
-        'needDecrypt': false,
-        'needCompress': false,
-        'needDecompress': false,
-        'needEncode': false,
-        'needDecode': false
-      };
-      session.config(tempConfig);
-      return this;
+
+    'getConfig': function(){
+      return tempConfig;
+    },
+    'getDefaultConfig': function(){
+      return DEFAULT_CONFIG;
     }
+
   });
+
+  //initialize
+  httpconnection.on('ready', function(){
+    state = State.CONNECTING;
+  });
+  httpconnection.on('connect', function(){
+    state = State.CONNECTED;
+  });
+  httpconnection.on('close', function(){
+    state = State.INITIALIZED;
+  });
+  httpconnection.on('authorize', function(){
+    state = State.AUTHORIZED;
+    isAuthorized = true;
+  });
+  state = State.INITIALIZED;
+
+  module.exports = httpconnection;
 
 });
