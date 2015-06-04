@@ -2,8 +2,6 @@
  * Created by Administrator on 2015/6/4.
  */
 
-/** @jsx React.DOM */
-
 require.config({
   shim: {
     jsbn2: {
@@ -64,12 +62,12 @@ require.config({
   ]
 });
 
-require(['react', 'jsx!../components/app'], function(React, App){
+require(['react', 'jsx!../components/app'], function(React, app){
 
-  var Ap = React.createFactory(App);
+  var App = React.createFactory(app);
 
   React.render(
-    Ap(),
+    App(),
     document.getElementById('content')
   );
 });
