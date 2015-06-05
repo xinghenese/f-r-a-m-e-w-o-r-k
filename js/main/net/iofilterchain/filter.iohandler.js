@@ -69,6 +69,7 @@ define(function(require, exports, module){
       }
       //if neither authorized nor authorizing, hold on the request until authorized
       if(!connection.isAuthorized() && !(PUBLICK_KEY_FIELD in msg.data)){
+        console.log('not Authorized');
         return handleHandShakeRequest(connection, msg);
       }
       //else start the request directly.
@@ -88,10 +89,19 @@ define(function(require, exports, module){
         connection.request(packet);
       });
     }
-    connection.disableConfig();
 
-    console.log('connection: ', connection);
+    connection.disableConfig();//.config({'urlPath': "auth/c"});
+//    return connection
+//      .disableConfig()
+//      .request(protocolpacket.create({
+//        'url': "auth/c",
+//        'tag': "HSK",
+//        'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
+//      }))
+//    ;
 
+//    console.log('connection: ', connection.getConfig());
+//
     return protocolpacket.create({
       'url': "auth/c",
       'tag': "HSK",
