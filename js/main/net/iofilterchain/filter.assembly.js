@@ -35,6 +35,8 @@ define(function(require, exports, module){
 
       if(protocolpacket.isPrototypeOf(msg)){
         if(connectionType == 'http'){
+          console.log('url: ', msg.url);
+          _.set(options, 'urlPath', msg.url);
           return msg.data;
         }else if(connectionType == 'socket'){
           return _.set({}, msg.tag, msg.data);

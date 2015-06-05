@@ -89,22 +89,24 @@ define(function(require, exports, module){
         connection.request(packet);
       });
     }
-    return connection
-      .disableConfig()
-      .request(protocolpacket.create({
-        'url': "auth/c",
-        'tag': "HSK",
-        'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
-      }))
-    ;
+
+    connection.disableConfig();//.config({'urlPath': "auth/c"});
+//    return connection
+//      .disableConfig()
+//      .request(protocolpacket.create({
+//        'url': "auth/c",
+//        'tag': "HSK",
+//        'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
+//      }))
+//    ;
 
 //    console.log('connection: ', connection.getConfig());
 //
-//    return this.processWritable(protocolpacket.create({
-//      'url': "auth/c",
-//      'tag': "HSK",
-//      'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
-//    }), connection.getConfig());
+    return protocolpacket.create({
+      'url': "auth/c",
+      'tag': "HSK",
+      'data': _.set({}, PUBLICK_KEY_FIELD, keyExchange.getPublicKey())
+    });
   }
 
   function handleHandShakeResponse(key, connection){

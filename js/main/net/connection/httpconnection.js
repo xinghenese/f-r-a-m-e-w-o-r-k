@@ -67,13 +67,13 @@ define(function(require, exports, module){
      * HTTP POST
      * @param url {String}
      * @param packet {Object|protocolpacket}
-     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'post': function(url, packet, options){
+    'post': function(url, packet){
       console.log('temp-opts: ', tempConfig);
 //      options = options ? _.assign({}, tempConfig, options) : tempConfig;
-      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
+      var options = _.set(tempConfig, 'urlPath', url);
+//      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
       console.log('post-opts: ', options);
 
       if(!protocolpacket.isPrototypeOf(packet)){
@@ -95,12 +95,12 @@ define(function(require, exports, module){
     /**
      * HTTP GET
      * @param url
-     * @param options {Object}
      * @returns {Q.Promise}
      */
-    'get': function(url, options){
+    'get': function(url){
 //      options = options ? _.assign({}, tempConfig, options) : tempConfig;
-      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
+      var options = _.set(tempConfig, 'urlPath', url);
+//      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
       return http.get(tempConfig.urlPath)
         .then(function(value){
           return session.read(value, options);
