@@ -24,6 +24,7 @@ define(function(require, exports, module){
     'needWrap': true,
     'needUnwrap': true,
     'urlRoot': "",
+    'urlPath': "",
     'encryptKey': "",
     'connectionType': "http"
   };
@@ -71,7 +72,8 @@ define(function(require, exports, module){
      */
     'post': function(url, packet, options){
       console.log('temp-opts: ', tempConfig);
-      options = options ? _.assign({}, tempConfig, options) : tempConfig;
+//      options = options ? _.assign({}, tempConfig, options) : tempConfig;
+      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
       console.log('post-opts: ', options);
 
       if(!protocolpacket.isPrototypeOf(packet)){
@@ -83,7 +85,7 @@ define(function(require, exports, module){
 
       return session.write(packet, options)
         .then(function(value){
-          return http.post(url, value);
+          return http.post(tempConfig.urlPath, value);
         })
         .then(function(value){
           return session.read(value, options);
@@ -97,8 +99,9 @@ define(function(require, exports, module){
      * @returns {Q.Promise}
      */
     'get': function(url, options){
-      options = options ? _.assign({}, tempConfig, options) : tempConfig;
-      return http.get(url)
+//      options = options ? _.assign({}, tempConfig, options) : tempConfig;
+      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
+      return http.get(tempConfig.urlPath)
         .then(function(value){
           return session.read(value, options);
         })
