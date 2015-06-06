@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 
-define(function(require, exports, module){
+define(function(require, exports, module) {
 
-  'use strict';
+    'use strict';
 
     var Login = require('jsx!./login');
     var React = require('react');
@@ -13,26 +13,24 @@ define(function(require, exports, module){
         _handleLoginSubmit: function(countryCode, phoneNumber) {
             console.log("submit");
             console.log(countryCode, "-", phoneNumber);
-            httpconnection
-                .request(protocolpacket.create({
-                    url: "usr/lg",
-                    data: {
-                        mid: phoneNumber,
-                        c: "1122",
-                        pf: "1",
-                        os: "PC",
-                        dv: "1",
-                        di: "1122334455",
-                        uuid: "7e9d-501c-dbd816078039"
-                    }
-                }))
-                .catch(function(reason){
-                    console.log("login error: ", reason);
-                })
-                .then(function(value){
-                    console.log("login sucess: ", value);
-                })
-
+            httpconnection.request(protocolpacket.create({
+                url: "usr/lg",
+                data: {
+                    mid: phoneNumber,
+                    c: "1122",
+                    pf: "1",
+                    os: "PC",
+                    dv: "1",
+                    di: "1122334455",
+                    uuid: "7e9d-501c-dbd816078039"
+                }
+            })).catch(function(reason) {
+                console.log("login error: ", reason);
+            }).then(function(value) {
+                console.log("login sucess: ", value);
+            }, function(value) {
+                console.log("login failed: ", value);
+            });
         },
         _onLoginSuccess: function() {
             console.log("login success");
@@ -47,7 +45,7 @@ define(function(require, exports, module){
             return (
                 <Login
                     onSubmit={this._handleLoginSubmit}
-                />
+                    />
             );
         }
     });
