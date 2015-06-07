@@ -8,8 +8,8 @@ define(function(require, exports, module){
     'INITIALIZED': 1,
     'CONNECTING': 2,
     'CONNECTED': 3,
-    'AUTHORIZING': 4,
-    'AUTHORIZED': 5,
+//    'AUTHORIZING': 4,
+//    'AUTHORIZED': 5,
     'CLOSING': 6,
     'CLOSED': 7
   }

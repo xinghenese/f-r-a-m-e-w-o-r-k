@@ -15,7 +15,7 @@ define(function(require, exports, module){
   module.exports = eventemitter.extend({
     /**
      *
-     * @param packet {protocolpacket}
+     * @param packet {Object|String}
      * @returns {Q.Promise}
      */
     'request': function(packet){
@@ -28,59 +28,8 @@ define(function(require, exports, module){
 
     'isAuthorized': function(){
       return false;
-    },
-
-    'getConfig': function(){
-      return {};
-    },
-
-    'getDefaultConfig': function(){
-      return {};
-    },
-
-    /**
-     *
-     * @param cfg {Object}
-     * @return {exports}
-     */
-    'config': function(cfg){
-      if(this.getConfig() && cfg){
-        _.assign(this.getConfig(), cfg, function(value1, value2, key, obj){
-          return _.isUndefined(obj[key]) ? value1 : value2;
-        });
-      }
-      return this;
-    },
-    /**
-     *
-     * @param omitconfig {Array}
-     * @returns {exports}
-     */
-    'resetConfig': function(omitconfig){
-      omitconfig = omitconfig || ["connectionType", "encryptKey"];
-      if(this.getConfig() && this.getDefaultConfig() && omitconfig){
-        _.assign(this.getConfig(), _.omit(this.getDefaultConfig(), omitconfig));
-      }
-      return this;
-    },
-    /**
-     *
-     * @returns {exports}
-     */
-    'disableConfig': function(){
-      if(this.getConfig()){
-        _.assign(this.getConfig(), {
-          'needEncrypt': false,
-          'needDecrypt': false,
-          'needCompress': false,
-          'needDecompress': false,
-          'needEncode': false,
-          'needDecode': false
-        });
-      }
-      return this;
     }
-  }, ['config', 'resetConfig', 'disableConfig']);
+  });
 
 
 });
