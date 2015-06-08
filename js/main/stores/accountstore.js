@@ -68,10 +68,10 @@ define(function(require, exports, module) {
                         mid: action.phone,
                         cc: code
                     }
-                }).catch(function(error) {
-                    AccountStore.emitCheckPhoneStatusError(error);
                 }).then(function(status) {
                     AccountStore.emitDidReceivePhoneStatus(status);
+                }).catch(function(error) {
+                    AccountStore.emitCheckPhoneStatusError(error);
                 });
                 break;
         }
