@@ -8,13 +8,6 @@ define(function(require, exports, module){
   var q = require('q');
   var _ = require('lodash');
 
-  //private const fields
-  var URL_ROOT_FIELD = "urlRoot";
-  var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
-
-  //private fields
-  var _root = DEFAULT_ROOT;
-
   //core module to export
   module.exports = origin.extend({
     /**
@@ -33,15 +26,6 @@ define(function(require, exports, module){
      */
     'post': function(url, data){
       return request("POST", url, data);
-    },
-    //exposed interface to config _root
-    'config': function(cfg){
-      if(cfg && (cfg = cfg[URL_ROOT_FIELD])){
-        _root = "" + cfg;
-      }else if(_root != DEFAULT_ROOT){
-        _root = DEFAULT_ROOT;
-      }
-      return this;
     }
   });
 
@@ -68,7 +52,7 @@ define(function(require, exports, module){
         }
       };
 
-      xhr.open(method,  _root + url);
+      xhr.open(method, url);
       xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 //      xhr.setRequestHeader("Content-type","text/plain");
       console.log(data);

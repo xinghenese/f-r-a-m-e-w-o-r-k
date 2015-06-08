@@ -6,14 +6,18 @@ define(function(require, exports, module){
   //dependencies
   var session = require('./iosession');
   var http = require('./http');
-  var origin = require('../base/origin');
   var q = require('q');
   var _ = require('lodash');
-  var protocolpacket = require('../protocolpacket/protocolpacket');
   var connection = require('./connection');
   var State = require('./connectionstate');
+  var keyExchange = require('../cipher/factory').createKeyExchange();
+  var userconfig = require('../userconfig/userconfig');
+
+  console.log('iosession: ', session);
 
   //private const fields
+  var PUBLIC_KEY_FIELD = "pk";
+  var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
   var DEFAULT_CONFIG = {
     'needEncrypt': true,
     'needDecrypt': true,
@@ -23,87 +27,59 @@ define(function(require, exports, module){
     'needDecode': false,
     'needWrap': true,
     'needUnwrap': true,
-    'urlRoot': "",
-    'urlPath': "",
     'encryptKey': "",
     'connectionType': "http"
   };
 
   //private fields.
-  var tempConfig = _.assign({}, DEFAULT_CONFIG);
+  var omitConfig = ["connectionType", "encryptKey"];
   var state = State.INITIALIZING;
   var isAuthorized = false;
+  var authorizePromise = null;
 
   //core module to export
   var httpconnection = module.exports = connection.extend({
     /**
      * unify the HTTP request interface by means of HTTP GET or HTTP POST
-     * @param packet {protocolpacket}
+     * @param packet{Object|String}
+     * @param options{Object}
      * @returns {Q.Promise}
      */
-    'request': function(packet){
-      var url;
-      var data;
-      var root;
-
-      if(protocolpacket.isPrototypeOf(packet)){
-        url = '' + packet.url;
-        data = packet.data;
-        root = '' + packet.root;
-        console.log('protocolpacket');
-
-        http.config({
-          'urlRoot': root
-        });
-
-        console.log('request-temp-opts: ', tempConfig);
-        if(data && !_.isEmpty(data)){
-          return this.post(url, packet, tempConfig);
-        }
-        return this.get(url, tempConfig);
-      }
-    },
-    /**
-     * HTTP POST
-     * @param url {String}
-     * @param packet {Object|protocolpacket}
-     * @returns {Q.Promise}
-     */
-    'post': function(url, packet){
-      console.log('temp-opts: ', tempConfig);
-//      options = options ? _.assign({}, tempConfig, options) : tempConfig;
-      var options = _.set(tempConfig, 'urlPath', url);
-//      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
-      console.log('post-opts: ', options);
-
-      if(!protocolpacket.isPrototypeOf(packet)){
-        packet = protocolpacket.create({
-          'url': url,
-          'data': packet
-        });
-      }
-
-      return session.write(packet, options)
+    'request': function(packet, options){
+      return authorize()
         .then(function(value){
-          return http.post(tempConfig.urlPath, value);
-        })
-        .then(function(value){
-          return session.read(value, options);
-        })
-      ;
-    },
-    /**
-     * HTTP GET
-     * @param url
-     * @returns {Q.Promise}
-     */
-    'get': function(url){
-//      options = options ? _.assign({}, tempConfig, options) : tempConfig;
-      var options = _.set(tempConfig, 'urlPath', url);
-//      options = _.assign({}, _.set(tempConfig, 'urlPath', url), options);
-      return http.get(tempConfig.urlPath)
-        .then(function(value){
-          return session.read(value, options);
+          var root;
+          var url;
+          var data;
+
+          if(!packet || _.isEmpty(packet)){
+            throw new Error("empty packet to be sent via http");
+          }
+
+          root = "" + (packet.root || DEFAULT_ROOT);
+          url = root + (packet.url || packet.path || packet);
+          data = packet.data;
+
+          //Unnecessary to define a privilege method for httpconnection to alter the
+          //configs and cache it, which would be used as a base configs for the next
+          //time to alter configs relative to, 'cause it would incur a problem that
+          //we can't clearly remember the temporal configs after last alter nor figure
+          //out how to alter the configs this time as logic becomes rather complex.
+          //In one word, the configuration method doesn't work well as espected. So
+          //ditch it and use the copy of the temporally altered configs relative to
+          //DEFAULT_CONFIG as an argument to pass into <i><httpconnectoin#request/i>.
+          //Just be simple.
+          options = _.assign({}, DEFAULT_CONFIG, _.omit(options, omitConfig));
+          console.log('options: ', options);
+
+          if(data && !_.isEmpty(data)){
+            //avoid duplicate authorization request.
+            if(PUBLIC_KEY_FIELD in data){
+              return value;
+            }
+            return post(url, data, options);
+          }
+          return get(url, options);
         })
       ;
     },
@@ -114,13 +90,6 @@ define(function(require, exports, module){
 
     'isAuthorized': function(){
       return isAuthorized;
-    },
-
-    'getConfig': function(){
-      return tempConfig;
-    },
-    'getDefaultConfig': function(){
-      return DEFAULT_CONFIG;
     }
 
   });
@@ -135,12 +104,43 @@ define(function(require, exports, module){
   httpconnection.on('close', function(){
     state = State.INITIALIZED;
   });
-  httpconnection.on('authorize', function(){
-    state = State.AUTHORIZED;
-    isAuthorized = true;
-  });
   state = State.INITIALIZED;
+  
+  //private functions
+  function post(url, data, options){
+    return session.write(data, options)
+      .then(function(value){
+        return http.post(url, value);
+      })
+      .then(function(value){
+        return session.read(value, options);
+      })
+    ;
+  }
 
-  module.exports = httpconnection;
+  function get(url, options){
+    return http.get(url)
+      .then(function(value){
+        return session.read(value, options);
+      })
+    ;
+  }
 
+  function authorize(){
+    if(!authorizePromise){
+      var packet = _.set({
+        'uuid': userconfig.getUuid()
+      }, PUBLIC_KEY_FIELD, keyExchange.getPublicKey());
+      var options = _.assign({}, DEFAULT_CONFIG, {'needDecompress': false});
+
+      authorizePromise = post(DEFAULT_ROOT + "auth/c", packet, options)
+        .then(function(value){
+          var encryptKey = keyExchange.getEncryptKey(_.get(value.data, PUBLIC_KEY_FIELD));
+          _.set(DEFAULT_CONFIG, 'encryptKey', encryptKey);
+          isAuthorized = true;
+          return value;
+        })
+    }
+    return authorizePromise;
+  }
 });

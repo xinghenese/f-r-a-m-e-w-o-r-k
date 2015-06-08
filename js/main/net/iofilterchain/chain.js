@@ -12,7 +12,7 @@ define(function(require, exports, module){
   var q = require('q');
 
   //private fields
-  var _tasks = _.map(['wrapper', 'crypto', 'zipper', 'json', 'assembly', 'iohandler'], function(item){
+  var _tasks = _.map(['wrapper', 'crypto', 'zipper', 'json', 'iohandler'], function(item){
     return factory.createFilter(item);
   });
 

@@ -4,16 +4,16 @@
 define(function(require, exports, module){
 
   //dependencies
-  var chain = require('../iofilterchain/chain');
-  var protocolpacket = require('../protocolpacket/protocolpacket');
   var origin = require('../base/origin');
+  var chain = require('../iofilterchain/chain');
+//  var protocolpacket = require('../protocolpacket/protocolpacket');
   var q = require('q');
 
   //core module to export
   module.exports =  origin.extend({
     /**
      * read data from the connection and then process it with filter chain.
-     * @param msg {protocolpacket}
+     * @param msg {Object}
      * @param options {Object}
      * @returns {Q.Promise}
      */
@@ -30,7 +30,7 @@ define(function(require, exports, module){
     },
     /**
      * write data processed with filter chain to the connection.
-     * @param msg {protocolpacket}
+     * @param msg {Object}
      * @param options {Object}
      * @returns {Q.Promise}
      */

@@ -7,13 +7,12 @@ define(function(require, exports, module) {
     var Login = require('jsx!./login');
     var React = require('react');
     var httpconnection = require('../net/connection/httpconnection');
-    var protocolpacket = require('../net/protocolpacket/protocolpacket');
 
     var App = React.createClass({
         _handleLoginSubmit: function(countryCode, phoneNumber) {
             console.log("submit");
             console.log(countryCode, "-", phoneNumber);
-            httpconnection.request(protocolpacket.create({
+            httpconnection.request({
                 url: "usr/lg",
                 data: {
                     mid: phoneNumber,
@@ -24,10 +23,11 @@ define(function(require, exports, module) {
                     di: "1122334455",
                     uuid: "7e9d-501c-dbd816078039"
                 }
-            })).catch(function(reason) {
+            }).catch(function(reason) {
                 console.log("login error: ", reason);
             }).then(function(value) {
                 console.log("login sucess: ", value);
+                socketconnection.request()
             }, function(value) {
                 console.log("login failed: ", value);
             });
