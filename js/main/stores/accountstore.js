@@ -70,7 +70,7 @@ define(function(require, exports, module) {
                     }
                 }).then(function(status) {
                     AccountStore.emitDidReceivePhoneStatus(status);
-                }).catch(function(error) {
+                }, function(error) {
                     AccountStore.emitCheckPhoneStatusError(error);
                 });
                 break;
