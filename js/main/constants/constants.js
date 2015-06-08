@@ -1,9 +1,12 @@
-'use strict';
+define(function(require, exports, module) {
+    'use strict';
 
-var keyMirror = require('keymirror');
+    var keyMirror = require('keymirror');
 
-module.exports = {
-    ActionTypes: keyMirror({
-        LOGIN: null
-    })
-};
+    module.exports = {
+        ActionTypes: keyMirror({
+            CHECK_PHONE_STATUS: null,
+            LOGIN: null
+        })
+    };
+});
