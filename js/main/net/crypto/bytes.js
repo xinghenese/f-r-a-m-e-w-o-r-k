@@ -44,9 +44,10 @@ module.exports = origin.extend({
   },
 
   init: function(array){
+    var result = this.bytes = [];
+
     if(WordArray.isPrototypeOf(array)){
       array = array.words;
-      var result = this.bytes = [];
 
       if(array.length > 0){
         _.forEach(array, function(value, index){
@@ -58,16 +59,12 @@ module.exports = origin.extend({
           result[i+3] = word & 0xFF;
         });
       }
-    }else if(_.isArray(array)){
-      this.bytes = array;
-
-      if(array.length > 0){
-        _.forEach(array, function(value, index){
-          array[index] = value & 0xFF;
-        });
-      }
-    }else{
-      this.bytes = [];
+    }else if(_.isArray(array) && array.length > 0){
+      _.forEach(array, function(value, index){
+        result[index] = value & 0xFF;
+      });
+      console.log('result: ', result);
+      console.log('result.length: ', result.length);
     }
   }
 });
