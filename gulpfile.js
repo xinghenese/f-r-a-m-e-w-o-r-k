@@ -10,7 +10,8 @@ var del = require('del');
 var runSequence = require('run-sequence');
 
 var browserifyConfig = {
-    entries: ['./lib/main.js']
+    entries: ['./app/main.js'],
+    basedir: './js/main/'
 };
 
 gulp.task('clean', function(cb) {
@@ -38,7 +39,8 @@ gulp.task('publish', function(cb) {
 
 gulp.task('watch', function() {
     var bundler = browserify({
-        entries: ['./js/main.js'],
+        entries: ['./app/demo.js'],
+        basedir: './js/main/',
         transform: [reactify],
         debug: true,
         cache: {},
@@ -46,7 +48,10 @@ gulp.task('watch', function() {
         fullPaths: true
     });
     var watcher = watchify(bundler);
-    return watcher.on('update', function() {
+    return watcher.on('error', function(err){
+        console.log('err while watching');
+        console.log(err);
+    }).on('update', function() {
         var updateStart = Date.now();
         console.log('Updating');
         watcher.bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));

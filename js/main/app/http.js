@@ -57,11 +57,11 @@ require.config({
 define('test', function(require, exports, module){
 
   var connection = require('../net/connection/httpconnection');
-  var factory = require('../net/cipher/factory');
-  var processible = require('../net/cipher/processible');
+  var factory = require('../net/crypto/factory');
+  var processible = require('../net/crypto/processible');
   var keyExchange = factory.createKeyExchange();
   var codec = factory.createCodec();
-  var crypto = factory.createCrypto();
+  var crypto = factory.createCipher();
   var protocolpacket = require('../net/protocolpacket/protocolpacket');
   var userconfig = require('../net/userconfig/userconfig');
 
@@ -71,35 +71,61 @@ define('test', function(require, exports, module){
   //
 
 
+  console.log('keyExchange.publicKey: ', keyExchange.getPublicKey());
 
-  connection
-    .disableConfig()
-//    .post("auth/c", packet)
-    .request(protocolpacket.create({
-      'url': "auth/c",
-      'data': {
-        'pk': keyExchange.getPublicKey(),
-        'uuid': userconfig.getUuid(),
-//        'web': '1'
-      }
-    }))
-    .catch(function(err){
-      console.error(err);
-    })
-    .then(function(value){
-      console.log(value);
-//      console.log(connection);
-//      console.log(connection.resetConfig()._cfg);
-      connection.resetConfig().post("usr/lg", {
-        mid: '18616371916',
-        c: 1122,
-        pf: 1,
-        os: 'PC',
-        dv: '1',
-        di: '1122334455',
-        uuid: '7e9d-501c-dbd816078039'
+//  connect0();
+  connect1();
+
+  function connect0() {
+    connection
+      .disableConfig()
+  //    .post("auth/c", packet)
+      .request(protocolpacket.create({
+        'url': "auth/c",
+        'data': {
+          'pk': keyExchange.getPublicKey(),
+          'uuid': userconfig.getUuid(),
+  //        'web': '1'
+        }
+      }))
+      .catch(function(err){
+        console.error(err);
       })
-    });
+      .then(function(value){
+        console.log(value);
+  //      console.log(connection);
+  //      console.log(connection.resetConfig()._cfg);
+        connection.resetConfig().post("usr/lg", {
+          mid: '18616371916',
+          c: 1122,
+          pf: 1,
+          os: 'PC',
+          dv: '1',
+          di: '1122334455',
+          uuid: '7e9d-501c-dbd816078039'
+        })
+      });
+  }
+
+
+  function connect1(){
+    connection
+      .request(protocolpacket.create({
+        'url': "usr/lg",
+        'data': {
+          mid: '18616371916',
+          c: 1122,
+          pf: 1,
+          os: 'PC',
+          dv: '1',
+          di: '1122334455',
+          uuid: '7e9d-501c-dbd816078039'
+        }
+      }))
+      .then(function(value){
+        console.log(value);
+      });
+  }
 
 });
 
