@@ -1,18 +1,15 @@
 /**
  * Created by Administrator on 2015/5/31.
  */
-define(function(require, exports, module){
 
-  //dependencies
-  var origin = require('../base/origin');
+//dependencies
+var origin = require('../base/origin.js');
 
-  //core module to export
-  module.exports = origin.extend({
-    'root': '',
-    'url': '',
-    'tag': '',
-    'data': {},
-    'result': ''
-  });
-
+//core module to export
+module.exports = origin.extend({
+  'root': '',
+  'url': '',
+  'tag': '',
+  'data': {},
+  'result': ''
 });

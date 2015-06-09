@@ -1,152 +1,164 @@
 /**
  * Created by Administrator on 2015/6/2.
  */
-define(function(require, exports, module){
 
-  //dependencies
-  var connection = require('./connection');
-  var protocolpacket = require('../protocolpacket/protocolpacket');
-  var _ = require('lodash');
-  var q = require('q');
-  var socket = require('./socket');
-  var session = require('./socketsession');
-  var State = require('./connectionstate');
+//dependencies
+var _ = require('lodash');
+var q = require('q');
+var State = require('./connectionstate');
+var connection = require('./connection');
+var iosession = require('./iosession');
+var socket = require('./socket');
+var keyExchange = require('../crypto/factory').createKeyExchange();
+var session = require('./socketiosession');
 
-  //private const fields
-  var DEFAULT_CONFIG = {
-    'needEncrypt': true,
-    'needDecrypt': true,
-    'needCompress': false,
-    'needDecompress': false,
-    'needEncode': false,
-    'needDecode': false,
-    'needWrap': false,
-    'needUnwrap': true,
-    'urlRoot': "",
-    'encryptKey': "",
-    'connectionType': "http"
-  };
+console.log('iosession: ', iosession);
 
-  //private fields.
-  var tempConfig = _.assign({}, DEFAULT_CONFIG);
-  var state = State.INITIALIZING;
+//private const fields
+var PUBLIC_KEY_FIELD = "pk";
+var HANDSHAKE_TAG = "HSK";
+var DEFAULT_CONFIG = {
+  'needEncrypt': true,
+  'needDecrypt': true,
+  'needCompress': false,
+  'needDecompress': false,
+  'needEncode': false,
+  'needDecode': false,
+  'needWrap': false,
+  'needUnwrap': true,
+  'urlRoot': "",
+  'encryptKey': "",
+  'connectionType': "http"
+};
 
-  //core module to export
-  var socketconnectoin = module.exports = connection.extend({
-    'request': function(packet){
-      var self = this;
-      var tag = '';
-      var data = {};
+//private fields.
+var authorizePromise = null;
+var state = State.INITIALIZING;
+var isAuthorized = false;
 
-      if(protocolpacket.isPrototypeOf(packet)){
-        tag = packet.tag;
-        data = packet.data;
+//core module to export
+var socketconnectoin = module.exports = connection.extend({
+  /**
+   *
+   * @param packet {Object}
+   * @returns {Q.Promise}
+   */
+  'request': function(packet){
+    return authorize().then(function(value){
+      //avoid duplicate authorization request.
+      if(!packet || (HANDSHAKE_TAG in packet) || (HANDSHAKE_TAG == packet.tag)){
+        return value;
       }
+      return post(packet);
+    })
+  },
 
-      if(tag && !_.isEmpty(data)){
-        return q.Promise(function(resolve, reject, progress){
-          self.once(tag, function(msg){
-            if(!msg){
-              reject('empty message received via socket');
-              return;
-            }
-            resolve(msg);
-          });
+  'getState': function(){
+    return state;
+  },
 
-          //process and write data to session and then send via socket.
-          session.write(_.set({}, tag, data))
-            .then(function(value){
-              return socket.send(value);
-            })
-          ;
-        });
-      }else if(tag && session.has(tag)){
-        return q(session.fetch(tag));
+  'isAuthorized': function(){
+    return isAuthorized;
+  }
+});
+
+//initialize
+socketconnectoin.on('ready', function(){
+  state = State.CONNECTING;
+});
+socketconnectoin.on('connect', function(){
+  state = State.CONNECTED;
+  socketconnectoin.on('message', onMessageReceived);
+});
+state = State.INITIALIZED;
+
+//private functoins
+function post(packet){
+  var tag = '';
+  var data = {};
+
+  if(!packet || _.isEmpty(packet)){
+    throw new Error("empty packet to be sent via socket");
+  }
+
+  tag = "" + (packet.tag || _.keys(packet)[0]);
+  data = packet.data || _.get(packet, tag);
+
+  if(!tag){
+    throw new Error("invalid packet tag");
+  }
+  if(!data || _.isEmpty(data)){
+    throw new Error("empty data in packet[" + tag + "]");
+  }
+
+  if(session.has(tag)){
+    return q(session.fetch(tag));
+  }
+  return q.Promise(function(resolve, reject, progress){
+    socketconnectoin.once(tag, function(msg){
+      if(!msg){
+        reject('empty message received via socket');
+        return;
       }
-    },
+      resolve(msg);
+    });
 
-    'getState': function(){
-      return state;
-    },
-
-    'isAuthorized': function(){
-      return state == State.AUTHORIZED;
-    },
-
-    'getConfig': function(){
-      return tempConfig;
-    },
-    'getDefaultConfig': function(){
-      return DEFAULT_CONFIG;
-    },
-
-    'init': function(){
-      var self = this;
-      socket.on('ready', function(){
-        state = State.CONNECTING;
-      });
-      self.on('connect', function(){
-        state = State.CONNECTED;
-        self.on('message', onMessageReceived);
-      });
-      state = State.INITIALIZED;
-    }
-  });
-
-  //initialize
-  socketconnectoin.on('ready', function(){
-    state = State.CONNECTING;
-  });
-  socketconnectoin.on('connect', function(){
-    state = State.CONNECTED;
-    socketconnectoin.on('message', onMessageReceived);
-  });
-  state = State.INITIALIZED;
-
-  //private functoins
-  function onMessageReceived(msg){
-    var self = this;
-    if(state == State.CONNECTED){
-      state = State.AUTHORIZING;
-    }
-    return session.read(msg)
+    //process and write data to session and then send via socket.
+    session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
       .then(function(value){
-        var tag;
-        var data;
+        return socket.send(value);
+      })
+    ;
+  });
+}
 
-        if(_.isEmpty(value)){
-          throw new Error('empty data after filterd');
-        }
-        if(protocolpacket.isPrototypeOf(value)){
-          tag = value.tag;
-          data = value.data;
+function onMessageReceived(msg){
+  return session.read(msg, _.assign({}, DEFAULT_CONFIG))
+    .then(function(value){
+      var tag = value.tag;
+      var data = value.data;
 
-          //check whether the message is pushed by server or pulled from server.
-          if(tag && !_.isEmpty(self.getListeners(tag))){
-            self.emit(tag, value);
-          }else{
-            //if the message pushed by server does not have to notify immediately,
-            //then cache it into the session for later use.
-            if(shouldNotify(tag)){
-              notifyImmediately(tag, data);
-            }else{
-              session.cache(tag, data);
-            }
-          }
+      //check whether the message is pushed by server or pulled from server.
+      if(tag && !_.isEmpty(socketconnectoin.getListeners(tag))){
+        socketconnectoin.emit(tag, data);
+      }else{
+        //if the message pushed by server does not have to notify immediately,
+        //then cache it into the session for later use.
+        if(shouldNotify(tag)){
+          notifyImmediately(tag, data);
+        }else{
+          session.cache(tag, data);
         }
+      }
+    })
+  ;
+}
+
+function authorize(){
+  if(!authorizePromise){
+    authorizePromise = post({
+        'tag': "HSK",
+        'data': {'pbk': keyExchange.getPublicKey()}
+      })
+      .then(function(value){
+        var key = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
+        _.set(DEFAULT_CONFIG, 'encryptKey', key);
+        isAuthorized = true;
+        return value;
       })
     ;
   }
 
-  function shouldNotify(tag){
-    return Math.random() < 0.5;
-  }
+  return authorizePromise;
+}
 
-  function notifyImmediately(tag, data){
-    console.log('notifyImmediately: ', JSON.stringify({
-      'tag': tag,
-      'data': data
-    }))
-  }
+function shouldNotify(tag){
+  return Math.random() < 0.5;
+}
 
-});
+function notifyImmediately(tag, data){
+  console.log('notifyImmediately: ', JSON.stringify({
+    'tag': tag,
+    'data': data
+  }))
+}

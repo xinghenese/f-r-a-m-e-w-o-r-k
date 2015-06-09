@@ -1,7 +1,5 @@
-define(function(require, exports, module) {
-    'use strict';
+'use strict';
 
-    module.exports = {
-        "unknown": "未知"
-    };
-});
+module.exports = {
+    "unknown": "未知"
+};
