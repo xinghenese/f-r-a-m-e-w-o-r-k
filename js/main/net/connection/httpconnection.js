@@ -134,7 +134,7 @@ function authorize(){
 
     authorizePromise = post(DEFAULT_ROOT + "auth/c", packet, options)
       .then(function(value){
-        var encryptKey = keyExchange.getEncryptKey(_.get(value.data, PUBLIC_KEY_FIELD));
+        var encryptKey = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
         _.set(DEFAULT_CONFIG, 'encryptKey', encryptKey);
         isAuthorized = true;
         return value;
