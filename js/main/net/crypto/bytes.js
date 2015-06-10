@@ -19,7 +19,7 @@ module.exports = origin.extend({
     }, '')
   },
 
-  toWords: function(){
+  toWordArray: function(){
     var result = [];
     var bts = this.bytes;
     var old_length = bts.length;
@@ -36,35 +36,31 @@ module.exports = origin.extend({
       }
     }
 
-    return result;
-  },
-
-  toWordArray: function(){
-    return WordArray.create(this.toWords());
+    return WordArray.create(result, old_length);    
   },
 
   init: function(array){
     var result = this.bytes = [];
 
     if(WordArray.isPrototypeOf(array)){
-      array = array.words;
+      var sigBytes = array.sigBytes;
+      var arr = array.words;
 
-      if(array.length > 0){
-        _.forEach(array, function(value, index){
+      if(arr.length > 0 && sigBytes > 0){
+        _.forEach(arr, function(value, index){
           var i = index * 4;
-          var word = array[index];
+          var word = arr[index];
           result[i] = (word >> 24) & 0xFF;
           result[i+1] = (word >> 16) & 0xFF;
           result[i+2] = (word >> 8) & 0xFF;
           result[i+3] = word & 0xFF;
         });
+        result.splice(sigBytes);
       }
     }else if(_.isArray(array) && array.length > 0){
       _.forEach(array, function(value, index){
         result[index] = value & 0xFF;
       });
-      console.log('result: ', result);
-      console.log('result.length: ', result.length);
     }
   }
 });

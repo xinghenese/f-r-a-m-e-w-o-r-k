@@ -51,8 +51,7 @@ module.exports = compressor.create({
         if(WordArray.isPrototypeOf(value)){
           return value;
         }
-//          return hex.parse(value);
-        return hex.parse(value.replace(/(0d)*/gm, ''));
+          return hex.parse(value);
       })
       //transfer the WordArray Object into a ByteArray one.
       .process(function(value){
