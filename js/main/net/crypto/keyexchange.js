@@ -69,11 +69,8 @@ module.exports = origin.extend({
 //          return bytes.create(value).toHex().replace(/(0d)|(0a)/gm, '');
         return bytes.create(value).toWordArray();
       })
+      .report('wordArray')
       .process(codec.encode)
-//        .process(codec.encodeHex)
-      .process(function(value){
-        return value.replace(/(0d)|(0a)/gm, '');
-      })
       .report('encode')
       .process(hash.hash, hash)
       .report('encrypt--key')
