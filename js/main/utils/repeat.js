@@ -24,11 +24,8 @@ module.exports = origin.extend({
     if(this._isDone){
       return this;
     }
-    callback1 = _.isFunction(callback1) ? callback1 : void 0;
-    callback2 = _.isFunction(callback2) ? callback2 : void 0;
-    this._tasks.push([callback1, callback2]);
-    notifyPromises(this);
-    return this;
+    registerCallbacks(this, callback1, callback2);
+    return notifyAllPromises(this);
   },
   /**
    * register failCallback for all promises and then notify all promises
@@ -50,12 +47,8 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'resolve': function(value){
-    this._promises.push({
-      'promise': q(value),
-      'stay': 0
-    });
-    notifyPromises(this);
-    return this;
+    this._promises.push(q(value));
+    return startPromise(this, -1);
   },
   /**
    * add rejected promise with value into promise list.
@@ -64,12 +57,8 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'reject': function(reason){
-    this._promises.push({
-      'promise': q.reject(reason),
-      'stay': 0
-    });
-    notifyPromises(this);
-    return this;
+    this._promises.push(q.reject(reason));
+    return startPromise(this, -1);
   },
   /**
    * symbolize that the repeat chain would be done and forbidden upcoming
@@ -79,8 +68,11 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'done': function(){
+    if(this._isDone){
+      return this;
+    }
     this._isDone = true;
-    return this;
+    return notifyPromisesDestroy(this);
   },
   /**
    * make initializer of repeat compatible with that of promise.
@@ -110,46 +102,57 @@ module.exports = origin.extend({
 });
 
 //private functions
-function notifyPromises(repeat){
-  var promises = repeat._promises;
-  var tasks = _(repeat._tasks);
-  var taskCount = tasks.value().length;
-  console.log('taskCount: ', taskCount);
+function registerCallbacks(repeat, callback1, callback2){
+  callback1 = _.isFunction(callback1) ? callback1 : void 0;
+  callback2 = _.isFunction(callback2) ? callback2 : void 0;
+  repeat._tasks.push([callback1, callback2]);
 
-  if(_.isEmpty(promises) || _.isEmpty(tasks)){
-    return;
-  }
-
-  _.forEach(promises, function(promise, index){
-    promise.promise = tasks.slice(promise.stay).reduce(function(currentPromise, taskPair){
-      var successCallback = taskPair[0] ? function(value){
-        //mark the step of current promise on the repeat chain.
-        promise.stay ++;
-        //bind thisArg.
-        return taskPair[0].call(currentPromise, value);
-      } : void 0;
-      var failCallback = taskPair[1] ? function(reason){
-        //mark the step of current promise on the repeat chain.
-        promise.stay ++;
-        //bind thisArg.
-        return taskPair[1].call(currentPromise, reason);
-      } : void 0;
-
-      return currentPromise.then(successCallback, failCallback);
-    }, promise.promise);
-
-    destroyIfDone(repeat, index);
-  });
+  return repeat;
 }
 
-function destroyIfDone(repeat, index){
-  if(repeat._isDone){
-    var promises = repeat._promises;
-    var promise = promises[index];
-    var destroyCallback = destroy(promises, index);
+function notifyAllPromises(repeat){
+  var promises = repeat._promises;
+  var task = _.last(repeat._tasks);
 
-    promise.promise.then(destroyCallback, destroyCallback);
+  _.forEach(promises, function(promise, index){
+    promises[index] = promise.then(task[0], task[1]);
+  });
+
+  return repeat;
+}
+
+function notifyPromisesDestroy(repeat){
+  var promises = repeat._promises;
+  var destroyCallback;
+
+  _.forEach(promises, function(promise, index){
+    destroyCallback = destroy(promises, index);
+    promise.then(destroyCallback, destroyCallback);
+  });
+
+  return repeat;
+}
+
+function startPromise(repeat, index, start){
+  var promises = repeat._promises;
+  var promiseLength = promises.length;
+  var pos = (promiseLength + index) % promiseLength;
+  var currentPromise = promises[pos];
+  var tasks = _(repeat._tasks);
+  var destroyCallback;
+
+  currentPromise = tasks.slice(start).reduce(function(promise, taskPair){
+    return promise.then(taskPair[0], taskPair[1]);
+  }, currentPromise);
+
+  if(repeat._isDone){
+    destroyCallback = destroy(promises, pos);
+    currentPromise = currentPromise.then(destroyCallback, destroyCallback);
   }
+
+  promises[pos] = currentPromise;
+
+  return repeat;
 }
 
 function destroy(promises, index){
