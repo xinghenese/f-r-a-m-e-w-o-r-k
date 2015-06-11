@@ -4,7 +4,7 @@
 
 //dependencies
 var EventEmitter = require('browserify/node_modules/events').EventEmitter;
-var origin = require('../net/base/origin');
+var originify = require('../net/base/originify');
 
 //core module to export
-module.exports = origin.extend({}, [], EventEmitter);
+module.exports = originify(EventEmitter);
