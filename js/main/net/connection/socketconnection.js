@@ -45,16 +45,18 @@ var socketconnection = module.exports = connection.extend({
    * @returns {Q.Promise}
    */
   'request': function(packet){
-    return authorize().then(function(value){
-      //avoid duplicate authorization request.
-      if(!packet || (HANDSHAKE_TAG in packet) || (HANDSHAKE_TAG == packet.tag)){
-        return value;
-      }
-      if(_.isPlainObject(packet)){
+    packet = packetFormalize(packet);
+
+    if(packet.data){
+      return authorize().then(function(value){
+        //avoid duplicate authorization request.
+        if(HANDSHAKE_TAG == packet.tag){
+          return value;
+        }
         return post(packet);
-      }
-      return get("" + packet);
-    })
+      })
+    }
+    return get(packet.tag);
   },
 
   'getState': function(){
@@ -77,10 +79,8 @@ socketconnection.on('connect', function(){
 state = State.INITIALIZED;
 
 //private functions
+//just listen to data reception with tag.
 function get(tag){
-  if(!tag){
-    throw new Error('invalid tag');
-  }
   return repeat.create(function(resolve, reject){
     socketconnection.on(tag, function(msg){
       if(!msg){
@@ -93,22 +93,8 @@ function get(tag){
 }
 
 function post(packet){
-  var tag = '';
-  var data = {};
-
-  if(!packet || _.isEmpty(packet)){
-    throw new Error("empty packet to be sent via socket");
-  }
-
-  tag = "" + (packet.tag || _.keys(packet)[0]);
-  data = packet.data || _.get(packet, tag);
-
-  if(!tag){
-    throw new Error("invalid packet tag");
-  }
-  if(!data || _.isEmpty(data)){
-    throw new Error("empty data in packet[" + tag + "]");
-  }
+  var tag = packet.tag;
+  var data = packet.data;
 
   if(session.has(tag)){
     return q(session.fetch(tag));
@@ -129,6 +115,33 @@ function post(packet){
       })
     ;
   });
+}
+
+function packetFormalize(packet){
+  var tag;
+  var data;
+
+  if(!packet || _.isEmpty(packet)){
+    throw new Error("empty packet to be sent via socket");
+  }
+  if(_.isPlainObject(packet)){
+    tag = "" + (packet.tag || _.keys(packet)[0]);
+    data = packet.data || _.get(packet, tag);
+
+    if(!tag){
+      throw new Error('invalid tag');
+    }
+    if(data && !_.isEmpty(data)){
+      return {
+        'tag': tag,
+        'data': data
+      }
+    }
+  }
+  return {
+    'tag': "" + packet,
+    'data': null
+  }
 }
 
 function onMessageReceived(msg){
