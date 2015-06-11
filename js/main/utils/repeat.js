@@ -24,10 +24,8 @@ module.exports = origin.extend({
     if(this._isDone){
       return this;
     }
-    callback1 = _.isFunction(callback1) ? callback1 : void 0;
-    callback2 = _.isFunction(callback2) ? callback2 : void 0;
-    this._tasks.push([callback1, callback2]);
-    notifyPromises(this);
+    registerCallbacks(this, callback1, callback2);
+    notifyAllPromises(this);
     return this;
   },
   /**
@@ -50,11 +48,10 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'resolve': function(value){
-    this._promises.push({
-      'promise': q(value),
-      'stay': 0
-    });
-    notifyPromises(this);
+//    var length = this._promises.push(q(value));
+//    startPromise(this, length - 1);
+    this._promises.push(q(value));
+    startPromise(this, -1);
     return this;
   },
   /**
@@ -64,11 +61,10 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'reject': function(reason){
-    this._promises.push({
-      'promise': q.reject(reason),
-      'stay': 0
-    });
-    notifyPromises(this);
+//    var length = this._promises.push(q.reject(reason));
+//    startPromise(this, length - 1);
+    this._promises.push(q.reject(reason));
+    startPromise(this, -1);
     return this;
   },
   /**
@@ -79,6 +75,10 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'done': function(){
+    if(this._isDone){
+      return this;
+    }
+    registerCallbacks(this, )
     this._isDone = true;
     return this;
   },
@@ -110,6 +110,37 @@ module.exports = origin.extend({
 });
 
 //private functions
+function registerCallbacks(repeat, callback1, callback2){
+  callback1 = _.isFunction(callback1) ? callback1 : void 0;
+  callback2 = _.isFunction(callback2) ? callback2 : void 0;
+  repeat._tasks.push([callback1, callback2]);
+  return repeat;
+}
+
+function notifyAllPromises(repeat){
+  var promises = repeat._promises;
+  var task = _.last(repeat._tasks);
+
+  _.forEach(promises, function(promise, index){
+    promises[index] = promise.promise.then(task[0], task[1]);
+  });
+
+  return repeat;
+}
+
+function startPromise(repeat, index, start){
+  var promises = repeat._promises;
+  var tasks = _(repeat._tasks);
+  var promiseLength = promises.length;
+  index = (promiseLength + index) % promiseLength;
+
+  promises[index] = tasks.slice(start).reduce(function(promise, taskPair){
+    return promise.then(taskPair[0], taskPair[1]);
+  }, promises[index]);
+
+  return repeat;
+}
+
 function notifyPromises(repeat){
   var promises = repeat._promises;
   var tasks = _(repeat._tasks);
