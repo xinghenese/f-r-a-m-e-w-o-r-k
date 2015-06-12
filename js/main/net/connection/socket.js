@@ -10,6 +10,7 @@ var _ = require('lodash');
 var socket = null;
 var socketPromise = null;
 var serverInfos = _.shuffle(['192.168.1.66', '192.168.1.67', '192.168.1.68']);
+var serverPort = 443;
 var serverInfoIndex = 0;
 
 module.exports = {
@@ -23,7 +24,8 @@ module.exports = {
 //private fields
 function send(data){
   console.log(serverInfos);
-  return connect(serverInfos[serverInfoIndex ++]).then(function(){
+  return connect(serverInfos[serverInfoIndex ++], serverPort).then(function(){
+    console.log('socket.send');
     socket.send(data);
   });
 }
@@ -44,6 +46,7 @@ function connect(host, port, path, protocol){
       }
       //url assembly
       port = port || '80';
+      path = path || '';
       protocol = protocol || 'ws';
       url = protocol + '://' + host + ':' + port + '/' + path;
       socket = new WebSocket(url);
