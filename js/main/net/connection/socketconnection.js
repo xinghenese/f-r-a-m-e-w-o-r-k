@@ -81,15 +81,7 @@ state = State.INITIALIZED;
 //private functions
 //just listen to data reception with tag.
 function get(tag){
-  return repeat.create(function(resolve, reject){
-    socketconnection.on(tag, function(msg){
-      if(!msg){
-        reject('empty message received via socket');
-        return;
-      }
-      resolve(msg);
-    })
-  });
+  return socketconnection.on(tag);
 }
 
 function post(packet){
@@ -99,22 +91,14 @@ function post(packet){
   if(session.has(tag)){
     return promise.create(session.fetch(tag));
   }
-  return promise.create(function(resolve, reject, progress){
-    socketconnection.once(tag, function(msg){
-      if(!msg){
-        reject('empty message received via socket');
-        return;
-      }
-      resolve(msg);
+
+  //process and write data to session and then send via socket.
+  session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
+    .then(function(value){
+      return socket.send(value);
     });
 
-    //process and write data to session and then send via socket.
-    session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
-      .then(function(value){
-        return socket.send(value);
-      })
-    ;
-  });
+  return socketconnection.once(tag);
 }
 
 function packetFormalize(packet){

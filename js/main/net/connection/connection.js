@@ -3,10 +3,10 @@
  */
 
 //dependencies
-var eventemitter = require('../../utils/eventEmitter');
 var _ = require('lodash');
-var promise = require('../../utils/promise');
 var State = require('./connectionstate');
+var promise = require('../../utils/promise');
+var eventemitter = require('../../utils/eventEmitter');
 
 console.log('eventEmitter: ', eventemitter);
 
