@@ -4,7 +4,7 @@
 
 //dependencies
 var _ = require('lodash');
-var q = require('q');
+var promise = require('../../utils/promise');
 var origin = require('../base/origin');
 var filter = require('./filter');
 var factory = require('./factory');
@@ -27,7 +27,7 @@ module.exports = origin.extend({
       return promise.then(function(value){
         return task.write(value, options);
       })
-    }, q(msg));
+    }, promise.create(msg));
   },
   /**
    *
@@ -40,7 +40,7 @@ module.exports = origin.extend({
       return promise.then(function(value){
         return task.read(value, options);
       })
-    }, q(msg));
+    }, promise.create(msg));
   },
   /**
    * filter tasks

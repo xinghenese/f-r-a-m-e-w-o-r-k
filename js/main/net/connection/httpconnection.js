@@ -3,7 +3,6 @@
  */
 
 //dependencies
-var q = require('q');
 var _ = require('lodash');
 var State = require('./connectionstate');
 var session = require('./iosession');

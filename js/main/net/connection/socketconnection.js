@@ -4,13 +4,14 @@
 
 //dependencies
 var _ = require('lodash');
-var q = require('q');
+var promise = require('../../utils/promise');
 var State = require('./connectionstate');
 var connection = require('./connection');
 var iosession = require('./iosession');
 var socket = require('./socket');
 var keyExchange = require('../crypto/factory').createKeyExchange();
 var session = require('./socketiosession');
+var repeat = require('../../utils/repeat');
 
 console.log('iosession: ', iosession);
 
@@ -37,20 +38,25 @@ var state = State.INITIALIZING;
 var isAuthorized = false;
 
 //core module to export
-var socketconnectoin = module.exports = connection.extend({
+var socketconnection = module.exports = connection.extend({
   /**
    *
-   * @param packet {Object}
+   * @param packet {Object|String}
    * @returns {Q.Promise}
    */
   'request': function(packet){
     return authorize().then(function(value){
+      packet = packetFormalize(packet);
+
       //avoid duplicate authorization request.
-      if(!packet || (HANDSHAKE_TAG in packet) || (HANDSHAKE_TAG == packet.tag)){
+      if(HANDSHAKE_TAG == packet.tag){
         return value;
       }
-      return post(packet);
-    })
+      if(packet.data){
+        return post(packet);
+      }
+      return get(packet.tag);
+    });
   },
 
   'getState': function(){
@@ -63,39 +69,38 @@ var socketconnectoin = module.exports = connection.extend({
 });
 
 //initialize
-socketconnectoin.on('ready', function(){
+socketconnection.on('ready', function(){
   state = State.CONNECTING;
 });
-socketconnectoin.on('connect', function(){
+socketconnection.on('connect', function(){
   state = State.CONNECTED;
-  socketconnectoin.on('message', onMessageReceived);
+  socketconnection.on('message', onMessageReceived);
 });
 state = State.INITIALIZED;
 
-//private functoins
+//private functions
+//just listen to data reception with tag.
+function get(tag){
+  return repeat.create(function(resolve, reject){
+    socketconnection.on(tag, function(msg){
+      if(!msg){
+        reject('empty message received via socket');
+        return;
+      }
+      resolve(msg);
+    })
+  });
+}
+
 function post(packet){
-  var tag = '';
-  var data = {};
-
-  if(!packet || _.isEmpty(packet)){
-    throw new Error("empty packet to be sent via socket");
-  }
-
-  tag = "" + (packet.tag || _.keys(packet)[0]);
-  data = packet.data || _.get(packet, tag);
-
-  if(!tag){
-    throw new Error("invalid packet tag");
-  }
-  if(!data || _.isEmpty(data)){
-    throw new Error("empty data in packet[" + tag + "]");
-  }
+  var tag = packet.tag;
+  var data = packet.data;
 
   if(session.has(tag)){
-    return q(session.fetch(tag));
+    return promise.create(session.fetch(tag));
   }
-  return q.Promise(function(resolve, reject, progress){
-    socketconnectoin.once(tag, function(msg){
+  return promise.create(function(resolve, reject, progress){
+    socketconnection.once(tag, function(msg){
       if(!msg){
         reject('empty message received via socket');
         return;
@@ -112,6 +117,33 @@ function post(packet){
   });
 }
 
+function packetFormalize(packet){
+  var tag;
+  var data;
+
+  if(!packet || _.isEmpty(packet)){
+    throw new Error("empty packet to be sent via socket");
+  }
+  if(_.isPlainObject(packet)){
+    tag = "" + (packet.tag || _.keys(packet)[0]);
+    data = packet.data || _.get(packet, tag);
+
+    if(!tag){
+      throw new Error('invalid tag');
+    }
+    if(data && !_.isEmpty(data)){
+      return {
+        'tag': tag,
+        'data': data
+      }
+    }
+  }
+  return {
+    'tag': "" + packet,
+    'data': null
+  }
+}
+
 function onMessageReceived(msg){
   return session.read(msg, _.assign({}, DEFAULT_CONFIG))
     .then(function(value){
@@ -119,8 +151,8 @@ function onMessageReceived(msg){
       var data = value.data;
 
       //check whether the message is pushed by server or pulled from server.
-      if(tag && !_.isEmpty(socketconnectoin.getListeners(tag))){
-        socketconnectoin.emit(tag, data);
+      if(tag && !_.isEmpty(socketconnection.getListeners(tag))){
+        socketconnection.emit(tag, data);
       }else{
         //if the message pushed by server does not have to notify immediately,
         //then cache it into the session for later use.

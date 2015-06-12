@@ -7,7 +7,7 @@
 
 //dependencies
 var origin = require('../net/base/origin');
-var q = require('q');
+var promise = require('./promise');
 var _ = require('lodash');
 
 //core module to export
@@ -47,7 +47,7 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'resolve': function(value){
-    this._promises.push(q(value));
+    this._promises.push(promise.create(value));
     return startPromise(this, -1);
   },
   /**
@@ -57,7 +57,7 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'reject': function(reason){
-    this._promises.push(q.reject(reason));
+    this._promises.push(promise.create(new Error(reason)));
     return startPromise(this, -1);
   },
   /**
@@ -91,11 +91,15 @@ module.exports = origin.extend({
     self._tasks = [];
 
     if(_.isFunction(executor)){
-      executor.call(self, function(value){
-        return self.resolve(value);
-      }, function(reason){
-        return self.reject(reason);
-      });
+      try{
+        executor.call(self, function(value){
+          return self.resolve(value);
+        }, function(reason){
+          return self.reject(reason);
+        });
+      }catch(exception){
+        self.reject(exception);
+      }
     }
   },
   '_isDone': false
