@@ -90,8 +90,9 @@ var style = {
     }
 };
 
-var React = require('react');
+var React = require('react/addons');
 var Lang = require('../locales/zh-cn');
+var Styles = require('../constants/styles');
 
 var Countries = [
     {"name": "阿尔巴尼亚", "code": "+355"},
@@ -318,7 +319,12 @@ var Countries = [
 
 var Login = React.createClass({
     getInitialState: function() {
-        return {countryName: "中国", countryCode: "+86", phoneNumber: ""};
+        return {
+            countryName: "中国",
+            countryCode: "+86",
+            phoneNumber: "",
+            promptInvalidPhone: false
+        };
     },
     _handleCountryNameChange: function(event) {
         var name = event.target.value;
@@ -334,7 +340,12 @@ var Login = React.createClass({
         this.setState({phoneNumber: event.target.value});
     },
     _handleSubmit: function() {
-        this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
+        if (!this._validatePhoneNumber()) {
+            this.setState({promptInvalidPhone: true});
+            React.findDOMNode(this.refs.phone).focus();
+        } else {
+            this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
+        }
     },
     _getCountryName: function(code) {
         for (var i = 0; i < Countries.length; i++) {
@@ -354,7 +365,19 @@ var Login = React.createClass({
         }
         return "";
     },
+    _validatePhoneNumber: function() {
+        return /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
+    },
     render: function() {
+        console.log(Styles.ERROR_TEXT_COLOR);
+        var phonePrompt = Lang.phone;
+        var phoneLableStyle = style.label;
+        if (this.state.promptInvalidPhone) {
+            phonePrompt = Lang.invalidPhone;
+            phoneLableStyle = React.addons.update(style.label, {
+                color: {$set: Styles.ERROR_TEXT_COLOR}
+            });
+        }
         return (
             <div style={style.div}>
                 <div className="login-head" style={style._loginHead}>
@@ -368,7 +391,7 @@ var Login = React.createClass({
                     </p>
 
                     <div className="login-country" style={style._loginInput}>
-                        <label style={style.label}>Country: </label>
+                        <label style={style.label}>{Lang.country}</label>
                         <input style={style.input} autoComplete="off" type="tel"
                                onChange={this._handleCountryNameChange}
                                value={this.state.countryName}
@@ -376,15 +399,16 @@ var Login = React.createClass({
                     </div>
                     <div>
                         <div style={style.Code}>
-                            <label style={style.label}>Code: </label>
+                            <label style={phoneLableStyle}>{Lang.code}</label>
                             <input style={style.input} autoComplete="off" type="tel"
                                    onChange={this._handleCountryCodeChange}
                                    value={this.state.countryCode}
                                 />
                         </div>
                         <div style={style.Number}>
-                            <label style={style.label}>Phone Number: </label>
-                            <input style={style.input} required="" autoComplete="off" type="tel"
+                            <label style={phoneLableStyle}>{phonePrompt}</label>
+                            <input style={style.input} required=""
+                                   ref="phone" autoComplete="off" type="tel"
                                    onChange={this._handlePhoneNumberChange}/>
                         </div>
                     </div>

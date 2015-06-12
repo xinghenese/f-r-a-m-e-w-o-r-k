@@ -4,13 +4,13 @@
 
 //dependencies
 var _ = require('lodash');
-var q = require('q');
+var promise = require('../../utils/promise');
 var State = require('./connectionstate');
 var connection = require('./connection');
 var iosession = require('./iosession');
 var socket = require('./socket');
 var keyExchange = require('../crypto/factory').createKeyExchange();
-var session = require('./socketiosession');
+var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 
 console.log('iosession: ', iosession);
@@ -45,18 +45,18 @@ var socketconnection = module.exports = connection.extend({
    * @returns {Q.Promise}
    */
   'request': function(packet){
-    packet = packetFormalize(packet);
+    return authorize().then(function(value){
+      packet = packetFormalize(packet);
 
-    if(packet.data){
-      return authorize().then(function(value){
-        //avoid duplicate authorization request.
-        if(HANDSHAKE_TAG == packet.tag){
-          return value;
-        }
+      //avoid duplicate authorization request.
+      if(HANDSHAKE_TAG == packet.tag){
+        return value;
+      }
+      if(packet.data){
         return post(packet);
-      })
-    }
-    return get(packet.tag);
+      }
+      return get(packet.tag);
+    });
   },
 
   'getState': function(){
@@ -81,15 +81,7 @@ state = State.INITIALIZED;
 //private functions
 //just listen to data reception with tag.
 function get(tag){
-  return repeat.create(function(resolve, reject){
-    socketconnection.on(tag, function(msg){
-      if(!msg){
-        reject('empty message received via socket');
-        return;
-      }
-      resolve(msg);
-    })
-  });
+  return socketconnection.on(tag);
 }
 
 function post(packet){
@@ -97,24 +89,16 @@ function post(packet){
   var data = packet.data;
 
   if(session.has(tag)){
-    return q(session.fetch(tag));
+    return promise.create(session.fetch(tag));
   }
-  return q.Promise(function(resolve, reject, progress){
-    socketconnection.once(tag, function(msg){
-      if(!msg){
-        reject('empty message received via socket');
-        return;
-      }
-      resolve(msg);
+
+  //process and write data to session and then send via socket.
+  session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
+    .then(function(value){
+      return socket.send(value);
     });
 
-    //process and write data to session and then send via socket.
-    session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
-      .then(function(value){
-        return socket.send(value);
-      })
-    ;
-  });
+  return socketconnection.once(tag);
 }
 
 function packetFormalize(packet){

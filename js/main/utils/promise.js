@@ -30,17 +30,20 @@ promise.init = function(resolver){
 var then = q.makePromise.prototype.then;
 promise.then = function(fulfilled, rejected, progressed){
   var repeat = require('./repeat');
-  var value = this.inspect().value;
 
-  try{
-    value = _.isFunction(fulfilled) ? fulfilled(value) : value;
-    if(repeat.isPrototypeOf(value)){
-      return value;
-    }
-  }catch(exception){
-    return q.reject(exception);
+  if(repeat && repeat.isPrototypeOf(fulfilled)){
+    return fulfilled;
   }
+  return promise.create(then.call(this, fulfilled, rejected, progressed));
+};
+promise.repeat = function(resolver){
+  var repeat = require('./repeat');
 
-  return then.call(this, fulfilled, rejected, progressed);
+  if(repeat){
+    return repeat.create(resolver);
+  }
+  return this.then(function(){
+    return promise.create(resolver);
+  })
 };
 promise.Promise = q;

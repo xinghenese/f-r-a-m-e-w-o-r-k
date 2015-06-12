@@ -14,14 +14,6 @@ var App = React.createClass({
     _handleCheckPhoneStatusError: function(error) {
         console.log("checkPhoneStatus: " + error);
     },
-    componentWillMount: function() {
-        AccountStore.addDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
-        AccountStore.addCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
-    },
-    componentWillUnmount: function() {
-        AccountStore.removeDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
-        AccountStore.removeCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
-    },
     _handlePhoneSubmit: function(countryCode, phoneNumber) {
         console.log("submit");
         console.log(countryCode, "-", phoneNumber);
@@ -35,6 +27,14 @@ var App = React.createClass({
     },
     _onProfileLoaded: function() {
         console.log("profile loaded, after login success!");
+    },
+    componentWillMount: function() {
+        AccountStore.addDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
+        AccountStore.addCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
+    },
+    componentWillUnmount: function() {
+        AccountStore.removeDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
+        AccountStore.removeCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
     },
     render: function() {
         return (

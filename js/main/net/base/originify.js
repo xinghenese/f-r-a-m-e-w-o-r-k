@@ -7,7 +7,7 @@ var origin = require('./origin');
 var _ = require('lodash');
 
 //core module to export
- module.exports = function(base){
+module.exports = function(base){
   var proto;
 
   if(_.isFunction(base)){
