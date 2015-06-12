@@ -1,6 +1,6 @@
 'use strict';
 
-var App = require('./components/app');
+var App = require('./main/components/app');
 var React = require('react');
 
 React.render(

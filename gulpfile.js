@@ -10,8 +10,13 @@ var del = require('del');
 var runSequence = require('run-sequence');
 
 var browserifyConfig = {
-    entries: ['./app/main.js'],
-    basedir: './js/main/'
+    entries: ['./main.js'],
+    basedir: './js/',
+    transform: [reactify],
+    debug: false,
+    cache: {},
+    packageCache: {},
+    fullPaths: true
 };
 
 gulp.task('clean', function(cb) {
@@ -24,14 +29,14 @@ gulp.task('lib', function() {
                .pipe(gulp.dest('lib'));
 });
 
-gulp.task('browserify', ['lib'], function() {
+gulp.task('browserify', function() {
     return browserify(browserifyConfig)
             .bundle()
             .pipe(source('main.js'))
-            .pipe(gulp.dest('dist'));
+            .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build', ['clean', 'lib', 'browserify']);
+gulp.task('build', ['clean', 'browserify']);
 
 gulp.task('publish', function(cb) {
     runSequence('clean', 'build', cb);
