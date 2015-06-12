@@ -6,9 +6,10 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var origin = require('../net/base/origin');
 var promise = require('./promise');
-var _ = require('lodash');
+var Promise = promise.Promise;
 
 //core module to export
 module.exports = origin.extend({
@@ -90,17 +91,23 @@ module.exports = origin.extend({
     //list to hold tasks registered by repeat.then() or repeat.catch().
     self._tasks = [];
 
-    if(_.isFunction(executor)){
+    Promise.nextTick(function(){
       try{
-        executor.call(self, function(value){
-          return self.resolve(value);
-        }, function(reason){
-          return self.reject(reason);
-        });
+        if(_.isFunction(executor)){
+          executor.call(self, function(value){
+            return self.resolve(value);
+          }, function (reason){
+            return self.reject(reason);
+          });
+        }else if(_.isError(executor)){
+          self.reject(executor);
+        }else {
+          self.resolve(executor);
+        }
       }catch(exception){
         self.reject(exception);
       }
-    }
+    });
   },
   '_isDone': false
 });
