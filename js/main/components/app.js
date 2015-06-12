@@ -4,6 +4,10 @@
 
 var Login = require('./login');
 var React = require('react');
+var Router = require('react-router');
+var Route = Router.Route;
+var DefaultRoute = Router.DefaultRoute;
+var RouteHandler = Router.RouteHandler;
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 
@@ -20,6 +24,7 @@ var App = React.createClass({
         AccountActions.checkPhoneStatus(countryCode, phoneNumber);
     },
     _onLoginSuccess: function() {
+        console.log(this);
         console.log("login success");
     },
     _onLoginFailed: function() {
@@ -38,11 +43,24 @@ var App = React.createClass({
     },
     render: function() {
         return (
-            <Login
+            <RouteHandler
                 onSubmit={this._handlePhoneSubmit}
                 />
         );
     }
 });
 
-module.exports = App;
+var routes = (
+    <Route name="app" path="/" handler={App}>
+        <Route name="login" handler={Login}/>
+        <DefaultRoute handler={Login}/>
+    </Route>
+);
+
+module.exports = {
+    start: function(element) {
+        Router.run(routes, function(Handler) {
+            React.render(<Handler/>, element);
+        });
+    }
+};
