@@ -7,7 +7,6 @@
  */
 
 //dependencies
-var q = require('q');
 var origin = require('../base/origin');
 
 //core module to export

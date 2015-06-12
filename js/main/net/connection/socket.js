@@ -3,7 +3,7 @@
  */
 
 //dependencies
-var q = require('q');
+var promise = require('../../utils/promise');
 var _ = require('lodash');
 
 //private fields
@@ -22,14 +22,15 @@ module.exports = {
 
 //private fields
 function send(data){
+  console.log(serverInfos);
   return connect(serverInfos[serverInfoIndex ++]).then(function(){
     socket.send(data);
   });
 }
 
-function connect(host, port, protocol){
+function connect(host, port, path, protocol){
   if(!(socket && socketPromise)){
-    socketPromise = q.Promise(function(resolve, reject){
+    socketPromise = promise.create(function(resolve, reject){
       var url;
 
       if(!host){
@@ -44,23 +45,26 @@ function connect(host, port, protocol){
       //url assembly
       port = port || '80';
       protocol = protocol || 'ws';
-      url = protocol + '//' + host + ':' + port;
+      url = protocol + '://' + host + ':' + port + '/' + path;
       socket = new WebSocket(url);
 
       getConnection().emit('ready');
 
       //set handler
       socket.onopen = function(event){
+        console.log(event);
         resolve(event);
         getConnection().emit('connect', event);
       };
       socket.onclose = function(event){
-
+        console.log(event);
       };
       socket.onerror = function(event){
+        console.log(event);
         reject(event);
       };
       socket.onmessage = function(event){
+        console.log(event);
         getConnection().emit('message', event.data);
       };
     });

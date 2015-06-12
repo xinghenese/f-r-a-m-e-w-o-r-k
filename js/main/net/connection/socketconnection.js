@@ -10,7 +10,7 @@ var connection = require('./connection');
 var iosession = require('./iosession');
 var socket = require('./socket');
 var keyExchange = require('../crypto/factory').createKeyExchange();
-var session = require('./socketiosession');
+var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 
 console.log('iosession: ', iosession);
