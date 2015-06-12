@@ -91,11 +91,15 @@ module.exports = origin.extend({
     self._tasks = [];
 
     if(_.isFunction(executor)){
-      executor.call(self, function(value){
-        return self.resolve(value);
-      }, function(reason){
-        return self.reject(reason);
-      });
+      try{
+        executor.call(self, function(value){
+          return self.resolve(value);
+        }, function(reason){
+          return self.reject(reason);
+        });
+      }catch(exception){
+        self.reject(exception);
+      }
     }
   },
   '_isDone': false
