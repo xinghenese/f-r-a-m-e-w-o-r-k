@@ -54,7 +54,7 @@ promise.then = function(fulfilled, rejected, progressed){
 };
 
 promise['catch'] = function(rejected){
-  return promise.then(void 0, rejected, void 0);
+  return this.then(void 0, rejected, void 0);
 };
 
 promise.repeat = function(fulfilled, rejected){
