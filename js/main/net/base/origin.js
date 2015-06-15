@@ -23,8 +23,8 @@ module.exports = {
    *     });
    */
   extend: function(adapter, finals){
-    var subtype = DEFAULT_CONSTRUCTOR.prototype = this;
-    var supertype = new DEFAULT_CONSTRUCTOR();
+    var supertype = DEFAULT_CONSTRUCTOR.prototype = this;
+    var subtype = new DEFAULT_CONSTRUCTOR();
 
     // Augment
     adapter = _.toPlainObject(adapter);
