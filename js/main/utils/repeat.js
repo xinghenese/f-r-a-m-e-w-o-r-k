@@ -94,6 +94,9 @@ var repeat = module.exports = eventEmitter.extend({
     try{
       switch(true){
         case repeat.isPrototypeOf(resolver):
+          if(repeat.isPrototypeOf(resolver._source)){
+            return resolver._source;
+          }
           return resolver;
         case _.isFunction(resolver):
           resolver.call(self, function(value){

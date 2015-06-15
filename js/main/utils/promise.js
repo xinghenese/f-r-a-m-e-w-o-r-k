@@ -26,10 +26,35 @@ promise.init = function(resolver){
     _.set(self, key, value);
   });
 };
+
+promise.resolve = function(value){
+  var self = promise.create(null);
+  var pro = q(value);
+
+  _.forOwn(pro, function(value, key){
+    _.set(self, key, value);
+  });
+  return self;
+};
+
+promise.reject = function(reason){
+  var self = promise.create(null);
+  var pro = q.reject(reason);
+
+  _.forOwn(pro, function(value, key){
+    _.set(self, key, value);
+  });
+  return self;
+};
+
 //enable promise.then adapt to repeat object.
 var then = q.makePromise.prototype.then;
 promise.then = function(fulfilled, rejected, progressed){
   return promise.create(then.call(this, fulfilled, rejected, progressed));
+};
+
+promise['catch'] = function(rejected){
+  return promise.then(void 0, rejected, void 0);
 };
 
 promise.repeat = function(fulfilled, rejected){
@@ -39,13 +64,24 @@ promise.repeat = function(fulfilled, rejected){
   var rep = deferred.create(null);
 
   self.then(function(value){
-    var _rep = repeat.create(_fulfilled(value));
-    console.log('_rep.proto.repeat: ', repeat.isPrototypeOf(_rep));
-    console.log('_rep: ', rep);
-    rep.emit('resolve', _rep);
+    var fulfilledValue = _fulfilled(value);
+    if(!repeat.isPrototypeOf(fulfilledValue)){
+      value = fulfilledValue;
+    }
+    rep.emit('resolve', {
+      'entity': repeat.create(fulfilledValue),
+      'value': value
+    });
     return value;
   }, function(reason){
-    rep.emit('reject', _rejected(reason));
+    var rejectedReason = _rejected(reason);
+    if(!repeat.isPrototypeOf(rejectedReason)){
+      reason = rejectedReason;
+    }
+    rep.emit('reject', {
+      'entity': repeat.create(rejectedReason),
+      'reason': reason
+    });
     return reason;
   });
 

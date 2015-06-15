@@ -7,7 +7,7 @@ var origin = require('./origin');
 var _ = require('lodash');
 
 //core module to export
-module.exports = function(base){
+module.exports = function(base, extras){
   var proto;
 
   if(_.isFunction(base)){
@@ -19,5 +19,5 @@ module.exports = function(base){
       || base.constructor.prototype;
   }
 
-  return _.create(proto, origin);
+  return _.create(proto, _.assign({}, origin, extras));
 };
