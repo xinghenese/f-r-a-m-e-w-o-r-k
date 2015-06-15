@@ -3,8 +3,10 @@
 'use strict';
 
 var Login = require('./login');
+var Chat = require('./chat');
 var React = require('react');
 var Router = require('react-router');
+var Navigation = Router.Navigation;
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
@@ -12,8 +14,12 @@ var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 
 var App = React.createClass({
+    mixins: [
+        Navigation
+    ],
     _handleDidReceivePhoneStatus: function(status) {
         console.log("checkPhoneStatus: " + status);
+        this.transitionTo("chat", {id: 10, showAge: true});
     },
     _handleCheckPhoneStatusError: function(error) {
         console.log("checkPhoneStatus: " + error);
@@ -62,6 +68,7 @@ var routes = (
         <Route name="login" handler={wrapComponent(Login, {
             onSubmit: app._handlePhoneSubmit
             })}/>
+        <Route name="chat" handler={Chat} />
         <DefaultRoute handler={wrapComponent(Login, {
             onSubmit: app._handlePhoneSubmit
             })}/>
@@ -70,8 +77,8 @@ var routes = (
 
 module.exports = {
     start: function(element) {
-        Router.run(routes, function(Handler) {
-            React.render(<Handler/>, element);
+        Router.run(routes, function(Handler, state) {
+            React.render(<Handler params={state.routes.params}/>, element);
         });
     }
 };
