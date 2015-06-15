@@ -43,17 +43,28 @@ var App = React.createClass({
     },
     render: function() {
         return (
-            <RouteHandler
-                onSubmit={this._handlePhoneSubmit}
-                />
+            <RouteHandler />
         );
     }
 });
 
+function wrapComponent(Component, props) {
+    return React.createClass({
+        render: function() {
+            return React.createElement(Component, props);
+        }
+    });
+}
+
+var app = new App();
 var routes = (
     <Route name="app" path="/" handler={App}>
-        <Route name="login" handler={Login}/>
-        <DefaultRoute handler={Login}/>
+        <Route name="login" handler={wrapComponent(Login, {
+            onSubmit: app._handlePhoneSubmit
+            })}/>
+        <DefaultRoute handler={wrapComponent(Login, {
+            onSubmit: app._handlePhoneSubmit
+            })}/>
     </Route>
 );
 

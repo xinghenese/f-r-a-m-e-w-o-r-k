@@ -369,7 +369,6 @@ var Login = React.createClass({
         return /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
     },
     render: function() {
-        console.log(Styles.ERROR_TEXT_COLOR);
         var phonePrompt = Lang.phone;
         var phoneLableStyle = style.label;
         if (this.state.promptInvalidPhone) {
@@ -419,4 +418,3 @@ var Login = React.createClass({
 });
 
 module.exports = Login;
-

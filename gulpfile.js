@@ -44,8 +44,8 @@ gulp.task('publish', function(cb) {
 
 gulp.task('watch', function() {
     var bundler = browserify({
-        entries: ['./app/demo.js'],
-        basedir: './js/main/',
+        entries: ['./main.js'],
+        basedir: './js/',
         transform: [reactify],
         debug: true,
         cache: {},
