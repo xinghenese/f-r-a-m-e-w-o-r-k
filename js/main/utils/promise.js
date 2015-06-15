@@ -29,21 +29,43 @@ promise.init = function(resolver){
 //enable promise.then adapt to repeat object.
 var then = q.makePromise.prototype.then;
 promise.then = function(fulfilled, rejected, progressed){
-  var repeat = require('./repeat');
-
-  if(repeat && repeat.isPrototypeOf(fulfilled)){
-    return fulfilled;
-  }
   return promise.create(then.call(this, fulfilled, rejected, progressed));
 };
-promise.repeat = function(resolver){
-  var repeat = require('./repeat');
 
-  if(repeat){
-    return repeat.create(resolver);
+promise.repeat = function(fulfilled, rejected){
+  var self = this;
+  var repeat = require('./repeat');
+  var deferred = require('./deferredrepeat');
+  var rep = deferred.create(null);
+
+  self.then(function(value){
+    var _rep = repeat.create(_fulfilled(value));
+    console.log('_rep.proto.repeat: ', repeat.isPrototypeOf(_rep));
+    console.log('_rep: ', rep);
+    rep.emit('resolve', _rep);
+    return value;
+  }, function(reason){
+    rep.emit('reject', _rejected(reason));
+    return reason;
+  });
+
+  return rep;
+
+  function _fulfilled(value){
+    try{
+      return typeof fulfilled === "function" ? fulfilled(value) : value;
+    }catch(exception){
+      return exception;
+    }
   }
-  return this.then(function(){
-    return promise.create(resolver);
-  })
+
+  function _rejected(exception){
+    try{
+      return typeof rejected === "function" ? rejected(exception) : exception;
+    }catch(exception){
+      return exception;
+    }
+  }
 };
+
 promise.Promise = q;

@@ -59,4 +59,11 @@ gulp.task('watch', function() {
     }).bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));
 });
 
+gulp.task('test', function(){
+  return browserify({
+      entries: ['./app/test.js'],
+      basedir: './js/main/'}
+  ).bundle().pipe(source('test.js')).pipe(gulp.dest('./dist'));
+});
+
 gulp.task('default', ['build']);

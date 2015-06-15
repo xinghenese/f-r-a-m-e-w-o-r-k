@@ -11,7 +11,7 @@ var iosession = require('./iosession');
 var socket = require('./socket');
 var keyExchange = require('../crypto/factory').createKeyExchange();
 var session = require('./socketsession');
-var repeat = require('../../utils/repeat');
+var repeat = require('../../utils/repeat.js');
 
 console.log('iosession: ', iosession);
 
@@ -45,9 +45,26 @@ var socketconnection = module.exports = connection.extend({
    * @returns {Q.Promise}
    */
   'request': function(packet){
-    return authorize().then(function(value){
-      packet = packetFormalize(packet);
+//    return authorize().then(function(value){
+//      packet = packetFormalize(packet);
+//
+//      //avoid duplicate authorization request.
+//      if(HANDSHAKE_TAG == packet.tag){
+//        return value;
+//      }
+//      if(packet.data){
+//        return post(packet);
+//      }
+//      return get(packet.tag);
+//    });
+    packet = packetFormalize(packet);
 
+    if(!(packet.data || HANDSHAKE_TAG == packet.tag)){
+      return authorize().repeat(function(){
+        return get(packet.tag);
+      });
+    }
+    return authorize().then(function(value){
       //avoid duplicate authorization request.
       if(HANDSHAKE_TAG == packet.tag){
         return value;
@@ -55,7 +72,6 @@ var socketconnection = module.exports = connection.extend({
       if(packet.data){
         return post(packet);
       }
-      return get(packet.tag);
     });
   },
 
