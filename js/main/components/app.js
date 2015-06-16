@@ -63,15 +63,14 @@ function wrapComponent(Component, props) {
 }
 
 var app = new App();
+var WrappedLogin = wrapComponent(Login, {
+    onSubmit: app._handlePhoneSubmit
+});
 var routes = (
     <Route name="app" path="/" handler={App}>
-        <Route name="login" handler={wrapComponent(Login, {
-            onSubmit: app._handlePhoneSubmit
-            })}/>
+        <Route name="login" handler={WrappedLogin} />
         <Route name="chat" handler={Chat} />
-        <DefaultRoute handler={wrapComponent(Login, {
-            onSubmit: app._handlePhoneSubmit
-            })}/>
+        <DefaultRoute handler={WrappedLogin} />
     </Route>
 );
 
