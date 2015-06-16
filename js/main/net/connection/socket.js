@@ -3,12 +3,14 @@
  */
 
 //dependencies
-var promise = require('../../utils/promise');
 var _ = require('lodash');
+var promise = require('../../utils/promise');
+var serverInfoEmitter = require('../emitters/serverInfos');
 
 //private fields
 var socket = null;
-var socketPromise = null;
+var connectPromise = null;
+var initPromise = null;
 var serverInfos = _.shuffle(['192.168.1.66', '192.168.1.67', '192.168.1.68']);
 var serverPort = 443;
 var serverInfoIndex = 0;
@@ -23,16 +25,67 @@ module.exports = {
 
 //private fields
 function send(data){
-  console.log(serverInfos);
-  return connect(serverInfos[serverInfoIndex ++], serverPort).then(function(){
-    console.log('socket.send');
-    socket.send(data);
+  var pro = init()
+    .then(function(serverInfo){
+      var host, port;
+      if(_.isPlainObject(serverInfo)){
+        host = serverInfo.host || serverInfo.ip;
+        port = serverInfo.port || serverPort;
+      }else{
+        host = "" + serverInfo;
+        port = serverPort;
+      }
+      return connect(host, port);
+    })
+    .then(function(){
+      console.log('socket.send');
+      console.log('data: ', data.toString());
+      console.log('socket: ', socket);
+      console.log('socket.state: ', socket.readyState);
+      socket.send(data);
+    }, function(){
+    //handle reconnect
+      console.log('reconnect');
+      return reset().then(function(){
+        return send(data);
+      });
+    }).catch(function(error){
+      console.error(error);
+    });
+  return pro;
+//  return connect(serverInfos[serverInfoIndex ++], serverPort).then(function(){
+//    console.log('socket.send');
+//    socket.send(data);
+//  });
+}
+
+function init(){
+  if(!initPromise){
+    if(serverInfos && serverInfos[serverInfoIndex]){
+      initPromise = promise.create(serverInfos[serverInfoIndex ++]);
+    }else{
+      initPromise = serverInfoEmitter.once(serverInfoEmitter.events.serverInfos)
+        .then(function(infos){
+          console.log(infos);
+          return _.shuffle(infos)[serverInfoIndex];
+        })
+      ;
+    }
+  }
+  return initPromise;
+}
+
+function reset(){
+  return promise.create(function(resolve, reject){
+    initPromise = null;
+    connectPromise = null;
+    resolve('reset');
   });
 }
 
 function connect(host, port, path, protocol){
-  if(!(socket && socketPromise)){
-    socketPromise = promise.create(function(resolve, reject){
+  if(!(socket && connectPromise)){
+    connectPromise = promise.create(function(resolve, reject){
       var url;
 
       if(!host){
@@ -42,6 +95,7 @@ function connect(host, port, path, protocol){
 
       //shutdown and clear socket
       if(socket){
+        console.log('socket to be closed');
         socket.close();
       }
       //url assembly
@@ -72,7 +126,7 @@ function connect(host, port, path, protocol){
       };
     });
   }
-  return socketPromise;
+  return connectPromise;
 }
 
 function getConnection(){
