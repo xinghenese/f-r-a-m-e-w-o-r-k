@@ -14,10 +14,12 @@ var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 
 console.log('iosession: ', iosession);
+console.log('socketsession: ', session);
 
 //private const fields
-var PUBLIC_KEY_FIELD = "pk";
+var PUBLIC_KEY_FIELD = "pbk";
 var HANDSHAKE_TAG = "HSK";
+var SOCKET_HOSTS = [];
 var DEFAULT_CONFIG = {
   'needEncrypt': true,
   'needDecrypt': true,
@@ -29,7 +31,7 @@ var DEFAULT_CONFIG = {
   'needUnwrap': true,
   'urlRoot': "",
   'encryptKey': "",
-  'connectionType': "http"
+  'connectionType': "socket"
 };
 
 //private fields.
@@ -45,9 +47,15 @@ var socketconnection = module.exports = connection.extend({
    * @returns {Q.Promise}
    */
   'request': function(packet){
-    return authorize().then(function(value){
-      packet = packetFormalize(packet);
+    packet = packetFormalize(packet);
 
+    if(!(packet.data || HANDSHAKE_TAG == packet.tag)){
+      return authorize().repeat(function(){
+        return get(packet.tag);
+      });
+    }
+    return authorize().then(function(value){
+      console.log('authorize.then: ', value);
       //avoid duplicate authorization request.
       if(HANDSHAKE_TAG == packet.tag){
         return value;
@@ -55,7 +63,6 @@ var socketconnection = module.exports = connection.extend({
       if(packet.data){
         return post(packet);
       }
-      return get(packet.tag);
     });
   },
 
@@ -92,13 +99,21 @@ function post(packet){
     return promise.create(session.fetch(tag));
   }
 
+  var pro = socketconnection.once(tag);
+
   //process and write data to session and then send via socket.
   session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
     .then(function(value){
       return socket.send(value);
     });
 
-  return socketconnection.once(tag);
+  console.log('socketconnection: ', socketconnection);
+  console.log('post(tag): ', tag);
+  console.log('socketconnection.once(tag): ', pro);
+  console.log('promise.isPrototypeOf(socketconnection.once(tag)): ', promise.isPrototypeOf(pro));
+  console.log('listeners: ', socketconnection.listeners(tag));
+//  return socketconnection.once(tag);
+  return pro;
 }
 
 function packetFormalize(packet){
@@ -134,8 +149,14 @@ function onMessageReceived(msg){
       var tag = value.tag;
       var data = value.data;
 
+      console.dir(value);
+      console.log('tag: ', tag);
+      console.log('data: ', data);
+
       //check whether the message is pushed by server or pulled from server.
-      if(tag && !_.isEmpty(socketconnection.getListeners(tag))){
+      console.log('listeners: ', socketconnection.listeners(tag));
+      if(tag && !_.isEmpty(socketconnection.listeners(tag))){
+        console.log('socketconnection#emit: ', value);
         socketconnection.emit(tag, data);
       }else{
         //if the message pushed by server does not have to notify immediately,
@@ -154,13 +175,15 @@ function authorize(){
   if(!authorizePromise){
     authorizePromise = post({
         'tag': "HSK",
-        'data': {'pbk': keyExchange.getPublicKey()}
+        'data': _.set({}, PUBLIC_KEY_FIELD, keyExchange.getPublicKey())
       })
       .then(function(value){
         var key = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
         _.set(DEFAULT_CONFIG, 'encryptKey', key);
         isAuthorized = true;
         return value;
+      }, function(reason){
+        console.log('error: ', reason);
       })
     ;
   }

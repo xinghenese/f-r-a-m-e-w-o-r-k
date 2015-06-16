@@ -14,7 +14,6 @@ module.exports = {
    * Creates a new object that inherits from this object.
    * @param adapter {Object}
    * @param finals {Object|Array}
-   * @param constructor {Function}
    * @return {Object} The new object.
    * @example
    *     var MyType = origin.extend({
@@ -23,19 +22,9 @@ module.exports = {
    *         }
    *     });
    */
-  extend: function(adapter, finals, constructor){
-    var subtype;
-    var supertype;
-
-    //modify prototype by adopting constructor.prototype
-    if(_.isFunction(constructor)){
-      supertype = DEFAULT_CONSTRUCTOR.prototype = _.assign({}, this, constructor.prototype);
-      console.log('mixin-proto: ', DEFAULT_CONSTRUCTOR.prototype);
-    }else{
-      supertype = DEFAULT_CONSTRUCTOR.prototype = this;
-    }
-
-    subtype = new DEFAULT_CONSTRUCTOR();
+  extend: function(adapter, finals){
+    var supertype = DEFAULT_CONSTRUCTOR.prototype = this;
+    var subtype = new DEFAULT_CONSTRUCTOR();
 
     // Augment
     adapter = _.toPlainObject(adapter);
@@ -51,15 +40,7 @@ module.exports = {
     // Create default initializer
     if (!subtype.hasOwnProperty('init')) {
       subtype.init = function () {
-        subtype.$super.init.apply(this, arguments);
-      };
-    }
-    //Depend constructor initializer
-    if(_.isFunction(constructor)){
-      var func = subtype.init;
-      subtype.init = function () {
-        constructor.apply(this, arguments);
-        func.apply(this, arguments);
+        return subtype.$super.init.apply(this, arguments);
       };
     }
 
@@ -91,7 +72,10 @@ module.exports = {
     }
 
     var instance = this.extend(overrides, null, void 0);
-    instance.init.apply(instance, initials);
+    var ret = instance.init.apply(instance, initials);
+    if(this.isPrototypeOf(ret)){
+      return ret;
+    }
 
     return instance;
   },

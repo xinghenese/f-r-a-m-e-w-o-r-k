@@ -12,24 +12,31 @@ module.exports = filter.create({
     var connectionType = options.connectionType;
     var result;
     var data;
+    var tag;
 
     if(connectionType == 'http'){
       result = + msg.r;
       data = msg.data;
     }else if(connectionType == 'socket'){
       result = + _.isEmpty(msg);
-      data = '' + _.values(msg)[0];
+      tag = '' + _.keys(msg)[0];
+      data = {
+        'tag': tag,
+        'data': _.get(msg, tag)
+      };
     }
 
     //should extend the logic here to handle various invalid results.
     if(result != 0){
-      throw new Error('invalid result');
+      throw new Error('invalid result valued ' + result);
     }
     //in case of something wrong with response data.
     if(!data){
       throw new Error('empty data');
     }
     notify(msg);
+
+    console.log('data: ', data);
 
     return data;
   }
