@@ -19,7 +19,7 @@ var App = React.createClass({
     ],
     _handleDidReceivePhoneStatus: function(status) {
         console.log("checkPhoneStatus: " + status);
-        this.transitionTo("chat", {id: 10, showAge: true});
+        this.transitionTo("chat", {t: "boy"}, {age: 8});
     },
     _handleCheckPhoneStatusError: function(error) {
         console.log("checkPhoneStatus: " + error);
@@ -69,7 +69,7 @@ var WrappedLogin = wrapComponent(Login, {
 var routes = (
     <Route name="app" path="/" handler={App}>
         <Route name="login" handler={WrappedLogin} />
-        <Route name="chat" handler={Chat} />
+        <Route name="chat" path="/chat/:t" handler={Chat} />
         <DefaultRoute handler={WrappedLogin} />
     </Route>
 );
