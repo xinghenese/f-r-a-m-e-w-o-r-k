@@ -8,6 +8,7 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var del = require('del');
 var runSequence = require('run-sequence');
+var moment = require('moment');
 
 var browserifyConfig = {
     entries: ['./main.js'],
@@ -58,9 +59,8 @@ gulp.task('watch', function() {
         console.log(err);
     }).on('update', function() {
         var updateStart = Date.now();
-        console.log('Updating');
         watcher.bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));
-        console.log('Updated!', (Date.now() - updateStart) + 'ms');
+        console.log(moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated!', (Date.now() - updateStart) + 'ms');
     }).bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));
 });
 

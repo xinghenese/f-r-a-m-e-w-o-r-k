@@ -12,11 +12,15 @@ var Chat = React.createClass({
         State
     ],
     componentDidMount: function() {
-        console.log(this.props.params);
+        console.log("chat mounted");
+        console.log(this.props);
     },
     render: function() {
         return (
-            <div></div>
+            <div>
+                <p>{this.props.id}</p>
+                <p>{this.props.showAge}</p>
+            </div>
         );
     }
 });

@@ -25,7 +25,8 @@
         "run-sequence": "*",
         "vinyl-source-stream": "*",
         "watchify": "*",
-        "react-router": "^0.13.3"
+        "react-router": "^0.13.3",
+        "moment": "^2.10.3"
     },
     "dependencies": {
         "browserify": "^10.2.4",
