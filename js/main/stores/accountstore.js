@@ -11,6 +11,8 @@ var Lang = require('../locales/zh-cn');
 
 var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
 var CHECK_PHONE_STATUS_ERROR = 'checkPhoneStatusError';
+var CHECK_VERIFICATION_CODE_SUCCESS = 'checkVerificationCodeSuccess';
+var CHECK_VERIFICATION_CODE_FAILED = 'checkVerificationCodeFailed';
 var REGISTER_SUCCESS = "registerSuccess";
 var REGISTER_FAILED = "registerFailed";
 var LOGIN_SUCCESS = 'loginSuccess';
@@ -31,6 +33,24 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     emitCheckPhoneStatusError: function(error) {
         this.emit(CHECK_PHONE_STATUS_ERROR, error);
+    },
+    addCheckVerificationCodeSuccessListener: function(callback) {
+        this.on(CHECK_VERIFICATION_CODE_SUCCESS, callback);
+    },
+    removeCheckVerificationCodeSuccessListener: function(callback) {
+        this.removeListener(CHECK_VERIFICATION_CODE_SUCCESS, callback);
+    },
+    emitCheckVerificationCodeSuccess: function() {
+        this.on(CHECK_VERIFICATION_CODE_SUCCESS);
+    },
+    addCheckVerificationCodeFailedListener: function(callback) {
+        this.on(CHECK_VERIFICATION_CODE_FAILED, callback);
+    },
+    removeCheckVerificationCodeFailedListener: function(callback) {
+        this.removeListener(CHECK_VERIFICATION_CODE_FAILED, callback);
+    },
+    emitCheckVerificationCodeFailed: function() {
+        this.on(CHECK_VERIFICATION_CODE_FAILED);
     },
     addDidReceivePhoneStatusListener: function(callback) {
         this.on(DID_RECEIVE_PHONE_STATUS, callback);
@@ -157,6 +177,31 @@ function _handleCheckPhoneStatusRequest(action) {
         AccountStore.emitDidReceivePhoneStatus(status);
     }, function(error) {
         AccountStore.emitCheckPhoneStatusError(error);
+    });
+}
+
+function _handleCheckVerificationCodeRequest(action) {
+    var code = _removeLeadingPlusSignOfCode(action.code);
+    var data = {
+        cc: code,
+        mid: action.phone,
+        tp: action.verificationType,
+        c: action.verificationCode
+    };
+    HttpConnection.request({
+        url: "sms/cc",
+        data: data
+    }).then(function(response) {
+        switch (response.r) {
+            case 0: // success
+                AccountStore.emitCheckVerificationCodeSuccess();
+                break;
+            default: // failed
+                AccountStore.emitCheckVerificationCodeFailed();
+                break;
+        }
+    }, function(error) {
+        AccountStore.emitCheckVerificationCodeFailed();
     });
 }
 
