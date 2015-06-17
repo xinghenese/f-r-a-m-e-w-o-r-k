@@ -15,6 +15,8 @@ var REGISTER_SUCCESS = "registerSuccess";
 var REGISTER_FAILED = "registerFailed";
 var LOGIN_SUCCESS = 'loginSuccess';
 var LOGIN_FAILED = 'loginFailed';
+var LOGOUT_SUCCESS = 'logoutSuccess';
+var LOGOUT_FAILED = 'logoutFailed';
 
 var AccountStore = assign({}, EventEmitter.prototype, {
     addCheckPhoneStatusErrorListener: function(callback) {
@@ -52,6 +54,24 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     emitLoginFailed: function(reason) {
         this.emit(LOGIN_FAILED, reason);
+    },
+    addLogoutSuccessListener: function(callback) {
+        this.on(LOGOUT_SUCCESS, callback);
+    },
+    removeLogoutSuccessListener: function(callback) {
+        this.removeListener(LOGOUT_SUCCESS, callback);
+    },
+    emitLogoutSuccess: function() {
+        this.on(LOGOUT_SUCCESS);
+    },
+    addLogoutFailedListener: function(callback) {
+        this.on(LOGIN_FAILED, callback);
+    },
+    removeLogoutFailedListener: function(callback) {
+        this.removeListener(LOGIN_FAILED, callback);
+    },
+    emitLogoutFailed: function() {
+        this.on(LOGIN_FAILED);
     },
     addRegisterSuccessListener: function(callback) {
         this.on(REGISTER_SUCCESS, callback);
@@ -134,11 +154,28 @@ function _handleLoginRequest(action) {
                 AccountStore.emitLoginFailed(Lang.wrongPassword);
                 break;
             default:
-                ActionStore.emitLoginFailed(Lang.loginFailed);
+                AccountStore.emitLoginFailed(Lang.loginFailed);
                 break;
         }
     }, function(error) {
-        ActionStore.emitLoginFailed(Lang.loginFailed);
+        AccountStore.emitLoginFailed(Lang.loginFailed);
+    });
+}
+
+function _handleLogoutRequest(action) {
+    HttpConnection.request({
+        url: "usr/lo"
+    }).then(function(response) {
+        switch (response.r) {
+            case 0: // success
+                AccountStore.emitLogoutSuccess();
+                break;
+            default: // failed
+                AccountStore.emitLogoutFailed();
+                break;
+        }
+    }, function(error) {
+        AccountStore.emitLogoutFailed();
     });
 }
 
