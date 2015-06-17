@@ -17,7 +17,7 @@ var App = React.createClass({
     mixins: [
         Navigation
     ],
-    _handleDidReceivePhoneStatus: function(status) {
+    _handleCheckPhoneStatusSuccess: function(status) {
         console.log("checkPhoneStatus: " + status);
         this.transitionTo("chat", {t: "boy"}, {age: 8});
     },
@@ -40,12 +40,12 @@ var App = React.createClass({
         console.log("profile loaded, after login success!");
     },
     componentWillMount: function() {
-        AccountStore.addDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
-        AccountStore.addCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
+        AccountStore.addListener(AccountStore.Events.CHECK_PHONE_STATUS_SUCCESS, this._handleCheckPhoneStatusSuccess);
+        AccountStore.addListener(AccountStore.Events.CHECK_PHONE_STATUS_ERROR, this._handleCheckPhoneStatusError);
     },
     componentWillUnmount: function() {
-        AccountStore.removeDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
-        AccountStore.removeCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
+        AccountStore.removeListener(AccountStore.Events.CHECK_PHONE_STATUS_SUCCESS, this._handleCheckPhoneStatusSuccess);
+        AccountStore.removeListener(AccountStore.Events.CHECK_PHONE_STATUS_ERROR, this._handleCheckPhoneStatusError);
     },
     render: function() {
         return (

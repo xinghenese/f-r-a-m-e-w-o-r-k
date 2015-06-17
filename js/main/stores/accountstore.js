@@ -25,132 +25,29 @@ var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
 var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
 var AccountStore = assign({}, EventEmitter.prototype, {
-    addCheckPhoneStatusErrorListener: function(callback) {
-        this.on(CHECK_PHONE_STATUS_ERROR, callback);
+    Events: {
+        CHECK_PHONE_STATUS_SUCCESS: 'checkPhoneStatusSuccess',
+        CHECK_PHONE_STATUS_ERROR: 'checkPhoneStatusError',
+        CHECK_VERIFICATION_CODE_SUCCESS: 'checkVerificationCodeSuccess',
+        CHECK_VERIFICATION_CODE_FAILED: 'checkVerificationCodeFailed',
+        REGISTER_SUCCESS: "registerSuccess",
+        REGISTER_FAILED: "registerFailed",
+        LOGIN_SUCCESS: 'loginSuccess',
+        LOGIN_FAILED: 'loginFailed',
+        LOGOUT_SUCCESS: 'logoutSuccess',
+        LOGOUT_FAILED: 'logoutFailed',
+        VERIFICATION_CODE_SENT: 'verificationCodeSent',
+        VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent',
+        VOICE_VERIFICATION_CODE_SENT: 'voiceVerificationCodeSent',
+        VOICE_VERIFICATION_CODE_NOT_SENT: 'voiceVerificationCodeNotSent'
     },
-    removeCheckPhoneStatusErrorListener: function(callback) {
-        this.removeListener(CHECK_PHONE_STATUS_ERROR, callback);
+    addListener: function(event, callback) {
+        this.on(event, callback);
     },
-    emitCheckPhoneStatusError: function(error) {
-        this.emit(CHECK_PHONE_STATUS_ERROR, error);
+    removeListener: function(event, callback) {
+        this.removeListener(event, callback);
     },
-    addCheckVerificationCodeSuccessListener: function(callback) {
-        this.on(CHECK_VERIFICATION_CODE_SUCCESS, callback);
-    },
-    removeCheckVerificationCodeSuccessListener: function(callback) {
-        this.removeListener(CHECK_VERIFICATION_CODE_SUCCESS, callback);
-    },
-    emitCheckVerificationCodeSuccess: function() {
-        this.on(CHECK_VERIFICATION_CODE_SUCCESS);
-    },
-    addCheckVerificationCodeFailedListener: function(callback) {
-        this.on(CHECK_VERIFICATION_CODE_FAILED, callback);
-    },
-    removeCheckVerificationCodeFailedListener: function(callback) {
-        this.removeListener(CHECK_VERIFICATION_CODE_FAILED, callback);
-    },
-    emitCheckVerificationCodeFailed: function() {
-        this.on(CHECK_VERIFICATION_CODE_FAILED);
-    },
-    addDidReceivePhoneStatusListener: function(callback) {
-        this.on(DID_RECEIVE_PHONE_STATUS, callback);
-    },
-    removeDidReceivePhoneStatusListener: function(callback) {
-        this.removeListener(DID_RECEIVE_PHONE_STATUS, callback);
-    },
-    emitDidReceivePhoneStatus: function(status) {
-        this.emit(DID_RECEIVE_PHONE_STATUS, status);
-    },
-    addLoginSuccessListener: function(callback) {
-        this.on(LOGIN_SUCCESS, callback);
-    },
-    removeLoginSuccessListener: function(callback) {
-        this.removeListener(LOGIN_SUCCESS, callback);
-    },
-    emitLoginSuccess: function(response) {
-        this.emit(LOGIN_SUCCESS, response);
-    },
-    addLoginFailedListener: function(callback) {
-        this.on(LOGIN_FAILED, callback);
-    },
-    removeLoginFailedListener: function(callback) {
-        this.removeListener(LOGIN_FAILED, callback);
-    },
-    emitLoginFailed: function(reason) {
-        this.emit(LOGIN_FAILED, reason);
-    },
-    addLogoutSuccessListener: function(callback) {
-        this.on(LOGOUT_SUCCESS, callback);
-    },
-    removeLogoutSuccessListener: function(callback) {
-        this.removeListener(LOGOUT_SUCCESS, callback);
-    },
-    emitLogoutSuccess: function() {
-        this.on(LOGOUT_SUCCESS);
-    },
-    addLogoutFailedListener: function(callback) {
-        this.on(LOGIN_FAILED, callback);
-    },
-    removeLogoutFailedListener: function(callback) {
-        this.removeListener(LOGIN_FAILED, callback);
-    },
-    emitLogoutFailed: function() {
-        this.on(LOGIN_FAILED);
-    },
-    addRegisterSuccessListener: function(callback) {
-        this.on(REGISTER_SUCCESS, callback);
-    },
-    removeRegisterSuccessListener: function(callback) {
-        this.removeListener(REGISTER_SUCCESS, callback);
-    },
-    emitRegisterSuccess: function(data) {
-        this.emit(REGISTER_SUCCESS, data);
-    },
-    addRegisterFailureListener: function(callback) {
-        this.on(REGISTER_FAILED, callback);
-    },
-    removeRegisterFailureListener: function(callback) {
-        this.removeListener(REGISTER_FAILED, callback);
-    },
-    emitRegisterFailure: function(error) {
-        this.on(REGISTER_FAILED, error);
-    },
-    addVerificationCodeSentListener: function(callback) {
-        this.on(VERIFICATION_CODE_SENT, callback);
-    },
-    removeVerificationCodeSentListener: function(callback) {
-        this.removeListener(VERIFICATION_CODE_SENT, callback);
-    },
-    emitVerificationCodeSent: function() {
-        this.on(VERIFICATION_CODE_SENT);
-    },
-    addVerificationCodeNotSentListener: function(callback) {
-        this.on(VERIFICATION_CODE_NOT_SENT, callback);
-    },
-    removeVerificationCodeNotSentListener: function(callback) {
-        this.removeListener(VERIFICATION_CODE_NOT_SENT, callback);
-    },
-    emitVerificationCodeNotSent: function(error) {
-        this.on(VERIFICATION_CODE_NOT_SENT, error);
-    },
-    addVoiceVerificationCodeSentListener: function(callback) {
-        this.on(VOICE_VERIFICATION_CODE_SENT, callback);
-    },
-    removeVoiceVerificationCodeSentListener: function(callback) {
-        this.removeListener(VOICE_VERIFICATION_CODE_SENT, callback);
-    },
-    emitVoiceVerificationCodeSent: function() {
-        this.on(VOICE_VERIFICATION_CODE_SENT);
-    },
-    addVoiceVerificationCodeNotSentListener: function(callback) {
-        this.on(VOICE_VERIFICATION_CODE_NOT_SENT, callback);
-    },
-    removeVoiceVerificationCodeNotSentListener: function(callback) {
-        this.removeListener(VOICE_VERIFICATION_CODE_NOT_SENT, callback);
-    },
-    emitVoiceVerificationCodeNotSent: function(error) {
-        this.on(VOICE_VERIFICATION_CODE_NOT_SENT, error);
-    }
+    emit: this.on
 });
 
 function _removeLeadingPlusSignOfCode(code) {
@@ -174,9 +71,9 @@ function _handleCheckPhoneStatusRequest(action) {
             cc: code
         }
     }).then(function(status) {
-        AccountStore.emitDidReceivePhoneStatus(status);
+        AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_SUCCESS, status);
     }, function(error) {
-        AccountStore.emitCheckPhoneStatusError(error);
+        AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_ERROR, error);
     });
 }
 
@@ -194,14 +91,14 @@ function _handleCheckVerificationCodeRequest(action) {
     }).then(function(response) {
         switch (response.r) {
             case 0: // success
-                AccountStore.emitCheckVerificationCodeSuccess();
+                AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS);
                 break;
             default: // failed
-                AccountStore.emitCheckVerificationCodeFailed();
+                AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED);
                 break;
         }
     }, function(error) {
-        AccountStore.emitCheckVerificationCodeFailed();
+        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED);
     });
 }
 
@@ -224,26 +121,26 @@ function _handleLoginRequest(action) {
     }).then(function(response) {
         switch (response.r) {
             case 0: // success
-                AccountStore.emitLoginSuccess(_stripStatusCodeInResponse(response));
+                AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS, _stripStatusCodeInResponse(response));
                 break;
             case 2001: // user not exist
-                AccountStore.emitLoginFailed(Lang.userNotExist);
+                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.userNotExist);
                 break;
             case 2005: // invalid phone number
-                AccountStore.emitLoginFailed(Lang.invalidPhone);
+                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.invalidPhone);
                 break;
             case 2009: // invalid verification code
-                AccountStore.emitLoginFailed(Lang.invalidVerificationCode);
+                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.invalidVerificationCode);
                 break;
             case 2013: // wrong password
-                AccountStore.emitLoginFailed(Lang.wrongPassword);
+                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.wrongPassword);
                 break;
             default:
-                AccountStore.emitLoginFailed(Lang.loginFailed);
+                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
                 break;
         }
     }, function(error) {
-        AccountStore.emitLoginFailed(Lang.loginFailed);
+        AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
     });
 }
 
@@ -253,14 +150,14 @@ function _handleLogoutRequest(action) {
     }).then(function(response) {
         switch (response.r) {
             case 0: // success
-                AccountStore.emitLogoutSuccess();
+                AccountStore.emit(AccountStore.Events.LOGOUT_SUCCESS);
                 break;
             default: // failed
-                AccountStore.emitLogoutFailed();
+                AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
                 break;
         }
     }, function(error) {
-        AccountStore.emitLogoutFailed();
+        AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
     });
 }
 
@@ -282,32 +179,32 @@ function _handleRegisterRequest(action) {
     }).then(function(response) {
         switch (response.r) {
             case 0: // success
-                AccountStore.emitRegisterSuccess(_stripStatusCodeInResponse(response));
+                AccountStore.emit(AccountStore.Events.REGISTER_SUCCESS, _stripStatusCodeInResponse(response));
                 break;
             case 1: // failure
-                AccountStore.emitRegisterFailure(Lang.registerFailed);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
             case 5: // invalid arguments
-                AccountStore.emitRegisterFailure(Lang.registerFailed);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
             case 2002: // invalid nickname
-                AccountStore.emitRegisterFailure(Lang.invalidNickname);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.invalidNickname);
                 break;
             case 2005: // invalid phone number
-                AccountStore.emitRegisterFailure(Lang.invalidPhone);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.invalidPhone);
                 break;
             case 2006: // invalid country code
-                AccountStore.emitRegisterFailure(Lang.invalidCountryCode);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.invalidCountryCode);
                 break;
             case 2009: // invalid verification code
-                AccountStore.emitRegisterFailure(Lang.invalidVerificationCode);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.invalidVerificationCode);
                 break;
             default: // unknown error
-                AccountStore.emitRegisterFailure(Lang.registerFailed);
+                AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
         }
     }, function(error) {
-        AccountStore.emitRegisterFailure(Lang.registerFailed);
+        AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
     });
 }
 
@@ -347,8 +244,12 @@ function _handleVerificationCodeRequest(action) {
     _handleVerificationRequest(
         action,
         "sms/sc",
-        AccountStore.emitVerificationCodeSent,
-        AccountStore.emitVerificationCodeNotSent
+        function() {
+            AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
+        },
+        function(error) {
+            AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, error);
+        }
     );
 }
 
@@ -356,8 +257,12 @@ function _handleVoiceVerificationCodeRequest(action) {
     _handleVerificationRequest(
         action,
         "sms/svc",
-        AccountStore.emitVoiceVerificationCodeSent,
-        AccountStore.emitVoiceVerificationCodeNotSent
+        function() {
+            AccountStore.emit(AccountStore.Events.VOICE_VERIFICATION_CODE_SENT);
+        },
+        function(error) {
+            AccountStore.emit(AccountStore.Events.VOICE_VERIFICATION_CODE_NOT_SENT, error);
+        }
     );
 }
 
