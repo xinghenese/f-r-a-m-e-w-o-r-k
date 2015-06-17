@@ -17,6 +17,10 @@ var LOGIN_SUCCESS = 'loginSuccess';
 var LOGIN_FAILED = 'loginFailed';
 var LOGOUT_SUCCESS = 'logoutSuccess';
 var LOGOUT_FAILED = 'logoutFailed';
+var VERIFICATION_CODE_SENT = 'verificationCodeSent';
+var VERIFICATION_CODE_NOT_SENT = 'verificationCodeNotSent';
+var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
+var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
 var AccountStore = assign({}, EventEmitter.prototype, {
     addCheckPhoneStatusErrorListener: function(callback) {
@@ -90,6 +94,42 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     emitRegisterFailure: function(error) {
         this.on(REGISTER_FAILED, error);
+    },
+    addVerificationCodeSentListener: function(callback) {
+        this.on(VERIFICATION_CODE_SENT, callback);
+    },
+    removeVerificationCodeSentListener: function(callback) {
+        this.removeListener(VERIFICATION_CODE_SENT, callback);
+    },
+    emitVerificationCodeSent: function() {
+        this.on(VERIFICATION_CODE_SENT);
+    },
+    addVerificationCodeNotSentListener: function(callback) {
+        this.on(VERIFICATION_CODE_NOT_SENT, callback);
+    },
+    removeVerificationCodeNotSentListener: function(callback) {
+        this.removeListener(VERIFICATION_CODE_NOT_SENT, callback);
+    },
+    emitVerificationCodeNotSent: function(error) {
+        this.on(VERIFICATION_CODE_NOT_SENT, error);
+    },
+    addVoiceVerificationCodeSentListener: function(callback) {
+        this.on(VOICE_VERIFICATION_CODE_SENT, callback);
+    },
+    removeVoiceVerificationCodeSentListener: function(callback) {
+        this.removeListener(VOICE_VERIFICATION_CODE_SENT, callback);
+    },
+    emitVoiceVerificationCodeSent: function() {
+        this.on(VOICE_VERIFICATION_CODE_SENT);
+    },
+    addVoiceVerificationCodeNotSentListener: function(callback) {
+        this.on(VOICE_VERIFICATION_CODE_NOT_SENT, callback);
+    },
+    removeVoiceVerificationCodeNotSentListener: function(callback) {
+        this.removeListener(VOICE_VERIFICATION_CODE_NOT_SENT, callback);
+    },
+    emitVoiceVerificationCodeNotSent: function(error) {
+        this.on(VOICE_VERIFICATION_CODE_NOT_SENT, error);
     }
 });
 
@@ -226,16 +266,72 @@ function _handleRegisterRequest(action) {
     });
 }
 
+function _handleVerificationRequest(action, url, successCallback, failureCallback) {
+    var code = _removeLeadingPlusSignOfCode(action.code);
+    var data = {
+        mid: action.phone,
+        cc: code,
+        tp: action.verificationType
+    };
+    HttpConnection.request({
+        url: url,
+        data: data
+    }).then(function(response) {
+        switch (response.r) {
+            case 0: // success
+                successCallback();
+                break;
+            case 1: // failed
+            case 5: // invalid arguments
+            case 102: // too many requests within 24 hours
+            case 103: // send sms too often
+            case 2001: // user not exist
+            case 2005: // invalid phone number
+            case 2007: // user deleted
+            case 2012: // user already exist
+            default:
+                failureCallback(Lang.requestVerificationCodeFailed);
+                break;
+        }
+    }, function(error) {
+        failureCallback(Lang.requestVerificationCodeFailed);
+    });
+}
+
+function _handleVerificationCodeRequest(action) {
+    _handleVerificationRequest(
+        action,
+        "sms/sc",
+        AccountStore.emitVerificationCodeSent,
+        AccountStore.emitVerificationCodeNotSent
+    );
+}
+
+function _handleVoiceVerificationCodeRequest(action) {
+    _handleVerificationRequest(
+        action,
+        "sms/svc",
+        AccountStore.emitVoiceVerificationCodeSent,
+        AccountStore.emitVoiceVerificationCodeNotSent
+    );
+}
+
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.CHECK_PHONE_STATUS:
             _handleCheckPhoneStatusRequest(action);
             break;
         case ActionTypes.LOGIN:
-            AccountStore.emitLoginSuccess();
+            _handleLoginRequest(action);
             break;
         case ActionTypes.REGISTER:
             _handleRegisterRequest(action);
+            break;
+        case ActionTypes.REQUEST_VERIFICATION_CODE:
+            _handleVerificationCodeRequest(action);
+            break;
+        case ActionTypes.REQUEST_VOICE_VERIFICATION_CODE:
+            _handleVoiceVerificationCodeRequest(action);
             break;
     }
 });
