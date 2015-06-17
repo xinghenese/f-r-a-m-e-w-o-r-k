@@ -6,7 +6,7 @@
 var _ = require('lodash');
 var State = require('./connectionstate');
 var promise = require('../../utils/promise');
-var eventemitter = require('../../utils/eventEmitter');
+var eventemitter = require('../../utils/eventemitter.thenable');
 
 console.log('eventEmitter: ', eventemitter);
 
