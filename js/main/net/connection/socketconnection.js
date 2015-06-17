@@ -12,6 +12,8 @@ var socket = require('./socket');
 var keyExchange = require('../crypto/factory').createKeyExchange();
 var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
+var authentication = require('./authentication');
+var UserConfig = require('../userconfig/userconfig');
 
 console.log('iosession: ', iosession);
 console.log('socketsession: ', session);
@@ -19,6 +21,8 @@ console.log('socketsession: ', session);
 //private const fields
 var PUBLIC_KEY_FIELD = "pbk";
 var HANDSHAKE_TAG = "HSK";
+var AUTH_TAG = "AUTH";
+var PING_TAG = "P";
 var SOCKET_HOSTS = [];
 var DEFAULT_CONFIG = {
   'needEncrypt': true,
@@ -35,6 +39,7 @@ var DEFAULT_CONFIG = {
 };
 
 //private fields.
+var handshakePromise = null;
 var authorizePromise = null;
 var state = State.INITIALIZING;
 var isAuthorized = false;
@@ -56,8 +61,8 @@ var socketconnection = module.exports = connection.extend({
     }
     return authorize().then(function(value){
       console.log('authorize.then: ', value);
-      //avoid duplicate authorization request.
-      if(HANDSHAKE_TAG == packet.tag){
+      //avoid duplicate handshake authorization request.
+      if(HANDSHAKE_TAG == packet.tag || AUTH_TAG == packet.tag){
         return value;
       }
       if(packet.data){
@@ -65,6 +70,8 @@ var socketconnection = module.exports = connection.extend({
       }
     });
   },
+
+  'ping': ping,
 
   'getState': function(){
     return state;
@@ -99,21 +106,13 @@ function post(packet){
     return promise.create(session.fetch(tag));
   }
 
-  var pro = socketconnection.once(tag);
-
   //process and write data to session and then send via socket.
   session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
     .then(function(value){
       return socket.send(value);
     });
 
-  console.log('socketconnection: ', socketconnection);
-  console.log('post(tag): ', tag);
-  console.log('socketconnection.once(tag): ', pro);
-  console.log('promise.isPrototypeOf(socketconnection.once(tag)): ', promise.isPrototypeOf(pro));
-  console.log('listeners: ', socketconnection.listeners(tag));
-//  return socketconnection.once(tag);
-  return pro;
+  return socketconnection.once(tag);
 }
 
 function packetFormalize(packet){
@@ -149,14 +148,8 @@ function onMessageReceived(msg){
       var tag = value.tag;
       var data = value.data;
 
-      console.dir(value);
-      console.log('tag: ', tag);
-      console.log('data: ', data);
-
       //check whether the message is pushed by server or pulled from server.
-      console.log('listeners: ', socketconnection.listeners(tag));
       if(tag && !_.isEmpty(socketconnection.listeners(tag))){
-        console.log('socketconnection#emit: ', value);
         socketconnection.emit(tag, data);
       }else{
         //if the message pushed by server does not have to notify immediately,
@@ -173,22 +166,51 @@ function onMessageReceived(msg){
 
 function authorize(){
   if(!authorizePromise){
-    authorizePromise = post({
-        'tag': "HSK",
-        'data': _.set({}, PUBLIC_KEY_FIELD, keyExchange.getPublicKey())
-      })
-      .then(function(value){
-        var key = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
-        _.set(DEFAULT_CONFIG, 'encryptKey', key);
-        isAuthorized = true;
-        return value;
-      }, function(reason){
-        console.log('error: ', reason);
-      })
-    ;
+    authorizePromise = handshake().then(function(){
+      return post({
+        'tag': AUTH_TAG,
+        'data': UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev")
+      });
+    }).then(function(data){
+      if(!authentication.validateSequence(_.get(data, 'msqsid'))){
+        throw new Error("sequence invalid with ", _.get(data, 'msqsid'));
+      }
+      console.log('msqid: ', authentication.getSequence());
+      return data;
+    });
   }
 
   return authorizePromise;
+}
+
+function handshake(){
+  if(!handshakePromise){
+    handshakePromise = post({
+      'tag': HANDSHAKE_TAG,
+      'data': _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
+        , keyExchange.getPublicKey())
+    }).then(function(data){
+      _.set(DEFAULT_CONFIG, 'encryptKey'
+        , keyExchange.getEncryptKey(_.get(data, PUBLIC_KEY_FIELD)));
+      isAuthorized = true;
+      return data;
+    });
+  }
+
+  return handshakePromise;
+}
+
+function ping(){
+  return authorize().then(function(){
+    return post({
+      'tag': PING_TAG,
+      'data': _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
+        , authentication.getSequenceKey())
+    })
+  }).then(function(data){
+    console.log('ping: ', data);
+    return data;
+  });
 }
 
 function shouldNotify(tag){

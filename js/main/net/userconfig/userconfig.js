@@ -12,24 +12,24 @@ var profile = {
   'dv': "1",
   'uid': "212",
   'uuid': "7e9d-501c-dbd816078039",
-  'ver': "4.0",
-  "v": "1.0",
+  'ver': "1.0",
   'zip': "1",
   'devn': "Sony Z3+",
-  'tk': void 0
+  'tk': void 0,
+  'msqid': void 0
 };
 var _configs = ['ver', 'uuid'];
 
 var http2socket = {
   'uid': "msuid",
-  'dv': "dev",
-  'tk': "token"
+  'uuid': "devuuid",
+  'dv': "dev"
 };
 
 var socket2http = {
   'msuid': "uid",
-  'dev': "dv",
-  'token': "tk"
+  'devuuid': "uuid",
+  'dev': "dv"
 };
 
 
@@ -42,14 +42,15 @@ module.exports = {
     _.set(profile, _getKey(key), value);
     return this;
   },
-  'subset': function(keys){
-    if(!keys){
+  'subset': function(){
+    var keys = _.flattenDeep(arguments);
+    if(_.isEmpty(keys)){
       return _.assign({}, profile)
     }
     return _.pick(profile, _.map(keys, _getKey));
   },
-  'socksubset': function(keys){
-    return _.mapKeys(this.subset(keys), function(value, key){
+  'socksubset': function(){
+    return _.mapKeys(this.subset(arguments), function(value, key){
       return _.get(http2socket, key) || key;
     })
   },
