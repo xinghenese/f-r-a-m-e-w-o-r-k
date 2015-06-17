@@ -16,13 +16,9 @@ module.exports = filter.create({
    */
   'processReadable': function(value, options){
     if(options.needDecrypt && options.encryptKey) {
-      var decrypted = cipher.decrypt(value, options.encryptKey);
-      console.log('decrypted: ', CryptoJS.enc.Hex.stringify(decrypted));
-      return decrypted;
+      return cipher.decrypt(value, options.encryptKey);
     }
     return value;
-//      return CryptoJS.enc.Hex.parse('1f8b0800b7c26a550003ab562a52b2' +
-//        'd235ac0500f16d3b7608000000');
   },
   /**
    * process the data by decryption and then write to the connection
@@ -35,7 +31,6 @@ module.exports = filter.create({
     console.log('encrypt-opts: ', options);
     console.log('cipher: ', cipher);
     if(options.needEncrypt && options.encryptKey){
-//        return crypto.encrypt(value, options.encryptKey);
       return cipher.encrypt(value, options.encryptKey);
     }
     return value;

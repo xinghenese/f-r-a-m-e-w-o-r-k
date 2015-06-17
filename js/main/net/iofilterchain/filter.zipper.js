@@ -18,6 +18,9 @@ module.exports = filter.create({
       console.log('compress: ', value);
       return compressor.decompress(value);
     }
-    return value;
+    if(CryptoJS.lib.WordArray.isPrototypeOf(value)){
+      return CryptoJS.enc.Utf8.stringify(value);
+    }
+    return "" + value;
   }
 });
