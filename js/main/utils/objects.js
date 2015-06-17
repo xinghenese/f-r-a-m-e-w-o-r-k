@@ -4,6 +4,9 @@
 'use strict';
 
 module.exports = {
+    containsTruthy: function(obj, prop) {
+        return obj[prop] ? true : false;
+    },
     mergeObjects: function(obj1, obj2) {
         var result = {};
         for (var attr in obj1) {
