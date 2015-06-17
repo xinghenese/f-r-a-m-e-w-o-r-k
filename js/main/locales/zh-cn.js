@@ -9,5 +9,8 @@ module.exports = {
     "invalidVerificationCode": "不正确的验证码",
     "phone": "手机号码",
     "registerFailed": "注册失败，请重试！",
-    "unknown": "未知"
+    "loginFailed": "登录失败，请重试！",
+    "unknown": "未知",
+    "userNotExist": "该用户不存在！",
+    "wrongPassword": "密码错误！"
 };

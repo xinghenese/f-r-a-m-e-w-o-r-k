@@ -41,8 +41,8 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     removeLoginSuccessListener: function(callback) {
         this.removeListener(LOGIN_SUCCESS, callback);
     },
-    emitLoginSuccess: function() {
-        this.emit(LOGIN_SUCCESS);
+    emitLoginSuccess: function(response) {
+        this.emit(LOGIN_SUCCESS, response);
     },
     addLoginFailedListener: function(callback) {
         this.on(LOGIN_FAILED, callback);
@@ -50,8 +50,8 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     removeLoginFailedListener: function(callback) {
         this.removeListener(LOGIN_FAILED, callback);
     },
-    emitLoginFailed: function() {
-        this.emit(LOGIN_FAILED);
+    emitLoginFailed: function(reason) {
+        this.emit(LOGIN_FAILED, reason);
     },
     addRegisterSuccessListener: function(callback) {
         this.on(REGISTER_SUCCESS, callback);
@@ -80,10 +80,9 @@ function _removeLeadingPlusSignOfCode(code) {
     return code;
 }
 
-function _copyTruthyProp(src, srcAttr, dst, dstAttr) {
-    if (objects.containsTruthy(src, srcAttr)) {
-        dst[dstAttr] = src[srcAttr];
-    }
+function _stripStatusCodeInResponse(response) {
+    delete response.r;
+    return response;
 }
 
 function _handleCheckPhoneStatusRequest(action) {
@@ -101,6 +100,48 @@ function _handleCheckPhoneStatusRequest(action) {
     });
 }
 
+function _handleLoginRequest(action) {
+    var data = {
+        mid: action.phone,
+        os: action.os,
+        di: action.deviceInfo,
+        dv: action.device
+    };
+    // code is optional, default to 86
+    if (objects.containsValuedProp(action, "code")) {
+        data.code = _removeLeadingPlusSignOfCode(action.code);
+    }
+    objects.copyValuedProp(action, "verificationCode", data, "c");
+    objects.copyValuedProp(action, "password", data, "psw");
+    HttpConnection.request({
+        url: "usr/lg",
+        data: data
+    }).then(function(response) {
+        switch (response.r) {
+            case 0: // success
+                AccountStore.emitLoginSuccess(_stripStatusCodeInResponse(response));
+                break;
+            case 2001: // user not exist
+                AccountStore.emitLoginFailed(Lang.userNotExist);
+                break;
+            case 2005: // invalid phone number
+                AccountStore.emitLoginFailed(Lang.invalidPhone);
+                break;
+            case 2009: // invalid verification code
+                AccountStore.emitLoginFailed(Lang.invalidVerificationCode);
+                break;
+            case 2013: // wrong password
+                AccountStore.emitLoginFailed(Lang.wrongPassword);
+                break;
+            default:
+                ActionStore.emitLoginFailed(Lang.loginFailed);
+                break;
+        }
+    }, function(error) {
+        ActionStore.emitLoginFailed(Lang.loginFailed);
+    });
+}
+
 function _handleRegisterRequest(action) {
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
@@ -111,16 +152,15 @@ function _handleRegisterRequest(action) {
         di: action.deviceInfo,
         os: action.os
     };
-    _copyTruthyProp(action, "avatar", data, "pt");
-    _copyTruthyProp(action, "c", data, "verificationCode");
+    objects.copyValuedProp(action, "avatar", data, "pt");
+    objects.copyValuedProp(action, "verificationCode", data, "c");
     HttpConnection.request({
         url: "usr/reg",
         data: data
-    }).then(function(status) {
-        switch (status.r) {
+    }).then(function(response) {
+        switch (response.r) {
             case 0: // success
-                delete status.r;
-                AccountStore.emitRegisterSuccess(status);
+                AccountStore.emitRegisterSuccess(_stripStatusCodeInResponse(response));
                 break;
             case 1: // failure
                 AccountStore.emitRegisterFailure(Lang.registerFailed);
