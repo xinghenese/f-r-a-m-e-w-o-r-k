@@ -9,7 +9,6 @@ var userconfigs = require('../userconfig/userconfig');
 //core module to export
 module.exports = filter.create({
   'processWritable': function(value, options){
-    console.log('options: ', options);
     if(options.needWrap){
       return queryStringify(value);
     }
@@ -25,7 +24,7 @@ module.exports = filter.create({
 
 //private functions.
 function queryStringify(msg){
-  return 'data=' + encodeURIComponent(msg) + "&" +
-    "ver=" + userconfigs.getVersion() + "&" +
-    "uuid=" + userconfigs.getUuid();
+  return 'data=' + encodeURIComponent(msg) + "&"
+    + (userconfigs.getVersion() ? "ver=" + userconfigs.getVersion() + "&" : "")
+    + (userconfigs.getUuid() ? "uuid=" + userconfigs.getUuid() : "");
 }

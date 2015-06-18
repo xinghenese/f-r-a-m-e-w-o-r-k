@@ -54,7 +54,6 @@ function request(method, url, data){
     xhr.open(method, url);
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 //      xhr.setRequestHeader("Content-type","text/plain");
-    console.log(data);
 
     xhr.send(data);
   });

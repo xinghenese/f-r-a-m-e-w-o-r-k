@@ -38,14 +38,9 @@ function send(data){
       return connect(host, port);
     })
     .then(function(){
-      console.log('socket.send');
-      console.log('data: ', data.toString());
-      console.log('socket: ', socket);
-      console.log('socket.state: ', socket.readyState);
       socket.send(data);
     }, function(){
-    //handle reconnect
-      console.log('reconnect');
+      //handle reconnect
       return reset().then(function(){
         return send(data);
       });
@@ -53,10 +48,6 @@ function send(data){
       console.error(error);
     });
   return pro;
-//  return connect(serverInfos[serverInfoIndex ++], serverPort).then(function(){
-//    console.log('socket.send');
-//    socket.send(data);
-//  });
 }
 
 function init(){
@@ -109,7 +100,7 @@ function connect(host, port, path, protocol){
 
       //set handler
       socket.onopen = function(event){
-        console.log(event);
+//        console.log(event);
         resolve(event);
         getConnection().emit('connect', event);
       };
@@ -121,7 +112,7 @@ function connect(host, port, path, protocol){
         reject(event);
       };
       socket.onmessage = function(event){
-        console.log(event);
+//        console.log(event);
         getConnection().emit('message', event.data);
       };
     });

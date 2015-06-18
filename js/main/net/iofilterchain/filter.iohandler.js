@@ -36,13 +36,11 @@ module.exports = filter.create({
     }
     notify(msg);
 
-    console.log('data: ', data);
-
     return data;
   }
 });
 
 //private functions
 function notify(msg){
-  console.log('notify with ', msg);
+//  console.log('notify with ', msg);
 }

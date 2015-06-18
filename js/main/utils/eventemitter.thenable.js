@@ -8,8 +8,6 @@ var eventEmitter = require('./eventemitter');
 var promise = require('./promise');
 var repeat = require('./repeat');
 
-console.log('Emitter: ', eventEmitter);
-
 //core module to export
 module.exports = eventEmitter.extend({
   'on': on,
@@ -46,8 +44,6 @@ function once(event, callback){
     //the overridden this.on.
     self._onceTag = true;
     eventEmitter.once.call(self, event, function(msg){
-      console.log('once.event.Type: ', event);
-      console.log('once.event.Data: ', msg);
       if(!msg){
         reject('empty message received');
         return;
@@ -55,7 +51,6 @@ function once(event, callback){
       resolve(msg);
     })
   }).then(function(msg){
-    console.log('then.msg: ', msg);
     return _.isFunction(callback) ? callback(msg) : msg;
   })
 }

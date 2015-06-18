@@ -63,12 +63,6 @@ module.exports = compressor.create({
       .process(function(value){
         return bytes.create(value).toWordArray();
       })
-      .process(function(value){
-        console.log('decompress: ', CryptoJS.enc.Hex.stringify(value));
-//          var json = CryptoJS.enc.Utf8.stringify(value);
-//          console.log(JSON.parse(json));
-        return value;
-      })
       //stringify the WordArray Object into a utf8 string.
       .process(utf8.stringify)
       .done()
