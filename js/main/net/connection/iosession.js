@@ -16,10 +16,6 @@ module.exports =  origin.extend({
    */
   'read': function(msg, options){
     return chain.filterRead(msg, options)
-      .then(function(value){
-        console.groupEnd();
-        return value;
-      })
       .catch(function(err){
         console.error(err);
       })
@@ -32,7 +28,6 @@ module.exports =  origin.extend({
    * @returns {Q.Promise}
    */
   'write': function(msg, options){
-    console.group("iosession");
     return chain.filterWrite(msg, options)
       .catch(function(err){
         console.error(err);

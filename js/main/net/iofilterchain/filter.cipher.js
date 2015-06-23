@@ -28,8 +28,6 @@ module.exports = filter.create({
    * @returns {*}
    */
   'processWritable': function(value, options){
-    console.log('encrypt-opts: ', options);
-    console.log('cipher: ', cipher);
     if(options.needEncrypt && options.encryptKey){
       return cipher.encrypt(value, options.encryptKey);
     }

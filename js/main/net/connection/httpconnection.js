@@ -11,10 +11,9 @@ var connection = require('./connection');
 var keyExchange = require('../crypto/factory').createKeyExchange();
 var userconfig = require('../userconfig/userconfig');
 
-console.log('iosession: ', session);
-
 //private const fields
 var PUBLIC_KEY_FIELD = "pk";
+var UUID_FILED = "uuid";
 var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
 var DEFAULT_CONFIG = {
   'needEncrypt': true,
@@ -68,7 +67,6 @@ var httpconnection = module.exports = connection.extend({
         //DEFAULT_CONFIG as an argument to pass into <i><httpconnectoin#request/i>.
         //Just be simple.
         options = _.assign({}, DEFAULT_CONFIG, _.omit(options, omitConfig));
-        console.log('options: ', options);
 
         if(data && !_.isEmpty(data)){
           //avoid duplicate authorization request.
@@ -106,6 +104,8 @@ state = State.INITIALIZED;
 
 //private functions
 function post(url, data, options){
+  console.group('http post -', url);
+  console.log('<=',  data ? JSON.stringify(data) : 'empty data sent');
   return session.write(data, options)
     .then(function(value){
       return http.post(url, value);
@@ -113,28 +113,43 @@ function post(url, data, options){
     .then(function(value){
       return session.read(value, options);
     })
+    .then(function(data){
+      console.log('=>', data ? JSON.stringify(data) : 'empty data received');
+      console.groupEnd();
+      return data;
+    })
   ;
 }
 
 function get(url, options){
+  console.group('http get -', url);
+  console.log('<=');
   return http.get(url)
     .then(function(value){
       return session.read(value, options);
+    })
+    .then(function(data){
+      console.log(url, '=>', data ? JSON.stringify(data) : 'empty data received');
+      console.groupEnd();
+      return data;
     })
   ;
 }
 
 function authorize(){
   if(!authorizePromise){
-    var packet = _.set({
-      'uuid': userconfig.getUuid()
-    }, PUBLIC_KEY_FIELD, keyExchange.getPublicKey());
+    var packet = _({})
+      .set(UUID_FILED, userconfig.getUuid())
+      .set(PUBLIC_KEY_FIELD, keyExchange.getPublicKey())
+      .value();
+//    var packet = _.set({}, PUBLIC_KEY_FIELD, keyExchange.getPublicKey());
     var options = _.assign({}, DEFAULT_CONFIG, {'needDecompress': false});
 
     authorizePromise = post(DEFAULT_ROOT + "auth/c", packet, options)
       .then(function(value){
         var encryptKey = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
         _.set(DEFAULT_CONFIG, 'encryptKey', encryptKey);
+        userconfig.setUuid(_.get(value, UUID_FILED));
         isAuthorized = true;
         return value;
       })

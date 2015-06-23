@@ -15,7 +15,6 @@ module.exports = filter.create({
    */
   'processReadable': function(value, options){
     if(options.needDecompress){
-      console.log('compress: ', value);
       return compressor.decompress(value);
     }
     if(CryptoJS.lib.WordArray.isPrototypeOf(value)){
