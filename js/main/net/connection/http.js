@@ -3,7 +3,7 @@
  */
 
 //dependencies
-var q = require('q');
+var promise = require('../../utils/promise');
 var _ = require('lodash');
 var origin = require('../base/origin.js');
 
@@ -30,7 +30,7 @@ module.exports = origin.extend({
 
 //private functions
 function request(method, url, data){
-  return q.Promise(function(resolve, reject, progress){
+  return promise.create(function(resolve, reject, progress){
     var xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function(){
@@ -54,7 +54,6 @@ function request(method, url, data){
     xhr.open(method, url);
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 //      xhr.setRequestHeader("Content-type","text/plain");
-    console.log(data);
 
     xhr.send(data);
   });

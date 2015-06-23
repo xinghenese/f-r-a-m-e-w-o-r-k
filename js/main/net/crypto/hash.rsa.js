@@ -5,6 +5,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var hash = require('./hash');
 
 //private const fields

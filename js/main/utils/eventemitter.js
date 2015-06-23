@@ -4,7 +4,50 @@
 
 //dependencies
 var EventEmitter = require('browserify/node_modules/events').EventEmitter;
-var origin = require('../net/base/origin');
+var originify = require('../net/base/originify');
 
 //core module to export
-module.exports = origin.extend({}, [], EventEmitter);
+module.exports = originify(EventEmitter);
+
+//var eventEmitter = module.exports = originify(EventEmitter);
+
+//var on = EventEmitter.prototype.on;
+//var once = EventEmitter.prototype.once;
+//
+//eventEmitter.on = function(event, callback){
+//  var self = this;
+//  callback = _.isFunction(callback) ? callback : function(msg){
+//    return msg;
+//  };
+//
+//  return repeat.create(function(resolve, reject){
+//    on.call(self, event, function(msg){
+//      if(!msg){
+//        reject('empty message received');
+//        return;
+//      }
+//      resolve(msg);
+//    })
+//  }).then(function(msg){
+//    return callback(msg);
+//  })
+//};
+//
+//eventEmitter.once = function(event, callback){
+//  var self = this;
+//  callback = _.isFunction(callback) ? callback : function(msg){
+//    return msg;
+//  };
+//
+//  return promise.create(function(resolve, reject){
+//    once.call(self, event, function(msg){
+//      if(!msg){
+//        reject('empty message received');
+//        return;
+//      }
+//      resolve(msg);
+//    })
+//  }).then(function(msg){
+//    return callback(msg);
+//  })
+//};

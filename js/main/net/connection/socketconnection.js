@@ -4,19 +4,26 @@
 
 //dependencies
 var _ = require('lodash');
-var q = require('q');
+var promise = require('../../utils/promise');
 var State = require('./connectionstate');
 var connection = require('./connection');
 var iosession = require('./iosession');
 var socket = require('./socket');
 var keyExchange = require('../crypto/factory').createKeyExchange();
-var session = require('./socketiosession');
+var session = require('./socketsession');
+var repeat = require('../../utils/repeat');
+var authentication = require('./authentication');
+var UserConfig = require('../userconfig/userconfig');
 
 console.log('iosession: ', iosession);
+console.log('socketsession: ', session);
 
 //private const fields
-var PUBLIC_KEY_FIELD = "pk";
+var PUBLIC_KEY_FIELD = "pbk";
 var HANDSHAKE_TAG = "HSK";
+var AUTH_TAG = "AUTH";
+var PING_TAG = "P";
+var SOCKET_HOSTS = [];
 var DEFAULT_CONFIG = {
   'needEncrypt': true,
   'needDecrypt': true,
@@ -28,30 +35,44 @@ var DEFAULT_CONFIG = {
   'needUnwrap': true,
   'urlRoot': "",
   'encryptKey': "",
-  'connectionType': "http"
+  'connectionType': "socket"
 };
 
 //private fields.
+var tokenPromise = null;
+var handshakePromise = null;
 var authorizePromise = null;
 var state = State.INITIALIZING;
 var isAuthorized = false;
 
 //core module to export
-var socketconnectoin = module.exports = connection.extend({
+var socketconnection = module.exports = connection.extend({
   /**
    *
-   * @param packet {Object}
+   * @param packet {Object|String}
    * @returns {Q.Promise}
    */
   'request': function(packet){
+    packet = packetFormalize(packet);
+
+    if(!(packet.data || HANDSHAKE_TAG == packet.tag)){
+      return authorize().repeat(function(){
+        return get(packet.tag);
+      });
+    }
     return authorize().then(function(value){
-      //avoid duplicate authorization request.
-      if(!packet || (HANDSHAKE_TAG in packet) || (HANDSHAKE_TAG == packet.tag)){
+      console.log('authorize.then: ', value);
+      //avoid duplicate handshake authorization request.
+      if(HANDSHAKE_TAG == packet.tag || AUTH_TAG == packet.tag){
         return value;
       }
-      return post(packet);
-    })
+      if(packet.data){
+        return post(packet);
+      }
+    });
   },
+
+  'ping': ping,
 
   'getState': function(){
     return state;
@@ -63,53 +84,75 @@ var socketconnectoin = module.exports = connection.extend({
 });
 
 //initialize
-socketconnectoin.on('ready', function(){
+socketconnection.on('ready', function(){
   state = State.CONNECTING;
 });
-socketconnectoin.on('connect', function(){
+socketconnection.on('connect', function(){
   state = State.CONNECTED;
-  socketconnectoin.on('message', onMessageReceived);
+  socketconnection.on('message', onMessageReceived);
 });
 state = State.INITIALIZED;
 
-//private functoins
+//private functions
+//just listen to data reception with tag.
+function get(tag){
+  return socketconnection.on(tag, function(data){
+    console.group('socket');
+    console.log('=>', tag + ": " + JSON.stringify(data));
+    console.groupEnd();
+    return data;
+  });
+}
+
 function post(packet){
-  var tag = '';
-  var data = {};
+  var tag = packet.tag;
+  var data = packet.data;
+
+  console.group('socket');
+  console.log('<=', tag + ": " + JSON.stringify(data));
+
+  if(session.has(tag)){
+    return promise.create(session.fetch(tag));
+  }
+
+  //process and write data to session and then send via socket.
+  session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
+    .then(function(value){
+      return socket.send(value);
+    });
+
+  return socketconnection.once(tag, function(data){
+    console.log('=>', tag + ": " + JSON.stringify(data));
+    console.groupEnd();
+    return data;
+  });
+}
+
+function packetFormalize(packet){
+  var tag;
+  var data;
 
   if(!packet || _.isEmpty(packet)){
     throw new Error("empty packet to be sent via socket");
   }
+  if(_.isPlainObject(packet)){
+    tag = "" + (packet.tag || _.keys(packet)[0]);
+    data = packet.data || _.get(packet, tag);
 
-  tag = "" + (packet.tag || _.keys(packet)[0]);
-  data = packet.data || _.get(packet, tag);
-
-  if(!tag){
-    throw new Error("invalid packet tag");
-  }
-  if(!data || _.isEmpty(data)){
-    throw new Error("empty data in packet[" + tag + "]");
-  }
-
-  if(session.has(tag)){
-    return q(session.fetch(tag));
-  }
-  return q.Promise(function(resolve, reject, progress){
-    socketconnectoin.once(tag, function(msg){
-      if(!msg){
-        reject('empty message received via socket');
-        return;
+    if(!tag){
+      throw new Error('invalid tag');
+    }
+    if(data && !_.isEmpty(data)){
+      return {
+        'tag': tag,
+        'data': data
       }
-      resolve(msg);
-    });
-
-    //process and write data to session and then send via socket.
-    session.write(_.set({}, tag, data), _.assign({}, DEFAULT_CONFIG))
-      .then(function(value){
-        return socket.send(value);
-      })
-    ;
-  });
+    }
+  }
+  return {
+    'tag': "" + packet,
+    'data': null
+  }
 }
 
 function onMessageReceived(msg){
@@ -118,9 +161,11 @@ function onMessageReceived(msg){
       var tag = value.tag;
       var data = value.data;
 
+//      console.log("[socket response] =>", tag + ": " + JSON.stringify(data));
+
       //check whether the message is pushed by server or pulled from server.
-      if(tag && !_.isEmpty(socketconnectoin.getListeners(tag))){
-        socketconnectoin.emit(tag, data);
+      if(tag && !_.isEmpty(socketconnection.listeners(tag))){
+        socketconnection.emit(tag, data);
       }else{
         //if the message pushed by server does not have to notify immediately,
         //then cache it into the session for later use.
@@ -136,20 +181,57 @@ function onMessageReceived(msg){
 
 function authorize(){
   if(!authorizePromise){
-    authorizePromise = post({
-        'tag': "HSK",
-        'data': {'pbk': keyExchange.getPublicKey()}
-      })
-      .then(function(value){
-        var key = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
-        _.set(DEFAULT_CONFIG, 'encryptKey', key);
-        isAuthorized = true;
-        return value;
-      })
-    ;
+    authorizePromise = handshake().then(function(){
+      return post({
+        'tag': AUTH_TAG,
+        'data': UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev")
+      });
+    }).then(function(data){
+      if(!authentication.validateSequence(_.get(data, 'msqsid'))){
+        throw new Error("sequence invalid with ", _.get(data, 'msqsid'));
+      }
+      console.log('msqid: ', authentication.getSequence());
+      return data;
+    });
   }
 
   return authorizePromise;
+}
+
+function handshake(){
+  if(!handshakePromise){
+    handshakePromise = post({
+      'tag': HANDSHAKE_TAG,
+      'data': _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
+        , keyExchange.getPublicKey())
+    }).then(function(data){
+      _.set(DEFAULT_CONFIG, 'encryptKey'
+        , keyExchange.getEncryptKey(_.get(data, PUBLIC_KEY_FIELD)));
+      isAuthorized = true;
+      return data;
+    });
+  }
+
+  return handshakePromise;
+}
+
+function awaitToken(){
+  if(!tokenPromise){
+    tokenPromise = ';'
+  }
+}
+
+function ping(){
+  return authorize().then(function(){
+    return post({
+      'tag': PING_TAG,
+      'data': _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
+        , authentication.getSequenceKey())
+    })
+  }).then(function(data){
+    console.log('ping: ', data);
+    return data;
+  });
 }
 
 function shouldNotify(tag){

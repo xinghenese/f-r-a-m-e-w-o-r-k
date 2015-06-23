@@ -3,22 +3,15 @@
  */
 
 //dependencies
-var eventemitter = require('../../utils/eventEmitter');
 var _ = require('lodash');
-var q = require('q');
 var State = require('./connectionstate');
-
-console.log('eventEmitter: ', eventemitter);
+var promise = require('../../utils/promise');
+var eventemitter = require('../../utils/eventemitter.thenable');
 
 //core module to export
 module.exports = eventemitter.extend({
-  /**
-   *
-   * @param packet {Object|String}
-   * @returns {Q.Promise}
-   */
   'request': function(packet){
-    return q(packet);
+    return promise.create(packet);
   },
 
   'getState': function(){

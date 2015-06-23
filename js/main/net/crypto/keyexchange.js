@@ -30,13 +30,10 @@ module.exports = origin.extend({
    */
   getPublicKey: function(){
     return processible.create(this.getLocalKey().toByteArray())
-      .report('localKey')
       .process(function(value){
         return bytes.create(value).toHex();
       })
-      .report('publickKey.beforeEncode')
       .process(codec.encodeHex, codec)
-      .report('publicKey')
       .done()
     ;
   },
@@ -47,7 +44,6 @@ module.exports = origin.extend({
    * @returns {*} BigInteger recommended
    */
   getSharedKey: function(remotePub){
-    console.log('should never access in');
     return new BigInteger(remotePub, 16, true);
   },
   /**
@@ -60,20 +56,15 @@ module.exports = origin.extend({
     return processible.create(remotePub)
       .process(codec.decodeToHex)
       .process(this.getSharedKey)
-      .report('getSharedKey')
       .process(function(value){
         return value.toByteArray();
       })
-      .report('bytes')
       .process(function(value){
 //          return bytes.create(value).toHex().replace(/(0d)|(0a)/gm, '');
         return bytes.create(value).toWordArray();
       })
-      .report('wordArray')
       .process(codec.encode)
-      .report('encode')
       .process(hash.hash, hash)
-      .report('encrypt--key')
       .process(CryptoJS.enc.Utf8.parse)
       .done()
     ;

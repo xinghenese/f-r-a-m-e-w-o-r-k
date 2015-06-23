@@ -6,12 +6,13 @@
  */
 
 //dependencies
-var origin = require('../net/base/origin');
-var q = require('q');
 var _ = require('lodash');
+var eventEmitter = require('./eventemitter');
+var promise = require('./promise');
+var Promise = promise.Promise;
 
 //core module to export
-module.exports = origin.extend({
+var repeat = module.exports = eventEmitter.extend({
   /**
    * register sucessCallback and failCallback for all promises and then
    * notify all promises to fulfill tasks along the repeat chain.
@@ -47,7 +48,7 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'resolve': function(value){
-    this._promises.push(q(value));
+    this._promises.push(promise.create(value));
     return startPromise(this, -1);
   },
   /**
@@ -57,7 +58,7 @@ module.exports = origin.extend({
    * @returns {exports}
    */
   'reject': function(reason){
-    this._promises.push(q.reject(reason));
+    this._promises.push(promise.create(new Error(reason)));
     return startPromise(this, -1);
   },
   /**
@@ -81,23 +82,40 @@ module.exports = origin.extend({
    * as for repeat creation:
    *    repeating = repeat.create(function(resolve, reject){});
    *
-   * @param executor {Function}
+   * @param resolver {Function}
    */
-  'init': function(executor){
+  'init': function(resolver){
     var self = this;
     //list to hold promises.
-    self._promises = [];
+    this._promises = [];
     //list to hold tasks registered by repeat.then() or repeat.catch().
-    self._tasks = [];
+    this._tasks = [];
 
-    if(_.isFunction(executor)){
-      executor.call(self, function(value){
-        return self.resolve(value);
-      }, function(reason){
-        return self.reject(reason);
-      });
+    try{
+      switch(true){
+        case repeat.isPrototypeOf(resolver):
+          if(repeat.isPrototypeOf(resolver._source)){
+            return resolver._source;
+          }
+          return resolver;
+        case _.isFunction(resolver):
+          resolver.call(self, function(value){
+            return self.resolve(value);
+          }, function (reason){
+            return self.reject(reason);
+          });
+          break;
+        case _.isError(resolver):
+          self.reject(resolver);
+          break;
+        default:
+          self.resolve(resolver);
+      }
+    }catch(exception){
+      self.reject(exception);
     }
   },
+
   '_isDone': false
 });
 
