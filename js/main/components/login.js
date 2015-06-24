@@ -298,25 +298,47 @@ var Login = React.createClass({
 
                     <div className="login-form-country-name" style={makeStyle(style.login.form.countryName)}>
                         <label style={makeStyle(style.login.form.label)}>{Lang.country}</label>
-                        <input style={makeStyle(style.login.form.input)} autoComplete="off" type="tel"
-                               onChange={this._handleCountryNameChange}
-                               value={this.state.countryName}
-                            />
+                        <input
+                            style={makeStyle(style.login.form.input)}
+                            autoComplete="off" type="tel"
+                            onChange={this._handleCountryNameChange}
+                            onBlur={onInputBlur}
+                            onFocus={onInputFocus}
+                            placeholder={this.state.countryName}
+                        />
                     </div>
                     <div>
                         <div className="login-form-country-code" style={makeStyle(style.login.form.countryCode)}>
                             <label style={phoneLableStyle}>{Lang.code}</label>
-                            <input style={makeStyle(style.login.form.input)} autoComplete="off" type="tel"
-                                   onChange={this._handleCountryCodeChange}
-                                   value={this.state.countryCode}
-                                />
+                            <input
+                                style={makeStyle(style.login.form.input)}
+                                autoComplete="off"
+                                type="tel"
+                                onChange={this._handleCountryCodeChange}
+                                onBlur={onInputBlur}
+                                onFocus={onInputFocus}
+                                placeholder={this.state.countryCode}
+                            />
                         </div>
                         <div className="login-form-phone-number" style={makeStyle(style.login.form.phoneNumber)}>
                             <label style={phoneLableStyle}>{phonePrompt}</label>
-                            <input style={makeStyle(style.login.form.input)} required=""
-                                   ref="phone" autoComplete="off" type="tel"
-                                   onChange={this._handlePhoneNumberChange}/>
+                            <input
+                                style={makeStyle(style.login.form.input)}
+                                required=""
+                                ref="phone"
+                                autoComplete="off" type="tel"
+                                onBlur={onInputBlur}
+                                onFocus={onInputFocus}
+                                onChange={this._handlePhoneNumberChange}
+                            />
                         </div>
+                    </div>
+                    <div>
+                        <input
+                            type="submit"
+                            value={Lang.next}
+                            style={style.login.form.button}
+                        />
                     </div>
                 </div>
             </div>
@@ -325,3 +347,12 @@ var Login = React.createClass({
 });
 
 module.exports = Login;
+
+//private functions
+function onInputBlur(event){
+  event.target.style.borderBottom = style.login.form.input.borderBottom;
+}
+
+function onInputFocus(event){
+  event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
+}

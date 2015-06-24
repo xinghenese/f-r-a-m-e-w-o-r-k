@@ -22,7 +22,6 @@ module.exports = {
       height: "74px"
     },
     form: {
-      height: "252px",
 
       countryName: {
         height: "50px",
@@ -30,31 +29,31 @@ module.exports = {
       },
       countryCode: {
         float: "left",
-        marginRight: "25px",
-        width: "50px",
+        width: "32px",
         background: "none repeat scroll 0 0 #FFFFFF",
         border: "0 none",
         boxShadow: "none",
         color: "#000",
         display: "inline-block",
-        fontSize: "13px",
-        margin: "3px 0 0",
+        fontSize: "14px",
         outline: "0 none",
-        padding: "3px 0",
-        resize: "none",
+        resize: "none"
       },
       phoneNumber: {
-        marginLeft: "70px",
+        marginLeft: "40px",
         background: "none repeat scroll 0 0 #FFFFFF",
         border: "0 none",
         boxShadow: "none",
         color: "#000",
         display: "inline-block",
-        fontSize: "13px",
+        fontSize: "14px",
         outline: "0 none",
         resize: "none",
         float: "right",
-        width: "260px"
+        width: "196px"
+      },
+      submit: {
+
       },
       p: {
         color: "#b5b5b5",
@@ -66,7 +65,7 @@ module.exports = {
         color: "#999",
         cursor: "pointer",
         display: "block",
-        fontSize: "13px",
+        fontSize: "14px",
         fontWeight: "400"
       },
       input: {
@@ -82,8 +81,16 @@ module.exports = {
         resize: "none",
         width: "100%"
       },
-      submit: {
-
+      button: {
+        border: "0px",
+        background: "#6cace1",
+        color: "#fff",
+        height: "47px",
+        width: "100%",
+        marginTop: "37px"
+      },
+      inputFocus: {
+        borderBottom: "2px solid #6cace1"
       }
     }
   },
