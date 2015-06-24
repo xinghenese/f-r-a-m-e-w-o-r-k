@@ -1,6 +1,7 @@
 'use strict';
 
-var React = require('react/addons');
+var _ = require('lodash');
+var React = require('react');
 var Lang = require('../locales/zh-cn');
 var Styles = require('../constants/styles');
 var style = require('../style/login');
@@ -278,7 +279,6 @@ var Login = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
-//      return true;
         return /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
     },
     render: function() {
@@ -286,37 +286,60 @@ var Login = React.createClass({
         var phoneLableStyle = makeStyle(style.login.form.label);
         if (this.state.promptInvalidPhone) {
             phonePrompt = Lang.invalidPhone;
-            phoneLableStyle = React.addons.update(style.label, {
-                color: {$set: Styles.ERROR_TEXT_COLOR}
+            _.assign(phoneLableStyle, {
+              color: Styles.ERROR_TEXT_COLOR
             });
         }
         return (
             <div style={makeStyle(style.login)}>
                 <div className="login-form" style={makeStyle(style.login.form)}>
-                    <h3>{Lang.loginTitle}</h3>
+                    <p style={makeStyle(style.login.form.title)}>{Lang.loginTitle}</p>
                     <p style={makeStyle(style.login.form.p)}>{Lang.loginSubTitle}</p>
 
                     <div className="login-form-country-name" style={makeStyle(style.login.form.countryName)}>
                         <label style={makeStyle(style.login.form.label)}>{Lang.country}</label>
-                        <input style={makeStyle(style.login.form.input)} autoComplete="off" type="tel"
-                               onChange={this._handleCountryNameChange}
-                               value={this.state.countryName}
-                            />
+                        <input
+                            style={makeStyle(style.login.form.input)}
+                            autoComplete="off" type="tel"
+                            onChange={this._handleCountryNameChange}
+                            onBlur={onInputBlur}
+                            onFocus={onInputFocus}
+                            placeholder={this.state.countryName}
+                        />
                     </div>
                     <div>
                         <div className="login-form-country-code" style={makeStyle(style.login.form.countryCode)}>
                             <label style={phoneLableStyle}>{Lang.code}</label>
-                            <input style={makeStyle(style.login.form.input)} autoComplete="off" type="tel"
-                                   onChange={this._handleCountryCodeChange}
-                                   value={this.state.countryCode}
-                                />
+                            <input
+                                style={makeStyle(style.login.form.input)}
+                                autoComplete="off"
+                                type="tel"
+                                onChange={this._handleCountryCodeChange}
+                                onBlur={onInputBlur}
+                                onFocus={onInputFocus}
+                                placeholder={this.state.countryCode}
+                            />
                         </div>
                         <div className="login-form-phone-number" style={makeStyle(style.login.form.phoneNumber)}>
                             <label style={phoneLableStyle}>{phonePrompt}</label>
-                            <input style={makeStyle(style.login.form.input)} required=""
-                                   ref="phone" autoComplete="off" type="tel"
-                                   onChange={this._handlePhoneNumberChange}/>
+                            <input
+                                style={makeStyle(style.login.form.input)}
+                                required=""
+                                ref="phone"
+                                autoComplete="off" type="tel"
+                                onBlur={onInputBlur}
+                                onFocus={onInputFocus}
+                                onChange={this._handlePhoneNumberChange}
+                            />
                         </div>
+                    </div>
+                    <div>
+                        <input
+                            type="submit"
+                            value={Lang.next}
+                            style={style.login.form.button}
+                            onClick={this._handleSubmit}
+                        />
                     </div>
                 </div>
             </div>
@@ -325,3 +348,12 @@ var Login = React.createClass({
 });
 
 module.exports = Login;
+
+//private functions
+function onInputBlur(event){
+  event.target.style.borderBottom = style.login.form.input.borderBottom;
+}
+
+function onInputFocus(event){
+  event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
+}
