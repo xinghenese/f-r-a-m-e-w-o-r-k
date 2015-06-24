@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = {
+    "loginTitle": "网页版登录",
+    "loginSubTitle": "请选择你所在的国家并输入手机号码",
+    "next": "下一步",
     "code": "代码",
     "country": "国家",
     "invalidCountryCode": "不正确的区号",

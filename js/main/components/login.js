@@ -1,98 +1,11 @@
 'use strict';
 
-var style = {
-    "div": {
-        "margin": "-131px auto 90px",
-        "maxWidth": "404px"
-    },
-    "cursive": {
-        "fontFamily": "cursive",
-        "fontSize": "16px"
-    },
-    "_loginHead": {
-        "height": "74px"
-    },
-    "a": {
-        "float": "right",
-        "cursor": "pointer",
-        "color": "#ffffff",
-        "textDecoration": "none",
-        "padding": "27px 15px 28px",
-        "lineHeight": "20px"
-    },
-    "_loginForm": {
-        "background": "#fff",
-        "padding": "40px",
-        "height": "252px"
-    },
-    "p": {
-        "color": "#999",
-        "fontSize": "13px",
-        "lineHeight": "1.6",
-        "margin": "15px 0 30px"
-    },
-    "_loginInput": {
-        "borderBottom": "1px solid #e6e6e6",
-        "height": "50px",
-        "margin": "0 0 22px"
-    },
-    "label": {
-        "color": "#999",
-        "cursor": "pointer",
-        "display": "block",
-        "fontSize": "13px",
-        "fontWeight": "400"
-    },
-    "input": {
-        "background": "none repeat scroll 0 0 #FFFFFF",
-        "border": "0 none",
-        "boxShadow": "none",
-        "color": "#000",
-        "display": "inline-block",
-        "fontSize": "13px",
-        "margin": "3px 0 0",
-        "outline": "0 none",
-        "padding": "3px 0",
-        "resize": "none",
-        "width": "100%",
-    },
-    "Code": {
-        "float": "left",
-        "marginRight": "25px",
-        "width": "50px",
-        "background": "none repeat scroll 0 0 #FFFFFF",
-        "border": "0 none",
-        "boxShadow": "none",
-        "color": "#000",
-        "display": "inline-block",
-        "fontSize": "13px",
-        "margin": "3px 0 0",
-        "outline": "0 none",
-        "padding": "3px 0",
-        "resize": "none",
-        "borderBottom": "1px solid #e6e6e6"
-    },
-    "Number": {
-        "marginLeft": "70px",
-        "background": "none repeat scroll 0 0 #FFFFFF",
-        "border": "0 none",
-        "boxShadow": "none",
-        "color": "#000",
-        "display": "inline-block",
-        "fontSize": "13px",
-        "margin": "3px 0 0",
-        "outline": "0 none",
-        "padding": "3px 0",
-        "resize": "none",
-        "borderBottom": "1px solid #e6e6e6",
-        "float": "right",
-        "width": "260px"
-    }
-};
-
-var React = require('react/addons');
+var _ = require('lodash');
+var React = require('react');
 var Lang = require('../locales/zh-cn');
 var Styles = require('../constants/styles');
+var style = require('../style/login');
+var makeStyle = require('../style/stylenormalizer');
 
 var Countries = [
     {"name": "阿尔巴尼亚", "code": "+355"},
@@ -370,46 +283,63 @@ var Login = React.createClass({
     },
     render: function() {
         var phonePrompt = Lang.phone;
-        var phoneLableStyle = style.label;
+        var phoneLableStyle = makeStyle(style.login.form.label);
         if (this.state.promptInvalidPhone) {
             phonePrompt = Lang.invalidPhone;
-            phoneLableStyle = React.addons.update(style.label, {
-                color: {$set: Styles.ERROR_TEXT_COLOR}
+            _.assign(phoneLableStyle, {
+              color: Styles.ERROR_TEXT_COLOR
             });
         }
         return (
-            <div style={style.div}>
-                <div className="login-head" style={style._loginHead}>
-                    <a style={style.a} onClick={this._handleSubmit}>Next &gt;</a>
-                </div>
-                <div className="login-form" style={style._loginForm}>
-                    <h3>Sign in</h3>
+            <div style={makeStyle(style.login)}>
+                <div className="login-form" style={makeStyle(style.login.form)}>
+                    <p style={makeStyle(style.login.form.title)}>{Lang.loginTitle}</p>
+                    <p style={makeStyle(style.login.form.p)}>{Lang.loginSubTitle}</p>
 
-                    <p style={style.p}>
-                        Please choose your country and enter your full phone number.
-                    </p>
-
-                    <div className="login-country" style={style._loginInput}>
-                        <label style={style.label}>{Lang.country}</label>
-                        <input style={style.input} autoComplete="off" type="tel"
-                               onChange={this._handleCountryNameChange}
-                               value={this.state.countryName}
-                            />
+                    <div className="login-form-country-name" style={makeStyle(style.login.form.countryName)}>
+                        <label style={makeStyle(style.login.form.label)}>{Lang.country}</label>
+                        <input
+                            style={makeStyle(style.login.form.input)}
+                            autoComplete="off" type="tel"
+                            onChange={this._handleCountryNameChange}
+                            onBlur={onInputBlur}
+                            onFocus={onInputFocus}
+                            placeholder={this.state.countryName}
+                        />
                     </div>
                     <div>
-                        <div style={style.Code}>
+                        <div className="login-form-country-code" style={makeStyle(style.login.form.countryCode)}>
                             <label style={phoneLableStyle}>{Lang.code}</label>
-                            <input style={style.input} autoComplete="off" type="tel"
-                                   onChange={this._handleCountryCodeChange}
-                                   value={this.state.countryCode}
-                                />
+                            <input
+                                style={makeStyle(style.login.form.input)}
+                                autoComplete="off"
+                                type="tel"
+                                onChange={this._handleCountryCodeChange}
+                                onBlur={onInputBlur}
+                                onFocus={onInputFocus}
+                                placeholder={this.state.countryCode}
+                            />
                         </div>
-                        <div style={style.Number}>
+                        <div className="login-form-phone-number" style={makeStyle(style.login.form.phoneNumber)}>
                             <label style={phoneLableStyle}>{phonePrompt}</label>
-                            <input style={style.input} required=""
-                                   ref="phone" autoComplete="off" type="tel"
-                                   onChange={this._handlePhoneNumberChange}/>
+                            <input
+                                style={makeStyle(style.login.form.input)}
+                                required=""
+                                ref="phone"
+                                autoComplete="off" type="tel"
+                                onBlur={onInputBlur}
+                                onFocus={onInputFocus}
+                                onChange={this._handlePhoneNumberChange}
+                            />
                         </div>
+                    </div>
+                    <div>
+                        <input
+                            type="submit"
+                            value={Lang.next}
+                            style={style.login.form.button}
+                            onClick={this._handleSubmit}
+                        />
                     </div>
                 </div>
             </div>
@@ -418,3 +348,12 @@ var Login = React.createClass({
 });
 
 module.exports = Login;
+
+//private functions
+function onInputBlur(event){
+  event.target.style.borderBottom = style.login.form.input.borderBottom;
+}
+
+function onInputFocus(event){
+  event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
+}

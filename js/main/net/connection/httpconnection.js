@@ -105,7 +105,7 @@ state = State.INITIALIZED;
 //private functions
 function post(url, data, options){
   console.group('http post -', url);
-  console.log('<=',  JSON.stringify(data));
+  console.log('<=',  data ? JSON.stringify(data) : 'empty data sent');
   return session.write(data, options)
     .then(function(value){
       return http.post(url, value);
@@ -114,7 +114,7 @@ function post(url, data, options){
       return session.read(value, options);
     })
     .then(function(data){
-      console.log('=>', JSON.stringify(data));
+      console.log('=>', data ? JSON.stringify(data) : 'empty data received');
       console.groupEnd();
       return data;
     })
@@ -129,7 +129,7 @@ function get(url, options){
       return session.read(value, options);
     })
     .then(function(data){
-      console.log(url, '=>', JSON.stringify(data));
+      console.log(url, '=>', data ? JSON.stringify(data) : 'empty data received');
       console.groupEnd();
       return data;
     })

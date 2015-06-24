@@ -28,7 +28,8 @@ module.exports = filter.create({
 
     //should extend the logic here to handle various invalid results.
     if(result != 0){
-      throw new Error('invalid result valued ' + result);
+      console.error('invalid result valued:', result);
+      throw new Error(result);
     }
     //in case of something wrong with response data.
     if(!data){

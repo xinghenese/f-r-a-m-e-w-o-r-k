@@ -24,6 +24,9 @@ var VERIFICATION_CODE_NOT_SENT = 'verificationCodeNotSent';
 var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
 var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
+//private fields
+
+
 var AccountStore = assign({}, EventEmitter.prototype, {
     Events: {
         CHECK_PHONE_STATUS_SUCCESS: 'checkPhoneStatusSuccess',
@@ -62,6 +65,8 @@ function _handleCheckPhoneStatusRequest(action) {
             cc: code
         }
     }).then(function(status) {
+      console.log('check.phone.sucess', status);
+      console.log(AccountStore);
         AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_SUCCESS, status);
     }, function(error) {
         AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_ERROR, error);
@@ -80,16 +85,9 @@ function _handleCheckVerificationCodeRequest(action) {
         url: "sms/cc",
         data: data
     }).then(function(response) {
-        switch (response.r) {
-            case 0: // success
-                AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS);
-                break;
-            default: // failed
-                AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED);
-                break;
-        }
+        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, response);
     }, function(error) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED);
+        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, error.message);
     });
 }
 

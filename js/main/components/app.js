@@ -2,6 +2,7 @@
 
 'use strict';
 
+var _ = require('lodash');
 var Login = require('./login');
 var Chat = require('./chat');
 var React = require('react');
@@ -25,6 +26,13 @@ var App = React.createClass({
         }
     },
     _handleCheckPhoneStatusError: function(error) {
+        console.log("checkPhoneStatus: " + error);
+    },
+    _handleCheckVerificationCodeSuccess: function(status) {
+        console.log("checkPhoneStatus: ", status);
+        this.transitionTo("chat", {t: "boy"}, {age: 8});
+    },
+    _handleCheckVerificationCodeError: function(error) {
         console.log("checkPhoneStatus: " + error);
     },
     _handlePhoneSubmit: function(countryCode, phoneNumber) {
