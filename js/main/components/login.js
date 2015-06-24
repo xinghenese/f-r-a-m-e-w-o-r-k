@@ -1,6 +1,7 @@
 'use strict';
 
-var React = require('react/addons');
+var _ = require('lodash');
+var React = require('react');
 var Lang = require('../locales/zh-cn');
 var Styles = require('../constants/styles');
 var style = require('../style/login');
@@ -278,7 +279,6 @@ var Login = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
-//      return true;
         return /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
     },
     render: function() {
@@ -286,14 +286,14 @@ var Login = React.createClass({
         var phoneLableStyle = makeStyle(style.login.form.label);
         if (this.state.promptInvalidPhone) {
             phonePrompt = Lang.invalidPhone;
-            phoneLableStyle = React.addons.update(style.label, {
-                color: {$set: Styles.ERROR_TEXT_COLOR}
+            _.assign(phoneLableStyle, {
+              color: Styles.ERROR_TEXT_COLOR
             });
         }
         return (
             <div style={makeStyle(style.login)}>
                 <div className="login-form" style={makeStyle(style.login.form)}>
-                    <h3>{Lang.loginTitle}</h3>
+                    <p style={makeStyle(style.login.form.title)}>{Lang.loginTitle}</p>
                     <p style={makeStyle(style.login.form.p)}>{Lang.loginSubTitle}</p>
 
                     <div className="login-form-country-name" style={makeStyle(style.login.form.countryName)}>
@@ -338,6 +338,7 @@ var Login = React.createClass({
                             type="submit"
                             value={Lang.next}
                             style={style.login.form.button}
+                            onClick={this._handleSubmit}
                         />
                     </div>
                 </div>
