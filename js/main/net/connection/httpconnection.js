@@ -10,6 +10,7 @@ var http = require('./http');
 var connection = require('./connection');
 var keyExchange = require('../crypto/factory').createKeyExchange();
 var userconfig = require('../userconfig/userconfig');
+var ConnectionType = require('./connectiontype');
 
 //private const fields
 var PUBLIC_KEY_FIELD = "pk";
@@ -25,7 +26,7 @@ var DEFAULT_CONFIG = {
   'needWrap': true,
   'needUnwrap': true,
   'encryptKey': "",
-  'connectionType': "http"
+  'connectionType': ConnectionType.HTTP
 };
 
 //private fields.

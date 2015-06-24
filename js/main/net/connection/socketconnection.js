@@ -14,6 +14,7 @@ var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 var authentication = require('./authentication');
 var UserConfig = require('../userconfig/userconfig');
+var ConnectionType = require('./connectiontype');
 
 console.log('iosession: ', iosession);
 console.log('socketsession: ', session);
@@ -35,7 +36,7 @@ var DEFAULT_CONFIG = {
   'needUnwrap': true,
   'urlRoot': "",
   'encryptKey': "",
-  'connectionType': "socket"
+  'connectionType': ConnectionType.SOCKET
 };
 
 //private fields.

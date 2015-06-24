@@ -5,13 +5,15 @@
 //dependencies
 var _ = require('lodash');
 
-module.exports = function(cssObj){
-  if(_.isPlainObject(cssObj)){
-    return _.mapValues(cssObj, function(value, key){
-      if(!_.isObject(value) && !_.isFunction(value)){
-        return value + "";
-      }
-    })
-  }
-  return {};
+module.exports = function(){
+  return _.reduce(_.toArray(arguments), function(result, arg){
+    if(_.isPlainObject(arg)){
+      return _.assign(result, _.mapValues(arg, function(value){
+        if(!_.isObject(value) && !_.isFunction(value)){
+          return value + "";
+        }
+      }))
+    }
+    return result;
+  }, {});
 };

@@ -5,6 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var filter = require('./filter');
+var ConnectionType = require('../connection/connectiontype');
 
 //core module to export
 module.exports = filter.create({
@@ -14,10 +15,10 @@ module.exports = filter.create({
     var data;
     var tag;
 
-    if(connectionType == 'http'){
+    if(connectionType == ConnectionType.HTTP){
       result = + msg.r;
       data = msg.data;
-    }else if(connectionType == 'socket'){
+    }else if(connectionType == ConnectionType.SOCKET){
       result = + _.isEmpty(msg);
       tag = '' + _.keys(msg)[0];
       data = {
@@ -32,9 +33,9 @@ module.exports = filter.create({
       throw new Error(result);
     }
     //in case of something wrong with response data.
-    if(!data){
-      throw new Error('empty data');
-    }
+//    if(!data){
+//      throw new Error('empty data');
+//    }
     notify(msg);
 
     return data;
