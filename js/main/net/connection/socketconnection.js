@@ -14,6 +14,7 @@ var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 var authentication = require('./authentication');
 var UserConfig = require('../userconfig/userconfig');
+var ConnectionType = require('./connectiontype');
 
 console.log('iosession: ', iosession);
 console.log('socketsession: ', session);
@@ -35,10 +36,11 @@ var DEFAULT_CONFIG = {
   'needUnwrap': true,
   'urlRoot': "",
   'encryptKey': "",
-  'connectionType': "socket"
+  'connectionType': ConnectionType.SOCKET
 };
 
 //private fields.
+var tokenPromise = null;
 var handshakePromise = null;
 var authorizePromise = null;
 var state = State.INITIALIZING;
@@ -95,12 +97,20 @@ state = State.INITIALIZED;
 //private functions
 //just listen to data reception with tag.
 function get(tag){
-  return socketconnection.on(tag);
+  return socketconnection.on(tag, function(data){
+    console.group('socket');
+    console.log('=>', tag + ": " + JSON.stringify(data));
+    console.groupEnd();
+    return data;
+  });
 }
 
 function post(packet){
   var tag = packet.tag;
   var data = packet.data;
+
+  console.group('socket');
+  console.log('<=', tag + ": " + JSON.stringify(data));
 
   if(session.has(tag)){
     return promise.create(session.fetch(tag));
@@ -112,7 +122,11 @@ function post(packet){
       return socket.send(value);
     });
 
-  return socketconnection.once(tag);
+  return socketconnection.once(tag, function(data){
+    console.log('=>', tag + ": " + JSON.stringify(data));
+    console.groupEnd();
+    return data;
+  });
 }
 
 function packetFormalize(packet){
@@ -147,6 +161,8 @@ function onMessageReceived(msg){
     .then(function(value){
       var tag = value.tag;
       var data = value.data;
+
+//      console.log("[socket response] =>", tag + ": " + JSON.stringify(data));
 
       //check whether the message is pushed by server or pulled from server.
       if(tag && !_.isEmpty(socketconnection.listeners(tag))){
@@ -198,6 +214,12 @@ function handshake(){
   }
 
   return handshakePromise;
+}
+
+function awaitToken(){
+  if(!tokenPromise){
+    tokenPromise = ';'
+  }
 }
 
 function ping(){

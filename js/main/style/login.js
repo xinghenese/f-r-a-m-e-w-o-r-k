@@ -11,7 +11,7 @@
 //core module to export
 module.exports = {
   login: {
-    margin: "-131px auto 90px",
+    margin: "-80px auto 90px",
     width: "270px",
     height: "310px",
     border: "1px solid #e6e6e6",
@@ -64,7 +64,7 @@ module.exports = {
       p: {
         color: "#b5b5b5",
         fontSize: "13px",
-        margin: "20px 0 56px"
+        margin: "12px 0 48px"
       },
       label: {
         color: "#999",
@@ -92,22 +92,36 @@ module.exports = {
         color: "#fff",
         height: "47px",
         width: "100%",
-        marginTop: "37px",
+        marginTop: "35px",
         borderRadius: "4px",
         cursor: "pointer"
       },
       inputFocus: {
         borderBottom: "1px solid #6cace1"
       }
+    },
+    codeForm: {
+      textAlign: "center",
+      reset: {
+        color: "#6cace1",
+        lineHeight: "2.5"
+      },
+      notice: {
+        color: "#999",
+        lineHeight: "2",
+        margin: "20px 0 40px"
+      },
+      commonText: {
+        fontSize: "13px",
+        textAlign: "center",
+      },
+      submit: {
+        marginTop: "42px"
+      }
+    },
+    "pointer": {
+      "cursor": "pointer"
     }
-  },
-  "a": {
-    "float": "right",
-    "cursor": "pointer",
-    "color": "#ffffff",
-    "textDecoration": "none",
-    "padding": "27px 15px 28px",
-    "lineHeight": "20px"
   }
 };
 
