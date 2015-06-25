@@ -3,7 +3,8 @@
  */
 
 var React = require('react');
-var app = require('../components/app.js');
+var app = require('../components/app');
+//var app = require('../components/chatmessagebox');
 
 var App = React.createFactory(app);
 //

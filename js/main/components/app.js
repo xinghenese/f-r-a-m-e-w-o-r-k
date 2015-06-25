@@ -9,7 +9,7 @@ var AccountStore = require('../stores/accountstore');
 
 var App = React.createClass({
     _handleDidReceivePhoneStatus: function(status) {
-        console.log("checkPhoneStatus: " + status);
+        console.log("checkPhoneStatus: ", status);
     },
     _handleCheckPhoneStatusError: function(error) {
         console.log("checkPhoneStatus: " + error);
@@ -29,12 +29,12 @@ var App = React.createClass({
         console.log("profile loaded, after login success!");
     },
     componentWillMount: function() {
-        AccountStore.addDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
-        AccountStore.addCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
+//        AccountStore.addDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
+//        AccountStore.addCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
     },
     componentWillUnmount: function() {
-        AccountStore.removeDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
-        AccountStore.removeCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
+//        AccountStore.removeDidReceivePhoneStatusListener(this._handleDidReceivePhoneStatus);
+//        AccountStore.removeCheckPhoneStatusErrorListener(this._handleCheckPhoneStatusError);
     },
     render: function() {
         return (

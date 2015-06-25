@@ -6,7 +6,7 @@ var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var ActionTypes = Constants.ActionTypes;
 var HttpConnection = require('../net/connection/httpconnection');
-var objects = require('../utils/objects');
+//var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 
 var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
@@ -107,11 +107,11 @@ function _handleLoginRequest(action) {
         dv: action.device
     };
     // code is optional, default to 86
-    if (objects.containsValuedProp(action, "code")) {
+//    if (objects.containsValuedProp(action, "code")) {
         data.code = _removeLeadingPlusSignOfCode(action.code);
-    }
-    objects.copyValuedProp(action, "verificationCode", data, "c");
-    objects.copyValuedProp(action, "password", data, "psw");
+//    }
+//    objects.copyValuedProp(action, "verificationCode", data, "c");
+//    objects.copyValuedProp(action, "password", data, "psw");
     HttpConnection.request({
         url: "usr/lg",
         data: data
@@ -168,8 +168,8 @@ function _handleRegisterRequest(action) {
         di: action.deviceInfo,
         os: action.os
     };
-    objects.copyValuedProp(action, "avatar", data, "pt");
-    objects.copyValuedProp(action, "verificationCode", data, "c");
+//    objects.copyValuedProp(action, "avatar", data, "pt");
+//    objects.copyValuedProp(action, "verificationCode", data, "c");
     HttpConnection.request({
         url: "usr/reg",
         data: data
