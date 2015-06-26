@@ -40,15 +40,7 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         LOGOUT_SUCCESS: 'logoutSuccess',
         LOGOUT_FAILED: 'logoutFailed',
         VERIFICATION_CODE_SENT: 'verificationCodeSent',
-        VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent',
-        VOICE_VERIFICATION_CODE_SENT: 'voiceVerificationCodeSent',
-        VOICE_VERIFICATION_CODE_NOT_SENT: 'voiceVerificationCodeNotSent'
-    },
-    addListener: function(event, callback) {
-        this.on(event, callback);
-    },
-    removeListener: function(event, callback) {
-        this.removeListener(event, callback);
+        VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
     }
 });
 
@@ -205,20 +197,21 @@ function _handleRegisterRequest(action) {
     });
 }
 
-function _handleVerificationRequest(action, url, successCallback, failureCallback) {
+function _handleVerificationCodeRequest(action, successCallback, failureCallback) {
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
         mid: action.phone,
         cc: code,
-        tp: action.verificationType
+        tp: action.requestType,
+        mt: action.codeType
     };
     HttpConnection.request({
-        url: url,
+        url: "sms/sc",
         data: data
     }).then(function(response) {
         switch (response.r) {
             case 0: // success
-                successCallback();
+                AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
                 break;
             case 1: // failed
             case 5: // invalid arguments
@@ -229,38 +222,12 @@ function _handleVerificationRequest(action, url, successCallback, failureCallbac
             case 2007: // user deleted
             case 2012: // user already exist
             default:
-                failureCallback(Lang.requestVerificationCodeFailed);
+                AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, Lang.requestVerificationCodeFailed);
                 break;
         }
     }, function(error) {
-        failureCallback(Lang.requestVerificationCodeFailed);
+        AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, Lang.requestVerificationCodeFailed);
     });
-}
-
-function _handleVerificationCodeRequest(action) {
-    _handleVerificationRequest(
-        action,
-        "sms/sc",
-        function() {
-            AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
-        },
-        function(error) {
-            AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, error);
-        }
-    );
-}
-
-function _handleVoiceVerificationCodeRequest(action) {
-    _handleVerificationRequest(
-        action,
-        "sms/svc",
-        function() {
-            AccountStore.emit(AccountStore.Events.VOICE_VERIFICATION_CODE_SENT);
-        },
-        function(error) {
-            AccountStore.emit(AccountStore.Events.VOICE_VERIFICATION_CODE_NOT_SENT, error);
-        }
-    );
 }
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
@@ -276,12 +243,6 @@ AccountStore.dispatchToken = AppDispatcher.register(function(action) {
             break;
         case ActionTypes.REQUEST_VERIFICATION_CODE:
             _handleVerificationCodeRequest(action);
-            break;
-        case ActionTypes.CHECK_VERIFICATION_CODE:
-            _handleCheckVerificationCodeRequest(action);
-            break;
-        case ActionTypes.REQUEST_VOICE_VERIFICATION_CODE:
-            _handleVoiceVerificationCodeRequest(action);
             break;
     }
 });
