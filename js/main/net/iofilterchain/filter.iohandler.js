@@ -32,10 +32,7 @@ module.exports = filter.create({
       console.error('invalid result valued:', result);
       throw new Error(result);
     }
-    //in case of something wrong with response data.
-//    if(!data){
-//      throw new Error('empty data');
-//    }
+    
     notify(msg);
 
     return data;
