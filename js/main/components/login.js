@@ -231,9 +231,9 @@ var Countries = [
 ];
 
 var LoginStep = {
-  FILL_INFO: 1,
-  ENTER_CODE: 2,
-  LOGIN: 3
+    FILL_INFO: 1,
+    ENTER_CODE: 2,
+    LOGIN: 3
 };
 
 var Login = React.createClass({
@@ -258,6 +258,11 @@ var Login = React.createClass({
         var name = this._getCountryName(code);
         this.setState({countryName: name, countryCode: code});
     },
+    _handleKeyDown: function(event) {
+        if (event.keyCode == 13) { // enter key
+            this._handleSubmit();
+        }
+    },
     _handlePhoneNumberChange: function(event) {
         this.setState({phoneNumber: event.target.value});
     },
@@ -265,21 +270,20 @@ var Login = React.createClass({
         this.setState({step: LoginStep.FILL_INFO, promptInvalidPhone: false});
     },
     _handleSubmit: function() {
-        if(this.state.step === LoginStep.FILL_INFO){
-          if (!this._validatePhoneNumber()) {
-            this.setState({promptInvalidPhone: true});
-            React.findDOMNode(this.refs.phone).focus();
-          } else {
-            this.setState({step: LoginStep.ENTER_CODE});
-          }
+        if (this.state.step === LoginStep.FILL_INFO) {
+            if (!this._validatePhoneNumber()) {
+                this.setState({promptInvalidPhone: true});
+                React.findDOMNode(this.refs.phone).focus();
+            } else {
+                this.setState({step: LoginStep.ENTER_CODE});
+            }
         } else if (this.state.step === LoginStep.ENTER_CODE) {
-          if( !this._validateSMSCode()) {
-            this.setState({promptInvalidSMSCode: true});
-            React.findDOMNode(this.refs.smscode).focus();
-          } else {
-            this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
-          }
-
+            if (!this._validateSMSCode()) {
+                this.setState({promptInvalidSMSCode: true});
+                React.findDOMNode(this.refs.smscode).focus();
+            } else {
+                this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
+            }
         }
     },
     _getCountryName: function(code) {
@@ -301,7 +305,7 @@ var Login = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
-        return /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
+        return this.state.countryCode != "+86" || /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
     },
     _validateSMSCode: function() {
         //should extend logic here by using promise
@@ -360,6 +364,7 @@ var Login = React.createClass({
                                     value={this.state.phoneNumber}
                                     onBlur={onInputBlur}
                                     onFocus={onInputFocus}
+                                    onKeyDown={this._handleKeyDown}
                                     onChange={this._handlePhoneNumberChange}
                                 />
                             </div>
