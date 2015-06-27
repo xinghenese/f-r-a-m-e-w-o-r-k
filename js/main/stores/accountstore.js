@@ -27,7 +27,8 @@ var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 //private fields
 var _account = {
     code: "+86",
-    phone: ""
+    phone: "",
+    requestType: 1
 };
 
 var AccountStore = assign({}, EventEmitter.prototype, {
@@ -56,6 +57,9 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     getPhone: function() {
         return _account.phone;
+    },
+    getRequestType: function() {
+        return _account.requestType;
     }
 });
 
@@ -89,6 +93,7 @@ function _handleCheckPhoneStatusRequest(action) {
 }
 
 function _handleCheckVerificationCodeRequest(action) {
+    console.log("check code");
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
         cc: code,
@@ -248,12 +253,16 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
 function _updateAccount(action) {
     _account.code = action.code;
     _account.phone = action.phone;
+    _account.requestType = action.requestType;
 }
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.CHECK_PHONE_STATUS:
             _handleCheckPhoneStatusRequest(action);
+            break;
+        case ActionTypes.CHECK_VERIFICATION_CODE:
+            _handleCheckVerificationCodeRequest(action);
             break;
         case ActionTypes.LOGIN:
             _handleLoginRequest(action);

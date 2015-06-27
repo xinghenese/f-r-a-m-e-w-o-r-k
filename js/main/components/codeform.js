@@ -19,6 +19,9 @@ var CodeForm = React.createClass({
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode).focus();
     },
+    _handleCodeChange: function(event) {
+        this.setState({smsCode: event.target.value});
+    },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
@@ -29,7 +32,7 @@ var CodeForm = React.createClass({
             this.setState({promptInvalidSMSCode: true});
             this._focusInput();
         } else {
-            this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
+            this.props.onSubmit(this.state.smsCode);
         }
     },
     _validateSMSCode: function() {
@@ -70,7 +73,8 @@ var CodeForm = React.createClass({
                                autoComplete="off"
                                type="tel"
                                ref="smscode"
-                               onChange={this._handleCountryCodeChange}
+                               onKeyDown={this._handleKeyDown}
+                               onChange={this._handleCodeChange}
                                onBlur={onInputBlur}
                                onFocus={onInputFocus}
                             />

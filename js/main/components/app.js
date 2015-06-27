@@ -6,6 +6,7 @@ var _ = require('lodash');
 var PhoneForm = require('./phoneform');
 var CodeForm = require('./codeform');
 var Chat = require('./chat');
+var SmartSlot = require('./mixins/smartslot');
 var React = require('react');
 var Router = require('react-router');
 var Navigation = Router.Navigation;
@@ -17,7 +18,8 @@ var AccountStore = require('../stores/accountstore');
 
 var App = React.createClass({
     mixins: [
-        Navigation
+        Navigation,
+        SmartSlot
     ],
     _handleCheckPhoneStatusSuccess: function(status) {
         console.log(status);
@@ -30,15 +32,19 @@ var App = React.createClass({
         console.log("checkPhoneStatus: " + error);
     },
     _handleCheckVerificationCodeSuccess: function(status) {
-        console.log("checkPhoneStatus: ", status);
         this.transitionTo("chat", {t: "boy"}, {age: 8});
     },
     _handleCheckVerificationCodeError: function(error) {
-        console.log("checkPhoneStatus: " + error);
+        console.log("checkCode: " + error);
     },
-    _handleCodeSubmit: function(data) {
+    _handleCodeSubmit: function(verificationCode) {
         console.log("code submit");
-        console.log(data);
+        AccountActions.checkVerificationCode(
+            AccountStore.getCode(),
+            AccountStore.getPhone(),
+            AccountStore.getRequestType(),
+            verificationCode
+        );
     },
     _handlePhoneSubmit: function(countryCode, phoneNumber) {
         console.log(countryCode, "-", phoneNumber);
@@ -68,10 +74,14 @@ var App = React.createClass({
     componentWillMount: function() {
         AccountStore.on(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
         AccountStore.on(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
+        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
+        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
     },
     componentWillUnmount: function() {
         AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
         AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
+        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
+        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
     },
     render: function() {
         return (
