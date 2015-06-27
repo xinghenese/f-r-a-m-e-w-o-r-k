@@ -1,9 +1,13 @@
+/**
+ * Created by kevin on 6/26/15.
+ */
 'use strict';
 
 var _ = require('lodash');
 var React = require('react');
 var Lang = require('../locales/zh-cn');
 var Styles = require('../constants/styles');
+var KeyCodes = require('../constants/keycodes');
 var style = require('../style/login');
 var makeStyle = require('../style/stylenormalizer');
 
@@ -230,23 +234,17 @@ var Countries = [
     {"name": "泽西岛", "code": "+44"}
 ];
 
-var LoginStep = {
-    FILL_INFO: 1,
-    ENTER_CODE: 2,
-    LOGIN: 3
-};
-
-var Login = React.createClass({
+var PhoneForm = React.createClass({
     getInitialState: function() {
         return {
             countryName: "中国",
             countryCode: "+86",
             phoneNumber: "",
-            smsCode: "",
-            promptInvalidPhone: false,
-            promptInvalidSMSCode: false,
-            step: LoginStep.FILL_INFO
+            promptInvalidPhone: false
         };
+    },
+    _focusPhoneInput: function() {
+        React.findDOMNode(this.refs.phone).focus();
     },
     _handleCountryNameChange: function(event) {
         var name = event.target.value;
@@ -258,32 +256,26 @@ var Login = React.createClass({
         var name = this._getCountryName(code);
         this.setState({countryName: name, countryCode: code});
     },
+    _handleInputBlur: function(event) {
+        event.target.style.borderBottom = style.login.form.input.borderBottom;
+    },
+    _handleInputFocus: function(event) {
+        event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
+    },
     _handleKeyDown: function(event) {
-        if (event.keyCode == 13) { // enter key
+        if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
         }
     },
     _handlePhoneNumberChange: function(event) {
         this.setState({phoneNumber: event.target.value});
     },
-    _handleReset: function(){
-        this.setState({step: LoginStep.FILL_INFO, promptInvalidPhone: false});
-    },
     _handleSubmit: function() {
-        if (this.state.step === LoginStep.FILL_INFO) {
-            if (!this._validatePhoneNumber()) {
-                this.setState({promptInvalidPhone: true});
-                React.findDOMNode(this.refs.phone).focus();
-            } else {
-                this.setState({step: LoginStep.ENTER_CODE});
-            }
-        } else if (this.state.step === LoginStep.ENTER_CODE) {
-            if (!this._validateSMSCode()) {
-                this.setState({promptInvalidSMSCode: true});
-                React.findDOMNode(this.refs.smscode).focus();
-            } else {
-                this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
-            }
+        if (!this._validatePhoneNumber()) {
+            this.setState({promptInvalidPhone: true});
+            this._focusPhoneInput();
+        } else {
+            this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
         }
     },
     _getCountryName: function(code) {
@@ -307,135 +299,78 @@ var Login = React.createClass({
     _validatePhoneNumber: function() {
         return this.state.countryCode != "+86" || /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
     },
-    _validateSMSCode: function() {
-        //should extend logic here by using promise
-        return true;
+    componentDidMount: function() {
+        this._focusPhoneInput();
     },
     render: function() {
         var login = style.login;
         var loginForm = login.form;
-        var codeForm = login.codeForm;
         var phonePrompt = Lang.phone;
         var phoneLableStyle = makeStyle(loginForm.label);
         if (this.state.promptInvalidPhone) {
             phonePrompt = Lang.invalidPhone;
             _.assign(phoneLableStyle, {
-              color: Styles.ERROR_TEXT_COLOR
+                color: Styles.ERROR_TEXT_COLOR
             });
         }
-        if(this.state.step === LoginStep.FILL_INFO){
-            return (
-                <div style={makeStyle(login)}>
-                    <div className="login-form" style={makeStyle(loginForm)}>
-                        <p style={makeStyle(loginForm.title)}>{Lang.loginTitle}</p>
-                        <p style={makeStyle(loginForm.p)}>{Lang.loginSubTitle}</p>
+        return (
+            <div style={makeStyle(login)}>
+                <div className="login-form" style={makeStyle(loginForm)}>
+                    <p style={makeStyle(loginForm.title)}>{Lang.loginTitle}</p>
 
-                        <div className="login-form-country-name" style={makeStyle(loginForm.countryName)}>
-                            <label style={makeStyle(loginForm.label)}>{Lang.country}</label>
+                    <p style={makeStyle(loginForm.p)}>{Lang.loginSubTitle}</p>
+
+                    <div className="login-form-country-name" style={makeStyle(loginForm.countryName)}>
+                        <label style={makeStyle(loginForm.label)}>{Lang.country}</label>
+                        <input
+                            style={makeStyle(loginForm.input)}
+                            autoComplete="off" type="tel"
+                            onChange={this._handleCountryNameChange}
+                            onBlur={this._handleInputBlur}
+                            onFocus={this._handleInputFocus}
+                            placeholder={this.state.countryName}
+                            />
+                    </div>
+                    <div>
+                        <div className="login-form-country-code" style={makeStyle(loginForm.countryCode)}>
+                            <label style={phoneLableStyle}>{Lang.code}</label>
                             <input
                                 style={makeStyle(loginForm.input)}
-                                autoComplete="off" type="tel"
-                                onChange={this._handleCountryNameChange}
-                                onBlur={onInputBlur}
-                                onFocus={onInputFocus}
-                                placeholder={this.state.countryName}
-                            />
-                        </div>
-                        <div>
-                            <div className="login-form-country-code" style={makeStyle(loginForm.countryCode)}>
-                                <label style={phoneLableStyle}>{Lang.code}</label>
-                                <input
-                                    style={makeStyle(loginForm.input)}
-                                    autoComplete="off"
-                                    type="tel"
-                                    onChange={this._handleCountryCodeChange}
-                                    onBlur={onInputBlur}
-                                    onFocus={onInputFocus}
-                                    placeholder={this.state.countryCode}
-                                />
-                            </div>
-                            <div className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
-                                <label style={phoneLableStyle}>{phonePrompt}</label>
-                                <input
-                                    style={makeStyle(loginForm.input)}
-                                    required=""
-                                    ref="phone"
-                                    autoComplete="off" type="tel"
-                                    value={this.state.phoneNumber}
-                                    onBlur={onInputBlur}
-                                    onFocus={onInputFocus}
-                                    onKeyDown={this._handleKeyDown}
-                                    onChange={this._handlePhoneNumberChange}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <input
-                                type="submit"
-                                value={Lang.next}
-                                style={loginForm.button}
-                                onClick={this._handleSubmit}
-                            />
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        if(this.state.step === LoginStep.ENTER_CODE){
-            return (
-                <div style={makeStyle(login)}>
-                    <div className="login-code-form" style={codeForm}>
-                        <p className="login-current-phone" style={loginForm.title}>
-                            {this.state.countryCode + " " + this.state.phoneNumber}
-                        </p>
-                        <a
-                            className="login-reset"
-                            style={makeStyle(codeForm.commonText, login.pointer, codeForm.reset)}
-                            onClick={this._handleReset}
-                        >
-                            {Lang.loginReset}
-                        </a>
-                        <p
-                            className="login-send-code-notice"
-                            style={makeStyle(codeForm.commonText, codeForm.notice)}
-                            dangerouslySetInnerHTML={{__html: Lang.sendCodeNotice}}
-                        >
-                        </p>
-                        <div className="login-enter-code">
-                            <label style={makeStyle(loginForm.label)}>{Lang.enterCode}</label>
-                            <input type="text"
-                                style={makeStyle(loginForm.input, codeForm.commonText)}
                                 autoComplete="off"
                                 type="tel"
-                                ref="smscode"
                                 onChange={this._handleCountryCodeChange}
-                                onBlur={onInputBlur}
-                                onFocus={onInputFocus}
-                            />
+                                onBlur={this._handleInputBlur}
+                                onFocus={this._handleInputFocus}
+                                placeholder={this.state.countryCode}
+                                />
                         </div>
-                        <div>
+                        <div className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
+                            <label style={phoneLableStyle}>{phonePrompt}</label>
                             <input
-                              type="submit"
-                              value={Lang.next}
-                              style={makeStyle(loginForm.button, codeForm.submit)}
-                              onClick={this._handleSubmit}
-                            />
+                                style={makeStyle(loginForm.input)}
+                                required=""
+                                ref="phone"
+                                autoComplete="off" type="tel"
+                                value={this.state.phoneNumber}
+                                onBlur={this._handleInputBlur}
+                                onFocus={this._handleInputFocus}
+                                onKeyDown={this._handleKeyDown}
+                                onChange={this._handlePhoneNumberChange}
+                                />
                         </div>
                     </div>
+                    <div>
+                        <input
+                            type="submit"
+                            value={Lang.next}
+                            style={loginForm.button}
+                            onClick={this._handleSubmit}
+                            />
+                    </div>
                 </div>
-            );
-        }
-        return null;
+            </div>
+        );
     }
 });
 
-module.exports = Login;
-
-//private functions
-function onInputBlur(event){
-  event.target.style.borderBottom = style.login.form.input.borderBottom;
-}
-
-function onInputFocus(event){
-  event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
-}
+module.exports = PhoneForm;

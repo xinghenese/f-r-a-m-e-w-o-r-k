@@ -25,7 +25,10 @@ var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
 var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
 //private fields
-
+var _account = {
+    code: "+86",
+    phone: ""
+};
 
 var AccountStore = assign({}, EventEmitter.prototype, {
     Events: {
@@ -41,6 +44,18 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         LOGOUT_FAILED: 'logoutFailed',
         VERIFICATION_CODE_SENT: 'verificationCodeSent',
         VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
+    },
+    getInitialState: function() {
+        return {
+            code: "+86",
+            phone: ""
+        };
+    },
+    getCode: function() {
+        return _account.code;
+    },
+    getPhone: function() {
+        return _account.phone;
     }
 });
 
@@ -198,10 +213,12 @@ function _handleRegisterRequest(action) {
 }
 
 function _handleVerificationCodeRequest(action, successCallback, failureCallback) {
+    _updateAccount(action);
+
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
-        mid: action.phone,
         cc: code,
+        mid: action.phone,
         tp: action.requestType,
         mt: action.codeType
     };
@@ -209,10 +226,9 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
         url: "sms/sc",
         data: data
     }).then(function(response) {
-        switch (response.r) {
-            case 0: // success
-                AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
-                break;
+        AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
+    }, function(error) {
+        switch (error) {
             case 1: // failed
             case 5: // invalid arguments
             case 102: // too many requests within 24 hours
@@ -222,12 +238,16 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
             case 2007: // user deleted
             case 2012: // user already exist
             default:
-                AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, Lang.requestVerificationCodeFailed);
+                console.log(error);
                 break;
         }
-    }, function(error) {
         AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, Lang.requestVerificationCodeFailed);
     });
+}
+
+function _updateAccount(action) {
+    _account.code = action.code;
+    _account.phone = action.phone;
 }
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {

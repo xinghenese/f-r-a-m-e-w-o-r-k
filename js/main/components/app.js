@@ -3,7 +3,8 @@
 'use strict';
 
 var _ = require('lodash');
-var Login = require('./login');
+var PhoneForm = require('./phoneform');
+var CodeForm = require('./codeform');
 var Chat = require('./chat');
 var React = require('react');
 var Router = require('react-router');
@@ -35,8 +36,11 @@ var App = React.createClass({
     _handleCheckVerificationCodeError: function(error) {
         console.log("checkPhoneStatus: " + error);
     },
+    _handleCodeSubmit: function(data) {
+        console.log("code submit");
+        console.log(data);
+    },
     _handlePhoneSubmit: function(countryCode, phoneNumber) {
-        console.log("submit");
         console.log(countryCode, "-", phoneNumber);
         AccountActions.requestVerificationCode(
             countryCode,
@@ -45,8 +49,8 @@ var App = React.createClass({
             1  // text code
         );
     },
-    _handleVerificationCodeSent: function(data) {
-        console.log(data);
+    _handleVerificationCodeSent: function() {
+        this.transitionTo("code");
     },
     _handleVerificationCodeNotSent: function(error) {
         console.log(error);
@@ -67,7 +71,7 @@ var App = React.createClass({
     },
     componentWillUnmount: function() {
         AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
-        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerficationCodeNotSent);
+        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
     },
     render: function() {
         return (
@@ -85,14 +89,18 @@ function wrapComponent(Component, props) {
 }
 
 var app = new App();
-var WrappedLogin = wrapComponent(Login, {
+var WrappedPhoneForm = wrapComponent(PhoneForm, {
     onSubmit: app._handlePhoneSubmit
+});
+var WrappedCodeForm = wrapComponent(CodeForm, {
+    onSubmit: app._handleCodeSubmit
 });
 var routes = (
     <Route name="app" path="/" handler={App}>
-        <Route name="login" handler={WrappedLogin} />
+        <Route name="phone" handle={WrappedPhoneForm} />
+        <Route name="code" handler={WrappedCodeForm} />
         <Route name="chat" path="/chat/:t" handler={Chat} />
-        <DefaultRoute handler={WrappedLogin} />
+        <DefaultRoute handler={WrappedPhoneForm} />
     </Route>
 );
 
