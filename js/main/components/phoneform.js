@@ -8,6 +8,8 @@ var React = require('react');
 var Lang = require('../locales/zh-cn');
 var Styles = require('../constants/styles');
 var KeyCodes = require('../constants/keycodes');
+var AccountActions = require('../actions/accountactions');
+var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
 var makeStyle = require('../style/stylenormalizer');
 
@@ -268,15 +270,28 @@ var PhoneForm = React.createClass({
         }
     },
     _handlePhoneNumberChange: function(event) {
-        this.setState({phoneNumber: event.target.value});
+        this.setState({
+            phoneNumber: event.target.value,
+            promptInvalidPhone: false
+        });
     },
     _handleSubmit: function() {
         if (!this._validatePhoneNumber()) {
             this.setState({promptInvalidPhone: true});
             this._focusPhoneInput();
         } else {
-            this.props.onSubmit(this.state.countryCode, this.state.phoneNumber);
+            AccountActions.requestVerificationCode(
+                this.state.countryCode,
+                this.state.phoneNumber
+            );
         }
+    },
+    _handleVerificationCodeSent: function() {
+        console.log("code sent");
+        this.props.onVerificationCodeSent();
+    },
+    _handleVerificationCodeNotSent: function(error) {
+        console.log(error);
     },
     _getCountryName: function(code) {
         for (var i = 0; i < Countries.length; i++) {
@@ -301,6 +316,15 @@ var PhoneForm = React.createClass({
     },
     componentDidMount: function() {
         this._focusPhoneInput();
+    },
+    componentWillMount: function() {
+        AccountStore.on(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
+        AccountStore.on(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
+    },
+    componentWillUnmount: function() {
+        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
+        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
+        AccountStore.printSelf();
     },
     render: function() {
         var login = style.login;

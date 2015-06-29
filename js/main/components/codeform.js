@@ -3,8 +3,8 @@
 var _ = require('lodash');
 var React = require('react');
 var Lang = require('../locales/zh-cn');
-var Styles = require('../constants/styles');
 var KeyCodes = require('../constants/keycodes');
+var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
 var makeStyle = require('../style/stylenormalizer');
@@ -19,6 +19,12 @@ var CodeForm = React.createClass({
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode).focus();
     },
+    _handleCheckVerificationCodeSuccess: function() {
+        this.props.onCheckVerificationSuccess();
+    },
+    _handleCheckVerificationCodeError: function(error) {
+        console.log("checkCode: " + error);
+    },
     _handleCodeChange: function(event) {
         this.setState({smsCode: event.target.value});
     },
@@ -32,7 +38,13 @@ var CodeForm = React.createClass({
             this.setState({promptInvalidSMSCode: true});
             this._focusInput();
         } else {
-            this.props.onSubmit(this.state.smsCode);
+            console.log("code submit");
+            AccountActions.checkVerificationCode(
+                AccountStore.getCode(),
+                AccountStore.getPhone(),
+                AccountStore.getRequestType(),
+                this.state.smsCode
+            );
         }
     },
     _validateSMSCode: function() {
@@ -41,16 +53,18 @@ var CodeForm = React.createClass({
     componentDidMount: function() {
         this._focusInput();
     },
+    componentWillMount: function() {
+        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
+        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
+    },
+    componentWillUnmount: function() {
+        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
+        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
+    },
     render: function() {
         var login = style.login;
         var loginForm = login.form;
         var codeForm = login.codeForm;
-        var phoneLableStyle = makeStyle(loginForm.label);
-        if (this.state.promptInvalidPhone) {
-            _.assign(phoneLableStyle, {
-                color: Styles.ERROR_TEXT_COLOR
-            });
-        }
         return (
             <div style={makeStyle(login)}>
                 <div className="login-code-form" style={codeForm}>

@@ -60,6 +60,9 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     getRequestType: function() {
         return _account.requestType;
+    },
+    printSelf: function() {
+        console.log(this);
     }
 });
 

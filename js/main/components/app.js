@@ -18,46 +18,18 @@ var AccountStore = require('../stores/accountstore');
 
 var App = React.createClass({
     mixins: [
-        Navigation,
-        SmartSlot
+        Navigation
     ],
-    _handleCheckPhoneStatusSuccess: function(status) {
-        console.log(status);
+    _handleCheckVerificationCodeSuccess: function() {
+        console.log("this");
+        console.log(this);
         this.transitionTo("chat", {t: "boy"}, {age: 8});
-        if (status.hr == 0) {
-            this.transitionTo("code");
-        }
-    },
-    _handleCheckPhoneStatusError: function(error) {
-        console.log("checkPhoneStatus: " + error);
-    },
-    _handleCheckVerificationCodeSuccess: function(status) {
-        this.transitionTo("chat", {t: "boy"}, {age: 8});
-    },
-    _handleCheckVerificationCodeError: function(error) {
-        console.log("checkCode: " + error);
-    },
-    _handleCodeSubmit: function(verificationCode) {
-        console.log("code submit");
-        AccountActions.checkVerificationCode(
-            AccountStore.getCode(),
-            AccountStore.getPhone(),
-            AccountStore.getRequestType(),
-            verificationCode
-        );
-    },
-    _handlePhoneSubmit: function(countryCode, phoneNumber) {
-        console.log(countryCode, "-", phoneNumber);
-        AccountActions.requestVerificationCode(
-            countryCode,
-            phoneNumber
-        );
     },
     _handleVerificationCodeSent: function() {
+        console.log("to code");
+        console.log(this);
         this.transitionTo("code");
-    },
-    _handleVerificationCodeNotSent: function(error) {
-        console.log(error);
+        console.log('done');
     },
     _onLoginSuccess: function() {
         console.log(this);
@@ -68,18 +40,6 @@ var App = React.createClass({
     },
     _onProfileLoaded: function() {
         console.log("profile loaded, after login success!");
-    },
-    componentWillMount: function() {
-        AccountStore.on(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
-        AccountStore.on(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
-        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
-        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
-    },
-    componentWillUnmount: function() {
-        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
-        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
-        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
-        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
     },
     render: function() {
         return (
@@ -98,10 +58,10 @@ function wrapComponent(Component, props) {
 
 var app = new App();
 var WrappedPhoneForm = wrapComponent(PhoneForm, {
-    onSubmit: app._handlePhoneSubmit
+    onVerificationCodeSent: app._handleVerificationCodeSent
 });
 var WrappedCodeForm = wrapComponent(CodeForm, {
-    onSubmit: app._handleCodeSubmit
+    onCheckVerificationCodeSuccess: app._handleCheckVerificationCodeSuccess
 });
 var routes = (
     <Route name="app" path="/" handler={App}>
