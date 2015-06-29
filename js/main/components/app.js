@@ -50,9 +50,7 @@ var App = React.createClass({
         console.log(countryCode, "-", phoneNumber);
         AccountActions.requestVerificationCode(
             countryCode,
-            phoneNumber,
-            1, // register/login
-            1  // text code
+            phoneNumber
         );
     },
     _handleVerificationCodeSent: function() {

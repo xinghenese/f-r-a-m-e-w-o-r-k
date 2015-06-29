@@ -36,8 +36,7 @@ var CodeForm = React.createClass({
         }
     },
     _validateSMSCode: function() {
-        //should extend logic here by using promise
-        return true;
+        return (/(\d){5,}/).test(this.state.smsCode);
     },
     componentDidMount: function() {
         this._focusInput();

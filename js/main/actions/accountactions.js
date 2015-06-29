@@ -51,8 +51,8 @@ module.exports = {
             type: ActionTypes.REQUEST_VERIFICATION_CODE,
             code: code,
             phone: phone,
-            requestType: requestType,
-            codeType: codeType
+            requestType: requestType || 1, // register/login, by default
+            codeType: codeType || 1 // text code, by default
         });
     }
 };
