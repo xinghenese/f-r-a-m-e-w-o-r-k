@@ -15,6 +15,7 @@ var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
+var _context = null;
 
 var App = React.createClass({
     mixins: [
@@ -28,7 +29,7 @@ var App = React.createClass({
     _handleVerificationCodeSent: function() {
         console.log("to code");
         console.log(this);
-        this.transitionTo("code");
+        this._routeTo("code");
         console.log('done');
     },
     _onLoginSuccess: function() {
@@ -41,7 +42,20 @@ var App = React.createClass({
     _onProfileLoaded: function() {
         console.log("profile loaded, after login success!");
     },
+    _routeTo: function(pathname, query, state) {
+        console.log(this);
+        if (typeof this.context === "undefined") {
+            this.context = _context;
+        }
+        this.transitionTo(pathname, query, state);
+    },
+    componentWillMount: function() {
+        console.log(this);
+        _context = this.context;
+    },
     render: function() {
+        console.log("context");
+        console.log(this.context);
         return (
             <RouteHandler />
         );
@@ -57,6 +71,7 @@ function wrapComponent(Component, props) {
 }
 
 var app = new App();
+console.log(App);
 var WrappedPhoneForm = wrapComponent(PhoneForm, {
     onVerificationCodeSent: app._handleVerificationCodeSent
 });
