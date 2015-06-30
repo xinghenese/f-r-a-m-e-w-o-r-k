@@ -3,13 +3,12 @@
  */
 
 var React = require('react');
-var app = require('../components/app');
-//var app = require('../components/chatmessagebox');
+//var app = require('../components/app');
+var App = require('../components/chatmessagebox');
 
-var App = React.createFactory(app);
 //
 React.render(
-  App(),
+  <App/>,
   document.getElementById('content')
 );
 console.log('init');
