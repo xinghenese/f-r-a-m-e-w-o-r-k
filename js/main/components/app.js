@@ -11,7 +11,15 @@ var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
 
-var App = React.createClass({
+function wrapComponent(Component, props) {
+    return React.createClass({
+        render: function() {
+            return React.createElement(Component, props);
+        }
+    });
+}
+
+var app = {
     _handleCheckVerificationCodeSuccess: function() {
         router.transitionTo("chat", {t: "boy"}, {age: 8});
     },
@@ -27,23 +35,8 @@ var App = React.createClass({
     },
     _onProfileLoaded: function() {
         console.log("profile loaded, after login success!");
-    },
-    render: function() {
-        return (
-            <RouteHandler />
-        );
     }
-});
-
-function wrapComponent(Component, props) {
-    return React.createClass({
-        render: function() {
-            return React.createElement(Component, props);
-        }
-    });
-}
-
-var app = new App();
+};
 var WrappedPhoneForm = wrapComponent(PhoneForm, {
     onVerificationCodeSent: app._handleVerificationCodeSent
 });
@@ -51,7 +44,7 @@ var WrappedCodeForm = wrapComponent(CodeForm, {
     onCheckVerificationCodeSuccess: app._handleCheckVerificationCodeSuccess
 });
 var routes = (
-    <Route name="app" path="/" handler={App}>
+    <Route name="app" path="/">
         <Route name="phone" handle={WrappedPhoneForm} />
         <Route name="code" handler={WrappedCodeForm} />
         <Route name="chat" path="/chat/:t" handler={Chat} />
