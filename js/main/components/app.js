@@ -2,19 +2,14 @@
 
 'use strict';
 
-var _ = require('lodash');
 var PhoneForm = require('./phoneform');
 var CodeForm = require('./codeform');
 var Chat = require('./chat');
-var SmartSlot = require('./mixins/smartslot');
 var React = require('react');
 var Router = require('react-router');
-var Navigation = Router.Navigation;
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
-var AccountActions = require('../actions/accountactions');
-var AccountStore = require('../stores/accountstore');
 
 var App = React.createClass({
     _handleCheckVerificationCodeSuccess: function() {
