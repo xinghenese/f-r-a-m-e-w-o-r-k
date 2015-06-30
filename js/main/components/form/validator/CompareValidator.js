@@ -21,8 +21,8 @@ var validator = module.exports = React.createClass({
         errorMessage={this.props.errorMessage}
         successMessage={this.props.successMessage}
         controlToValidate={this.props.controlToValidate}
-        pattern={validateFunction}
-        atServer={this.props.atServer}
+        validationAtClient={validateFunction}
+        validationAtServer={this.props.validationAtServer}
       />
       )
   }

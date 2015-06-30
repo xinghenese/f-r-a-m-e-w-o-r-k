@@ -21,6 +21,8 @@ module.exports = {
       fontSize: '12px',
       lineHeight: '20px',
       wordWrap: 'break-word',
+      border: '0',
+      outline: '0',
       borderBottom: '1px #d2dbe3 solid',
       margin: '0 124px 0 60px',
       padding: '10px 0'

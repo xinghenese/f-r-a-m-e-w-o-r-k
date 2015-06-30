@@ -46,20 +46,13 @@ module.exports = {
             verificationCode: verificationCode
         });
     },
-    requestVerificationCode: function(code, phone, verificationType) {
+    requestVerificationCode: function(code, phone, requestType, codeType) {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_VERIFICATION_CODE,
             code: code,
             phone: phone,
-            verificationType: verificationType
-        });
-    },
-    requestVoiceVerificationCode: function(code, phone, verificationType) {
-        AppDispatcher.dispatch({
-            type: ActionTypes.REQUEST_VOICE_VERIFICATION_CODE,
-            code: code,
-            phone: phone,
-            verificationType: verificationType
+            requestType: requestType || 1, // register/login, by default
+            codeType: codeType || 1 // text code, by default
         });
     }
 };

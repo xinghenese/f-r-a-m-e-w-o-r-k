@@ -17,7 +17,8 @@ var InputBox = React.createClass({
   render: function(){
     return (
       <input
-        style={makeStyle(style.input, theme.input)}
+        id={this.props.id}
+        style={makeStyle(style.input, theme.input, this.props.style)}
         autoComplete="off" type="tel"
         onChange={this.props.onChange}
         onBlur={onInputBlur}
