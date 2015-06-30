@@ -60,9 +60,6 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     getRequestType: function() {
         return _account.requestType;
-    },
-    printSelf: function() {
-        console.log(this);
     }
 });
 
@@ -78,25 +75,7 @@ function _stripStatusCodeInResponse(response) {
     return response;
 }
 
-function _handleCheckPhoneStatusRequest(action) {
-    var code = _removeLeadingPlusSignOfCode(action.code);
-    HttpConnection.request({
-        url: "usr/cm",
-        data: {
-            mid: action.phone,
-            cc: code
-        }
-    }).then(function(status) {
-      console.log('check.phone.sucess', status);
-      console.log(AccountStore);
-        AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_SUCCESS, status);
-    }, function(error) {
-        AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_ERROR, error);
-    });
-}
-
 function _handleCheckVerificationCodeRequest(action) {
-    console.log("check code");
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
         cc: code,
@@ -108,7 +87,7 @@ function _handleCheckVerificationCodeRequest(action) {
         url: "sms/cc",
         data: data
     }).then(function(response) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, response);
+        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS);
     }, function(error) {
         AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, error.message);
     });

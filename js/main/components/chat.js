@@ -8,9 +8,6 @@ var Router = require('react-router');
 var State = Router.State;
 
 var Chat = React.createClass({
-    componentDidMount: function() {
-        console.log(this.props);
-    },
     render: function() {
         return (
             <div>

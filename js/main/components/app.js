@@ -13,9 +13,7 @@ var RouteHandler = Router.RouteHandler;
 
 var App = React.createClass({
     _handleCheckVerificationCodeSuccess: function() {
-        console.log("this");
-        console.log(this);
-        this.transitionTo("chat", {t: "boy"}, {age: 8});
+        router.transitionTo("chat", {t: "boy"}, {age: 8});
     },
     _handleVerificationCodeSent: function() {
         router.transitionTo("code");

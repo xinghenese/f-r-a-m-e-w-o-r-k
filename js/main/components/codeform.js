@@ -20,7 +20,7 @@ var CodeForm = React.createClass({
         React.findDOMNode(this.refs.smscode).focus();
     },
     _handleCheckVerificationCodeSuccess: function() {
-        this.props.onCheckVerificationSuccess();
+        this.props.onCheckVerificationCodeSuccess();
     },
     _handleCheckVerificationCodeError: function(error) {
         console.log("checkCode: " + error);
@@ -38,7 +38,6 @@ var CodeForm = React.createClass({
             this.setState({promptInvalidSMSCode: true});
             this._focusInput();
         } else {
-            console.log("code submit");
             AccountActions.checkVerificationCode(
                 AccountStore.getCode(),
                 AccountStore.getPhone(),
@@ -69,7 +68,7 @@ var CodeForm = React.createClass({
             <div style={makeStyle(login)}>
                 <div className="login-code-form" style={codeForm}>
                     <p className="login-current-phone" style={loginForm.title}>
-                        {AccountStore.getCode() + " " + AccountStore.getPhone()}
+                        {AccountStore.getCode() + " - " + AccountStore.getPhone()}
                     </p>
 
                     <p

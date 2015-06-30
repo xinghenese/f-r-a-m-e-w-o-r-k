@@ -287,7 +287,6 @@ var PhoneForm = React.createClass({
         }
     },
     _handleVerificationCodeSent: function() {
-        console.log("code sent");
         this.props.onVerificationCodeSent();
     },
     _handleVerificationCodeNotSent: function(error) {
@@ -324,7 +323,6 @@ var PhoneForm = React.createClass({
     componentWillUnmount: function() {
         AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
         AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
-        AccountStore.printSelf();
     },
     render: function() {
         var login = style.login;
