@@ -15,22 +15,15 @@ var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
-var _context = null;
 
 var App = React.createClass({
-    mixins: [
-        Navigation
-    ],
     _handleCheckVerificationCodeSuccess: function() {
         console.log("this");
         console.log(this);
         this.transitionTo("chat", {t: "boy"}, {age: 8});
     },
     _handleVerificationCodeSent: function() {
-        console.log("to code");
-        console.log(this);
-        this._routeTo("code");
-        console.log('done');
+        router.transitionTo("code");
     },
     _onLoginSuccess: function() {
         console.log(this);
@@ -42,20 +35,7 @@ var App = React.createClass({
     _onProfileLoaded: function() {
         console.log("profile loaded, after login success!");
     },
-    _routeTo: function(pathname, query, state) {
-        console.log(this);
-        if (typeof this.context === "undefined") {
-            this.context = _context;
-        }
-        this.transitionTo(pathname, query, state);
-    },
-    componentWillMount: function() {
-        console.log(this);
-        _context = this.context;
-    },
     render: function() {
-        console.log("context");
-        console.log(this.context);
         return (
             <RouteHandler />
         );
@@ -71,7 +51,6 @@ function wrapComponent(Component, props) {
 }
 
 var app = new App();
-console.log(App);
 var WrappedPhoneForm = wrapComponent(PhoneForm, {
     onVerificationCodeSent: app._handleVerificationCodeSent
 });
@@ -86,10 +65,11 @@ var routes = (
         <DefaultRoute handler={WrappedPhoneForm} />
     </Route>
 );
+var router = Router.create(routes);
 
 module.exports = {
     start: function(element) {
-        Router.run(routes, function(Handler, state) {
+        router.run(function(Handler, state) {
             React.render(<Handler params={state.routes.params}/>, element);
         });
     }
