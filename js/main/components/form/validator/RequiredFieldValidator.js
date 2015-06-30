@@ -7,10 +7,15 @@ var React = require('react');
 var Validator = require('./Validator');
 
 //private fields
-
+var seq = 'validator';
 
 //core module to export
-var validator = module.exports = React.createClass({
+var RequiredFieldValidator = React.createClass({
+  validate: function() {
+    console.log('seq: ', seq);
+    console.log('this.refs[' + seq + ']', this.refs[seq]);
+    return this.refs[seq].validate();
+  },
   render: function(){
     return (
       <Validator
@@ -18,17 +23,20 @@ var validator = module.exports = React.createClass({
         errorMessage={this.props.errorMessage}
         successMessage={this.props.successMessage}
         controlToValidate={this.props.controlToValidate}
-        pattern={validateFunction}
-        atServer={this.props.atServer}
+        validationAtClient={validation}
+        ref={seq}
       />
-    )
+    );
   }
 });
+
+module.exports = RequiredFieldValidator;
 
 //module initialization
 
 
 //private functions
-function validateFunction(value) {
+function validation(value) {
+  console.log('validating');
   return value !== void 0 && value !== '';
 }

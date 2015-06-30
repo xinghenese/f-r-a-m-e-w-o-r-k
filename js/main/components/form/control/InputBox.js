@@ -5,19 +5,22 @@
 //dependencies
 var React = require('react');
 var style = require('../../../style/common');
-var makeStyle = require('../../../style/stylenormalizer');
+var theme = require('../../../style/default');
+var makeStyle = require('../../../style/styles').makeStyle;
+var setStyle = require('../../../style/styles').setStyle;
 
 //private fields
 
 
 //core module to export
-var box = module.exprots = React.createClass({
+var InputBox = React.createClass({
   render: function(){
     return (
       <input
-        style={makeStyle(style.input)}
+        id={this.props.id}
+        style={makeStyle(style.input, theme.input, this.props.style)}
         autoComplete="off" type="tel"
-        onChange={this.props.handleInputChange}
+        onChange={this.props.onChange}
         onBlur={onInputBlur}
         onFocus={onInputFocus}
         placeholder={this.props.defaultValue}
@@ -26,14 +29,16 @@ var box = module.exprots = React.createClass({
   }
 });
 
+module.exports = InputBox;
+
 //module initialization
 
 
 //private functions
 function onInputBlur(event){
-  event.target.style.borderBottom = style.login.form.input.borderBottom;
+  setStyle(event.target.style, theme.input.blur);
 }
 
 function onInputFocus(event){
-  event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
+  setStyle(event.target.style, theme.input.focus);
 }
