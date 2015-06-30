@@ -29,6 +29,7 @@ module.exports = origin.extend({
     init: function(data) {
         if (_.isPlainObject(data)) {
             var emitter =  eventemitter.create();
+            this._data = {};
             _.forOwn(data, function(prop, key) {
                 _.set(this._data, key, deferredData.create(prop.value, prop.monitor, emitter, key));
             });

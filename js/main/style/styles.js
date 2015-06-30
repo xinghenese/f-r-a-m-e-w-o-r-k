@@ -5,7 +5,14 @@
 //dependencies
 var _ = require('lodash');
 
-module.exports = function(){
+//core module to export
+module.exports = {
+  makeStyle: makeStyle,
+  setStyle: setStyle
+};
+
+//private functions
+function makeStyle() {
   return _.reduce(_.toArray(arguments), function(result, arg){
     if(_.isPlainObject(arg)){
       return _.assign(result, _.mapValues(arg, function(value){
@@ -16,4 +23,10 @@ module.exports = function(){
     }
     return result;
   }, {});
-};
+}
+
+function setStyle(targetStyle, sourceStyle) {
+  _.forOwn(makeStyle(sourceStyle), function(value, key) {
+    _.set(targetStyle, key, value);
+  });
+}
