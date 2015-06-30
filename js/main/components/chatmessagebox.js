@@ -6,6 +6,10 @@
 var React = require('react');
 var ChatMessageList = require('./chatmessagelist');
 var ChatMessageToolbar = require('./chatmessagetoolbar');
+var InputBox = require('./form/control/InputBox');
+var Form = require('./form/form');
+var RequiredFieldValidator = require('./form/validator/RequiredFieldValidator');
+var Submit = require('./form/control/Submit');
 
 //core module to export
 var messagebox = module.exports = React.createClass({
@@ -24,6 +28,17 @@ var messagebox = module.exports = React.createClass({
       <div className="chat-message-box">
         <ChatMessageList data={this.state.data}/>
         <ChatMessageToolbar/>
+        <InputBox defaultValue="default"/>
+        <Form handleSubmit={function(){console.log('submit success!');}}>
+          <RequiredFieldValidator
+            defaultMessage="PassWord"
+            errorMessage="Empty Password!!"
+            successMessage="Password Inputted"
+            controlToValidate="password"
+          />
+          <InputBox id="password" defaultValue="password"/>
+          <Submit />
+        </Form>
       </div>
     );
   }

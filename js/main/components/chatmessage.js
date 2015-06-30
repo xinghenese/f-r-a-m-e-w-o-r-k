@@ -5,7 +5,7 @@
 //dependencies
 var React = require('react');
 var style = require('../style/chatmessage');
-var makeStyle = require('../style/stylenormalizer');
+var makeStyle = require('../style/styles').makeStyle;
 
 //core module to export
 var chatmessage = module.exports = React.createClass({
