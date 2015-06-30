@@ -28,28 +28,26 @@ var ValidatorClasses = [
  */
 
 //module initialization
-var form = module.exports = React.createClass({
+var Form = React.createClass({
   render: function(){
     var i = 0;
     var children = React.Children.map(this.props.children, function(child) {
-      return React.cloneElement(child, {ref: 'form-control-' + (i++)});
+      var seq = i ++;
+      return React.cloneElement(child, {
+        ref: 'form-control-' + (seq),
+        seq: seq
+      });
     });
     return <form onSubmit={submit(this)}>{children}</form>
   }
 });
 
+module.exports = Form;
+
 //private functions
 function submit(form){
-  return function(event){
-    _.reduce(form.refs, function(memo, element) {
-      if (isValidator(element)) {
-        return memo.then(function(){
-          return element.validate();
-        });
-      }
-      return memo;
-    }, promise.create(0))
-    .then(function() {
+  return function f(event) {
+    walkRefs(form).then(function() {
       form.props.handleSubmit(event);
     });
 
@@ -57,6 +55,22 @@ function submit(form){
     event.preventDefault();
     return false;
   }
+}
+
+function walkRefs(root) {
+  return _.reduce(root.refs, function(memo, element) {
+    if (isValidator(element)) {
+      return memo.then(function() {
+        return element.validate();
+      });
+    }
+    if (!_.isEmpty(element.refs)) {
+      return memo.then(function() {
+        return walkRefs(element);
+      });
+    }
+    return memo;
+  }, promise.create(0))
 }
 
 function isValidator(element) {

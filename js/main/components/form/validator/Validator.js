@@ -15,8 +15,8 @@ var promise = require('../../../utils/promise');
 //          errorMessage
 //          successMessage
 //          controlToValidate
-//          pattern
-//          atServer
+//          validationAtClient
+//          validationAtServer
 //        />
 var Validator = React.createClass({
   propTypes: {
