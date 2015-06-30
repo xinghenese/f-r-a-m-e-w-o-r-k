@@ -15,16 +15,16 @@ var promise = require('../../../utils/promise');
 //          errorMessage
 //          successMessage
 //          controlToValidate
-//          pattern
-//          atServer
+//          validationAtClient
+//          validationAtServer
 //        />
 var Validator = React.createClass({
   propTypes: {
     defaultMessage: React.PropTypes.string,
     errorMessage: React.PropTypes.string,
     successMessage: React.PropTypes.string,
-    pattern: React.PropTypes.func,
-    atServer: React.PropTypes.bool
+    validationAtServer: React.PropTypes.func,
+    validationAtClient: React.PropTypes.func
   },
   getDefaultProps: function() {
     return {
@@ -37,18 +37,33 @@ var Validator = React.createClass({
   validate: function() {
     var self = this;
     var value =  document.getElementById(this.props.controlToValidate).value;
-    var isValid = this.props.pattern(value);
 
-    if (this.props.atServer && promise.isPrototypeOf(isValid)) {
-      return isValid.then(function() {
+    //first validate at client end
+    var isValidAtClient = this.props.validationAtClient
+      ? !! this.props.validationAtClient(value)
+      : true;
+
+    if (!isValidAtClient) {
+      return handleError(this);
+    }
+
+    //then validate at server end
+    var isValidAtServer = this.props.validationAtServer
+      ? this.props.validationAtServer(value)
+      : true;
+
+    if (promise.isPrototypeOf(isValidAtServer)) {
+      return isValidAtServer.then(function() {
         return handleSuccess(self);
       }, function() {
         return handleError(self);
       });
     }
-    if (!isValid) {
+
+    if (!isValidAtServer) {
       return handleError(this);
     }
+
     return handleSuccess(this);
   },
   render: function(){

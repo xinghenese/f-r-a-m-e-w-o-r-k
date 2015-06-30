@@ -6,15 +6,17 @@
 var _ = require('lodash');
 var React = require('react');
 var promise = require('../../utils/promise');
+var Validator = require('./validator/validator');
 var RequiredFieldValidator = require('./validator/RequiredFieldValidator');
+var CompareValidator = require('./validator/CompareValidator');
+var RegularExpressionValidator = require('./validator/RegularExpressionValidator');
 
 //private fields
-var ValidatorTypes = [
-  "RequiredFieldValidator",
-  "RangeValidator",
-  "CompareValidator",
-  "CustomValidator",
-  "RegularExpressionValidator"
+var ValidatorClasses = [
+  RequiredFieldValidator,
+  CompareValidator,
+  RegularExpressionValidator,
+  Validator
 ];
 
 //core module to export
@@ -26,39 +28,56 @@ var ValidatorTypes = [
  */
 
 //module initialization
-var form = module.exports = React.createClass({
+var Form = React.createClass({
   render: function(){
-    return <form onSubmit={submit(this)}>{this.props.children}</form>
+    var i = 0;
+    var children = React.Children.map(this.props.children, function(child) {
+      var seq = i ++;
+      return React.cloneElement(child, {
+        ref: 'form-control-' + (seq),
+        seq: seq
+      });
+    });
+    return <form onSubmit={submit(this)}>{children}</form>
   }
 });
 
+module.exports = Form;
+
 //private functions
 function submit(form){
-  return function(event){
-    console.log('start to submit');
-    console.log('required: ', RequiredFieldValidator);
-    _(form.props.children)
-      .toArray()
-      .reduce(function(memo, child) {
-        console.log('child', child);
-//        console.log('child.type', child.type);
-
-        if(child.type === RequiredFieldValidator){
-          console.log('start to validate');
-          return memo.then(function(){
-            return child.validate();
-          });
-        }
-        return memo;
-      }, promise.create(0))
-//      .value()
-
-      .then(function() {
-        form.props.handleSubmit(event);
-      });
+  return function f(event) {
+    walkRefs(form).then(function() {
+      form.props.handleSubmit(event);
+    });
 
     event.stopPropagation();
     event.preventDefault();
     return false;
   }
+}
+
+function walkRefs(root) {
+  return _.reduce(root.refs, function(memo, element) {
+    if (isValidator(element)) {
+      return memo.then(function() {
+        return element.validate();
+      });
+    }
+    if (!_.isEmpty(element.refs)) {
+      return memo.then(function() {
+        return walkRefs(element);
+      });
+    }
+    return memo;
+  }, promise.create(0))
+}
+
+function isValidator(element) {
+  for (var i = 0, len = ValidatorClasses.length; i < len; i ++) {
+    if (element instanceof ValidatorClasses[i]) {
+      return true;
+    }
+  }
+  return false;
 }

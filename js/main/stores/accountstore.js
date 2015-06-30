@@ -6,7 +6,7 @@ var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var ActionTypes = Constants.ActionTypes;
 var HttpConnection = require('../net/connection/httpconnection');
-//var objects = require('../utils/objects');
+var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 
 var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
@@ -25,7 +25,11 @@ var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
 var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
 //private fields
-
+var _account = {
+    code: "+86",
+    phone: "",
+    requestType: 1
+};
 
 var AccountStore = assign({}, EventEmitter.prototype, {
     Events: {
@@ -40,15 +44,22 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         LOGOUT_SUCCESS: 'logoutSuccess',
         LOGOUT_FAILED: 'logoutFailed',
         VERIFICATION_CODE_SENT: 'verificationCodeSent',
-        VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent',
-        VOICE_VERIFICATION_CODE_SENT: 'voiceVerificationCodeSent',
-        VOICE_VERIFICATION_CODE_NOT_SENT: 'voiceVerificationCodeNotSent'
+        VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
     },
-    addListener: function(event, callback) {
-        this.on(event, callback);
+    getInitialState: function() {
+        return {
+            code: "+86",
+            phone: ""
+        };
     },
-    removeListener: function(event, callback) {
-        this.removeListener(event, callback);
+    getCode: function() {
+        return _account.code;
+    },
+    getPhone: function() {
+        return _account.phone;
+    },
+    getRequestType: function() {
+        return _account.requestType;
     }
 });
 
@@ -64,23 +75,6 @@ function _stripStatusCodeInResponse(response) {
     return response;
 }
 
-function _handleCheckPhoneStatusRequest(action) {
-    var code = _removeLeadingPlusSignOfCode(action.code);
-    HttpConnection.request({
-        url: "usr/cm",
-        data: {
-            mid: action.phone,
-            cc: code
-        }
-    }).then(function(status) {
-      console.log('check.phone.sucess', status);
-      console.log(AccountStore);
-        AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_SUCCESS, status);
-    }, function(error) {
-        AccountStore.emit(AccountStore.Events.CHECK_PHONE_STATUS_ERROR, error);
-    });
-}
-
 function _handleCheckVerificationCodeRequest(action) {
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
@@ -93,7 +87,7 @@ function _handleCheckVerificationCodeRequest(action) {
         url: "sms/cc",
         data: data
     }).then(function(response) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, response);
+        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS);
     }, function(error) {
         AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, error.message);
     });
@@ -107,11 +101,11 @@ function _handleLoginRequest(action) {
         dv: action.device
     };
     // code is optional, default to 86
-//    if (objects.containsValuedProp(action, "code")) {
+    if (objects.containsValuedProp(action, "code")) {
         data.code = _removeLeadingPlusSignOfCode(action.code);
-//    }
-//    objects.copyValuedProp(action, "verificationCode", data, "c");
-//    objects.copyValuedProp(action, "password", data, "psw");
+    }
+    objects.copyValuedProp(action, "verificationCode", data, "c");
+    objects.copyValuedProp(action, "password", data, "psw");
     HttpConnection.request({
         url: "usr/lg",
         data: data
@@ -168,8 +162,8 @@ function _handleRegisterRequest(action) {
         di: action.deviceInfo,
         os: action.os
     };
-//    objects.copyValuedProp(action, "avatar", data, "pt");
-//    objects.copyValuedProp(action, "verificationCode", data, "c");
+    objects.copyValuedProp(action, "avatar", data, "pt");
+    objects.copyValuedProp(action, "verificationCode", data, "c");
     HttpConnection.request({
         url: "usr/reg",
         data: data
@@ -205,21 +199,23 @@ function _handleRegisterRequest(action) {
     });
 }
 
-function _handleVerificationRequest(action, url, successCallback, failureCallback) {
+function _handleVerificationCodeRequest(action, successCallback, failureCallback) {
+    _updateAccount(action);
+
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
-        mid: action.phone,
         cc: code,
-        tp: action.verificationType
+        mid: action.phone,
+        tp: action.requestType,
+        mt: action.codeType
     };
     HttpConnection.request({
-        url: url,
+        url: "sms/sc",
         data: data
     }).then(function(response) {
-        switch (response.r) {
-            case 0: // success
-                successCallback();
-                break;
+        AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
+    }, function(error) {
+        switch (error) {
             case 1: // failed
             case 5: // invalid arguments
             case 102: // too many requests within 24 hours
@@ -229,44 +225,26 @@ function _handleVerificationRequest(action, url, successCallback, failureCallbac
             case 2007: // user deleted
             case 2012: // user already exist
             default:
-                failureCallback(Lang.requestVerificationCodeFailed);
+                console.log(error);
                 break;
         }
-    }, function(error) {
-        failureCallback(Lang.requestVerificationCodeFailed);
+        AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, Lang.requestVerificationCodeFailed);
     });
 }
 
-function _handleVerificationCodeRequest(action) {
-    _handleVerificationRequest(
-        action,
-        "sms/sc",
-        function() {
-            AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
-        },
-        function(error) {
-            AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, error);
-        }
-    );
-}
-
-function _handleVoiceVerificationCodeRequest(action) {
-    _handleVerificationRequest(
-        action,
-        "sms/svc",
-        function() {
-            AccountStore.emit(AccountStore.Events.VOICE_VERIFICATION_CODE_SENT);
-        },
-        function(error) {
-            AccountStore.emit(AccountStore.Events.VOICE_VERIFICATION_CODE_NOT_SENT, error);
-        }
-    );
+function _updateAccount(action) {
+    _account.code = action.code;
+    _account.phone = action.phone;
+    _account.requestType = action.requestType;
 }
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.CHECK_PHONE_STATUS:
             _handleCheckPhoneStatusRequest(action);
+            break;
+        case ActionTypes.CHECK_VERIFICATION_CODE:
+            _handleCheckVerificationCodeRequest(action);
             break;
         case ActionTypes.LOGIN:
             _handleLoginRequest(action);
@@ -276,12 +254,6 @@ AccountStore.dispatchToken = AppDispatcher.register(function(action) {
             break;
         case ActionTypes.REQUEST_VERIFICATION_CODE:
             _handleVerificationCodeRequest(action);
-            break;
-        case ActionTypes.CHECK_VERIFICATION_CODE:
-            _handleCheckVerificationCodeRequest(action);
-            break;
-        case ActionTypes.REQUEST_VOICE_VERIFICATION_CODE:
-            _handleVoiceVerificationCodeRequest(action);
             break;
     }
 });
