@@ -19,11 +19,13 @@ var InputBox = React.createClass({
       <input
         id={this.props.id}
         style={makeStyle(style.input, theme.input, this.props.style)}
+        className={this.props.className}
         autoComplete="off" type="tel"
         onChange={this.props.onChange}
         onBlur={onInputBlur}
         onFocus={onInputFocus}
         placeholder={this.props.defaultValue}
+        value={this.props.initialValue}
       />
     )
   }
