@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 'use strict';
 
 var PhoneForm = require('./phoneform');
@@ -52,6 +50,7 @@ var routes = (
     </Route>
 );
 var router = Router.create(routes);
+
 
 module.exports = {
     start: function(element) {
