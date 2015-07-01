@@ -13,6 +13,13 @@ var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
 
+var Wrapper = require('./form/control/Wrapper');
+var InputBox = require('./form/control/InputBox');
+var Submit = require('./form/control/Submit');
+var Form = require('./form/form');
+var RequiredValidator = require('./form/validator/RequiredFieldValidator');
+var RegExpValidator = require('./form/validator/RegularExpressionValidator');
+
 var Countries = [
     {"name": "阿尔巴尼亚", "code": "+355"},
     {"name": "阿尔及利亚", "code": "+213"},
@@ -246,7 +253,7 @@ var PhoneForm = React.createClass({
         };
     },
     _focusPhoneInput: function() {
-        React.findDOMNode(this.refs.phone).focus();
+        document.getElementById("phone-input").focus();
     },
     _handleCountryNameChange: function(event) {
         var name = event.target.value;
@@ -257,12 +264,6 @@ var PhoneForm = React.createClass({
         var code = event.target.value;
         var name = this._getCountryName(code);
         this.setState({countryName: name, countryCode: code});
-    },
-    _handleInputBlur: function(event) {
-        event.target.style.borderBottom = style.login.form.input.borderBottom;
-    },
-    _handleInputFocus: function(event) {
-        event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
     },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
@@ -276,15 +277,10 @@ var PhoneForm = React.createClass({
         });
     },
     _handleSubmit: function() {
-        if (!this._validatePhoneNumber()) {
-            this.setState({promptInvalidPhone: true});
-            this._focusPhoneInput();
-        } else {
-            AccountActions.requestVerificationCode(
-                this.state.countryCode,
-                this.state.phoneNumber
-            );
-        }
+        AccountActions.requestVerificationCode(
+            this.state.countryCode,
+            this.state.phoneNumber
+        );
     },
     _handleVerificationCodeSent: function() {
         this.props.onVerificationCodeSent();
@@ -310,9 +306,6 @@ var PhoneForm = React.createClass({
         }
         return "";
     },
-    _validatePhoneNumber: function() {
-        return this.state.countryCode != "+86" || /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
-    },
     componentDidMount: function() {
         this._focusPhoneInput();
     },
@@ -327,69 +320,70 @@ var PhoneForm = React.createClass({
     render: function() {
         var login = style.login;
         var loginForm = login.form;
-        var phonePrompt = Lang.phone;
-        var phoneLableStyle = makeStyle(loginForm.label);
-        if (this.state.promptInvalidPhone) {
-            phonePrompt = Lang.invalidPhone;
-            _.assign(phoneLableStyle, {
-                color: Styles.ERROR_TEXT_COLOR
-            });
-        }
+
         return (
             <div style={makeStyle(login)}>
-                <div className="login-form" style={makeStyle(loginForm)}>
+                <Form className="login-form" style={makeStyle(loginForm)} onSubmit={this._handleSubmit}>
                     <p style={makeStyle(loginForm.title)}>{Lang.loginTitle}</p>
-
                     <p style={makeStyle(loginForm.p)}>{Lang.loginSubTitle}</p>
-
-                    <div className="login-form-country-name" style={makeStyle(loginForm.countryName)}>
-                        <label style={makeStyle(loginForm.label)}>{Lang.country}</label>
-                        <input
-                            style={makeStyle(loginForm.input)}
-                            autoComplete="off" type="tel"
+                    <Wrapper className="login-form-country-name" style={makeStyle(loginForm.countryName)}>
+                        <RequiredValidator
+                            style={loginForm.label}
+                            defaultMessage={Lang.country}
+                            errorMessage={Lang.country}
+                            successMessage={Lang.country}
+                            controlToValidate="country-input"
+                        />
+                        <InputBox
+                            id="country-input"
+                            style={loginForm.input}
                             onChange={this._handleCountryNameChange}
-                            onBlur={this._handleInputBlur}
-                            onFocus={this._handleInputFocus}
-                            placeholder={this.state.countryName}
+                            defaultValue={this.state.countryName}
+                            initialValue={this.state.countryName}
+                        />
+                    </Wrapper>
+                    <Wrapper>
+                        <Wrapper className="login-form-country-code" style={makeStyle(loginForm.countryCode)}>
+                            <RequiredValidator
+                                style={loginForm.label}
+                                defaultMessage={Lang.code}
+                                errorMessage={Lang.code}
+                                successMessage={Lang.code}
+                                controlToValidate="code-input"
                             />
-                    </div>
-                    <div>
-                        <div className="login-form-country-code" style={makeStyle(loginForm.countryCode)}>
-                            <label style={phoneLableStyle}>{Lang.code}</label>
-                            <input
-                                style={makeStyle(loginForm.input)}
-                                autoComplete="off"
-                                type="tel"
+                            <InputBox
+                                id="code-input"
+                                style={loginForm.input}
                                 onChange={this._handleCountryCodeChange}
-                                onBlur={this._handleInputBlur}
-                                onFocus={this._handleInputFocus}
-                                placeholder={this.state.countryCode}
-                                />
-                        </div>
-                        <div className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
-                            <label style={phoneLableStyle}>{phonePrompt}</label>
-                            <input
-                                style={makeStyle(loginForm.input)}
-                                required=""
-                                ref="phone"
-                                autoComplete="off" type="tel"
+                                defaultValue={this.state.countryCode}
+                                initialValue={this.state.countryCode}
+                            />
+                        </Wrapper>
+                        <Wrapper className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
+                            <RegExpValidator
+                                style={loginForm.label}
+                                defaultMessage={Lang.phone}
+                                errorMessage={Lang.invalidPhone}
+                                successMessage={Lang.phone}
+                                controlToValidate="phone-input"
+                                regExp={/^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/}
+                            />
+                            <InputBox
+                                id="phone-input"
+                                style={loginForm.input}
                                 value={this.state.phoneNumber}
-                                onBlur={this._handleInputBlur}
-                                onFocus={this._handleInputFocus}
                                 onKeyDown={this._handleKeyDown}
                                 onChange={this._handlePhoneNumberChange}
                                 />
-                        </div>
-                    </div>
-                    <div>
-                        <input
-                            type="submit"
+                        </Wrapper>
+                    </Wrapper>
+                    <Wrapper>
+                        <Submit
                             value={Lang.next}
                             style={loginForm.button}
-                            onClick={this._handleSubmit}
-                            />
-                    </div>
-                </div>
+                        />
+                    </Wrapper>
+                </Form>
             </div>
         );
     }

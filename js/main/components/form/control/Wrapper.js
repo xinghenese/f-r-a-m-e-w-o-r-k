@@ -4,6 +4,7 @@
 
 //dependencies
 var React = require('react');
+var makeStyle = require('../../../style/styles').makeStyle;
 
 //private fields
 
@@ -18,7 +19,7 @@ var ControlWrapper = React.createClass({
         });
       });
       return (
-        <div>{children}</div>
+        <div style={makeStyle(this.props.style)}>{children}</div>
       )
     }
 });

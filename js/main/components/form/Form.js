@@ -38,7 +38,14 @@ var Form = React.createClass({
         seq: seq
       });
     });
-    return <form onSubmit={submit(this)}>{children}</form>
+    return (
+      <form
+        onSubmit={submit(this)}
+        className={this.props.className}
+        style={this.props.style}
+      >
+      {children}</form>
+      )
   }
 });
 
@@ -48,7 +55,7 @@ module.exports = Form;
 function submit(form){
   return function f(event) {
     walkRefs(form).then(function() {
-      form.props.handleSubmit(event);
+      form.props.onSubmit(event);
     });
 
     event.stopPropagation();

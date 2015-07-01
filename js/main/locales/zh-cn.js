@@ -16,5 +16,10 @@ module.exports = {
     "requestVerificationCodeFailed": "发送验证码失败，请重试！",
     "unknown": "未知",
     "userNotExist": "该用户不存在！",
-    "wrongPassword": "密码错误！"
+    "wrongPassword": "密码错误！",
+    "loginReset": "更改手机号码",
+    "enterCode": "请输入验证码",
+    "sendCodeNotice": "验证码已通过短信发送<br/>请在下面输入验证码",
+    "codeError": "不匹配的验证码",
+    "codeSuccess": "验证码匹配成功"
 };
