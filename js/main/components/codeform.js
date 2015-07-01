@@ -7,7 +7,7 @@ var KeyCodes = require('../constants/keycodes');
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
-var makeStyle = require('../style/stylenormalizer');
+var makeStyle = require('../style/styles').makeStyle;
 
 var CodeForm = React.createClass({
     getInitialState: function() {
