@@ -27,11 +27,12 @@ var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
 var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
 //private fields
-var _account = {
+var _requestAccount = {
     code: "+86",
     phone: "",
     requestType: 1
 };
+var _myself = {};
 
 var AccountStore = assign({}, EventEmitter.prototype, {
     Events: {
@@ -49,13 +50,13 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
     },
     getCode: function() {
-        return _account.code;
+        return _requestAccount.code;
     },
     getPhone: function() {
-        return _account.phone;
+        return _requestAccount.phone;
     },
     getRequestType: function() {
-        return _account.requestType;
+        return _requestAccount.requestType;
     }
 });
 
@@ -72,6 +73,8 @@ function _stripStatusCodeInResponse(response) {
 }
 
 function _handleLoginRequest(action) {
+    console.log("device");
+    console.log(Config.device);
     var data = {
         mid: action.phone,
         os: UserAgent.getOS(),
@@ -88,6 +91,7 @@ function _handleLoginRequest(action) {
         url: "usr/lg",
         data: data
     }).then(function(response) {
+        console.log(response);
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS, _stripStatusCodeInResponse(response));
@@ -211,9 +215,9 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
 }
 
 function _updateAccount(action) {
-    _account.code = action.code;
-    _account.phone = action.phone;
-    _account.requestType = action.requestType;
+    _requestAccount.code = action.code;
+    _requestAccount.phone = action.phone;
+    _requestAccount.requestType = action.requestType;
 }
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {

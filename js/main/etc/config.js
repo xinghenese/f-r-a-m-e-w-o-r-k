@@ -3,6 +3,6 @@
  */
 'use strict';
 
-module.exprots = {
+module.exports = {
     device: 4
 };

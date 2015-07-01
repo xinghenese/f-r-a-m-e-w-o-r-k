@@ -41,7 +41,6 @@ var CodeForm = React.createClass({
             AccountActions.login(
                 AccountStore.getCode(),
                 AccountStore.getPhone(),
-                AccountStore.getRequestType(),
                 this.state.smsCode
             );
         }
