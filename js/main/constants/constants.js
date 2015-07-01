@@ -6,6 +6,7 @@ module.exports = {
     ActionTypes: keyMirror({
         CHECK_PHONE_STATUS: null,
         CHECK_VERIFICATION_CODE: null,
+        GET_CHAT_LIST: null,
         LOGIN: null,
         LOGOUT: null,
         REGISTER: null,

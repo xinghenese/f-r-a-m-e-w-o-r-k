@@ -311,7 +311,8 @@ var PhoneForm = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
-        return this.state.countryCode != "+86" || /^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.state.phoneNumber);
+        var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
+        return this.state.countryCode != "+86" || phoneRegex.test(this.state.phoneNumber);
     },
     componentDidMount: function() {
         this._focusPhoneInput();

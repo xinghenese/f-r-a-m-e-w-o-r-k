@@ -38,7 +38,7 @@ var CodeForm = React.createClass({
             this.setState({promptInvalidSMSCode: true});
             this._focusInput();
         } else {
-            AccountActions.checkVerificationCode(
+            AccountActions.login(
                 AccountStore.getCode(),
                 AccountStore.getPhone(),
                 AccountStore.getRequestType(),

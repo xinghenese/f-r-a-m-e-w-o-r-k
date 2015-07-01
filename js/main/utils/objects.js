@@ -8,7 +8,7 @@ module.exports = {
         return obj[prop] ? true : false;
     },
     copyValuedProp: function(src, srcAttr, dst, dstAttr) {
-        if (containsValuedProp(src, srcAttr)) {
+        if (this.containsValuedProp(src, srcAttr)) {
             dst[dstAttr] = src[srcAttr];
         }
     },

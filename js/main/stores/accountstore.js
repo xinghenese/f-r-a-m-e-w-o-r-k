@@ -8,6 +8,8 @@ var ActionTypes = Constants.ActionTypes;
 var HttpConnection = require('../net/connection/httpconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
+var UserAgent = require('../utils/useragent');
+var Config = require('../etc/config');
 
 var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
 var CHECK_PHONE_STATUS_ERROR = 'checkPhoneStatusError';
@@ -46,12 +48,6 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         VERIFICATION_CODE_SENT: 'verificationCodeSent',
         VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
     },
-    getInitialState: function() {
-        return {
-            code: "+86",
-            phone: ""
-        };
-    },
     getCode: function() {
         return _account.code;
     },
@@ -75,34 +71,16 @@ function _stripStatusCodeInResponse(response) {
     return response;
 }
 
-function _handleCheckVerificationCodeRequest(action) {
-    var code = _removeLeadingPlusSignOfCode(action.code);
-    var data = {
-        cc: code,
-        mid: action.phone,
-        tp: action.verificationType,
-        c: action.verificationCode
-    };
-    HttpConnection.request({
-        url: "sms/cc",
-        data: data
-    }).then(function(response) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS);
-    }, function(error) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, error.message);
-    });
-}
-
 function _handleLoginRequest(action) {
     var data = {
         mid: action.phone,
-        os: action.os,
-        di: action.deviceInfo,
-        dv: action.device
+        os: UserAgent.getOS(),
+        di: UserAgent.getDeviceInfo(),
+        dv: Config.device
     };
     // code is optional, default to 86
     if (objects.containsValuedProp(action, "code")) {
-        data.code = _removeLeadingPlusSignOfCode(action.code);
+        data.cc = _removeLeadingPlusSignOfCode(action.code);
     }
     objects.copyValuedProp(action, "verificationCode", data, "c");
     objects.copyValuedProp(action, "password", data, "psw");
@@ -240,12 +218,6 @@ function _updateAccount(action) {
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
-        case ActionTypes.CHECK_PHONE_STATUS:
-            _handleCheckPhoneStatusRequest(action);
-            break;
-        case ActionTypes.CHECK_VERIFICATION_CODE:
-            _handleCheckVerificationCodeRequest(action);
-            break;
         case ActionTypes.LOGIN:
             _handleLoginRequest(action);
             break;

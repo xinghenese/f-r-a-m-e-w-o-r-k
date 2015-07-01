@@ -5,13 +5,6 @@ var Constants = require('../constants/constants');
 var ActionTypes = Constants.ActionTypes;
 
 module.exports = {
-    checkPhoneStatus: function(code, phone) {
-        AppDispatcher.dispatch({
-            type: ActionTypes.CHECK_PHONE_STATUS,
-            code: code,
-            phone: phone
-        });
-    },
     checkVerificationCode: function(code, phone, verificationType, verificationCode) {
         AppDispatcher.dispatch({
             type: ActionTypes.CHECK_VERIFICATION_CODE,
@@ -21,12 +14,12 @@ module.exports = {
             verificationCode: verificationCode
         });
     },
-    login: function(code, phone, password) {
+    login: function(code, phone, verificationCode) {
         AppDispatcher.dispatch({
             type: ActionTypes.LOGIN,
             code: code,
             phone: phone,
-            password: password
+            verificationCode: verificationCode
         });
     },
     logout: function() {
