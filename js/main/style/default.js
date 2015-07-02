@@ -21,6 +21,22 @@ module.exports = {
   },
   errorText: {
     color: "#D45A58"
+  },
+  mask: {
+    background: "#818181"
+  },
+  messagebox: {
+    width: "348px",
+    height: "192px",
+    background: "#fff",
+    color: "#282828",
+    textAlign: "center",
+    fontSize: "14px",
+    button: {
+      float: "right",
+      color: "#4c83b5",
+      margin: "0 32px 22px 0"
+    }
   }
 };
 

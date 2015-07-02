@@ -60,7 +60,7 @@ module.exports = origin.extend({
     return value;
   },
   /**
-   * config the filter to specify whether to process the data which is
+   * etc the filter to specify whether to process the data which is
    * read from the connection or ready to write to the connection. and
    * some other settings as well.
    * @param cfg

@@ -3,6 +3,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var promise = require('../../../utils/promise');
@@ -10,10 +11,12 @@ var defaultStyle = require('../../../style/default');
 
 //private fields
 var ValidateState = {
-  NEVER: 0,
-  FAILED: 1,
-  SUCCESS: 2
+    NEVER: 0,
+    FAILED: 1,
+    SUCCESS: 2
 };
+var seq = 'custom-validator-';
+var index = 0;
 
 //core module to export
 //use as <Validator
@@ -25,84 +28,98 @@ var ValidateState = {
 //          validationAtServer
 //        />
 var Validator = React.createClass({
-  propTypes: {
-    defaultMessage: React.PropTypes.string,
-    errorMessage: React.PropTypes.string,
-    successMessage: React.PropTypes.string,
-    validationAtServer: React.PropTypes.func,
-    validationAtClient: React.PropTypes.func
-  },
-  getDefaultProps: function() {
-    return {
-      atServer: false
-    };
-  },
-  getInitialState: function() {
-    return {validateState: ValidateState.NEVER};
-  },
-  validate: function() {
-    var self = this;
-    var value =  document.getElementById(this.props.controlToValidate).value;
+    propTypes: {
+        defaultMessage: React.PropTypes.string,
+        errorMessage: React.PropTypes.string,
+        successMessage: React.PropTypes.string,
+        validationAtServer: React.PropTypes.func,
+        validationAtClient: React.PropTypes.func
+    },
+    getDefaultProps: function() {
+        return {
+            atServer: false
+        };
+    },
+    getInitialState: function() {
+        return {validateState: ValidateState.NEVER, errorType: 0};
+    },
+    validate: function() {
+        var self = this;
+        var controls = this.props.controlToValidate;
+        controls = _.isArray(controls) ? controls : [controls];
 
-    //first validate at client end
-    var isValidAtClient = this.props.validationAtClient
-      ? !! this.props.validationAtClient(value)
-      : true;
+        console.log('controls: ', controls);
 
-    if (!isValidAtClient) {
-      return handleError(this);
+        var values = _.map(controls, function(control) {
+            return document.getElementById(control).value;
+        });
+
+        console.log('values: ', values);
+
+        //first validate at client end
+        var isValidAtClient = _.isFunction(this.props.validationAtClient)
+            ? !! this.props.validationAtClient.apply(this, values)
+            : true;
+
+        if (!isValidAtClient) {
+            return handleError(this);
+        }
+
+        //then validate at server end
+        var isValidAtServer = _.isFunction(this.props.validationAtServer)
+            ? this.props.validationAtServer(this, values)
+            : true;
+
+        if (promise.isPrototypeOf(isValidAtServer)) {
+            return isValidAtServer.then(function() {
+                return handleSuccess(self);
+            }, function(err) {
+                return handleError(self, err);
+            });
+        }
+
+        if (!isValidAtServer) {
+            return handleError(this);
+        }
+
+        return handleSuccess(this);
+    },
+    render: function() {
+        if (!this.props.controlToValidate) {
+            console.error('no controlToValidate props found in Validator');
+            return null;
+        }
+        var style;
+        var message;
+
+        switch (this.state.validateState) {
+            case ValidateState.NEVER:
+                message = this.props.defaultMessage;
+                break;
+            case ValidateState.FAILED:
+                //differ various errorType
+                var errMsg = this.props.errorMessage;
+                message = !_.isString(errMsg)
+                    && errMsg[this.state.errorType]
+                    || errMsg;
+                style = defaultStyle.errorText;
+                break;
+            case ValidateState.SUCCESS:
+                message = this.props.successMessage;
+                break;
+            default:
+                message = this.props.defaultMessage;
+                break;
+        }
+
+        return (
+            <label
+                style={makeStyle(this.props.style, style)}
+                className={this.props.className}>
+                {message}
+            </label>
+        )
     }
-
-    //then validate at server end
-    var isValidAtServer = this.props.validationAtServer
-      ? this.props.validationAtServer(value)
-      : true;
-
-    if (promise.isPrototypeOf(isValidAtServer)) {
-      return isValidAtServer.then(function() {
-        return handleSuccess(self);
-      }, function() {
-        return handleError(self);
-      });
-    }
-
-    if (!isValidAtServer) {
-      return handleError(this);
-    }
-
-    return handleSuccess(this);
-  },
-  render: function(){
-    if (!this.props.controlToValidate) {
-      console.error('no controlToValidate props found in Validator');
-      return null;
-    }
-    var style;
-    var message;
-
-    switch (this.state.validateState) {
-      case ValidateState.NEVER:
-        message = this.props.defaultMessage;
-        break;
-      case ValidateState.FAILED:
-        message = this.props.errorMessage;
-        style = defaultStyle.errorText;
-        break;
-      case ValidateState.SUCCESS:
-        message = this.props.successMessage;
-        break;
-      default:
-        message = this.props.defaultMessage;
-    }
-
-    return (
-      <label
-          style={makeStyle(this.props.style, style)}
-          className={this.props.className}>
-      {message}
-      </label>
-    )
-  }
 });
 
 module.exports = Validator;
@@ -111,13 +128,13 @@ module.exports = Validator;
 
 
 //private functions
-function handleError(validator) {
-  validator.setState({validateState: ValidateState.FAILED});
-  document.getElementById(validator.props.controlToValidate).focus();
-  throw new Error('invalid value');
+function handleError(validator, error) {
+    validator.setState({validateState: ValidateState.FAILED, errorType: error || 0});
+    document.getElementById(validator.props.controlToValidate).focus();
+    throw new Error('invalid value');
 }
 
 function handleSuccess(validator) {
-  validator.setState({validateState: ValidateState.SUCCESS});
-  return true;
+    validator.setState({validateState: ValidateState.SUCCESS});
+    return true;
 }

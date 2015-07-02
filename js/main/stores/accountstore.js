@@ -8,6 +8,9 @@ var ActionTypes = Constants.ActionTypes;
 var HttpConnection = require('../net/connection/httpconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
+var UserAgent = require('../utils/useragent');
+var Config = require('../etc/config');
+var myself = require('../datamodel/myself');
 
 var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
 var CHECK_PHONE_STATUS_ERROR = 'checkPhoneStatusError';
@@ -25,7 +28,7 @@ var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
 var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
 
 //private fields
-var _account = {
+var _requestAccount = {
     code: "+86",
     phone: "",
     requestType: 1
@@ -46,63 +49,47 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         VERIFICATION_CODE_SENT: 'verificationCodeSent',
         VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
     },
-    getInitialState: function() {
-        return {
-            code: "+86",
-            phone: ""
-        };
-    },
     getCode: function() {
-        return _account.code;
+        return _requestAccount.code;
     },
     getPhone: function() {
-        return _account.phone;
+        return _requestAccount.phone;
     },
     getRequestType: function() {
-        return _account.requestType;
+        return _requestAccount.requestType;
     }
 });
 
-function _removeLeadingPlusSignOfCode(code) {
-    if (code.charAt(0) == '+') {
-        return code.substring(1);
+module.exports = AccountStore;
+
+// module modifications
+AccountStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch (action.type) {
+        case ActionTypes.LOGIN:
+            _handleLoginRequest(action);
+            break;
+        case ActionTypes.REGISTER:
+            _handleRegisterRequest(action);
+            break;
+        case ActionTypes.REQUEST_VERIFICATION_CODE:
+            _handleVerificationCodeRequest(action);
+            break;
     }
-    return code;
-}
+});
 
-function _stripStatusCodeInResponse(response) {
-    delete response.r;
-    return response;
-}
-
-function _handleCheckVerificationCodeRequest(action) {
-    var code = _removeLeadingPlusSignOfCode(action.code);
-    var data = {
-        cc: code,
-        mid: action.phone,
-        tp: action.verificationType,
-        c: action.verificationCode
-    };
-    HttpConnection.request({
-        url: "sms/cc",
-        data: data
-    }).then(function(response) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS);
-    }, function(error) {
-        AccountStore.emit(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, error.message);
-    });
-}
-
+// private functions
 function _handleLoginRequest(action) {
+    console.log("device");
+    console.log(Config.device);
     var data = {
         mid: action.phone,
-        os: action.os,
-        di: action.deviceInfo,
-        dv: action.device
+        os: UserAgent.getOS(),
+        di: UserAgent.getDeviceInfo(),
+        dv: Config.device
     };
     // code is optional, default to 86
     if (objects.containsValuedProp(action, "code")) {
-        data.code = _removeLeadingPlusSignOfCode(action.code);
+        data.cc = _removeLeadingPlusSignOfCode(action.code);
     }
     objects.copyValuedProp(action, "verificationCode", data, "c");
     objects.copyValuedProp(action, "password", data, "psw");
@@ -110,29 +97,44 @@ function _handleLoginRequest(action) {
         url: "usr/lg",
         data: data
     }).then(function(response) {
-        switch (response.r) {
-            case 0: // success
-                AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS, _stripStatusCodeInResponse(response));
-                break;
-            case 2001: // user not exist
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.userNotExist);
-                break;
-            case 2005: // invalid phone number
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.invalidPhone);
-                break;
-            case 2009: // invalid verification code
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.invalidVerificationCode);
-                break;
-            case 2013: // wrong password
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.wrongPassword);
-                break;
-            default:
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
-                break;
-        }
-    }, function(error) {
+        _handleLoginSuccess(response);
+    }, function() {
         AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
     });
+}
+
+function _handleLoginSuccess(response) {
+    objects.copyValuedProp(response, "uid", myself, "uid");
+    objects.copyValuedProp(response, "nn", myself, "nickname");
+    objects.copyValuedProp(response, "pt", myself, "avatar");
+    objects.setTruePropIfNotZero(myself, "hasPassword", response.hp);
+    objects.setTruePropIfNotZero(myself, "autoPlayDynamicEmotion", response.eape);
+    objects.setTruePropIfNotZero(myself, "autoPlayPrivateDynamicEmotion", response.epape);
+    objects.setTruePropIfNotZero(myself, "autoPlayGroupDynamicEmotion", response.erape);
+    objects.setTruePropIfNotZero(myself, "autoLoadPicture", response.eapp);
+    objects.setTruePropIfNotZero(myself, "autoLoadPrivatePicture", response.epapp);
+    objects.setTruePropIfNotZero(myself, "autoLoadGroupPicture", response.erapp);
+    objects.setTruePropIfNotZero(myself, "autoPlayAudio", response.eaps);
+    objects.setTruePropIfNotZero(myself, "autoPlayPrivateAudio", response.epaps);
+    objects.setTruePropIfNotZero(myself, "autoPlayGroupAudio", response.eraps);
+    objects.setTruePropIfNotZero(myself, "autoSavePicture", response.easp);
+    objects.setTruePropIfNotZero(myself, "autoSavePrivatePicture", response.epasp);
+    objects.setTruePropIfNotZero(myself, "autoSaveGroupPicture", response.erasp);
+    objects.setTruePropIfNotZero(myself, "enableNotification", response.en);
+    objects.setTruePropIfNotZero(myself, "enableVibrationNotification", response.evn);
+    objects.setTruePropIfNotZero(myself, "enableContactJoinedNotification", response.ecjn);
+    objects.setTruePropIfNotZero(myself, "enablePrivateMessageNotification", response.epn);
+    objects.setTruePropIfNotZero(myself, "enableGroupMessageNotification", response.ern);
+    objects.copyValuedProp(response, "dnds", myself, "doNotDistrubStartTime");
+    objects.copyValuedProp(response, "dnde", myself, "doNotDistrubEndTime");
+    objects.copyValuedProp(response, "ups", myself, "userPrivateSettings");
+    objects.copyValuedProp(response, "urs", myself, "userRoomSettings");
+    objects.copyValuedProp(response, "tk", myself, "token");
+    objects.copyValuedProp(response, "rtk", myself, "refreshToken");
+    objects.copyValuedProp(response, "trt", myself, "tokenRefreshTime");
+    objects.copyValuedProp(response, "ct", myself, "serverTime");
+    objects.copyValuedProp(response, "tdlg", myself, "topConversations");
+    console.log(myself);
 }
 
 function _handleLogoutRequest(action) {
@@ -232,30 +234,30 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
     });
 }
 
-function _updateAccount(action) {
-    _account.code = action.code;
-    _account.phone = action.phone;
-    _account.requestType = action.requestType;
+function _parseUserRoomSettings(json) {
+    // TODO
+    return JSON.parse(json);
 }
 
-AccountStore.dispatchToken = AppDispatcher.register(function(action) {
-    switch (action.type) {
-        case ActionTypes.CHECK_PHONE_STATUS:
-            _handleCheckPhoneStatusRequest(action);
-            break;
-        case ActionTypes.CHECK_VERIFICATION_CODE:
-            _handleCheckVerificationCodeRequest(action);
-            break;
-        case ActionTypes.LOGIN:
-            _handleLoginRequest(action);
-            break;
-        case ActionTypes.REGISTER:
-            _handleRegisterRequest(action);
-            break;
-        case ActionTypes.REQUEST_VERIFICATION_CODE:
-            _handleVerificationCodeRequest(action);
-            break;
+function _parseUserPrivateSettings(json) {
+    // TODO
+    return JSON.parse(json);
+}
+function _removeLeadingPlusSignOfCode(code) {
+    if (code.charAt(0) == '+') {
+        return code.substring(1);
     }
-});
+    return code;
+}
 
-module.exports = AccountStore;
+function _stripStatusCodeInResponse(response) {
+    delete response.r;
+    return response;
+}
+
+function _updateAccount(action) {
+    _requestAccount.code = action.code;
+    _requestAccount.phone = action.phone;
+    _requestAccount.requestType = action.requestType;
+}
+

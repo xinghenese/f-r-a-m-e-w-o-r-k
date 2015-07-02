@@ -1,5 +1,8 @@
+/** @jsx React.DOM */
+
 'use strict';
 
+// dependencies
 var PhoneForm = require('./phoneform');
 var CodeForm = require('./codeform');
 var Chat = require('./chat');
@@ -9,14 +12,7 @@ var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
 
-function wrapComponent(Component, props) {
-    return React.createClass({
-        render: function() {
-            return React.createElement(Component, props);
-        }
-    });
-}
-
+// private fields
 var app = {
     _handleCheckVerificationCodeSuccess: function() {
         router.transitionTo("chat", {t: "boy"}, {age: 8});
@@ -35,10 +31,10 @@ var app = {
         console.log("profile loaded, after login success!");
     }
 };
-var WrappedPhoneForm = wrapComponent(PhoneForm, {
+var WrappedPhoneForm = _wrapComponent(PhoneForm, {
     onVerificationCodeSent: app._handleVerificationCodeSent
 });
-var WrappedCodeForm = wrapComponent(CodeForm, {
+var WrappedCodeForm = _wrapComponent(CodeForm, {
     onCheckVerificationCodeSuccess: app._handleCheckVerificationCodeSuccess
 });
 var routes = (
@@ -51,7 +47,7 @@ var routes = (
 );
 var router = Router.create(routes);
 
-
+// export
 module.exports = {
     start: function(element) {
         router.run(function(Handler, state) {
@@ -59,3 +55,12 @@ module.exports = {
         });
     }
 };
+
+// private functions
+function _wrapComponent(Component, props) {
+    return React.createClass({
+        render: function() {
+            return React.createElement(Component, props);
+        }
+    });
+}
