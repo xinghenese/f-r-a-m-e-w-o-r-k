@@ -1,7 +1,5 @@
 /**
  * Created by kevin on 6/27/15.
- *
- * TODO: to simplify the add/remove listener in stores, but not done yet.
  */
 'use strict';
 
@@ -35,4 +33,4 @@ var SmartSlot = {
     }
 };
 
-module.exprots = SmartSlot;
+module.exports = SmartSlot;

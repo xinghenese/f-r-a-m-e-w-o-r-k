@@ -33,7 +33,6 @@ var _requestAccount = {
     phone: "",
     requestType: 1
 };
-var _myself = {};
 
 var AccountStore = assign({}, EventEmitter.prototype, {
     Events: {
@@ -61,18 +60,24 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     }
 });
 
-function _removeLeadingPlusSignOfCode(code) {
-    if (code.charAt(0) == '+') {
-        return code.substring(1);
+module.exports = AccountStore;
+
+// module modifications
+AccountStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch (action.type) {
+        case ActionTypes.LOGIN:
+            _handleLoginRequest(action);
+            break;
+        case ActionTypes.REGISTER:
+            _handleRegisterRequest(action);
+            break;
+        case ActionTypes.REQUEST_VERIFICATION_CODE:
+            _handleVerificationCodeRequest(action);
+            break;
     }
-    return code;
-}
+});
 
-function _stripStatusCodeInResponse(response) {
-    delete response.r;
-    return response;
-}
-
+// private functions
 function _handleLoginRequest(action) {
     console.log("device");
     console.log(Config.device);
@@ -92,7 +97,8 @@ function _handleLoginRequest(action) {
         url: "usr/lg",
         data: data
     }).then(function(response) {
-    }, function(error) {
+        _handleLoginSuccess(response);
+    }, function() {
         AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
     });
 }
@@ -101,14 +107,34 @@ function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "uid", myself, "uid");
     objects.copyValuedProp(response, "nn", myself, "nickname");
     objects.copyValuedProp(response, "pt", myself, "avatar");
-    objects.setTruePropIf(myself, "hasPassword", response.hp === "1");
-    objects.setTruePropIf(myself, "autoPlayDynamicEmotion", response.eape === "1");
-    objects.setTruePropIf(myself, "autoPlayPrivateDynamicEmotion", response.epape === "1");
-    objects.setTruePropIf(myself, "autoPlayGroupDynamicEmotion", response.erape === "1");
+    objects.setTruePropIfNotZero(myself, "hasPassword", response.hp);
+    objects.setTruePropIfNotZero(myself, "autoPlayDynamicEmotion", response.eape);
+    objects.setTruePropIfNotZero(myself, "autoPlayPrivateDynamicEmotion", response.epape);
+    objects.setTruePropIfNotZero(myself, "autoPlayGroupDynamicEmotion", response.erape);
+    objects.setTruePropIfNotZero(myself, "autoLoadPicture", response.eapp);
+    objects.setTruePropIfNotZero(myself, "autoLoadPrivatePicture", response.epapp);
+    objects.setTruePropIfNotZero(myself, "autoLoadGroupPicture", response.erapp);
+    objects.setTruePropIfNotZero(myself, "autoPlayAudio", response.eaps);
+    objects.setTruePropIfNotZero(myself, "autoPlayPrivateAudio", response.epaps);
+    objects.setTruePropIfNotZero(myself, "autoPlayGroupAudio", response.eraps);
+    objects.setTruePropIfNotZero(myself, "autoSavePicture", response.easp);
+    objects.setTruePropIfNotZero(myself, "autoSavePrivatePicture", response.epasp);
+    objects.setTruePropIfNotZero(myself, "autoSaveGroupPicture", response.erasp);
+    objects.setTruePropIfNotZero(myself, "enableNotification", response.en);
+    objects.setTruePropIfNotZero(myself, "enableVibrationNotification", response.evn);
+    objects.setTruePropIfNotZero(myself, "enableContactJoinedNotification", response.ecjn);
+    objects.setTruePropIfNotZero(myself, "enablePrivateMessageNotification", response.epn);
+    objects.setTruePropIfNotZero(myself, "enableGroupMessageNotification", response.ern);
     objects.copyValuedProp(response, "dnds", myself, "doNotDistrubStartTime");
     objects.copyValuedProp(response, "dnde", myself, "doNotDistrubEndTime");
-    objects.copyValuedProp(response, "uid", myself, "uid");
-    objects.copyValuedProp(response, "uid", myself, "uid");
+    objects.copyValuedProp(response, "ups", myself, "userPrivateSettings");
+    objects.copyValuedProp(response, "urs", myself, "userRoomSettings");
+    objects.copyValuedProp(response, "tk", myself, "token");
+    objects.copyValuedProp(response, "rtk", myself, "refreshToken");
+    objects.copyValuedProp(response, "trt", myself, "tokenRefreshTime");
+    objects.copyValuedProp(response, "ct", myself, "serverTime");
+    objects.copyValuedProp(response, "tdlg", myself, "topConversations");
+    console.log(myself);
 }
 
 function _handleLogoutRequest(action) {
@@ -208,24 +234,30 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
     });
 }
 
+function _parseUserRoomSettings(json) {
+    // TODO
+    return JSON.parse(json);
+}
+
+function _parseUserPrivateSettings(json) {
+    // TODO
+    return JSON.parse(json);
+}
+function _removeLeadingPlusSignOfCode(code) {
+    if (code.charAt(0) == '+') {
+        return code.substring(1);
+    }
+    return code;
+}
+
+function _stripStatusCodeInResponse(response) {
+    delete response.r;
+    return response;
+}
+
 function _updateAccount(action) {
     _requestAccount.code = action.code;
     _requestAccount.phone = action.phone;
     _requestAccount.requestType = action.requestType;
 }
 
-AccountStore.dispatchToken = AppDispatcher.register(function(action) {
-    switch (action.type) {
-        case ActionTypes.LOGIN:
-            _handleLoginRequest(action);
-            break;
-        case ActionTypes.REGISTER:
-            _handleRegisterRequest(action);
-            break;
-        case ActionTypes.REQUEST_VERIFICATION_CODE:
-            _handleVerificationCodeRequest(action);
-            break;
-    }
-});
-
-module.exports = AccountStore;

@@ -26,5 +26,10 @@ module.exports = {
         if (condition) {
             target[prop] = true;
         }
+    },
+    setTruePropIfNotZero: function(target, prop, dependent) {
+        if (dependent !== 0 && dependent !== "0") {
+            target[prop] = true;
+        }
     }
 };

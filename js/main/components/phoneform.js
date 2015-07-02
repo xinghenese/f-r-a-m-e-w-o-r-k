@@ -242,6 +242,7 @@ var Countries = [
     {"name": "赞比亚", "code": "+260"},
     {"name": "泽西岛", "code": "+44"}
 ];
+var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
 
 var PhoneForm = React.createClass({
     getInitialState: function() {
@@ -307,7 +308,6 @@ var PhoneForm = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
-        var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
         return this.state.countryCode != "+86" || phoneRegex.test(this.state.phoneNumber);
     },
     componentDidMount: function() {
@@ -370,7 +370,7 @@ var PhoneForm = React.createClass({
                                 errorMessage={Lang.invalidPhone}
                                 successMessage={Lang.phone}
                                 controlToValidate="phone-input"
-                                regExp={/^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/}
+                                regExp={phoneRegex}
                             />
                             <InputBox
                                 id="phone-input"
