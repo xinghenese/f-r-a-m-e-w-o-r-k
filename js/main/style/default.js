@@ -18,6 +18,9 @@ module.exports = {
     focus: {
       borderBottom: "1px solid #6cace1"
     }
+  },
+  errorText: {
+    color: "#D45A58"
   }
 };
 

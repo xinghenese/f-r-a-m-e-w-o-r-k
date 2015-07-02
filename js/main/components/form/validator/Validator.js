@@ -4,10 +4,16 @@
 
 //dependencies
 var React = require('react');
+var makeStyle = require('../../../style/styles').makeStyle;
 var promise = require('../../../utils/promise');
+var defaultStyle = require('../../../style/default');
 
 //private fields
-
+var ValidateState = {
+  NEVER: 0,
+  FAILED: 1,
+  SUCCESS: 2
+};
 
 //core module to export
 //use as <Validator
@@ -32,7 +38,7 @@ var Validator = React.createClass({
     };
   },
   getInitialState: function() {
-    return {message: this.props.defaultMessage};
+    return {validateState: ValidateState.NEVER};
   },
   validate: function() {
     var self = this;
@@ -68,9 +74,34 @@ var Validator = React.createClass({
   },
   render: function(){
     if (!this.props.controlToValidate) {
+      console.error('no controlToValidate props found in Validator');
       return null;
     }
-    return <label>{this.state.message}</label>
+    var style;
+    var message;
+
+    switch (this.state.validateState) {
+      case ValidateState.NEVER:
+        message = this.props.defaultMessage;
+        break;
+      case ValidateState.FAILED:
+        message = this.props.errorMessage;
+        style = defaultStyle.errorText;
+        break;
+      case ValidateState.SUCCESS:
+        message = this.props.successMessage;
+        break;
+      default:
+        message = this.props.defaultMessage;
+    }
+
+    return (
+      <label
+          style={makeStyle(this.props.style, style)}
+          className={this.props.className}>
+      {message}
+      </label>
+    )
   }
 });
 
@@ -81,11 +112,12 @@ module.exports = Validator;
 
 //private functions
 function handleError(validator) {
-  validator.setState({message: validator.props.errorMessage});
+  validator.setState({validateState: ValidateState.FAILED});
+  document.getElementById(validator.props.controlToValidate).focus();
   throw new Error('invalid value');
 }
 
 function handleSuccess(validator) {
-  validator.setState({message: validator.props.successMessage});
+  validator.setState({validateState: ValidateState.SUCCESS});
   return true;
 }

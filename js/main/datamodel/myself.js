@@ -25,5 +25,13 @@ module.exports = {
     enableContactJoinedNotification: true,
     enablePrivateMessageNotification: true,
     enableGroupMessageNotification: true,
-    
+    doNotDisturbStartTime: 0,
+    doNotDisturbEndTime: 0,
+    userRoomSettings: {},
+    userPrivateSettings: {},
+    token: "",
+    refreshToken: "",
+    tokenRefreshTime: 0,
+    serverTime: 0,
+    topConversations: []
 };

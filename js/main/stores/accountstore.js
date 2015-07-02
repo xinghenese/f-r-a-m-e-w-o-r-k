@@ -10,6 +10,7 @@ var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
 var Config = require('../etc/config');
+var myself = require('../datamodel/myself');
 
 var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
 var CHECK_PHONE_STATUS_ERROR = 'checkPhoneStatusError';
@@ -91,30 +92,23 @@ function _handleLoginRequest(action) {
         url: "usr/lg",
         data: data
     }).then(function(response) {
-        console.log(response);
-        switch (response.r) {
-            case 0: // success
-                AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS, _stripStatusCodeInResponse(response));
-                break;
-            case 2001: // user not exist
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.userNotExist);
-                break;
-            case 2005: // invalid phone number
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.invalidPhone);
-                break;
-            case 2009: // invalid verification code
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.invalidVerificationCode);
-                break;
-            case 2013: // wrong password
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.wrongPassword);
-                break;
-            default:
-                AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
-                break;
-        }
     }, function(error) {
         AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
     });
+}
+
+function _handleLoginSuccess(response) {
+    objects.copyValuedProp(response, "uid", myself, "uid");
+    objects.copyValuedProp(response, "nn", myself, "nickname");
+    objects.copyValuedProp(response, "pt", myself, "avatar");
+    objects.setTruePropIf(myself, "hasPassword", response.hp === "1");
+    objects.setTruePropIf(myself, "autoPlayDynamicEmotion", response.eape === "1");
+    objects.setTruePropIf(myself, "autoPlayPrivateDynamicEmotion", response.epape === "1");
+    objects.setTruePropIf(myself, "autoPlayGroupDynamicEmotion", response.erape === "1");
+    objects.copyValuedProp(response, "dnds", myself, "doNotDistrubStartTime");
+    objects.copyValuedProp(response, "dnde", myself, "doNotDistrubEndTime");
+    objects.copyValuedProp(response, "uid", myself, "uid");
+    objects.copyValuedProp(response, "uid", myself, "uid");
 }
 
 function _handleLogoutRequest(action) {

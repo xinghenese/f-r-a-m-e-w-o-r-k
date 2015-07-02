@@ -21,5 +21,10 @@ module.exports = {
             result[attr] = obj2[attr];
         }
         return result;
+    },
+    setTruePropIf: function(target, prop, condition) {
+        if (condition) {
+            target[prop] = true;
+        }
     }
 };

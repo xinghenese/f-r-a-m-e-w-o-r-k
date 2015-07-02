@@ -4,6 +4,7 @@
 
 //dependencies
 var React = require('react');
+var makeStyle = require('../../../style/styles').makeStyle;
 
 //private fields
 
@@ -15,6 +16,7 @@ var Submit = React.createClass({
       <input
         type="submit"
         value={this.props.value || "submit"}
+        style={makeStyle(this.props.style)}
       />
     );
   }
