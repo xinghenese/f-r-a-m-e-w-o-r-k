@@ -3,6 +3,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var promise = require('../../../utils/promise');
@@ -14,6 +15,8 @@ var ValidateState = {
     FAILED: 1,
     SUCCESS: 2
 };
+var seq = 'custom-validator-';
+var index = 0;
 
 //core module to export
 //use as <Validator
@@ -38,15 +41,24 @@ var Validator = React.createClass({
         };
     },
     getInitialState: function() {
-        return {validateState: ValidateState.NEVER};
+        return {validateState: ValidateState.NEVER, errorType: 0};
     },
     validate: function() {
         var self = this;
-        var value = document.getElementById(this.props.controlToValidate).value;
+        var controls = this.props.controlToValidate;
+        controls = _.isArray(controls) ? controls : [controls];
+
+        console.log('controls: ', controls);
+
+        var values = _.map(controls, function(control) {
+            return document.getElementById(control).value;
+        });
+
+        console.log('values: ', values);
 
         //first validate at client end
-        var isValidAtClient = this.props.validationAtClient
-            ? !!this.props.validationAtClient(value)
+        var isValidAtClient = _.isFunction(this.props.validationAtClient)
+            ? !! this.props.validationAtClient.apply(this, values)
             : true;
 
         if (!isValidAtClient) {
@@ -54,15 +66,15 @@ var Validator = React.createClass({
         }
 
         //then validate at server end
-        var isValidAtServer = this.props.validationAtServer
-            ? this.props.validationAtServer(value)
+        var isValidAtServer = _.isFunction(this.props.validationAtServer)
+            ? this.props.validationAtServer(this, values)
             : true;
 
         if (promise.isPrototypeOf(isValidAtServer)) {
             return isValidAtServer.then(function() {
                 return handleSuccess(self);
-            }, function() {
-                return handleError(self);
+            }, function(err) {
+                return handleError(self, err);
             });
         }
 
@@ -85,7 +97,11 @@ var Validator = React.createClass({
                 message = this.props.defaultMessage;
                 break;
             case ValidateState.FAILED:
-                message = this.props.errorMessage;
+                //differ various errorType
+                var errMsg = this.props.errorMessage;
+                message = !_.isString(errMsg)
+                    && errMsg[this.state.errorType]
+                    || errMsg;
                 style = defaultStyle.errorText;
                 break;
             case ValidateState.SUCCESS:
@@ -112,8 +128,8 @@ module.exports = Validator;
 
 
 //private functions
-function handleError(validator) {
-    validator.setState({validateState: ValidateState.FAILED});
+function handleError(validator, error) {
+    validator.setState({validateState: ValidateState.FAILED, errorType: error || 0});
     document.getElementById(validator.props.controlToValidate).focus();
     throw new Error('invalid value');
 }

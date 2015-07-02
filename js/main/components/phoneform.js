@@ -17,6 +17,7 @@ var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
 var Submit = require('./form/control/Submit');
 var Form = require('./form/form');
+var Validator = require('./form/validator/Validator');
 var RequiredValidator = require('./form/validator/RequiredFieldValidator');
 var RegExpValidator = require('./form/validator/RegularExpressionValidator');
 
@@ -242,6 +243,7 @@ var Countries = [
     {"name": "赞比亚", "code": "+260"},
     {"name": "泽西岛", "code": "+44"}
 ];
+var codeRegex = /\+86/;
 var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
 
 var PhoneForm = React.createClass({
@@ -369,8 +371,8 @@ var PhoneForm = React.createClass({
                                 defaultMessage={Lang.phone}
                                 errorMessage={Lang.invalidPhone}
                                 successMessage={Lang.phone}
-                                controlToValidate="phone-input"
-                                regExp={phoneRegex}
+                                controlToValidate={["code-input", "phone-input"]}
+                                regExp={[codeRegex, phoneRegex]}
                             />
                             <InputBox
                                 id="phone-input"
