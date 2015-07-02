@@ -19,11 +19,8 @@ var CodeForm = React.createClass({
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode).focus();
     },
-    _handleCheckVerificationCodeSuccess: function() {
-        this.props.onCheckVerificationCodeSuccess();
-    },
-    _handleCheckVerificationCodeError: function(error) {
-        console.log("checkCode: " + error);
+    _handleLoginFailed: function(error) {
+        console.log("login failed: " + error);
     },
     _handleCodeChange: function(event) {
         this.setState({smsCode: event.target.value});
@@ -52,12 +49,12 @@ var CodeForm = React.createClass({
         this._focusInput();
     },
     componentWillMount: function() {
-        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
-        AccountStore.on(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
+        AccountStore.on(AccountStore.Events.LOGIN_SUCCESS, this.props.onLoginSuccess);
+        AccountStore.on(AccountStore.Events.LOGIN_FAILED, this._handleLoginFailed);
     },
     componentWillUnmount: function() {
-        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_SUCCESS, this._handleCheckVerificationCodeSuccess);
-        AccountStore.removeListener(AccountStore.Events.CHECK_VERIFICATION_CODE_FAILED, this._handleCheckVerificationCodeError);
+        AccountStore.removeListener(AccountStore.Events.LOGIN_SUCCESS, this.props.onLoginSuccess);
+        AccountStore.removeListener(AccountStore.Events.LOGIN_FAILED, this._handleLoginFailed);
     },
     render: function() {
         var login = style.login;

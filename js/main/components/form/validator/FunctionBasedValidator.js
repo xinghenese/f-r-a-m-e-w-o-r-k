@@ -15,7 +15,6 @@ var _index = 0;
 var FunctionBasedValidator = React.createClass({
     _seq: _prefix + (_index++),
     validate: function() {
-        console.log("validator - " + this._seq);
         return this.refs[this._seq].validate();
     },
     render: function() {
@@ -39,8 +38,6 @@ module.exports = FunctionBasedValidator;
 // private functions
 function _validation(validator) {
     return function() {
-        console.log("validating");
-        console.log(validator.props);
         return validator.props.validateFunc();
     };
 }

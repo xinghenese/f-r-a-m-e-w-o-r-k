@@ -23,7 +23,6 @@ module.exports = ChatStore;
 ChatStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.GET_CHAT_LIST:
-            console.log("22222222222");
             _handleGetChatListRequest(action);
             break;
     }

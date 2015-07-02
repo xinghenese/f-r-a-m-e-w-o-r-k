@@ -14,8 +14,6 @@ var index = 0;
 var RequiredFieldValidator = React.createClass({
     _seq: seq + (index++),
     validate: function() {
-        console.log('seq: ', this._seq);
-        console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
         return this.refs[this._seq].validate();
     },
     render: function() {

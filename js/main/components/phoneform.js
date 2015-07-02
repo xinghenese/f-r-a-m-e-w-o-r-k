@@ -308,7 +308,6 @@ var PhoneForm = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
-        console.log("validating phone");
         return this.state.countryCode != "+86" || phoneRegex.test(this.state.phoneNumber);
     },
     componentDidMount: function() {
