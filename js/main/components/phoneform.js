@@ -253,7 +253,7 @@ var PhoneForm = React.createClass({
         };
     },
     _focusPhoneInput: function() {
-        document.getElementById("country-input").focus();
+        document.getElementById("phone-input").focus();
     },
     _handleCountryNameChange: function(event) {
         var name = event.target.value;
