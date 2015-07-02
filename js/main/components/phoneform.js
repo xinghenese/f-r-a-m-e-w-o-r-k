@@ -19,6 +19,7 @@ var Submit = require('./form/control/Submit');
 var Form = require('./form/form');
 var RequiredValidator = require('./form/validator/RequiredFieldValidator');
 var RegExpValidator = require('./form/validator/RegularExpressionValidator');
+var FunctionBasedValidator = require('./form/validator/FunctionBasedValidator');
 
 var Countries = [
     {"name": "阿尔巴尼亚", "code": "+355"},
@@ -107,7 +108,6 @@ var Countries = [
     {"name": "黑山", "code": "+382"},
     {"name": "津巴布韦", "code": "+263"},
     {"name": "吉布提", "code": "+253"},
-    {"name": "加拿大", "code": "+1"},
     {"name": "吉尔吉斯斯坦", "code": "+996"},
     {"name": "几内亚", "code": "+224"},
     {"name": "几内亚比绍", "code": "+245"},
@@ -148,7 +148,7 @@ var Countries = [
     {"name": "马提尼克", "code": "+596"},
     {"name": "毛里求斯", "code": "+230"},
     {"name": "毛里塔尼亚", "code": "+222"},
-    {"name": "美国", "code": "+1"},
+    {"name": "美国/加拿大", "code": "+1"},
     {"name": "美属萨摩亚", "code": "+1684"},
     {"name": "蒙古", "code": "+976"},
     {"name": "蒙塞拉特岛", "code": "+1664"},
@@ -308,6 +308,7 @@ var PhoneForm = React.createClass({
         return "";
     },
     _validatePhoneNumber: function() {
+        console.log("validating phone");
         return this.state.countryCode != "+86" || phoneRegex.test(this.state.phoneNumber);
     },
     componentDidMount: function() {
@@ -364,13 +365,13 @@ var PhoneForm = React.createClass({
                             />
                         </Wrapper>
                         <Wrapper className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
-                            <RegExpValidator
+                            <FunctionBasedValidator
                                 style={loginForm.label}
                                 defaultMessage={Lang.phone}
                                 errorMessage={Lang.invalidPhone}
                                 successMessage={Lang.phone}
                                 controlToValidate="phone-input"
-                                regExp={phoneRegex}
+                                validateFunc={this._validatePhoneNumber}
                             />
                             <InputBox
                                 id="phone-input"
