@@ -11,7 +11,6 @@ var ChatStore = require('../stores/chatstore');
 
 var Chat = React.createClass({
     componentWillMount: function() {
-        console.log("mount");
         ChatActions.getChatList(1);
     },
     render: function() {
