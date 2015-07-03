@@ -41,7 +41,7 @@ var Validator = React.createClass({
         };
     },
     getInitialState: function() {
-        return {validateState: ValidateState.NEVER, errorType: 0};
+        return {validateState: ValidateState.NEVER, errorType: -1};
     },
     validate: function() {
         var self = this;
@@ -129,7 +129,7 @@ module.exports = Validator;
 
 //private functions
 function handleError(validator, error) {
-    validator.setState({validateState: ValidateState.FAILED, errorType: error || 0});
+    validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
     document.getElementById(validator.props.controlToValidate).focus();
     throw new Error('invalid value');
 }

@@ -6,17 +6,17 @@
 var _ = require('lodash');
 var React = require('react');
 var promise = require('../../utils/promise');
-var Validator = require('./validator/validator');
 var RequiredFieldValidator = require('./validator/RequiredFieldValidator');
 var CompareValidator = require('./validator/CompareValidator');
 var RegularExpressionValidator = require('./validator/RegularExpressionValidator');
+var CustomValidator = require('./validator/CustomValidator');
 
 //private fields
 var ValidatorClasses = [
   RequiredFieldValidator,
   CompareValidator,
   RegularExpressionValidator,
-  Validator
+  CustomValidator
 ];
 
 //core module to export
