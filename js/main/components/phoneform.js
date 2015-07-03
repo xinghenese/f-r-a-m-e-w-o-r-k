@@ -375,9 +375,6 @@ var PhoneForm = React.createClass({
                                 validationAtClient={function(code, phone) {
                                     return code != "+86" || phoneRegex.test(phone);
                                 }}
-                                validationAtServer={function(code, phone) {
-
-                                }}
                             />
                             <InputBox
                                 id="phone-input"

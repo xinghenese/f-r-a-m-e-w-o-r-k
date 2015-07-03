@@ -13,7 +13,7 @@ var index = 0;
 //core module to export
 var CustomValidator = React.createClass({
   validate: function() {
-    console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
+//    console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
     return this.refs[this._seq].validate();
   },
   componentWillMount: function() {

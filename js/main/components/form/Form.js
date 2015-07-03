@@ -73,16 +73,16 @@ function submit(form){
 }
 
 function walkRefs(root) {
-    console.info(root.constructor.displayName + '#refs: ', root.refs);
+//    console.info(root.constructor.displayName + '#refs: ', root.refs);
     return _.reduce(root.refs, function(memo, element) {
         if (isValidator(element)) {
             return memo.then(function() {
-                console.log(element.constructor.displayName + ' start to validate');
+//                console.log(element.constructor.displayName + ' start to validate');
                 return element.validate();
             });
         }
         if (!_.isEmpty(element.refs)) {
-            console.log(element.constructor.displayName + '#ref not empty');
+//            console.log(element.constructor.displayName + '#ref not empty');
             return memo.then(function() {
                 return walkRefs(element);
             });
@@ -94,7 +94,6 @@ function walkRefs(root) {
 function isValidator(element) {
     for (var i = 0, len = ValidatorClasses.length; i < len; i ++) {
         if (element instanceof ValidatorClasses[i]) {
-            console.log('ValidatorClasses[' + i + ']');
             return true;
         }
     }

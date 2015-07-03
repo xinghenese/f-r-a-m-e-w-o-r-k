@@ -48,13 +48,13 @@ var Validator = React.createClass({
         var controls = this.props.controlToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
-        console.log('controls: ', controls);
+//        console.log('controls: ', controls);
 
         var values = _.map(controls, function(control) {
             return document.getElementById(control).value;
         });
 
-        console.log('values: ', values);
+//        console.log('values: ', values);
 
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
