@@ -19,7 +19,22 @@ module.exports = {
     resize: "none",
     width: "100%",
     padding: "0",
+    margin: "0"
+  },
+  button: {
+    border: "0",
+    outline: "0",
     margin: "0",
+    padding: "0",
+    cursor: "pointer"
+  },
+  mask: {
+    position: "fixed",
+    width: "100%",
+    height: "100%"
+  },
+  messagebox: {
+    margin: "0 auto"
   }
 };
 

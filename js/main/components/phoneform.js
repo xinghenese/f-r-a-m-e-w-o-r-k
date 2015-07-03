@@ -17,9 +17,9 @@ var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
 var Submit = require('./form/control/Submit');
 var Form = require('./form/form');
+var CustomValidator = require('./form/validator/CustomValidator');
 var RequiredValidator = require('./form/validator/RequiredFieldValidator');
 var RegExpValidator = require('./form/validator/RegularExpressionValidator');
-var FunctionBasedValidator = require('./form/validator/FunctionBasedValidator');
 
 var Countries = [
     {"name": "阿尔巴尼亚", "code": "+355"},
@@ -108,6 +108,7 @@ var Countries = [
     {"name": "黑山", "code": "+382"},
     {"name": "津巴布韦", "code": "+263"},
     {"name": "吉布提", "code": "+253"},
+    {"name": "加拿大", "code": "+1"},
     {"name": "吉尔吉斯斯坦", "code": "+996"},
     {"name": "几内亚", "code": "+224"},
     {"name": "几内亚比绍", "code": "+245"},
@@ -148,7 +149,7 @@ var Countries = [
     {"name": "马提尼克", "code": "+596"},
     {"name": "毛里求斯", "code": "+230"},
     {"name": "毛里塔尼亚", "code": "+222"},
-    {"name": "美国/加拿大", "code": "+1"},
+    {"name": "美国", "code": "+1"},
     {"name": "美属萨摩亚", "code": "+1684"},
     {"name": "蒙古", "code": "+976"},
     {"name": "蒙塞拉特岛", "code": "+1664"},
@@ -242,6 +243,7 @@ var Countries = [
     {"name": "赞比亚", "code": "+260"},
     {"name": "泽西岛", "code": "+44"}
 ];
+var codeRegex = /\+86/;
 var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
 
 var PhoneForm = React.createClass({
@@ -364,13 +366,15 @@ var PhoneForm = React.createClass({
                             />
                         </Wrapper>
                         <Wrapper className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
-                            <FunctionBasedValidator
+                            <CustomValidator
                                 style={loginForm.label}
                                 defaultMessage={Lang.phone}
                                 errorMessage={Lang.invalidPhone}
                                 successMessage={Lang.phone}
-                                controlToValidate="phone-input"
-                                validateFunc={this._validatePhoneNumber}
+                                controlToValidate={["code-input", "phone-input"]}
+                                validationAtClient={function(code, phone) {
+                                    return code != "+86" || phoneRegex.test(phone);
+                                }}
                             />
                             <InputBox
                                 id="phone-input"

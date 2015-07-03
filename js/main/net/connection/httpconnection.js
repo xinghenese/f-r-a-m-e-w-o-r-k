@@ -26,6 +26,7 @@ var DEFAULT_CONFIG = {
     'needDecompress': true,
     'needEncode': false,
     'needDecode': false,
+    'needToken' : true,
     'needWrap': true,
     'needUnwrap': true,
     'encryptKey': "",
@@ -120,6 +121,7 @@ function post(url, data, options) {
     console.log('<=', data ? JSON.stringify(data) : 'empty data sent');
     return session.write(data, options)
         .then(function(value) {
+            console.log(value);
             return http.post(url, value);
         })
         .then(function(value) {

@@ -24,11 +24,7 @@ module.exports = filter.create({
 
 //private functions.
 function queryStringify(msg) {
-    var result = 'data=' + encodeURIComponent(msg) + "&"
+    return 'data=' + encodeURIComponent(msg) + "&"
         + (userconfigs.getVersion() ? "ver=" + userconfigs.getVersion() + "&" : "")
         + (userconfigs.getUuid() ? "uuid=" + userconfigs.getUuid() : "");
-    if (userconfigs.getToken()) {
-        result += "&tk=" + userconfigs.getToken();
-    }
-    return result;
 }

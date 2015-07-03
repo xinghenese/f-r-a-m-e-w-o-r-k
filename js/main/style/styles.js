@@ -4,6 +4,7 @@
 
 //dependencies
 var _ = require('lodash');
+var React = require('react');
 
 //core module to export
 module.exports = {
@@ -28,5 +29,18 @@ function makeStyle() {
 function setStyle(targetStyle, sourceStyle) {
   _.forOwn(makeStyle(sourceStyle), function(value, key) {
     _.set(targetStyle, key, value);
+  });
+}
+
+function coverStyle(component, style) {
+  if (!_.isPlainObject(style)
+    || !component
+    || !component.props
+    || !component.props.children) {
+    return;
+  }
+  React.Children.forEach(component.props.children, function(child) {
+    var className = child.props.className;
+
   });
 }

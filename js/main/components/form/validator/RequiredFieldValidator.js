@@ -4,6 +4,7 @@
 'use strict';
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
 var Validator = require('./Validator');
 
@@ -13,11 +14,14 @@ var index = 0;
 
 //core module to export
 var RequiredFieldValidator = React.createClass({
-    _seq: seq + (index++),
     validate: function() {
+//        console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
         return this.refs[this._seq].validate();
     },
-    render: function() {
+    componentWillMount: function() {
+        this._seq = seq + (index ++);
+    },
+    render: function(){
         return (
             <Validator
                 className={this.props.className}
@@ -28,14 +32,22 @@ var RequiredFieldValidator = React.createClass({
                 validationAtClient={validation}
                 style={this.props.style}
                 ref={this._seq}
-                />
+            />
         );
     }
 });
 
 module.exports = RequiredFieldValidator;
 
+//module initialization
+
+
 //private functions
-function validation(value) {
-    return value !== void 0 && value !== '';
+function validation() {
+//    console.log('validating');
+    return _(arguments)
+        .toArray()
+        .every(function(arg) {
+            return arg !== void 0 && arg !== '';
+        });
 }

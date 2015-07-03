@@ -22,6 +22,11 @@ module.exports = {
         }
         return result;
     },
+    preventDefault: function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        return "preventDefault" in event || "stopPropagation" in event;
+    },
     setTruePropIf: function(target, prop, condition) {
         if (condition) {
             target[prop] = true;

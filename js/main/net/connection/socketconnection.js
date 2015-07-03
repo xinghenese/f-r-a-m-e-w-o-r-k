@@ -32,6 +32,7 @@ var DEFAULT_CONFIG = {
   'needDecompress': false,
   'needEncode': false,
   'needDecode': false,
+  'needToken': false,
   'needWrap': false,
   'needUnwrap': true,
   'urlRoot': "",

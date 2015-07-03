@@ -14,8 +14,10 @@ var ControlWrapper = React.createClass({
       var seq = this.props.seq;
       var i = 0;
       var children = React.Children.map(this.props.children, function(child) {
+        var newseq = seq + '-' + (i++);
         return React.cloneElement(child, {
-          ref: 'form-control-' + seq + '-' + (i++)
+          ref: 'form-control-' + newseq,
+          seq: newseq
         });
       });
       return (
@@ -30,3 +32,9 @@ module.exports = ControlWrapper;
 
 
 //private functions
+function getCSSClassPath(className) {
+  if (!className) {
+    return className;
+  }
+  return className.replace('-', '.');
+}
