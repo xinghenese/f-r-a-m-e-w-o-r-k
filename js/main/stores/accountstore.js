@@ -91,7 +91,7 @@ function _handleLoginRequest(action) {
     }
     objects.copyValuedProp(action, "verificationCode", data, "c");
     objects.copyValuedProp(action, "password", data, "psw");
-    HttpConnection.request({
+    HttpConnection.login({
         url: "usr/lg",
         data: data
     }).then(function(response) {
