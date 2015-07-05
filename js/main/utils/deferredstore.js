@@ -11,6 +11,25 @@ var deferredData = require('./deferreddata');
 //private fields
 
 //core module to export
+/**
+ *
+ * @type {Object}
+ * @example
+ *    var store = deferredStore.create({
+ *        prop1: {
+ *            value: value1,
+ *            monitor: {
+ *                initialized: true
+ *            }
+ *        },
+ *        prop2: {
+ *            value: value2,
+ *            monitor: {
+ *                updated: true
+ *            }
+ *        }
+ *    })
+ */
 module.exports = origin.extend({
     fetch: function(key) {
         return checkAndGetProp(this, key).fetch();
