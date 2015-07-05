@@ -12,6 +12,9 @@ module.exports = {
             dst[dstAttr] = src[srcAttr];
         }
     },
+    getBool: function(obj) {
+        return obj !== 0 && obj !== "0";
+    },
     mergeObjects: function(obj1, obj2) {
         var result = {};
         for (var attr in obj1) {
