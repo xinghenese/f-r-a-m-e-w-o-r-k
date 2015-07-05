@@ -45,10 +45,9 @@ module.exports = {
       float: 'right',
       width: '42px',
       lineHeight: '42px',
-      overflow: 'hidden',
       marginRight: '15px',
-      color: '#499dd9',
-      cursor: 'pointer'
+      background: "#fff",
+      color: '#499dd9'
     }
   }
 };

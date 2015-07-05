@@ -103,7 +103,7 @@ module.exports = origin.extend({
      *      }
      * @param emitter
      *    the eventEmitter which listeners would be attached to.
-     *    if noting to pass to the emitter parameter, an internal eventEmitter
+     *    if nothing to pass to the emitter parameter, an internal eventEmitter
      *    would be created.
      * @param event
      *    the name of the update or initialization event.
@@ -115,12 +115,12 @@ module.exports = origin.extend({
         value = value === null ? {} : value;
 
         this.value = value;
-        this.type = _.isArray(value)
-            ? 'array'
-            : _.isObject(value)
-                ? 'object'
-                : 'primitive'
-        ;
+//        this.type = _.isArray(value)
+//            ? 'array'
+//            : _.isObject(value)
+//                ? 'object'
+//                : 'primitive'
+//        ;
 
         switch (true) {
             case monitor.updated:

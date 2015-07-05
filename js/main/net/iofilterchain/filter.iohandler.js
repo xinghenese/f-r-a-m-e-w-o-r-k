@@ -7,6 +7,7 @@ var _ = require('lodash');
 var filter = require('./filter');
 var userconfig = require('../userconfig/userconfig');
 var ConnectionType = require('../connection/connectiontype');
+var errors = require('../../constants/errors');
 
 //core module to export
 module.exports = filter.create({
@@ -30,8 +31,8 @@ module.exports = filter.create({
 
         //should extend the logic here to handle various invalid results.
         if (result != 0) {
-            console.error('invalid result valued:', result);
-            throw new Error(result);
+            console.error('invalid result valued:', '{r: ' + result + '}');
+            throw new Error(_.get(errors, result));
         }
 
         notify(msg);

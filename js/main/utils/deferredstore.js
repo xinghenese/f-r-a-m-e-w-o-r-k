@@ -46,7 +46,11 @@ module.exports = origin.extend({
             var emitter =  eventemitter.create();
             var _data = this._data = {};
             _.forOwn(data, function(prop, key) {
-                _.set(_data, key, deferredData.create(prop.value, prop.monitor, emitter, key));
+                prop = deferredData.isPrototypeOf(prop)
+                    ? prop
+                    : deferredData.create(prop.value, prop.monitor, emitter, key)
+                ;
+                _.set(_data, key, prop);
             });
         }
     }
