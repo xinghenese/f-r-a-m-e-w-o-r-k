@@ -10,7 +10,7 @@ var eventemitter = require('./eventemitter.thenable');
 //private fields
 var DEFAULT_EVENT = 'change';
 var DEFAULT_MONITOR_CONFIG = {
-    initialized: true,
+    initialized: false,
     updated: false,
     deleted: false
 };
@@ -18,7 +18,10 @@ var DEFAULT_MONITOR_CONFIG = {
 //core module to export
 module.exports = origin.extend({
     fetch: function() {
-        return this._promise;
+        return this._promise || promise.create(this.value);
+    },
+    fetchSync: function() {
+        return this.value;
     },
     update: function(value) {
         if (eventemitter.isPrototypeOf(this._emitter)
@@ -71,7 +74,7 @@ module.exports = origin.extend({
                 this._promise = emitter.once(event);
                 break;
             default:
-                this._promise = promise.create(value);
+                this._promise = null;
         }
     }
 }, ['fetch', 'update']);

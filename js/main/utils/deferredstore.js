@@ -13,17 +13,13 @@ var deferredData = require('./deferreddata');
 //core module to export
 module.exports = origin.extend({
     fetch: function(key) {
-        var prop = _.get(this._data, key);
-        if (!deferredData.isPrototypeOf(prop)) {
-            throw new Error('no valid keys named ' + key + ' found in deferreddata: ', this);
-        }
-        return prop.fetch();
+        return checkAndGetProp(this, key).fetch();
+    },
+    fetchSync: function(key) {
+        return checkAndGetProp(this, key).fetchSync();
     },
     update: function(key, value) {
-        var prop = _.get(this._data, key);
-        if (deferredData.isPrototypeOf(prop)) {
-            prop.update(value);
-        }
+        checkAndGetProp(this, key).update(value);
         return this;
     },
     init: function(data) {
@@ -41,3 +37,10 @@ module.exports = origin.extend({
 
 
 //private functions
+function checkAndGetProp(store, key) {
+    var prop = _.get(store._data, key);
+    if (!deferredData.isPrototypeOf(prop)) {
+      throw new Error('no valid keys named ' + key + ' found in deferreddata: ', store);
+    }
+    return prop;
+}
