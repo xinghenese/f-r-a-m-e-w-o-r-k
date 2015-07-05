@@ -6,17 +6,20 @@
 var _ = require('lodash');
 var React = require('react');
 var promise = require('../../utils/promise');
-var Validator = require('./validator/validator');
 var RequiredFieldValidator = require('./validator/RequiredFieldValidator');
 var CompareValidator = require('./validator/CompareValidator');
 var RegularExpressionValidator = require('./validator/RegularExpressionValidator');
+var CustomValidator = require('./validator/CustomValidator');
+var FunctionBasedValidator = require('./validator/FunctionBasedValidator');
+var objects = require('../../utils/objects');
 
 //private fields
 var ValidatorClasses = [
-  RequiredFieldValidator,
-  CompareValidator,
-  RegularExpressionValidator,
-  Validator
+    RequiredFieldValidator,
+    CompareValidator,
+    RegularExpressionValidator,
+    CustomValidator,
+    FunctionBasedValidator
 ];
 
 //core module to export
@@ -29,69 +32,68 @@ var ValidatorClasses = [
 
 //module initialization
 var Form = React.createClass({
-  render: function(){
-    var i = 0;
-    var count = React.Children.count(this.props.children);
-    var children = React.Children.map(this.props.children, function(child) {
-      var seq = i ++;
-      return React.cloneElement(child, {
-        ref: 'form-control-' + (seq),
-        seq: seq,
-        count: count
-      });
-    });
-    return (
-      <form
-        onSubmit={submit(this)}
-        className={this.props.className}
-        style={this.props.style}
-      >
-      {children}</form>
-      )
-  }
+    render: function(){
+        var i = 0;
+        var count = React.Children.count(this.props.children);
+        var children = React.Children.map(this.props.children, function(child) {
+            var seq = i ++;
+            return React.cloneElement(child, {
+                ref: 'form-control-' + (seq),
+                seq: seq,
+                count: count
+            });
+        });
+        return (
+            <form
+                onSubmit={submit(this)}
+                className={this.props.className}
+                style={this.props.style}
+            >
+            {children}
+            </form>
+        )
+    }
 });
 
 module.exports = Form;
 
 //private functions
 function submit(form){
-  return function f(event) {
-    walkRefs(form).then(function() {
-      form.props.onSubmit(event);
-    });
+    return function f(event) {
+        walkRefs(form).then(function() {
+            form.props.onSubmit(event);
+        });
 
-    event.stopPropagation();
-    event.preventDefault();
-    return false;
-  }
+        if (!objects.preventDefault(event)) {
+            return false;
+        }
+    }
 }
 
 function walkRefs(root) {
-  console.info(root.constructor.displayName + '#refs: ', root.refs);
-  return _.reduce(root.refs, function(memo, element) {
-    if (isValidator(element)) {
-      return memo.then(function() {
-        console.log(element.constructor.displayName + ' start to validate');
-        return element.validate();
-      });
-    }
-    if (!_.isEmpty(element.refs)) {
-      console.log(element.constructor.displayName + '#ref not empty');
-      return memo.then(function() {
-        return walkRefs(element);
-      });
-    }
-    return memo;
-  }, promise.create(0))
+//    console.info(root.constructor.displayName + '#refs: ', root.refs);
+    return _.reduce(root.refs, function(memo, element) {
+        if (isValidator(element)) {
+            return memo.then(function() {
+//                console.log(element.constructor.displayName + ' start to validate');
+                return element.validate();
+            });
+        }
+        if (!_.isEmpty(element.refs)) {
+//            console.log(element.constructor.displayName + '#ref not empty');
+            return memo.then(function() {
+                return walkRefs(element);
+            });
+        }
+        return memo;
+    }, promise.create(0))
 }
 
 function isValidator(element) {
-  for (var i = 0, len = ValidatorClasses.length; i < len; i ++) {
-//    if (element instanceof React.ReactClass)
-    if (element instanceof ValidatorClasses[i]) {
-      console.log('ValidatorClasses[' + i + ']');
-      return true;
+    for (var i = 0, len = ValidatorClasses.length; i < len; i ++) {
+        if (element instanceof ValidatorClasses[i]) {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }

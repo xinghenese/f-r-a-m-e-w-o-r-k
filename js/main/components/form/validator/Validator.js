@@ -41,20 +41,20 @@ var Validator = React.createClass({
         };
     },
     getInitialState: function() {
-        return {validateState: ValidateState.NEVER, errorType: 0};
+        return {validateState: ValidateState.NEVER, errorType: -1};
     },
     validate: function() {
         var self = this;
         var controls = this.props.controlToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
-        console.log('controls: ', controls);
+//        console.log('controls: ', controls);
 
         var values = _.map(controls, function(control) {
             return document.getElementById(control).value;
         });
 
-        console.log('values: ', values);
+//        console.log('values: ', values);
 
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
@@ -129,7 +129,7 @@ module.exports = Validator;
 
 //private functions
 function handleError(validator, error) {
-    validator.setState({validateState: ValidateState.FAILED, errorType: error || 0});
+    validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
     document.getElementById(validator.props.controlToValidate).focus();
     throw new Error('invalid value');
 }

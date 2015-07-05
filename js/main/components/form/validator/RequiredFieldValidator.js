@@ -1,6 +1,7 @@
 /**
  * Created by Administrator on 2015/6/25.
  */
+'use strict';
 
 //dependencies
 var _ = require('lodash');
@@ -14,7 +15,7 @@ var index = 0;
 //core module to export
 var RequiredFieldValidator = React.createClass({
     validate: function() {
-        console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
+//        console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
         return this.refs[this._seq].validate();
     },
     componentWillMount: function() {
@@ -43,7 +44,7 @@ module.exports = RequiredFieldValidator;
 
 //private functions
 function validation() {
-    console.log('validating');
+//    console.log('validating');
     return _(arguments)
         .toArray()
         .every(function(arg) {

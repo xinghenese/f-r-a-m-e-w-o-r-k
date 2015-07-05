@@ -79,8 +79,6 @@ AccountStore.dispatchToken = AppDispatcher.register(function(action) {
 
 // private functions
 function _handleLoginRequest(action) {
-    console.log("device");
-    console.log(Config.device);
     var data = {
         mid: action.phone,
         os: UserAgent.getOS(),
@@ -93,11 +91,12 @@ function _handleLoginRequest(action) {
     }
     objects.copyValuedProp(action, "verificationCode", data, "c");
     objects.copyValuedProp(action, "password", data, "psw");
-    HttpConnection.request({
+    HttpConnection.login({
         url: "usr/lg",
         data: data
     }).then(function(response) {
         _handleLoginSuccess(response);
+        AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS);
     }, function() {
         AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
     });
@@ -134,7 +133,6 @@ function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "trt", myself, "tokenRefreshTime");
     objects.copyValuedProp(response, "ct", myself, "serverTime");
     objects.copyValuedProp(response, "tdlg", myself, "topConversations");
-    console.log(myself);
 }
 
 function _handleLogoutRequest(action) {
@@ -234,15 +232,6 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
     });
 }
 
-function _parseUserRoomSettings(json) {
-    // TODO
-    return JSON.parse(json);
-}
-
-function _parseUserPrivateSettings(json) {
-    // TODO
-    return JSON.parse(json);
-}
 function _removeLeadingPlusSignOfCode(code) {
     if (code.charAt(0) == '+') {
         return code.substring(1);

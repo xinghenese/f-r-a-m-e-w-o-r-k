@@ -21,11 +21,19 @@ module.exports = {
     padding: "0",
     margin: "0"
   },
+  textarea: {
+    boxSizing: 'content-box',
+    wordWrap: 'break-word',
+    border: '0',
+    outline: '0'
+  },
   button: {
     border: "0",
     outline: "0",
     margin: "0",
     padding: "0",
+    width: "100%",
+    overflow: "hidden",
     cursor: "pointer"
   },
   mask: {

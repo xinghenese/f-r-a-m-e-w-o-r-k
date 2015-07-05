@@ -17,7 +17,7 @@ var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
 var Submit = require('./form/control/Submit');
 var Form = require('./form/form');
-var Validator = require('./form/validator/Validator');
+var CustomValidator = require('./form/validator/CustomValidator');
 var RequiredValidator = require('./form/validator/RequiredFieldValidator');
 var RegExpValidator = require('./form/validator/RegularExpressionValidator');
 
@@ -366,13 +366,15 @@ var PhoneForm = React.createClass({
                             />
                         </Wrapper>
                         <Wrapper className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
-                            <RegExpValidator
+                            <CustomValidator
                                 style={loginForm.label}
                                 defaultMessage={Lang.phone}
                                 errorMessage={Lang.invalidPhone}
                                 successMessage={Lang.phone}
                                 controlToValidate={["code-input", "phone-input"]}
-                                regExp={[codeRegex, phoneRegex]}
+                                validationAtClient={function(code, phone) {
+                                    return code != "+86" || phoneRegex.test(phone);
+                                }}
                             />
                             <InputBox
                                 id="phone-input"

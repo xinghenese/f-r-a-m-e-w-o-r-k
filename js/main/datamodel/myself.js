@@ -33,5 +33,6 @@ module.exports = {
     refreshToken: "",
     tokenRefreshTime: 0,
     serverTime: 0,
-    topConversations: []
+    topConversations: [],
+    rooms: []
 };

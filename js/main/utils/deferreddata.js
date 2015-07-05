@@ -10,16 +10,65 @@ var eventemitter = require('./eventemitter.thenable');
 //private fields
 var DEFAULT_EVENT = 'change';
 var DEFAULT_MONITOR_CONFIG = {
-    initialized: true,
+    initialized: false,
     updated: false,
     deleted: false
 };
 
 //core module to export
+/**
+ *
+ * @type {Object}
+ * @example
+ *    var data = deferredData.create({
+ *      value: someValue,
+ *      monitor: configObject,
+ *      emitter: eventEmitter,
+ *      event: someEvent
+ *    })
+ */
 module.exports = origin.extend({
+    /**
+     * <dl>
+     * <dt>get the value of the data asynchronously</dt>
+     * <dd><ul><li>
+     *   if data.monitor.updated is true, doSomethingWith will be
+     * invoked with the newest value every time the value of the data
+     * has been updated.
+     * </li><li>
+     *   if data.monitor.updated is false and data.monitor.initialized
+     * is true, doSomethingWith will only be invoked once the value of
+     * the data has been changed for the first time.
+     * </li><li>
+     *   if data.monitor.updated is false and data.monitor.initialized
+     * is false, doSomethingWith will be only be invoke once with the
+     * initial value fo the data.
+     * </li></ul></dd>
+     * </dl>
+     * @returns {Promise}
+     * @example
+     *    data.fetch().then(function(value) {
+     *        return doSomethingWith(value);
+     *    }
+     */
     fetch: function() {
-        return this._promise;
+        return this._promise || promise.create(this.value);
     },
+    /**
+     * get the value of the data synchronously
+     * @returns {exports.value|*}
+     * @example
+     *    var value = data.fetch();
+     *    doSomethingWith(value);
+     */
+    fetchSync: function() {
+        return this.value;
+    },
+    /**
+     * update the value of the data with newest value.
+     * @param value {*}
+     * @returns {exports}
+     */
     update: function(value) {
         if (eventemitter.isPrototypeOf(this._emitter)
             && value != void 0
@@ -41,9 +90,23 @@ module.exports = origin.extend({
     /**
      *
      * @param value
+     *    the initial value of the data
      * @param monitor
+     *    the config object to tell whether should attach a listener to
+     *    the emitter to listen to the initialization or update event of
+     *    the value of the data.
+     *    e.g.
+     *      {
+     *        updated: {boolean}, true for listening to update event
+     *        initialized: {boolean}, true for listening to initialization
+     *        deleted: {boolean}, true for listening to deleted event
+     *      }
      * @param emitter
+     *    the eventEmitter which listeners would be attached to.
+     *    if nothing to pass to the emitter parameter, an internal eventEmitter
+     *    would be created.
      * @param event
+     *    the name of the update or initialization event.
      */
     init: function(value, monitor, emitter, event) {
         monitor = configMonitor(monitor);
@@ -52,12 +115,12 @@ module.exports = origin.extend({
         value = value === null ? {} : value;
 
         this.value = value;
-        this.type = _.isArray(value)
-            ? 'array'
-            : _.isObject(value)
-                ? 'object'
-                : 'primitive'
-        ;
+//        this.type = _.isArray(value)
+//            ? 'array'
+//            : _.isObject(value)
+//                ? 'object'
+//                : 'primitive'
+//        ;
 
         switch (true) {
             case monitor.updated:
@@ -71,7 +134,7 @@ module.exports = origin.extend({
                 this._promise = emitter.once(event);
                 break;
             default:
-                this._promise = promise.create(value);
+                this._promise = null;
         }
     }
 }, ['fetch', 'update']);

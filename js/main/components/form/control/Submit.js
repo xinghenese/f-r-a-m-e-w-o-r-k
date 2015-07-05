@@ -4,6 +4,8 @@
 
 //dependencies
 var React = require('react');
+var style = require('../../../style/common');
+var theme = require('../../../style/default');
 var makeStyle = require('../../../style/styles').makeStyle;
 
 //private fields
@@ -15,8 +17,8 @@ var Submit = React.createClass({
     return (
       <input
         type="submit"
-        value={this.props.value || "submit"}
-        style={makeStyle(this.props.style)}
+        value={this.props.name || this.props.value}
+        style={makeStyle(style.button, theme.button, this.props.style)}
       />
     );
   }

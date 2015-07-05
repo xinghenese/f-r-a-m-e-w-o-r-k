@@ -8,23 +8,23 @@ var userconfigs = require('../userconfig/userconfig');
 
 //core module to export
 module.exports = filter.create({
-  'processWritable': function(value, options){
-    if(options.needWrap){
-      return queryStringify(value);
+    'processWritable': function(value, options) {
+        if (options.needWrap) {
+            return queryStringify(value);
+        }
+        return value;
+    },
+    'processReadable': function(value, options) {
+        if (options.needUnwrap) {
+            return decodeURIComponent(value.replace(/[\r\n]/gm, ''));
+        }
+        return value;
     }
-    return value;
-  },
-  'processReadable': function(value, options){
-    if(options.needUnwrap){
-      return decodeURIComponent(value.replace(/[\r\n]/gm, ''));
-    }
-    return value;
-  }
 });
 
 //private functions.
-function queryStringify(msg){
-  return 'data=' + encodeURIComponent(msg) + "&"
-    + (userconfigs.getVersion() ? "ver=" + userconfigs.getVersion() + "&" : "")
-    + (userconfigs.getUuid() ? "uuid=" + userconfigs.getUuid() : "");
+function queryStringify(msg) {
+    return 'data=' + encodeURIComponent(msg)
+        + (userconfigs.getVersion() ? "&ver=" + userconfigs.getVersion() : "")
+        + (userconfigs.getUuid() ? "&uuid=" + userconfigs.getUuid() : "");
 }

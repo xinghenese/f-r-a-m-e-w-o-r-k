@@ -14,18 +14,11 @@ var RouteHandler = Router.RouteHandler;
 
 // private fields
 var app = {
-    _handleCheckVerificationCodeSuccess: function() {
-        router.transitionTo("chat", {t: "boy"}, {age: 8});
-    },
     _handleVerificationCodeSent: function() {
         router.transitionTo("code");
     },
-    _onLoginSuccess: function() {
-        console.log(this);
-        console.log("login success");
-    },
-    _onLoginFailed: function() {
-        console.log("login failed");
+    _handleLoginSuccess: function() {
+        router.transitionTo("chat", {t: "boy"}, {age: 8});
     },
     _onProfileLoaded: function() {
         console.log("profile loaded, after login success!");
@@ -35,7 +28,7 @@ var WrappedPhoneForm = _wrapComponent(PhoneForm, {
     onVerificationCodeSent: app._handleVerificationCodeSent
 });
 var WrappedCodeForm = _wrapComponent(CodeForm, {
-    onCheckVerificationCodeSuccess: app._handleCheckVerificationCodeSuccess
+    onLoginSuccess: app._handleLoginSuccess
 });
 var routes = (
     <Route name="app" path="/">
