@@ -71,7 +71,10 @@ module.exports = {
       overrides = {};
     }
 
-    var instance = this.extend(overrides, null, void 0);
+    var instance = this.extend(overrides, null);
+    //modify $super reference
+    instance.$super = this.$super;
+
     var ret = instance.init.apply(instance, initials);
     if(this.isPrototypeOf(ret)){
       return ret;
