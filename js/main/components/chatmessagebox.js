@@ -37,7 +37,7 @@ var messagebox = module.exports = React.createClass({
               defaultMessage="PassWord"
               errorMessage="Empty Password!!"
               successMessage="Password Inputted"
-              controlToValidate="password"
+              controlsToValidate="password"
             />
             <InputBox id="password" defaultValue="password"/>
            </Wrapper>

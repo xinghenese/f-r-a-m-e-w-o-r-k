@@ -26,7 +26,7 @@ var ValidatorClasses = [
 /**
  * <Form>
  *   <InputBox id=input1/>
- *   <RequiredValidator controlToValidate=input1/>
+ *   <RequiredValidator controlsToValidate=input1/>
  * </Form>
  */
 
@@ -71,16 +71,13 @@ function submit(form){
 }
 
 function walkRefs(root) {
-//    console.info(root.constructor.displayName + '#refs: ', root.refs);
     return _.reduce(root.refs, function(memo, element) {
         if (isValidator(element)) {
             return memo.then(function() {
-//                console.log(element.constructor.displayName + ' start to validate');
                 return element.validate();
             });
         }
         if (!_.isEmpty(element.refs)) {
-//            console.log(element.constructor.displayName + '#ref not empty');
             return memo.then(function() {
                 return walkRefs(element);
             });

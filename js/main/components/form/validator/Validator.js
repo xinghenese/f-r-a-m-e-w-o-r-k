@@ -23,7 +23,8 @@ var index = 0;
 //          defaultMessage
 //          errorMessage
 //          successMessage
-//          controlToValidate
+//          controlsToValidate
+//          controlToFocus
 //          validationAtClient
 //          validationAtServer
 //        />
@@ -45,7 +46,7 @@ var Validator = React.createClass({
     },
     validate: function() {
         var self = this;
-        var controls = this.props.controlToValidate;
+        var controls = this.props.controlsToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
 //        console.log('controls: ', controls);
@@ -85,8 +86,8 @@ var Validator = React.createClass({
         return handleSuccess(this);
     },
     render: function() {
-        if (!this.props.controlToValidate) {
-            console.error('no controlToValidate props found in Validator');
+        if (!this.props.controlsToValidate) {
+            console.error('no controlsToValidate props found in Validator');
             return null;
         }
         var style;
@@ -124,13 +125,20 @@ var Validator = React.createClass({
 
 module.exports = Validator;
 
-//module initialization
-
-
 //private functions
+function doFocus(validator) {
+    if (validator.props.controlToFocus) {
+        document.getElementById(validator.props.controlToFocus).focus();
+    } else {
+        var controls = validator.props.controlsToValidate;
+        var control = _.isArray(controls) ? _.last(controls) : controls;
+        document.getElementById(control).focus();
+    }
+}
+
 function handleError(validator, error) {
     validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
-    document.getElementById(validator.props.controlToValidate).focus();
+    doFocus(validator);
     throw new Error('invalid value');
 }
 
