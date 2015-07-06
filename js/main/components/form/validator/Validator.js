@@ -11,7 +11,7 @@ var defaultStyle = require('../../../style/default');
 
 //private fields
 var ValidateState = {
-    NEVER: 0,
+    DEFAULT: 0,
     FAILED: 1,
     SUCCESS: 2
 };
@@ -42,20 +42,16 @@ var Validator = React.createClass({
         };
     },
     getInitialState: function() {
-        return {validateState: ValidateState.NEVER, errorType: -1};
+        return {validateState: ValidateState.DEFAULT, errorType: -1};
     },
     validate: function() {
         var self = this;
         var controls = this.props.controlsToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
-//        console.log('controls: ', controls);
-
         var values = _.map(controls, function(control) {
             return document.getElementById(control).value;
         });
-
-//        console.log('values: ', values);
 
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
@@ -94,7 +90,7 @@ var Validator = React.createClass({
         var message;
 
         switch (this.state.validateState) {
-            case ValidateState.NEVER:
+            case ValidateState.DEFAULT:
                 message = this.props.defaultMessage;
                 break;
             case ValidateState.FAILED:
@@ -138,6 +134,7 @@ function doFocus(validator) {
 
 function handleError(validator, error) {
     validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
+    restoreDefaultStyleAfterChange(validator);
     doFocus(validator);
     throw new Error('invalid value');
 }
@@ -145,4 +142,17 @@ function handleError(validator, error) {
 function handleSuccess(validator) {
     validator.setState({validateState: ValidateState.SUCCESS});
     return true;
+}
+
+function restoreDefaultStyleAfterChange(validator) {
+    var controls = validator.props.controlsToValidate;
+    controls = _.isArray(controls) ? controls : [controls];
+    _.forEach(controls, function(c) {
+        var element = document.getElementById(c);
+        var onInput = function() {
+            element.removeEventListener("input", onInput);
+            validator.setState({validateState: ValidateState.DEFAULT});
+        };
+        element.addEventListener("input", onInput);
+    });
 }
