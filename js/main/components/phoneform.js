@@ -338,7 +338,7 @@ var PhoneForm = React.createClass({
                             defaultMessage={Lang.country}
                             errorMessage={Lang.country}
                             successMessage={Lang.country}
-                            controlToValidate="country-input"
+                            controlsToValidate="country-input"
                         />
                         <InputBox
                             id="country-input"
@@ -355,7 +355,7 @@ var PhoneForm = React.createClass({
                                 defaultMessage={Lang.code}
                                 errorMessage={Lang.code}
                                 successMessage={Lang.code}
-                                controlToValidate="code-input"
+                                controlsToValidate="code-input"
                             />
                             <InputBox
                                 id="code-input"
@@ -371,7 +371,8 @@ var PhoneForm = React.createClass({
                                 defaultMessage={Lang.phone}
                                 errorMessage={Lang.invalidPhone}
                                 successMessage={Lang.phone}
-                                controlToValidate={["code-input", "phone-input"]}
+                                controlsToValidate={["code-input", "phone-input"]}
+                                controlToFocus="phone-input"
                                 validationAtClient={function(code, phone) {
                                     return code != "+86" || phoneRegex.test(phone);
                                 }}

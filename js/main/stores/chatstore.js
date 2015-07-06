@@ -4,10 +4,13 @@
 'use strict';
 
 // dependencies
+var _ = require('lodash');
 var ActionTypes = require('../constants/constants').ActionTypes;
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
+var Group = require('../datamodel/group');
 var HttpConnection = require('../net/connection/httpconnection');
+var User = require('../datamodel/user');
 var assign = require('object-assign');
 var myself = require('../datamodel/myself');
 var groups = require('../datamodel/groups');
@@ -70,10 +73,14 @@ function _handleGetChatListRequest(action) {
 
 function _processGroupListResponse(response) {
     groups.setCursor(response.rl.cs);
-    groups.setGroups(response.rl.l);
+    _.forEach(response.rl.l, function(n) {
+        groups.addGroup(new Group(n));
+    });
 }
 
 function _processContactListResponse(response) {
     users.setCursor(response.ul.cs);
-    users.setUsers(response.ul.l);
+    _.forEach(response.ul.l, function(n) {
+        users.addUser(new User(n));
+    });
 }

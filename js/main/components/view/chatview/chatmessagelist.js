@@ -8,7 +8,7 @@ var React = require('react');
 var ChatMessage = require('./chatmessage');
 
 //core module to export
-var messagelist = module.exports = React.createClass({
+var ChatMessageList = React.createClass({
   render: function(){
     var chatMessageNodes = _.map(this.props.data, function(data){
       return (
@@ -24,3 +24,5 @@ var messagelist = module.exports = React.createClass({
     )
   }
 });
+
+module.exports = ChatMessageList;

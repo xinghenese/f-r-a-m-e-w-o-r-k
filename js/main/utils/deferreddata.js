@@ -3,6 +3,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var origin = require('../net/base/origin');
 var promise = require('./promise');
 var eventemitter = require('./eventemitter.thenable');
@@ -76,7 +77,7 @@ module.exports = origin.extend({
 
         if (_.isFunction(process)) {
             current = process(previous, value);
-        } else if (previous && _.isObject(previous)) {
+        } else if (previous && _.isPlainObject(previous)) {
             current = _.assign({}, previous, value);
         } else {
             current = value;

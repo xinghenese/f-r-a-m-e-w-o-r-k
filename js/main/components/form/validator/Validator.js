@@ -11,22 +11,23 @@ var defaultStyle = require('../../../style/default');
 
 //private fields
 var ValidateState = {
-    NEVER: 0,
+    DEFAULT: 0,
     FAILED: 1,
     SUCCESS: 2
 };
-var seq = 'custom-validator-';
-var index = 0;
 
 //core module to export
-//use as <Validator
-//          defaultMessage
-//          errorMessage
-//          successMessage
-//          controlToValidate
-//          validationAtClient
-//          validationAtServer
-//        />
+/**
+ * @example
+ *    <Validator
+ *        defaultMessage
+ *        errorMessage
+ *        successMessage
+ *        controlToValidate
+ *        validationAtClient
+ *        validationAtServer
+ *    />
+ */
 var Validator = React.createClass({
     propTypes: {
         defaultMessage: React.PropTypes.string,
@@ -35,26 +36,22 @@ var Validator = React.createClass({
         validationAtServer: React.PropTypes.func,
         validationAtClient: React.PropTypes.func
     },
-    getDefaultProps: function() {
-        return {
-            atServer: false
-        };
-    },
     getInitialState: function() {
-        return {validateState: ValidateState.NEVER, errorType: -1};
+        return {validateState: ValidateState.DEFAULT, errorType: -1};
     },
     validate: function() {
         var self = this;
-        var controls = this.props.controlToValidate;
+        var fieldValues = {};
+        var controls = this.props.controlsToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
-//        console.log('controls: ', controls);
-
         var values = _.map(controls, function(control) {
-            return document.getElementById(control).value;
+            control = document.getElementById(control);
+            var field = control.getAttribute('field') || control.id;
+            var value = control.value;
+            _.set(fieldValues, field, value);
+            return value;
         });
-
-//        console.log('values: ', values);
 
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
@@ -72,7 +69,7 @@ var Validator = React.createClass({
 
         if (promise.isPrototypeOf(isValidAtServer)) {
             return isValidAtServer.then(function() {
-                return handleSuccess(self);
+                return handleSuccess(self, fieldValues);
             }, function(err) {
                 return handleError(self, err);
             });
@@ -82,18 +79,18 @@ var Validator = React.createClass({
             return handleError(this);
         }
 
-        return handleSuccess(this);
+        return handleSuccess(this, fieldValues);
     },
     render: function() {
-        if (!this.props.controlToValidate) {
-            console.error('no controlToValidate props found in Validator');
+        if (!this.props.controlsToValidate) {
+            console.error('no controlsToValidate props found in Validator');
             return null;
         }
         var style;
         var message;
 
         switch (this.state.validateState) {
-            case ValidateState.NEVER:
+            case ValidateState.DEFAULT:
                 message = this.props.defaultMessage;
                 break;
             case ValidateState.FAILED:
@@ -124,17 +121,38 @@ var Validator = React.createClass({
 
 module.exports = Validator;
 
-//module initialization
-
-
 //private functions
+function doFocus(validator) {
+    if (validator.props.controlToFocus) {
+        document.getElementById(validator.props.controlToFocus).focus();
+    } else {
+        var controls = validator.props.controlsToValidate;
+        var control = _.isArray(controls) ? _.last(controls) : controls;
+        document.getElementById(control).focus();
+    }
+}
+
 function handleError(validator, error) {
     validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
-    document.getElementById(validator.props.controlToValidate).focus();
+    restoreDefaultStyleAfterChange(validator);
+    doFocus(validator);
     throw new Error('invalid value');
 }
 
-function handleSuccess(validator) {
+function handleSuccess(validator, data) {
     validator.setState({validateState: ValidateState.SUCCESS});
-    return true;
+    return data;
+}
+
+function restoreDefaultStyleAfterChange(validator) {
+    var controls = validator.props.controlsToValidate;
+    controls = _.isArray(controls) ? controls : [controls];
+    _.forEach(controls, function(c) {
+        var element = document.getElementById(c);
+        var onInput = function() {
+            element.removeEventListener("input", onInput);
+            validator.setState({validateState: ValidateState.DEFAULT});
+        };
+        element.addEventListener("input", onInput);
+    });
 }

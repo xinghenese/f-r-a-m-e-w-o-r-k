@@ -31,8 +31,9 @@ module.exports = filter.create({
 
         //should extend the logic here to handle various invalid results.
         if (result != 0) {
-            console.error('invalid result valued:', '{r: ' + result + '}');
-            throw new Error(_.get(errors, result));
+            console.error('invalid result: ', '{code: ' + result
+              + ', reason: ' + _.get(errors, result) + '}');
+            throw new Error(result);
         }
 
         notify(msg);
