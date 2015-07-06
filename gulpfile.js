@@ -9,6 +9,7 @@ var source = require('vinyl-source-stream');
 var del = require('del');
 var runSequence = require('run-sequence');
 var moment = require('moment');
+var plumber = require('gulp-plumber');
 
 var browserifyConfig = {
     entries: ['./main.js'],
@@ -61,7 +62,12 @@ gulp.task('watch', function() {
         var updateStart = Date.now();
         watcher.bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));
         console.log(moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated!', (Date.now() - updateStart) + 'ms');
-    }).bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));
+    }).bundle().pipe(plumber({
+        handleError: function (err) {
+            console.log(err);
+            this.emit('end');
+        }
+    })).pipe(source('main.js')).pipe(gulp.dest('./dist/'));
 });
 
 gulp.task('default', ['build']);

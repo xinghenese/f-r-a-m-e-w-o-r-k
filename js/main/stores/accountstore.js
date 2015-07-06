@@ -12,21 +12,6 @@ var UserAgent = require('../utils/useragent');
 var Config = require('../etc/config');
 var myself = require('../datamodel/myself');
 
-var DID_RECEIVE_PHONE_STATUS = 'didReceivePhoneStatus';
-var CHECK_PHONE_STATUS_ERROR = 'checkPhoneStatusError';
-var CHECK_VERIFICATION_CODE_SUCCESS = 'checkVerificationCodeSuccess';
-var CHECK_VERIFICATION_CODE_FAILED = 'checkVerificationCodeFailed';
-var REGISTER_SUCCESS = "registerSuccess";
-var REGISTER_FAILED = "registerFailed";
-var LOGIN_SUCCESS = 'loginSuccess';
-var LOGIN_FAILED = 'loginFailed';
-var LOGOUT_SUCCESS = 'logoutSuccess';
-var LOGOUT_FAILED = 'logoutFailed';
-var VERIFICATION_CODE_SENT = 'verificationCodeSent';
-var VERIFICATION_CODE_NOT_SENT = 'verificationCodeNotSent';
-var VOICE_VERIFICATION_CODE_SENT = 'voiceVerificationCodeSent';
-var VOICE_VERIFICATION_CODE_NOT_SENT = 'voiceVerificationCodeNotSent';
-
 //private fields
 var _requestAccount = {
     code: "+86",
