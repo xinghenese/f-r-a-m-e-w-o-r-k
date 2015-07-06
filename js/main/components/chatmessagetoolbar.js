@@ -6,45 +6,57 @@
 var React = require('react');
 var style = require('../style/chatmessagetoolbar');
 var makeStyle = require('../style/styles').makeStyle;
+var Form = require('./form/Form');
+var Button = require('./form/control/Button');
+var TextArea = require('./form/control/MultilineInputBox');
+var Submit = require('./form/control/Submit');
 
 //core module to export
 var toolbar = module.exports = React.createClass({
+  getInitialState: function() {
+    return {
+      time: '',
+      message: ''
+    }
+  },
+  _handleInputChange: function(event) {
+    this.setState({
+      time: new Date(),
+      message: event.target.value
+    })
+  },
   render: function(){
     return (
-      <div
+      <Form
         className="chat-message-toolbar"
-        style={makeStyle(style.toolbar)}
+        style={style.toolbar}
+        onSubmit={function(){console.log('send message')}}
       >
-        <a
+        <Button
           className="chat-message-toolbar-accessory"
-          style={makeStyle(style.toolbar.accessory)}
+          style={style.toolbar.accessory}
           onClick={this._toggleAccessory}
         >
-          <img className="toolbar-accessory-icon"/>
-        </a>
-        <a
+        </Button>
+        <Submit
+          value="Send"
           className="chat-message-toolbar-send"
-          style={makeStyle(style.toolbar.send)}
+          style={style.toolbar.send}
           onClick={this._onSubmit}
-        >
-          Send
-        </a>
-        <a
+        />
+        <Button
           className="chat-message-toolbar-emoji"
-          style={makeStyle(style.toolbar.emoji)}
+          style={style.toolbar.emoji}
           onClick={this._toggleEmoji}
-        >
-          <img className="toolbar-emoji-icon"/>
-        </a>
-        <div
+        />
+        <TextArea
+          id="chat-message-input"
           className="chat-message-toolbar-input"
-          contentEditable
-          style={makeStyle(style.toolbar.input)}
-          onFocus={onInputFocus}
-          onBlur={onInputBlur}
-        >
-        </div>
-      </div>
+          defaultValue="Write a message ..."
+          style={style.toolbar.input}
+          onChange={this._handleInputChange}
+        />
+      </Form>
     )
   }
 });
