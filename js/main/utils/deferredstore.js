@@ -37,8 +37,8 @@ module.exports = origin.extend({
     fetchSync: function(key) {
         return checkAndGetProp(this, key).fetchSync();
     },
-    update: function(key, value) {
-        checkAndGetProp(this, key).update(value);
+    update: function(key, value, process) {
+        checkAndGetProp(this, key).update(value, process);
         return this;
     },
     init: function(data) {

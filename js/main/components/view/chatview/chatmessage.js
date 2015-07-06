@@ -4,16 +4,14 @@
 
 //dependencies
 var React = require('react');
-var style = require('../style/chatmessage');
-var makeStyle = require('../style/styles').makeStyle;
+var style = require('../../../style/chatmessage');
+var makeStyle = require('../../../style/styles').makeStyle;
 
 //core module to export
-var chatmessage = module.exports = React.createClass({
+var ChatMessage =  React.createClass({
   render: function(){
     return (
-      <div
-        className="chat-message"
-      >
+      <div className="chat-message">
         <a
           className="chat-avatar"
           style={makeStyle(style.chatmessage.avatar)}
@@ -29,17 +27,11 @@ var chatmessage = module.exports = React.createClass({
         >
           {this.props.time}
         </div>
-        <div
-          className="chat-message-body"
-        >
-          <div
-            className="chat-nickname"
-          >
+        <div className="chat-message-body">
+          <div className="chat-nickname" >
             {this.props.senderName}
           </div>
-          <p
-            className="chat-message-content"
-          >
+          <p className="chat-message-content">
             {this.props.children}
           </p>
         </div>
@@ -47,3 +39,5 @@ var chatmessage = module.exports = React.createClass({
     )
   }
 });
+
+module.exports = ChatMessage;

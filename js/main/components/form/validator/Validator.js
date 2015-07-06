@@ -15,19 +15,19 @@ var ValidateState = {
     FAILED: 1,
     SUCCESS: 2
 };
-var seq = 'custom-validator-';
-var index = 0;
 
 //core module to export
-//use as <Validator
-//          defaultMessage
-//          errorMessage
-//          successMessage
-//          controlsToValidate
-//          controlToFocus
-//          validationAtClient
-//          validationAtServer
-//        />
+/**
+ * @example
+ *    <Validator
+ *        defaultMessage
+ *        errorMessage
+ *        successMessage
+ *        controlToValidate
+ *        validationAtClient
+ *        validationAtServer
+ *    />
+ */
 var Validator = React.createClass({
     propTypes: {
         defaultMessage: React.PropTypes.string,
@@ -36,21 +36,21 @@ var Validator = React.createClass({
         validationAtServer: React.PropTypes.func,
         validationAtClient: React.PropTypes.func
     },
-    getDefaultProps: function() {
-        return {
-            atServer: false
-        };
-    },
     getInitialState: function() {
         return {validateState: ValidateState.DEFAULT, errorType: -1};
     },
     validate: function() {
         var self = this;
+        var fieldValues = {};
         var controls = this.props.controlsToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
         var values = _.map(controls, function(control) {
-            return document.getElementById(control).value;
+            control = document.getElementById(control);
+            var field = control.getAttribute('field') || control.id;
+            var value = control.value;
+            _.set(fieldValues, field, value);
+            return value;
         });
 
         //first validate at client end
@@ -69,7 +69,7 @@ var Validator = React.createClass({
 
         if (promise.isPrototypeOf(isValidAtServer)) {
             return isValidAtServer.then(function() {
-                return handleSuccess(self);
+                return handleSuccess(self, fieldValues);
             }, function(err) {
                 return handleError(self, err);
             });
@@ -79,7 +79,7 @@ var Validator = React.createClass({
             return handleError(this);
         }
 
-        return handleSuccess(this);
+        return handleSuccess(this, fieldValues);
     },
     render: function() {
         if (!this.props.controlsToValidate) {
@@ -139,9 +139,9 @@ function handleError(validator, error) {
     throw new Error('invalid value');
 }
 
-function handleSuccess(validator) {
+function handleSuccess(validator, data) {
     validator.setState({validateState: ValidateState.SUCCESS});
-    return true;
+    return data;
 }
 
 function restoreDefaultStyleAfterChange(validator) {

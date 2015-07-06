@@ -60,7 +60,8 @@ module.exports = Form;
 //private functions
 function submit(form){
     return function f(event) {
-        walkRefs(form).then(function() {
+        walkRefs(form).then(function(data) {
+            event.data = data;
             form.props.onSubmit(event);
         });
 
@@ -70,20 +71,37 @@ function submit(form){
     }
 }
 
-function walkRefs(root) {
+function walkRefs(root, data) {
     return _.reduce(root.refs, function(memo, element) {
         if (isValidator(element)) {
-            return memo.then(function() {
-                return element.validate();
+            return memo.then(function(data) {
+                var values = element.validate();
+                if (promise.isPrototypeOf(values)) {
+                    return values.then(function(newData) {
+                        return _.assign(data, newData);
+                    })
+                }
+                return _.assign(data, values);
             });
         }
+
+        //TODO: filter the values of non-input controls
+        var control = React.findDOMNode(element);
+        var value = control.value || control.textContent || control.innerText;
+        var field = element.props.field || element.props.id;
+        if (value && field) {
+            memo = memo.then(function(data) {
+                return _.set(data, field, value);
+            })
+        }
+
         if (!_.isEmpty(element.refs)) {
-            return memo.then(function() {
-                return walkRefs(element);
+            return memo.then(function(data) {
+                return walkRefs(element, data);
             });
         }
         return memo;
-    }, promise.create(0))
+    }, promise.create(data || {}))
 }
 
 function isValidator(element) {

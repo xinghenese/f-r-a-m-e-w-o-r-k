@@ -3,6 +3,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var origin = require('../net/base/origin');
 var promise = require('./promise');
 var eventemitter = require('./eventemitter.thenable');
@@ -67,24 +68,35 @@ module.exports = origin.extend({
     /**
      * update the value of the data with newest value.
      * @param value {*}
+     * @param process {Function|undefined}
      * @returns {exports}
      */
-    update: function(value) {
-        if (eventemitter.isPrototypeOf(this._emitter)
-            && value != void 0
-            && this.value !== value) {
-            var previous = this.value;
-            if (this.value && _.isObject(this.value)) {
-                _.assign(this.value, value);
-            } else {
-                this.value = value;
-            }
+    update: function(value, process) {
+        var previous = this.value;
+        var current = previous;
+
+        if (_.isFunction(process)) {
+            current = process(previous, value);
+        } else if (previous && _.isPlainObject(previous)) {
+            current = _.assign({}, previous, value);
+        } else {
+            current = value;
+        }
+
+        //in case of nothing updated actually.
+        if (_.isEqual(current, previous)) {
+            return this;
+        }
+        this.value = current;
+
+        if (eventemitter.isPrototypeOf(this._emitter)) {
             this._emitter.emit(this._event, {
                 previous: previous,
-                current: this.value,
+                current: current,
                 differential: value
             });
         }
+
         return this;
     },
     /**

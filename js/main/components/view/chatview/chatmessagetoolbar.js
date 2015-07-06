@@ -4,12 +4,12 @@
 
 //dependencies
 var React = require('react');
-var style = require('../style/chatmessagetoolbar');
-var makeStyle = require('../style/styles').makeStyle;
-var Form = require('./form/Form');
-var Button = require('./form/control/Button');
-var TextArea = require('./form/control/MultilineInputBox');
-var Submit = require('./form/control/Submit');
+var style = require('../../../style/chatmessagetoolbar');
+var makeStyle = require('../../../style/styles').makeStyle;
+var Form = require('./../../form/Form');
+var Button = require('./../../form/control/Button');
+var TextArea = require('./../../form/control/MultilineInputBox');
+var Submit = require('./../../form/control/Submit');
 
 //core module to export
 var toolbar = module.exports = React.createClass({
@@ -30,7 +30,7 @@ var toolbar = module.exports = React.createClass({
       <Form
         className="chat-message-toolbar"
         style={style.toolbar}
-        onSubmit={function(){console.log('send message')}}
+        onSubmit={this.props.onSubmit}
       >
         <Button
           className="chat-message-toolbar-accessory"
@@ -42,7 +42,6 @@ var toolbar = module.exports = React.createClass({
           value="Send"
           className="chat-message-toolbar-send"
           style={style.toolbar.send}
-          onClick={this._onSubmit}
         />
         <Button
           className="chat-message-toolbar-emoji"
@@ -54,7 +53,6 @@ var toolbar = module.exports = React.createClass({
           className="chat-message-toolbar-input"
           defaultValue="Write a message ..."
           style={style.toolbar.input}
-          onChange={this._handleInputChange}
         />
       </Form>
     )
