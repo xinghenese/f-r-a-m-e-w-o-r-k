@@ -8,10 +8,12 @@ var Router = require('react-router');
 var State = Router.State;
 var ChatActions = require('../actions/chatactions');
 var ChatStore = require('../stores/chatstore');
+var GroupActioins = require('../actions/groupactions');
 
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
         // todo
+        GroupActioins.requestGroupMembers(708);
     },
     _handleUsersLoaded: function() {
         // todo

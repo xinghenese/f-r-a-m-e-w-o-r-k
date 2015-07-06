@@ -6,13 +6,16 @@
 // dependencies
 var objects = require('../utils/objects');
 
+// private fields
+var MEMBERS_CURSOR_FIELD = "membersCursor";
+
 // exports
 function Group(data) {
     this._data = data;
 }
 
 Group.prototype.getGroupId = function() {
-    return this._data["rid"];
+    return parseInt(this._data["rid"]);
 };
 
 Group.prototype.listedInConversations = function() {
@@ -43,8 +46,20 @@ Group.prototype.members = function() {
     return this._data["jml"];
 };
 
+Group.prototype.setMembers = function(arr) {
+    this._data["jml"] = arr;
+};
+
 Group.prototype.stickyMessage = function() {
     return this._data["tmsg"];
+};
+
+Group.prototype.setMembersCursor = function(cursor) {
+    this._data[MEMBERS_CURSOR_FIELD] = cursor;
+};
+
+Group.prototype.getMembersCursor = function() {
+    return this._data[MEMBERS_CURSOR_FIELD];
 };
 
 module.exports = Group;

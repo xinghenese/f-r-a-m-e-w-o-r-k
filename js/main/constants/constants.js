@@ -10,6 +10,7 @@ module.exports = {
         LOGIN: null,
         LOGOUT: null,
         REGISTER: null,
+        REQUEST_GROUP_MEMBERS: null,
         REQUEST_VERIFICATION_CODE: null,
         REQUEST_VOICE_VERIFICATION_CODE: null
     })

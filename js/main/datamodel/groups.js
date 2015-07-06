@@ -18,9 +18,12 @@ var groups = {
         return this._cursor;
     },
     getGroup: function(groupId) {
-        _.find(this._groups, function(group) {
+        var group = _.find(this._groups, function(group) {
             return group.getGroupId() === groupId;
         });
+        console.log("group");
+        console.log(group);
+        return group;
     },
     removeGroup: function(groupId) {
         _.remove(this._groups, function(group) {
