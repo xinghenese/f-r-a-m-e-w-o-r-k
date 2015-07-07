@@ -7,17 +7,8 @@ var React = require('react');
 var Lang = require('../../../locales/zh-cn');
 var ChatMessageList = require('./chatmessagelist');
 var ChatMessageToolbar = require('./chatmessagetoolbar');
-var InputBox = require('./../../form/control/InputBox');
-
-var Wrapper = require('./../../form/control/Wrapper');
-var Form = require('./../../form/Form');
-var RequiredValidator = require('./../../form/validator/RequiredFieldValidator');
-var Submit = require('./../../form/control/Submit');
-
-var style = require('../../../style/login');
+var style = require('../../../style/chatmessage');
 var makeStyle = require('../../../style/styles').makeStyle;
-var RegExpValidator = require('./../../form/validator/RegularExpressionValidator');
-var RequiredFieldValidator = require('./../../form/validator/RequiredFieldValidator');
 
 //core module to export
 var ChatMessageBox = React.createClass({
@@ -33,7 +24,7 @@ var ChatMessageBox = React.createClass({
         senderName: 'reco',
         senderAvatar: '',
         message: event.data,
-        time: +new Date()
+        time: (new Date()).toLocaleTimeString()
       });
       return previousState;
     });
@@ -44,21 +35,22 @@ var ChatMessageBox = React.createClass({
         senderName: 'xinghenese',
         senderAvatar: '',
         message: 'event.data',
-        time: +new Date()
+        time: (new Date()).toLocaleTimeString()
       }, {
         senderName: 'kim',
         senderAvatar: '',
         message: 'ok，3Q &lt;br/&gt; HTTP API 协议文档 上能否写下',
-        time: +new Date()
+        time: (new Date()).toLocaleTimeString()
       });
       return previousState;
     });
   },
   render: function(){
     return (
-      <div className="chat-message-box">
-        <ChatMessageList data={this.state.data}/>
-        <ChatMessageToolbar onSubmit={this._handleSubmit}/>
+      <div className="chat-message-box" style={makeStyle(style)}>
+        <div className="chat-message-box-header" style={makeStyle(style.header)}/>
+        <ChatMessageList data={this.state.data} style={style.chatmessagelist}/>
+        <ChatMessageToolbar onSubmit={this._handleSubmit} style={style.toolbar}/>
       </div>
     );
   }

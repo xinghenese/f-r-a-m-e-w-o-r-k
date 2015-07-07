@@ -11,6 +11,7 @@ var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
 var Config = require('../etc/config');
 var myself = require('../datamodel/myself');
+var userconfig = require('../net/userconfig/userconfig');
 
 //private fields
 var _requestAccount = {
@@ -81,10 +82,16 @@ function _handleLoginRequest(action) {
         data: data
     }).then(function(response) {
         _handleLoginSuccess(response);
+        _afterLogin();
         AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS);
     }, function() {
         AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
     });
+}
+
+function _afterLogin() {
+    userconfig.setUid(myself.uid);
+    userconfig.setToken(myself.token);
 }
 
 function _handleLoginSuccess(response) {

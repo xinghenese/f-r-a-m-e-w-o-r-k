@@ -14,13 +14,19 @@ var setStyle = require('../../../style/styles').setStyle;
 //core module to export
 var ConversationListItem = React.createClass({
     render: function() {
+        var currentStyle = style.conversationlist.item.default;
+
+        if (this.props.selected) {
+            currentStyle = style.conversationlist.item.active;
+        }
+
         return (
           <li className="conversation-list-item"
               id={this.props.index}
-              style={makeStyle(style.conversationlist.item)}
-              onClick={this.props.onClick}
-              onMouseEnter={onhoverin}
-              onMouseLeave={onhoverout}>
+              style={makeStyle(style.conversationlist.item, currentStyle)}
+              onClick={this.props.onSelect}
+              onMouseEnter={onhoverin(this)}
+              onMouseLeave={onhoverout(this)}>
               <a
                   className="conversation-list-item-avatar"
                   style={makeStyle(style.conversationlist.item.avatar)}
@@ -28,6 +34,8 @@ var ConversationListItem = React.createClass({
                 <img
                     alt={this.props.senderName}
                     src={this.props.senderAvatar}
+                    width="100%"
+                    height="100%"
                 />
               </a>
               <div
@@ -57,18 +65,18 @@ module.exports = ConversationListItem;
 
 
 //private functions
-function onfocus(event) {
-  setStyle(event.currentTarget.style, style.conversationlist.item.active);
+function onhoverin(item) {
+    return function(event) {
+        if (!item.props.selected) {
+            setStyle(event.currentTarget.style, style.conversationlist.item.hover);
+        }
+    };
 }
 
-function onblur(event) {
-  setStyle(event.currentTarget.style, style.conversationlist.item.default);
-}
-
-function onhoverin(event) {
-  setStyle(event.currentTarget.style, style.conversationlist.item.hover);
-}
-
-function onhoverout(event) {
-  setStyle(event.currentTarget.style, style.conversationlist.item.default);
+function onhoverout(item) {
+    return function(event) {
+        if (!item.props.selected) {
+            setStyle(event.currentTarget.style, style.conversationlist.item.default);
+        }
+    };
 }
