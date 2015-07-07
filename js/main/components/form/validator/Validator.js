@@ -53,6 +53,14 @@ var Validator = React.createClass({
             return value;
         });
 
+        //avoid redundant validation
+        if (this.state.validateState == ValidateState.SUCCESS) {
+            return handleSuccess(this, values);
+        }
+        if (this.state.validateState == ValidateState.FAILED) {
+            return handleError(this);
+        }
+
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
             ? !! this.props.validationAtClient.apply(this, values)

@@ -8,24 +8,37 @@ var React = require('react');
 var ConversationListItem = require('./conversationlistitem');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
+var setStyle = require('../../../style/styles').setStyle;
 
 //private fields
-
+var prefix = 'conversation-list-';
+var seq = 0;
 
 //core module to export
 var ConversationList = React.createClass({
+  getInitialState: function() {
+      return {selectedIndex: -1};
+  },
   render: function() {
-    var conversationListItem = _.map(this.props.data, function(data){
-      return (
-        <ConversationListItem time={data.time} senderName={data.senderName} senderAvatar={data.senderAvatar}>
-          {data.message}
-        </ConversationListItem>
-      );
-    });
+    var conversationListItem = _.map(this.props.data, function(data, key){
+        return (
+            <ConversationListItem
+                time={data.time}
+                senderName={data.senderName}
+                senderAvatar={data.senderAvatar}
+                index={prefix + key}
+                onSelect={onselect(this)}
+                selected={this.state.selectedIndex == key}
+            >
+                {data.message}
+            </ConversationListItem>
+        );
+    }, this);
     return (
       <ul className="chat-message-list"
-        style={makeStyle(style.conversationlist, this.props.style)}>
-        {conversationListItem}
+          style={makeStyle(style.conversationlist, this.props.style)}
+      >
+          {conversationListItem}
       </ul>
       )
   }
@@ -37,3 +50,8 @@ module.exports = ConversationList;
 
 
 //private functions
+function onselect(list) {
+    return function (event) {
+        list.setState({selectedIndex: event.currentTarget.id.replace(/\D/g, '')});
+    }
+}
