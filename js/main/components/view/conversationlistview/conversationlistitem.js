@@ -6,6 +6,7 @@
 var React = require('react');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
+var setStyle = require('../../../style/styles').setStyle;
 
 //private fields
 
@@ -14,7 +15,12 @@ var makeStyle = require('../../../style/styles').makeStyle;
 var ConversationListItem = React.createClass({
     render: function() {
         return (
-          <li className="conversation-list-item" style={makeStyle(style.conversationlist.item)}>
+          <li className="conversation-list-item"
+              id={this.props.index}
+              style={makeStyle(style.conversationlist.item)}
+              onClick={this.props.onClick}
+              onMouseEnter={onhoverin}
+              onMouseLeave={onhoverout}>
               <a
                   className="conversation-list-item-avatar"
                   style={makeStyle(style.conversationlist.item.avatar)}
@@ -31,10 +37,12 @@ var ConversationListItem = React.createClass({
                   {this.props.time}
               </div>
               <div className="conversation-list-item-body">
-                  <div className="conversation-list-item-nickname" >
+                  <div className="conversation-list-item-nickname"
+                  style={makeStyle(style.conversationlist.item.title)}>
                       {this.props.senderName}
                   </div>
-                  <p className="conversation-list-item-content">
+                  <p className="conversation-list-item-content"
+                      style={makeStyle(style.conversationlist.item.message)}>
                       {this.props.children}
                   </p>
               </div>
@@ -49,3 +57,18 @@ module.exports = ConversationListItem;
 
 
 //private functions
+function onfocus(event) {
+  setStyle(event.currentTarget.style, style.conversationlist.item.active);
+}
+
+function onblur(event) {
+  setStyle(event.currentTarget.style, style.conversationlist.item.default);
+}
+
+function onhoverin(event) {
+  setStyle(event.currentTarget.style, style.conversationlist.item.hover);
+}
+
+function onhoverout(event) {
+  setStyle(event.currentTarget.style, style.conversationlist.item.default);
+}

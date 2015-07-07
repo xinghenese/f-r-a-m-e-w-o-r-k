@@ -43,6 +43,11 @@ module.exports = {
   },
   messagebox: {
     margin: "0 auto"
+  },
+  singleLineText: {
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis"
   }
 };
 
