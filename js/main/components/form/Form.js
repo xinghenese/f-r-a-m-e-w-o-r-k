@@ -12,6 +12,7 @@ var RegularExpressionValidator = require('./validator/RegularExpressionValidator
 var CustomValidator = require('./validator/CustomValidator');
 var FunctionBasedValidator = require('./validator/FunctionBasedValidator');
 var objects = require('../../utils/objects');
+var makeStyle = require('../../style/styles').makeStyle;
 
 //private fields
 var ValidatorClasses = [
@@ -47,7 +48,7 @@ var Form = React.createClass({
             <form
                 onSubmit={submit(this)}
                 className={this.props.className}
-                style={this.props.style}
+                style={makeStyle(this.props.style)}
             >
             {children}
             </form>

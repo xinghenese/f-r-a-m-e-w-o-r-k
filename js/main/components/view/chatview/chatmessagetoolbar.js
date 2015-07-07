@@ -4,7 +4,6 @@
 
 //dependencies
 var React = require('react');
-var style = require('../../../style/chatmessagetoolbar');
 var makeStyle = require('../../../style/styles').makeStyle;
 var Form = require('./../../form/Form');
 var Button = require('./../../form/control/Button');
@@ -26,33 +25,34 @@ var toolbar = module.exports = React.createClass({
     })
   },
   render: function(){
+    var style = this.props.style;
     return (
       <Form
         className="chat-message-toolbar"
-        style={style.toolbar}
+        style={style}
         onSubmit={this.props.onSubmit}
       >
         <Button
           className="chat-message-toolbar-accessory"
-          style={style.toolbar.accessory}
+          style={style.accessory}
           onClick={this._toggleAccessory}
         >
         </Button>
         <Submit
           value="Send"
           className="chat-message-toolbar-send"
-          style={style.toolbar.send}
+          style={style.send}
         />
         <Button
           className="chat-message-toolbar-emoji"
-          style={style.toolbar.emoji}
+          style={style.emoji}
           onClick={this._toggleEmoji}
         />
         <TextArea
           id="chat-message-input"
           className="chat-message-toolbar-input"
           defaultValue="Write a message ..."
-          style={style.toolbar.input}
+          style={style.input}
         />
       </Form>
     )
