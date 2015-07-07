@@ -13,9 +13,9 @@ var ConversationList = require('./conversationlist');
 //core module to export
 var ConversationBox = React.createClass({
   getInitialState: function(){
-    return {
-      data: []
-    };
+      return {
+          data: []
+      };
   },
   componentWillMount: function() {
 //    var self = this;
@@ -23,26 +23,31 @@ var ConversationBox = React.createClass({
 //      self.setState({data: data});
 //    });
     this.setState(function(previousState) {
-        previousState.data.push({
-          senderName: 'xinghenese',
-          senderAvatar: '',
-          message: 'event.data',
-          time: (new Date()).toLocaleTimeString()
-        }, {
-          senderName: 'kim',
-          senderAvatar: '',
-          message: 'ok，3Q &lt;br/&gt; HTTP API 协议文档 上能否写下',
-          time: (new Date()).toLocaleTimeString()
-        });
-        return previousState;
+          previousState.data.push({
+              senderName: 'kim0',
+              senderAvatar: '',
+              message: 'event.data',
+              time: (new Date()).toLocaleTimeString()
+          }, {
+              senderName: 'kim1',
+              senderAvatar: '',
+              message: 'ok，3Q &lt;br/&gt; HTTP API 协议文档 上能否写下',
+              time: (new Date()).toLocaleTimeString()
+          }, {
+              senderName: 'kim2',
+              senderAvatar: '',
+              message: '议文档 上能否写下',
+              time: (new Date()).toLocaleTimeString()
+          });
+          return previousState;
     });
   },
   render: function() {
-    return (
-      <div className="conversation-list-box">
-        <ConversationList data={this.state.data}/>
-      </div>
-    )
+      return (
+          <div className="conversation-list-box">
+              <ConversationList data={this.state.data}/>
+          </div>
+      )
   }
 });
 
