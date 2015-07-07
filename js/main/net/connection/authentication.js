@@ -21,7 +21,7 @@ module.exports = {
     sequence = ~~value;
     return this;
   },
-  'getSequenceKey': function(){
+  "nextEncodedSequence": function(){
     if(!this.isAuthenticated()){
       throw new Error("Not authenticated yet!");
     }

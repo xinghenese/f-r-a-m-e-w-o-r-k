@@ -9,11 +9,25 @@ var State = Router.State;
 var ChatActions = require('../actions/chatactions');
 var ChatStore = require('../stores/chatstore');
 var GroupActioins = require('../actions/groupactions');
+var ConversationBox = require('./view/conversationlistview/conversationbox');
+var SocketConnection = require('../net/connection/socketconnection');
 
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
         // todo
         GroupActioins.requestGroupMembers(708);
+        SocketConnection.request({
+            tag: "HM",
+            data: {
+                data: {
+                    rmsg: {},
+                    pmsg: {},
+                    dmc: {}
+                }
+            }
+        }).then(function(v) {
+            console.log(v);
+        });
     },
     _handleUsersLoaded: function() {
         // todo
@@ -33,6 +47,7 @@ var Chat = React.createClass({
         return (
             <div>
                 <p>{this.props.params.t}</p>
+                <ConversationBox />
             </div>
         );
     }
