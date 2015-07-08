@@ -9,6 +9,7 @@ var Form = require('./../../form/Form');
 var Button = require('./../../form/control/Button');
 var TextArea = require('./../../form/control/MultilineInputBox');
 var Submit = require('./../../form/control/Submit');
+var Lang = require('../../../locales/zh-cn');
 
 //core module to export
 var toolbar = module.exports = React.createClass({
@@ -33,13 +34,14 @@ var toolbar = module.exports = React.createClass({
         onSubmit={this.props.onSubmit}
       >
         <Button
+          value={Lang.accessory}
           className="chat-message-toolbar-accessory"
           style={style.accessory}
           onClick={this._toggleAccessory}
         >
         </Button>
         <Submit
-          value="Send"
+          value={Lang.send}
           className="chat-message-toolbar-send"
           style={style.send}
         />
@@ -51,9 +53,9 @@ var toolbar = module.exports = React.createClass({
         <TextArea
           id="chat-message-input"
           className="chat-message-toolbar-input"
-          defaultValue="Write a message ..."
+          defaultValue={Lang.chatMessageInputTips}
           style={style.input}
-        />
+        ><div className="dev" /></TextArea>
       </Form>
     )
   }

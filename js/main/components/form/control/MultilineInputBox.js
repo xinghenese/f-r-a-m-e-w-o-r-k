@@ -3,28 +3,74 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
-var style = require('../../../style/common');
+var commonStyle = require('../../../style/common');
 var theme = require('../../../style/default');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
 
 //private fields
+//@link: <a href="http://www.textfixer.com/tutorials/browser-scrollbar-width"></a>
+var SCROLLBAR_WIDTH = 17;
+var LENTH_REG = /^(\d)+px$/;
+
+var prefix = 'textarea-';
+var index = 0;
+
+var indexible = {
+  componentWillMount: function() {
+    console.log('indexible mixins');
+    this._seq = prefix + (index ++);
+
+    this.props.children = React.Children.map(this.props.children, function(child, key) {
+      return React.cloneElement(child, {
+        id: 'key-' + key
+      });
+    });
+
+    console.log('children: ', this.props.children);
+  }
+};
 
 //core module to export
 var MultilineInputBox = React.createClass({
-  render: function() {
-    return (
-      <div
-        className={this.props.className}
-        contentEditable
-        placeholder={this.props.defaultValue}
-        style={makeStyle(style.textarea, theme.textarea, this.props.style)}
-        onChange={this.props.onChange}
-        onFocus={onInputFocus}
-        onBlur={onInputBlur}
-      ></div>
-    )
+    mixins: [indexible],
+    componentWillMount: function() {
+        console.log('original ');
+        console.log('this: ', this);
+        console.dir(this.constructor);
+    },
+    render: function() {
+        var props = this.props;
+        var style = props.style || {};
+        var visibleWidth = _.find([props.width, style.width, theme.width], function(width) {
+            return LENTH_REG.test(width);
+        });
+        var actualWidth = visibleWidth && (+ visibleWidth.replace('px', '')) + SCROLLBAR_WIDTH + 'px';
+        var wrapperWidthStyle = visibleWidth && {width: visibleWidth};
+        var textAreaWidthStyle = actualWidth && {width: actualWidth};
+
+        return (
+            <div
+              id="wrapper1"
+              className={props.className}
+              style={makeStyle(commonStyle.textarea.wrapper, theme.textarea.wrapper, wrapperWidthStyle)}
+          >
+              <textarea
+                  id="text1"
+                  placeholder={props.defaultValue}
+                  rows={props.initialRows || 1}
+                  onChange={onChange(this)}
+                  onKeyDown={submit}
+                  onFocus={onInputFocus}
+                  onBlur={onInputBlur}
+                  ref={this._seq}
+                  style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
+              ></textarea>
+              {this.props.children}
+          </div>
+        )
   }
 });
 
@@ -35,9 +81,27 @@ module.exports = MultilineInputBox;
 
 //private functions
 function onInputBlur(event){
-  setStyle(event.target.style, theme.textarea.blur);
+//  setStyle(event.target.style, theme.textarea.blur);
 }
 
 function onInputFocus(event){
-  setStyle(event.target.style, theme.textarea.focus);
+//  setStyle(event.target.style, theme.textarea.focus);
+}
+
+function submit(event) {
+    if (event.keyCode == 13 && event.ctrlKey) {}
+}
+
+function onChange(box) {
+    return function(event) {
+        var target = event.currentTarget;
+
+        //notify the renderer to recalculate the scrollHeight prop.
+        target.style.height = 0;
+        target.style.height = target.scrollHeight + 'px';
+
+        if (_.isFunction(box.props.onChange)) {
+            box.props.onChange(event);
+        }
+    };
 }

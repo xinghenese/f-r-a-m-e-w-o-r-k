@@ -1,8 +1,7 @@
 'use strict';
 
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var Constants = require('../constants/constants');
-var ActionTypes = Constants.ActionTypes;
+var ActionTypes = require('../constants/actiontypes');
 
 module.exports = {
     checkVerificationCode: function(code, phone, verificationType, verificationCode) {

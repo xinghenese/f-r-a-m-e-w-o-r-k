@@ -21,17 +21,13 @@ module.exports = {
         }
     },
     textarea: {
-        minHeight: "20px",
+        width: "200px",
         fontSize: "12px",
         lineHeight: "20px",
-        borderBottom: "1px solid" + COLOR_DIM,
-        margin: "0 124px 0 60px",
-        padding: "10px 0",
-        blur: {
-            borderBottom: "1px solid " + COLOR_DIM
-        },
-        focus: {
-            borderBottom: "2px solid" + COLOR_LIGHT
+        wrapper: {
+          padding: "5px 0 5px 5px",
+          outline: "1px #ececec solid",
+          background: "#fff"
         }
     },
     button: {

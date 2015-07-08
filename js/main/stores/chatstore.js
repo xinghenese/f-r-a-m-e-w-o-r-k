@@ -5,7 +5,7 @@
 
 // dependencies
 var _ = require('lodash');
-var ActionTypes = require('../constants/constants').ActionTypes;
+var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
 var Group = require('../datamodel/group');

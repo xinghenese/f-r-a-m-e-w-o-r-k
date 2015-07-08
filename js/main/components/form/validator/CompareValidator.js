@@ -5,17 +5,14 @@
 //dependencies
 var React = require('react');
 var Validator = require('./Validator');
+var referable = require('../../mixins/referable');
+var validatable = require('../../mixins/validatable');
 
 //private fields
-var seq = 'compare-validator-';
-var index = 0;
 
 //core module to export
 var CompareValidator = React.createClass({
-    _seq: seq + (index++),
-    validate: function() {
-        return this.refs[this._seq].validate();
-    },
+    mixins: [referable, validatable],
     render: function() {
         if (!_.isUndefined(this.props.max) && !_.isUndefined(this.props.min)) {
             console.error('no max or min props found in CompareValidator');

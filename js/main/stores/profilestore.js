@@ -1,11 +1,10 @@
 'use strict';
 
+var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var AccountStore = require('./accountstore');
-var Constants = require('../constants/constants');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
-var ActionTypes = Constants.ActionTypes;
 
 var PROFILE_LOADED = 'profileLoaded';
 

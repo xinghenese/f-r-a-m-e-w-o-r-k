@@ -22,10 +22,15 @@ module.exports = {
         margin: "0"
     },
     textarea: {
-        boxSizing: 'content-box',
-        wordWrap: 'break-word',
-        border: '0',
-        outline: '0'
+        wrapper: {
+          overflow: "hidden"
+        },
+        overflowX: "hidden",
+        overflowY: "scroll",
+        wordWrap: "break-word",
+        border: "0",
+        outline: "0",
+        display: "block"
     },
     button: {
         border: "0",

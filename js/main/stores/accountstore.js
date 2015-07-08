@@ -1,10 +1,9 @@
 'use strict';
 
+var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var Constants = require('../constants/constants');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
-var ActionTypes = Constants.ActionTypes;
 var HttpConnection = require('../net/connection/httpconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
@@ -123,7 +122,7 @@ function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "tk", myself, "token");
     objects.copyValuedProp(response, "rtk", myself, "refreshToken");
     objects.copyValuedProp(response, "trt", myself, "tokenRefreshTime");
-    objects.copyValuedProp(response, "ct", myself, "serverTime");
+    objects.copyValuedProp(response, "ct", myself, "cursor");
     objects.copyValuedProp(response, "tdlg", myself, "topConversations");
 }
 

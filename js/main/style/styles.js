@@ -38,11 +38,9 @@ function mixinStyle(style) {
     }, {})
 }
 
-//targetStyle: element.style
+//targetStyle: element | element.style
 function setStyle(targetStyle, sourceStyle) {
-//  _.forOwn(makeStyle(sourceStyle), function(value, key) {
-//    _.set(targetStyle, key, value);
-//  });
+    targetStyle = _.isObject(targetStyle.style) ? targetStyle.style : targetStyle;
     _.assign(targetStyle, makeStyle(sourceStyle));
 }
 

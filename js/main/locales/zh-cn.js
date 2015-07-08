@@ -23,5 +23,8 @@ module.exports = {
     "codeError": "不匹配的验证码",
     "codeSuccess": "验证码匹配成功",
     "confirm": "确定",
-    "cancel": "取消"
+    "cancel": "取消",
+    "send": "发送",
+    "accessory": "附",
+    "chatMessageInputTips": "按下Enter换行，Ctrl+Enter发送"
 };

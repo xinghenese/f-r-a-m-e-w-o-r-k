@@ -4,9 +4,8 @@
 'use strict';
 
 // dependencies
-var ActionTypes = require('../constants/constants').ActionTypes;
+var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var GroupStore = require('../stores/groupstore');
 
 // exports
 module.exports = {
