@@ -7,20 +7,14 @@
 var _ = require('lodash');
 var React = require('react');
 var Validator = require('./Validator');
+var referable = require('../../mixins/referable');
+var validatable = require('../../mixins/validatable');
 
 //private fields
-var seq = 'required-validator-';
-var index = 0;
 
 //core module to export
 var RequiredFieldValidator = React.createClass({
-    validate: function() {
-//        console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
-        return this.refs[this._seq].validate();
-    },
-    componentWillMount: function() {
-        this._seq = seq + (index ++);
-    },
+    mixins: [referable, validatable],
     render: function(){
         return (
             <Validator

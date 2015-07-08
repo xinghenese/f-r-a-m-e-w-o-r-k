@@ -6,6 +6,7 @@
 module.exports = {
     float: "right",
     width: "700px",
+    position: "relative",
     //header
     header: {
         background: "#fafafa",
@@ -13,7 +14,7 @@ module.exports = {
     },
     //chatmessagelist
     chatmessagelist: {
-        height: "600px",
+        height: "658px",
         padding: "0 32px 0 38px",
         //chatmessage
         chatmessage: {
@@ -50,31 +51,27 @@ module.exports = {
     },
     //toolbar
     toolbar: {
-        height: "58px",
+        position: "absolute",
+        bottom: "0",
+        minHeight: "34px",
         background: "#fafafa",
+        width: "100%",
+        padding: "12px 0",
         //accessory
         accessory: {
             boxSizing: "border-box",
             float: "left",
-            width: "42px",
-            height: "42px",
+            width: "30px",
+            height: "30px",
             overflow: "hidden",
-            marginRight: "15px",
-            background: "#499dd9",
-            cursor: "pointer"
+            margin: "0 10px 0 26px",
+            background: "#4d91c7",
+            cursor: "pointer",
+            borderRadius: "4px"
         },
         //input
         input: {
-            boxSizing: "content-box",
-            minHeight: "20px",
-            fontSize: "12px",
-            lineHeight: "20px",
-            wordWrap: "break-word",
-            border: "0",
-            outline: "0",
-            borderBottom: "1px #d2dbe3 solid",
-            margin: "0 124px 0 60px",
-            padding: "10px 0"
+            width: "530px"
         },
         //inputFocus
         inputFocus:{
@@ -91,15 +88,18 @@ module.exports = {
             borderRadius: "50%",
             background: "#499dd9",
             cursor: "pointer"
+            //test
+            ,display:"none"
         },
         //send
         send: {
             float: "right",
             width: "50px",
             lineHeight: "30px",
-            margin: "12px 15px 0 0",
+            margin: "0 26px 0 22px",
             background: "#4d91c7",
-            color: "#fff"
+            color: "#fff",
+            borderRadius: "4px"
         }
     }
 };

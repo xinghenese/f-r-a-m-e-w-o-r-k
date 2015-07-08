@@ -6,17 +6,14 @@
 // dependencies
 var React = require('react');
 var Validator = require('./Validator');
+var referable = require('../../mixins/referable');
+var validatable = require('../../mixins/validatable');
 
 // private fields
-var _prefix = "function-based-validator-";
-var _index = 0;
 
 // exports
 var FunctionBasedValidator = React.createClass({
-    _seq: _prefix + (_index++),
-    validate: function() {
-        return this.refs[this._seq].validate();
-    },
+    mixins: [referable, validatable],
     render: function() {
         return (
             <Validator

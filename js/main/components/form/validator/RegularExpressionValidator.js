@@ -6,20 +6,14 @@
 var _ = require('lodash');
 var React = require('react');
 var Validator = require('./Validator');
+var referable = require('../../mixins/referable');
+var validatable = require('../../mixins/validatable');
 
 //private fields
-var seq = 'regexp-validator-';
-var index = 0;
 
 //core module to export
 var RegularExpressionValidator = React.createClass({
-    validate: function() {
-//        console.log('this.refs[' + this._seq + ']', this.refs[this._seq]);
-        return this.refs[this._seq].validate();
-    },
-    componentWillMount: function() {
-        this._seq = seq + (index ++);
-    },
+    mixins: [referable, validatable],
     render: function(){
         if (!_.isArray(this.props.regExp) && !_.isRegExp(this.props.regExp)) {
             console.error('no regExp props found in RegularExpressionValidator');
