@@ -11,6 +11,8 @@ var ChatStore = require('../stores/chatstore');
 var GroupActioins = require('../actions/groupactions');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var ChatMessageBox = require('./view/chatview/chatmessagebox');
+var MessageActions = require('../actions/messageactions');
+var MessageStore = require('../stores/messagestore');
 var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
@@ -20,21 +22,7 @@ var Chat = React.createClass({
         // todo
         // for test
         GroupActioins.requestGroupMembers(708);
-        SocketConnection.request({
-            tag: "HM",
-            data: {
-                data: {
-                    msich: {
-                        cs: myself.cursor
-                    },
-                    rmsg: {},
-                    pmsg: {},
-                    dmc: {}
-                }
-            }
-        }).then(function(v) {
-            console.log(v);
-        });
+        MessageActions.requestHistoryMessages();
     },
     _handleUsersLoaded: function() {
         // todo
@@ -55,7 +43,6 @@ var Chat = React.createClass({
         return (
             <div>
                 <ChatMessageBox />
-                <ConversationBox />
             </div>
         );
     }

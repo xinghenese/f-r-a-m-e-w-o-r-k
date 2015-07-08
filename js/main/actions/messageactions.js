@@ -1,5 +1,5 @@
 /**
- * Created by kevin on 6/30/15.
+ * Created by kevin on 7/8/15.
  */
 'use strict';
 
@@ -9,10 +9,9 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 
 // exports
 module.exports = {
-    getChatList: function(listType) {
+    requestHistoryMessages: function() {
         AppDispatcher.dispatch({
-            type: ActionTypes.GET_CHAT_LIST,
-            listType: listType
+            type: ActionTypes.REQUEST_HISTORY_MESSAGES
         });
     }
 };

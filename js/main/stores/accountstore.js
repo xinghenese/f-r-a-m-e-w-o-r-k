@@ -1,10 +1,9 @@
 'use strict';
 
+var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var Constants = require('../constants/constants');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
-var ActionTypes = Constants.ActionTypes;
 var HttpConnection = require('../net/connection/httpconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');

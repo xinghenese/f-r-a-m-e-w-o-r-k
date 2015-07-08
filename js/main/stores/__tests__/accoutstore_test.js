@@ -8,7 +8,7 @@ describe('AppDispatcher', function() {
 
     beforeEach(function() {
         AppDispatcher = require('../../dispatchers/AppDispatcher');
-        ActionTypes = require('../../constants/constants');
+        ActionTypes = require('../../constants/actiontypes');
     });
 
     it('sends actions to subscribers', function() {
