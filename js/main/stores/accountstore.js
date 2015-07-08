@@ -123,7 +123,7 @@ function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "tk", myself, "token");
     objects.copyValuedProp(response, "rtk", myself, "refreshToken");
     objects.copyValuedProp(response, "trt", myself, "tokenRefreshTime");
-    objects.copyValuedProp(response, "ct", myself, "serverTime");
+    objects.copyValuedProp(response, "ct", myself, "cursor");
     objects.copyValuedProp(response, "tdlg", myself, "topConversations");
 }
 

@@ -32,7 +32,7 @@ module.exports = {
     token: "",
     refreshToken: "",
     tokenRefreshTime: 0,
-    serverTime: 0,
+    cursor: 0,
     topConversations: [],
     rooms: []
 };

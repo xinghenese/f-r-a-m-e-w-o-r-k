@@ -11,15 +11,20 @@ var ChatStore = require('../stores/chatstore');
 var GroupActioins = require('../actions/groupactions');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var SocketConnection = require('../net/connection/socketconnection');
+var myself = require('../datamodel/myself');
 
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
         // todo
+        // for test
         GroupActioins.requestGroupMembers(708);
         SocketConnection.request({
             tag: "HM",
             data: {
                 data: {
+                    msich: {
+                        cs: myself.cursor
+                    },
                     rmsg: {},
                     pmsg: {},
                     dmc: {}
@@ -46,7 +51,6 @@ var Chat = React.createClass({
     render: function() {
         return (
             <div>
-                <p>{this.props.params.t}</p>
                 <ConversationBox />
             </div>
         );
