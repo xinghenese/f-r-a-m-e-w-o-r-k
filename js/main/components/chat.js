@@ -56,6 +56,7 @@ var Chat = React.createClass({
         return (
             <div>
                 <ChatMessageBox />
+                <ConversationBox />
             </div>
         );
     }
