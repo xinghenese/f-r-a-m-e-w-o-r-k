@@ -8,6 +8,7 @@ var _ = require('lodash');
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
+var GroupHistoryMessages = require('../datamodel/grouphistorymessages');
 var Message = require('../datamodel/message');
 var assign = require('object-assign');
 var myself = require('../datamodel/myself');
@@ -18,6 +19,13 @@ var MessageStore = assign({}, EventEmitter.prototype, {
     Events: {
         HISTORY_MESSAGES_RECEIVED: "historyMessagesReceived",
         HISTORY_MESSAGES_MISSED: "historyMessagesMissed"
+    },
+    _historyMessages: {},
+    addGroupHistoryMessages: function(groupId, groupHistoryMessages) {
+        this._historyMessages[groupId] = groupHistoryMessages;
+    },
+    getGroupHistoryMessages: function(groupId) {
+        return this._historyMessages[groupId];
     }
 });
 
@@ -49,7 +57,6 @@ function _handleHistoryMessagesRequest(action) {
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
         MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_RECEIVED);
-        console.log(v);
     }, function(error) {
         MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_MISSED, error);
     });
@@ -61,14 +68,11 @@ function _handleHistoryMessagesResponse(response) {
     } else {
         console.log("no group history messages!");
     }
-    console.log(2);
 }
 
 function _handleGroupHistoryMessages(messages) {
-    console.log(3);
-    var r = _.map(messages, function(v) {
-        console.log(v);
-        return new Message(v);
+    _.forEach(messages, function(v) {
+        var groupHistoryMessages = new GroupHistoryMessages(v);
+        MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
     });
-    console.log(r);
 }

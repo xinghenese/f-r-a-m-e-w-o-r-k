@@ -15,6 +15,14 @@ module.exports = {
     getBool: function(obj) {
         return obj !== 0 && obj !== "0";
     },
+    isIntValue: function(obj, intValue) {
+        if (obj === intValue) {
+            return true;
+        } else if (typeof obj === "string") {
+            return parseInt(obj) === intValue;
+        }
+        return false;
+    },
     mergeObjects: function(obj1, obj2) {
         var result = {};
         for (var attr in obj1) {

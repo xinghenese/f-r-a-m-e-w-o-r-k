@@ -12,13 +12,13 @@
 // dependencies
 var _ = require('lodash');
 var objects = require('../utils/objects');
-
-// private fields
-
+var MessageConstants = require('../constants/messageconstants');
+var Message = require('../datamodel/message');
 
 // exports
 function GroupHistoryMessages(data) {
     this._data = data;
+    this._messages = _parseMessages(this._data["tms"]);
 }
 
 module.exports = GroupHistoryMessages;
@@ -37,7 +37,29 @@ GroupHistoryMessages.prototype.noMoreMessages = function() {
 };
 
 GroupHistoryMessages.prototype.getDirection = function() {
-    return this._data["etp"];
+    var direction = this._data["etp"];
+    return MessageConstants.parseMessageDirection(direction);
+};
+
+GroupHistoryMessages.prototype.isDirectionChanged = function() {
+    return "tp" in this._data;
+};
+
+GroupHistoryMessages.prototype.getReadCursor = function() {
+    return this._data["rcs"];
+};
+
+GroupHistoryMessages.prototype.getCleanCursor = function() {
+    return this._data["ccs"];
+};
+
+GroupHistoryMessages.prototype.getMessages = function() {
+    return this._messages;
 };
 
 // private functions
+function _parseMessages(arr) {
+    return _.map(arr, function(v) {
+        return new Message(v);
+    });
+}
