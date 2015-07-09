@@ -9,7 +9,7 @@ var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
 var GroupHistoryMessages = require('../datamodel/grouphistorymessages');
-var Message = require('../datamodel/message');
+var PrivateHistoryMessages = require('../datamodel/privatehistorymessages');
 var assign = require('object-assign');
 var myself = require('../datamodel/myself');
 var socketconnection = require('../net/connection/socketconnection');
@@ -20,12 +20,19 @@ var MessageStore = assign({}, EventEmitter.prototype, {
         HISTORY_MESSAGES_RECEIVED: "historyMessagesReceived",
         HISTORY_MESSAGES_MISSED: "historyMessagesMissed"
     },
-    _historyMessages: {},
+    _groupHistoryMessages: {},
+    _privateHistoryMessages: {},
     addGroupHistoryMessages: function(groupId, groupHistoryMessages) {
-        this._historyMessages[groupId] = groupHistoryMessages;
+        this._groupHistoryMessages[groupId] = groupHistoryMessages;
+    },
+    addPrivateHistoryMessages: function(userId, privateHistoryMessages) {
+        this._privateHistoryMessages[userId] = privateHistoryMessages;
     },
     getGroupHistoryMessages: function(groupId) {
-        return this._historyMessages[groupId];
+        return this._groupHistoryMessages[groupId];
+    },
+    getPrivateHistoryMessages: function(userId) {
+        return this._privateHistoryMessages[userId];
     }
 });
 
@@ -68,6 +75,12 @@ function _handleHistoryMessagesResponse(response) {
     } else {
         console.log("no group history messages!");
     }
+
+    if (response.data.pmsg && response.data.pmsg.cvs && response.data.pmsg.cvs.length > 0) {
+        _handlePrivateHistoryMessages(response.data.pmsg.cvs);
+    } else {
+        console.log("no private history messages!");
+    }
 }
 
 function _handleGroupHistoryMessages(messages) {
@@ -75,4 +88,11 @@ function _handleGroupHistoryMessages(messages) {
         var groupHistoryMessages = new GroupHistoryMessages(v);
         MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
     });
+}
+
+function _handlePrivateHistoryMessages(messages) {
+    _.forEach(messages, function(v) {
+        var privateHistoryMessages = new PrivateHistoryMessages(v);
+        MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
+    })
 }
