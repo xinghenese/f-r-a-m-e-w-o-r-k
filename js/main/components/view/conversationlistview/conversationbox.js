@@ -8,6 +8,8 @@ var ConversationList = require('./conversationlist');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 //var store = require('../../../stores/conversationliststore');
+var Search = require('../../tools/Search');
+var Lang = require('../../../locales/zh-cn');
 
 //private fields
 
@@ -43,12 +45,24 @@ var ConversationBox = React.createClass({
           });
           return previousState;
     });
+
   },
   render: function() {
       return (
           <div className="conversation-list-box" style={makeStyle(style)}>
               <div className="conversation-list-box-header"
-                  style={makeStyle(style.header)}>
+                  style={makeStyle(style.header)}
+              >
+                  <div
+                      className="conversation-list-search"
+                      style={makeStyle(style.header.searchbar)}
+                  >
+                      <Search
+                          defaultValue={Lang.search}
+                          datasource={this.state.data}
+                          style={style.header.searchbar.search}
+                      />
+                  </div>
               </div>
               <ConversationList data={this.state.data}/>
               <div className="conversation-list-box-footer"

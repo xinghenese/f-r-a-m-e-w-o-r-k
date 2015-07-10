@@ -26,5 +26,6 @@ module.exports = {
     "cancel": "取消",
     "send": "发送",
     "accessory": "附",
-    "chatMessageInputTips": "按下Enter换行，Ctrl+Enter发送"
+    "chatMessageInputTips": "按下Enter换行，Ctrl+Enter发送",
+    "search": "搜索"
 };

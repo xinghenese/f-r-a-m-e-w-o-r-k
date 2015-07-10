@@ -3,40 +3,27 @@
  */
 
 //dependencies
-var React = require('react');
-var Validator = require('./Validator');
-var referable = require('../../mixins/referable');
-var validatable = require('../../mixins/validatable');
+var _ = require('lodash');
+var createValidatableClass = require('../../base/creator/createValidatableClass');
 
 //private fields
 
 //core module to export
-var CompareValidator = React.createClass({
-    mixins: [referable, validatable],
+module.exports = createValidatableClass({
+    displayName: 'CompareValidator',
+    getDefaultProps: function() {
+        return {validationAtClient: validation(this)};
+    },
     render: function() {
         if (!_.isUndefined(this.props.max) && !_.isUndefined(this.props.min)) {
             console.error('no max or min props found in CompareValidator');
             return null;
         }
-        return (
-            <Validator
-                className={this.props.className}
-                defaultMessage={this.props.defaultMessage}
-                errorMessage={this.props.errorMessage}
-                successMessage={this.props.successMessage}
-                controlsToValidate={this.props.controlsToValidate}
-                validationAtClient={validateFunction}
-                validationAtServer={this.props.validationAtServer}
-                ref={this._seq}
-                />
-        )
     }
 });
 
-module.exports = CompareValidator;
-
 //private functions
-function validateFunction(validator) {
+function validation(validator) {
     return function(value) {
         return value >= validator.props.min && value <= validator.props.max;
     };

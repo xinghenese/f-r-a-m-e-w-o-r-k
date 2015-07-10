@@ -5,28 +5,19 @@
 //dependencies
 var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
+var createDownWalkableClass = require('../../base/creator/createDownWalkableClass');
 
 //private fields
 
 //core module to export
-var ControlWrapper = React.createClass({
+module.exports = createDownWalkableClass({
+    displayName: 'ControlWrapper',
     render: function() {
-      var seq = this.props.seq;
-      var i = 0;
-      var children = React.Children.map(this.props.children, function(child) {
-        var newseq = seq + '-' + (i++);
-        return React.cloneElement(child, {
-          ref: 'form-control-' + newseq,
-          seq: newseq
-        });
-      });
       return (
-        <div style={makeStyle(this.props.style)}>{children}</div>
+        <div style={makeStyle(this.props.style)}>{this.props.children}</div>
       )
     }
 });
-
-module.exports = ControlWrapper;
 
 //module initialization
 

@@ -16,7 +16,16 @@ module.exports = {
     //header
     header: {
         background: "#fafafa",
-        height: "48px"
+        height: "48px",
+        //searchbar
+        searchbar: {
+            padding: "9px 23px",
+            //search
+            search: {
+                height: "29px",
+                fontSize: "14px"
+            }
+        }
     },
     //footer
     footer: {

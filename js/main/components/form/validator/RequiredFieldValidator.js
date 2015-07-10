@@ -5,33 +5,17 @@
 
 //dependencies
 var _ = require('lodash');
-var React = require('react');
-var Validator = require('./Validator');
-var referable = require('../../mixins/referable');
-var validatable = require('../../mixins/validatable');
+var createValidatableClass = require('../../base/creator/createValidatableClass');
 
 //private fields
 
 //core module to export
-var RequiredFieldValidator = React.createClass({
-    mixins: [referable, validatable],
-    render: function(){
-        return (
-            <Validator
-                className={this.props.className}
-                defaultMessage={this.props.defaultMessage}
-                errorMessage={this.props.errorMessage}
-                successMessage={this.props.successMessage}
-                controlsToValidate={this.props.controlsToValidate}
-                validationAtClient={validation}
-                style={this.props.style}
-                ref={this._seq}
-            />
-        );
+module.exports = createValidatableClass({
+    displayName: 'RequiredFieldValidator',
+    getDefaultProps: function() {
+        return {validationAtClient: validation};
     }
 });
-
-module.exports = RequiredFieldValidator;
 
 //module initialization
 

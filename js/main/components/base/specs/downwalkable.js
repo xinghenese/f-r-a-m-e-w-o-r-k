@@ -1,5 +1,5 @@
 /**
- * Created by Administrator on 2015/7/8.
+ * Created by Administrator on 2015/7/10.
  */
 
 //dependencies
@@ -11,13 +11,7 @@ var React = require('react');
 
 //core module to export
 module.exports = {
-    componentWillMount: function() {
-        this.props.children = React.Children.map(this.props.children, function(child, key) {
-          return React.cloneElement(child, {
-            ref: (this._seq || 'child-') + key
-          });
-        }, this);
-    },
+    displayName: 'DownWalkable',
     walkRefs: function(callback, isdeep, walkResult) {
         return _.reduce(this.refs, function(memo, element) {
             if (isdeep && !_.isEmpty(element.refs)) {
@@ -25,6 +19,14 @@ module.exports = {
             }
             return callback(memo, element);
         }, walkResult, this);
+    },
+    render: function(element) {
+        var children = React.Children.map(element.props.children, function(child, key) {
+            return React.cloneElement(child, {
+                ref: (this._seq || 'child') + '-' + key
+            });
+        }, this);
+        return React.cloneElement(element, void 0, children);
     }
 };
 

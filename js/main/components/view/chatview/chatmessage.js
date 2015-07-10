@@ -4,18 +4,19 @@
 
 //dependencies
 var React = require('react');
-var style = require('../../../style/chatmessage');
+var style = require('../../../style/chatmessage').chatmessagelist.chatmessage;
+var commonStyle = require('../../../style/common');
 var makeStyle = require('../../../style/styles').makeStyle;
 
 //core module to export
 var ChatMessage =  React.createClass({
   render: function(){
-    var style = this.props.style;
+    var inlineStyle = this.props.style;
     return (
-      <div className="chat-message" style={makeStyle(style)}>
+      <div className="chat-message" style={makeStyle(style, inlineStyle)}>
         <a
           className="chat-avatar"
-          style={makeStyle(style.avatar)}
+          style={makeStyle(style.avatar, inlineStyle.avatar)}
         >
           <img
             alt={this.props.senderName}
@@ -26,11 +27,12 @@ var ChatMessage =  React.createClass({
         </a>
         <div
           className="chat-time"
-          style={makeStyle(style.time)}
+          style={makeStyle(style.time, inlineStyle.time)}
         >
           {this.props.time}
         </div>
-        <div className="chat-message-body" style={makeStyle(style.messagebody)}>
+        <div className="chat-message-body"
+          style={makeStyle(commonStyle.message, style.messagebody, inlineStyle.messagebody)}>
           <div className="chat-nickname" >
             {this.props.senderName}
           </div>

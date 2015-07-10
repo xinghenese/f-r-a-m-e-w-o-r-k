@@ -35,6 +35,7 @@ module.exports = {
             //messagebody
             messagebody: {
                 fontSize: "14px",
+                margin: "0 82px 0 54px",
                 //messagecontent
                 messagecontent: {
                     color: "#313232"

@@ -28,14 +28,21 @@ module.exports = {
 
     // Augment
     adapter = _.toPlainObject(adapter);
-    if(_.isPlainObject(finals)){
-      finals = _.keys(finals);
-      adapter = _.assign(adapter, finals);
-    }
+    finals = _.isObject(finals)
+      ? _.keys(finals)
+      : _.isArray(finals)
+        ? finals
+        : finals && [finals]
+    ;
+//    if(_.isPlainObject(finals)){
+//      finals = _.keys(finals);
+////      adapter = _.assign(adapter, finals);
+//    }
     //Important to have mixIn and setFinals invoked in such order.
     subtype._mixIn(_.omit(adapter, this._finals));
     finals = subtype._finals = _.union(this._finals, finals);
-    subtype._adapts = _.difference(_.keys(adapter), finals);
+//    subtype._adapts = _.difference(_.keys(adapter), finals);
+    subtype._adapts = _(adapter).keys().union(this._adapts).difference(finals).value();
 
     // Create default initializer
     if (!subtype.hasOwnProperty('init')) {
@@ -71,7 +78,7 @@ module.exports = {
       overrides = {};
     }
 
-    var instance = this.extend(overrides, null, void 0);
+    var instance = this.extend(overrides, null);
     var ret = instance.init.apply(instance, initials);
     if(this.isPrototypeOf(ret)){
       return ret;
@@ -85,20 +92,21 @@ module.exports = {
   },
 
   _mixIn: function(properties){
-    var self = this;
     _.forOwn(properties, function(property, propertyname){
-        self[propertyname] = property;
-    });
+        this[propertyname] = property;
+    }, this);
 
     // IE won't copy toString using the loop above
     if (properties.hasOwnProperty('toString')) {
-      self.toString = properties.toString;
+      this.toString = properties.toString;
     }
   },
 
   /**
    * store names of methods which would not be overriden by subtypes.
    */
-  _finals: []
+  _finals: [],
+
+  _adapts: []
 
 };
