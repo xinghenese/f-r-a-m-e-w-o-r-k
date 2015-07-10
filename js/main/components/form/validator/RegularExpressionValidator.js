@@ -4,37 +4,23 @@
 
 //dependencies
 var _ = require('lodash');
-var React = require('react');
-var Validator = require('./Validator');
-var referable = require('../../mixins/referable');
-var validatable = require('../../mixins/validatable');
+var createValidatableClass = require('../../base/creator/createValidatableClass');
 
 //private fields
 
 //core module to export
-var RegularExpressionValidator = React.createClass({
-    mixins: [referable, validatable],
+module.exports = createValidatableClass({
+    displayName: 'RegularExpressionValidator',
+    getDefaultProps: function() {
+        return {validationAtClient: validation(this)};
+    },
     render: function(){
         if (!_.isArray(this.props.regExp) && !_.isRegExp(this.props.regExp)) {
             console.error('no regExp props found in RegularExpressionValidator');
             return null;
         }
-        return (
-            <Validator
-                className={this.props.className}
-                defaultMessage={this.props.defaultMessage}
-                errorMessage={this.props.errorMessage}
-                successMessage={this.props.successMessage}
-                controlsToValidate={this.props.controlsToValidate}
-                validationAtClient={validation(this)}
-                validationAtServer={this.props.validationAtServer}
-                ref={this._seq}
-            />
-        )
     }
 });
-
-module.exports = RegularExpressionValidator;
 
 //module initialization
 

@@ -16,9 +16,6 @@ var authentication = require('./authentication');
 var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
 
-console.log('iosession: ', iosession);
-console.log('socketsession: ', session);
-
 //private const fields
 var PUBLIC_KEY_FIELD = "pbk";
 var HANDSHAKE_TAG = "HSK";

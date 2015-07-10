@@ -27,7 +27,7 @@ module.exports = {
         },
         overflowX: "hidden",
         overflowY: "scroll",
-        wordWrap: "break-word",
+        wordBreak: "break-all",
         border: "0",
         outline: "0",
         display: "block"
@@ -45,6 +45,9 @@ module.exports = {
         position: "fixed",
         width: "100%",
         height: "100%"
+    },
+    message: {
+        wordBreak: "break-all"
     },
     messagebox: {
         margin: "0 auto"

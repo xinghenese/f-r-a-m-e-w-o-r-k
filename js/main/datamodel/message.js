@@ -31,7 +31,7 @@ Message.prototype.getAtUserId = function() {
 };
 
 Message.prototype.getContent = function() {
-    return this._data["msg"];
+    return this._data["msg"]["t"];
 };
 
 Message.prototype.getUuid = function() {

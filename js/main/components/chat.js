@@ -3,6 +3,8 @@
  */
 'use strict';
 
+// dependencies
+var _ = require('lodash');
 var React = require('react');
 var Router = require('react-router');
 var State = Router.State;
@@ -17,6 +19,7 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 
+// exports
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
         // todo
@@ -27,22 +30,33 @@ var Chat = React.createClass({
     _handleUsersLoaded: function() {
         // todo
     },
+    _handleHistoryMessagesReceived: function() {
+        var groupHistoryMessages = MessageStore.getGroupHistoryMessages(426);
+        var messages = groupHistoryMessages.getMessages();
+        _.forEach(messages, function(message) {
+            var content = message.getContent();
+            console.log(content);
+        });
+    },
     componentWillMount: function() {
         // putting it here for test purpose
         // 1 for groups, 2 for contacts
         ChatActions.getChatList(1);
         ChatStore.on(ChatStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ChatStore.on(ChatStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
+        MessageStore.on(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
         modifyPageStyle();
     },
     componentWillUnmount: function() {
         ChatStore.removeListener(ChatStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ChatStore.removeListener(ChatStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
+        MessageStore.removeListener(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
     },
     render: function() {
         return (
             <div>
                 <ChatMessageBox />
+                <ConversationBox />
             </div>
         );
     }

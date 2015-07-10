@@ -19,7 +19,7 @@ var Submit = require('./form/control/Submit');
 var Form = require('./form/form');
 var CustomValidator = require('./form/validator/CustomValidator');
 var RequiredValidator = require('./form/validator/RequiredFieldValidator');
-var RegExpValidator = require('./form/validator/RegularExpressionValidator');
+
 
 var Countries = [
     {"name": "阿尔巴尼亚", "code": "+355"},
