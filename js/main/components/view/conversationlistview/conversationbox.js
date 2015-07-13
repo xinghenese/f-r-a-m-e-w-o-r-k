@@ -3,6 +3,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
 var ConversationList = require('./conversationlist');
 var style = require('../../../style/conversationlist');
@@ -10,44 +11,20 @@ var makeStyle = require('../../../style/styles').makeStyle;
 //var store = require('../../../stores/conversationliststore');
 var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
+var emitter = require('../../../utils/eventemitter.thenable');
 
 //private fields
 
-
 //core module to export
 var ConversationBox = React.createClass({
-  getInitialState: function(){
+    getInitialState: function(){
       return {
-          data: []
+          data: _.get(this.props.store, 'ConversationStore')
       };
-  },
-  componentWillMount: function() {
-//    var self = this;
-//    store.fetch('conversationList').then(function(data) {
-//      self.setState({data: data});
-//    });
-    this.setState(function(previousState) {
-          previousState.data.push({
-              senderName: 'kim0',
-              senderAvatar: '',
-              message: 'event.data',
-              time: (new Date()).toLocaleTimeString()
-          }, {
-              senderName: 'kim1',
-              senderAvatar: '',
-              message: 'ok，3Q &lt;br/&gt; HTTP API 协议文档 上能否写下',
-              time: (new Date()).toLocaleTimeString()
-          }, {
-              senderName: 'kim2',
-              senderAvatar: '',
-              message: '议文档 上能否写下',
-              time: (new Date()).toLocaleTimeString()
-          });
-          return previousState;
-    });
+    },
+    render: function() {
+        var datas = fetchLastMessages(this.state.data);
 
-  },
-  render: function() {
       return (
           <div className="conversation-list-box" style={makeStyle(style)}>
               <div className="conversation-list-box-header"
@@ -59,18 +36,26 @@ var ConversationBox = React.createClass({
                   >
                       <Search
                           defaultValue={Lang.search}
-                          datasource={this.state.data}
+                          datasource={datas}
+                          controllers={['switcher']}
                           style={style.header.searchbar.search}
+                          ref="search"
                       />
                   </div>
               </div>
-              <ConversationList data={this.state.data}/>
+              <ConversationList
+                  initialData={datas}
+                  controllers={['switcher', 'search']}
+              />
               <div className="conversation-list-box-footer"
-                  style={makeStyle(style.footer)}>
+                  style={makeStyle(style.footer)}
+                  datasource={this.props.store}
+                  ref="switcher"
+              >
               </div>
           </div>
       )
-  }
+    }
 });
 
 module.exports = ConversationBox;
@@ -79,3 +64,8 @@ module.exports = ConversationBox;
 
 
 //private functions
+function fetchLastMessages(data) {
+    return _.mapValues(data, function(value, key) {
+        return _.isArray(value) ? _.last(value) : value;
+    });
+}

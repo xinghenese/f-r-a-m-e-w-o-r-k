@@ -55,7 +55,7 @@ var toolbar = module.exports = React.createClass({
           className="chat-message-toolbar-input"
           defaultValue={Lang.chatMessageInputTips}
           style={style.input}
-        ><div className="dev" /></TextArea>
+        ></TextArea>
       </Form>
     )
   }

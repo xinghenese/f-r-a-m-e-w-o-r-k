@@ -7,7 +7,7 @@ var _ = require('lodash');
 var React = require('react');
 var makeStyle = require('../../style/styles').makeStyle;
 var commonStyle = require('../../style/common');
-var emitter = require('../../utils/eventemitter.thenable');
+var emitter = require('../../utils/eventemitter');
 
 //private fields
 
@@ -37,13 +37,13 @@ module.exports = Search;
 //module initialization
 //var hierarchy = (
 //    <Store>
-//        <BottomSwitcher handler={super.data.switch}>
-//            <TopSearchBar handler={super.data.search}>
-//                <LeftListSwitcher handler={super.data.switch}>
-//                    <RightList />
-//                </LeftListSwitcher>
-//            </TopSearchBar>
-//        </BottomSwitcher>
+//        <DataHolder handler={BottomSwitcher} control={super.data.switch}>
+//            <DataHolder handler={TopSearchBar} control={super.data.search}>
+//                <DataHolder handler={LeftListSwitcher} control={super.data.switch}>
+//                    <DataHolder handler={RightList} />
+//                </DataHolder>
+//            </DataHolder>
+//        </DataHolder>
 //    </Store>
 //);
 
@@ -51,8 +51,8 @@ module.exports = Search;
 function startSearch(search, event) {
     var searchText = event.target.value;
     var searchFunction = search.props.searchFunction || function(data) {
-        return _.some(data, function(value) {
-            return ('' + value).indexOf(searchText) > -1;
+        return _.some(data, function(value, key) {
+            return key !== 'time' && ('' + value).indexOf(searchText) > -1;
         })
     };
 
@@ -60,14 +60,16 @@ function startSearch(search, event) {
         return _.filter(search.props.datasource, searchFunction);
     }
     return null;
+//    return function(datasource) {
+//        return _.filter(datasource, searchFunction);
+//    };
 }
 
 function onchange(search) {
     return function(event) {
-        console.group('searched');
-        var result = startSearch(search, event);
-        console.log('result: ', result);
-        console.groupEnd();
-        emitter.emit('changeList', result);
+        emitter.emit(
+            search.constructor.displayName.toLowerCase(),
+            startSearch(search, event)
+        );
     }
 }

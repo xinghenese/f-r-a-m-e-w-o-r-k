@@ -33,11 +33,10 @@ module.exports = createDownWalkableClass({
     render: function(){
         return (
             <form
-                onSubmit={newSubmit(this)}
+                onSubmit={submit(this)}
                 className={this.props.className}
                 style={makeStyle(this.props.style)}
             >
-                <div className="sub-form-div">Sub-Form-Div</div>
                 {this.props.children}
             </form>
         )
@@ -45,28 +44,13 @@ module.exports = createDownWalkableClass({
 });
 
 //private functions
-function submit(form){
-    return function f(event) {
-        walkRefs(form).then(function(data) {
-            event.data = data;
-            form.props.onSubmit(event);
-            React.findDOMNode(form).reset();
-        });
-
-        if (!objects.preventDefault(event)) {
-            return false;
-        }
-    }
-}
-
-function newSubmit(form) {
-    console.log('newSubmit');
+function submit(form) {
     return function(event) {
         form.walkDescendants(validate).then(function(data) {
             event.data = data;
-//            form.props.onSubmit(event);
+            console.log(form.props.className + ' submit: ', data);
+            form.props.onSubmit(event);
             React.findDOMNode(form).reset();
-            console.log('data: ', data);
         });
 
         event.stopPropagation();
@@ -80,9 +64,7 @@ function validate(element, result) {
 
     if (isValidator(element)) {
         return result.then(function(data) {
-            console.log('inner-data: ', data);
             var values = element.validate();
-            console.log('values: ', values);
             if (promise.isPrototypeOf(values)) {
                 return values.then(function(newData) {
                     return _.assign(data, newData);
@@ -94,7 +76,7 @@ function validate(element, result) {
 
     //TODO: filter the values of non-input controls
     var control = React.findDOMNode(element);
-    var value = control.value || control.textContent || control.innerText;
+    var value = element.value || control.value || control.textContent || control.innerText;
     var field = element.props.field || element.props.id;
     if (value && field) {
         return result.then(function(data) {

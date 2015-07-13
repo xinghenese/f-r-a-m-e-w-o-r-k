@@ -19,6 +19,8 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 
+var ConversationAndUserStore = require('../stores/ConversationAndUserStore');
+
 // exports
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
@@ -54,15 +56,10 @@ var Chat = React.createClass({
     },
     render: function() {
         return (
-            <Page>
-                <DataHolder handler={BottomSwitcher} domPath={'/SideList/'}>
-                    <DataHolder handler={TopSearchBar} domPath={'/SideList/'}>
-                        <DataHolder handler={ConversationList} domPath={'/SideList/'}>
-                            <DataHolder handler={ChatMessageList} domPath={'/ChatBox/'}/>
-                        </DataHolder>
-                    </DataHolder>
-                </DataHolder>
-            </Page>
+            <div>
+                <ChatMessageBox />
+                <ConversationBox store={ConversationAndUserStore}/>
+            </div>
         );
     }
 });

@@ -68,7 +68,6 @@ var MultilineInputBox = React.createClass({
                   ref={this._seq}
                   style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
               ></textarea>
-              {this.props.children}
           </div>
         )
   }
@@ -99,6 +98,8 @@ function onChange(box) {
         //notify the renderer to recalculate the scrollHeight prop.
         target.style.height = 0;
         target.style.height = target.scrollHeight + 'px';
+
+        box.value = target.value;
 
         if (_.isFunction(box.props.onChange)) {
             box.props.onChange(event);
