@@ -37,58 +37,54 @@ module.exports = createDownWalkableClass({
                 className={this.props.className}
                 style={makeStyle(this.props.style)}
             >
-            {this.props.children}
+                {this.props.children}
             </form>
         )
     }
 });
 
 //private functions
-function submit(form){
-    return function f(event) {
-        walkRefs(form).then(function(data) {
+function submit(form) {
+    return function(event) {
+        form.walkDescendants(validate).then(function(data) {
             event.data = data;
+            console.log(form.props.className + ' submit: ', data);
             form.props.onSubmit(event);
             React.findDOMNode(form).reset();
         });
 
-        if (!objects.preventDefault(event)) {
-            return false;
-        }
-    }
+        event.stopPropagation();
+        event.preventDefault();
+        event.returnValue = false;
+    };
 }
 
-function walkRefs(root, data) {
-    return _.reduce(root.refs, function(memo, element) {
-        if (isValidator(element)) {
-            return memo.then(function(data) {
-                var values = element.validate();
-                if (promise.isPrototypeOf(values)) {
-                    return values.then(function(newData) {
-                        return _.assign(data, newData);
-                    })
-                }
-                return _.assign(data, values);
-            });
-        }
+function validate(element, result) {
+    result = result || promise.create({});
 
-        //TODO: filter the values of non-input controls
-        var control = React.findDOMNode(element);
-        var value = control.value || control.textContent || control.innerText;
-        var field = element.props.field || element.props.id;
-        if (value && field) {
-            memo = memo.then(function(data) {
-                return _.set(data, field, value);
-            })
-        }
+    if (isValidator(element)) {
+        return result.then(function(data) {
+            var values = element.validate();
+            if (promise.isPrototypeOf(values)) {
+                return values.then(function(newData) {
+                    return _.assign(data, newData);
+                })
+            }
+            return _.assign(data, values);
+        });
+    }
 
-        if (!_.isEmpty(element.refs)) {
-            return memo.then(function(data) {
-                return walkRefs(element, data);
-            });
-        }
-        return memo;
-    }, promise.create(data || {}))
+    //TODO: filter the values of non-input controls
+    var control = React.findDOMNode(element);
+    var value = control.value || control.textContent || control.innerText;
+    var field = element.props.field || element.props.id;
+    if (value && field) {
+        return result.then(function(data) {
+            return _.set(data, field, value);
+        })
+    }
+
+    return result;
 }
 
 function isValidator(element) {

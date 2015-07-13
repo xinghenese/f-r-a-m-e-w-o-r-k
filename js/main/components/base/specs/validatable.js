@@ -44,7 +44,7 @@ module.exports = {
 
         //avoid redundant validation
         if (this.state.validateState == ValidateState.SUCCESS) {
-            return handleSuccess(this, values);
+            return handleSuccess(this, fieldValues);
         }
         if (this.state.validateState == ValidateState.FAILED) {
             return handleError(this);

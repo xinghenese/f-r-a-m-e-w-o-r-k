@@ -21,11 +21,15 @@ module.exports = {
         }, walkResult, this);
     },
     render: function(element) {
-        var children = React.Children.map(element.props.children, function(child, key) {
-            return React.cloneElement(child, {
-                ref: (this._seq || 'child') + '-' + key
-            });
+//        var children = React.Children.map(element.props.children, function(child, key) {
+//            return React.cloneElement(child, {
+//                ref: (this._seq || 'child') + '-' + key
+//            });
+//        }, this);
+        var children = markChildren(element, function(child, key) {
+            return {className: (this._seq || 'child') + '-' + key};
         }, this);
+        console.log('children: ', children);
         return React.cloneElement(element, void 0, children);
     }
 };
@@ -34,3 +38,17 @@ module.exports = {
 
 
 //private functions
+function markChildren(element, callback, root) {
+    console.log('element: ', element);
+    console.log('element.props: ', element.props);
+    if (!element.props || !element.props.children) {
+        return void 0;
+    }
+    return React.Children.map(element.props.children, function(child, key) {
+        return React.cloneElement(
+            child,
+            callback.call(this, child, key),
+            markChildren(child, callback, root)
+        );
+    }, root || element);
+}

@@ -10,7 +10,7 @@ var createDownWalkableClass = require('../../base/creator/createDownWalkableClas
 //private fields
 
 //core module to export
-module.exports = createDownWalkableClass({
+module.exports = React.createClass({
     displayName: 'ControlWrapper',
     render: function() {
       return (

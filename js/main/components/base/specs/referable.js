@@ -18,9 +18,12 @@ module.exports = {
         var index = _.get(indexMap, className) || 0;
 
         _.set(indexMap, className, index + 1);
-        this._seq = hyphenFormalize(className) + '-' + index;
+        this._seq = hyphenFormalize(className) + '-' + index + '-';
     },
     render: function(element) {
+        if (!React.isValidElement(element)) {
+            return null;
+        }
         return React.cloneElement(element, {
             ref: this._seq
         }, element.props.children);
