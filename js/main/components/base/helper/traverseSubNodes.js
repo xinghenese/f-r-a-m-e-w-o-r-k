@@ -73,7 +73,7 @@ function traverse(element, process, filter, remove, thisArg, level) {
 
         return React.cloneElement(
             child,
-            process.call(this, child, currentLevel, element),
+            process.call(thisArg, child, currentLevel, element),
             traverse(child, process, filter, remove, thisArg, currentLevel)
         )
     }, thisArg || element);

@@ -19,6 +19,8 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 
+var ConversationAndUserStore = require('../stores/ConversationAndUserStore');
+
 // exports
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
@@ -56,7 +58,7 @@ var Chat = React.createClass({
         return (
             <div>
                 <ChatMessageBox />
-                <ConversationBox />
+                <ConversationBox store={ConversationAndUserStore}/>
             </div>
         );
     }
