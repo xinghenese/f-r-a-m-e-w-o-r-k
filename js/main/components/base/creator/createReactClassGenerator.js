@@ -5,7 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var specUtils = require('./../specs/specUtils');
+var mixinSpecs = require('./../helper/helper').mixinSpecs;
 
 //private fields
 
@@ -13,12 +13,12 @@ var specUtils = require('./../specs/specUtils');
 module.exports = function(configs) {
     return function(spec) {
         if (configs && configs.mixins && configs.mixins.push) {
-            //have a copy of mixins to make configs immutable.
-            var mixins = configs.mixins.slice(0);
-            mixins.push(spec);
-            spec = _.assign({}, configs, {mixins: mixins});
+            spec = _.assign({}, configs, {
+              //have a copy of mixins to make configs immutable.
+              mixins: _(configs.mixins).slice(0).push(spec).value()
+            });
         }
-        return React.createClass(specUtils.mixinSpecs(spec));
+        return React.createClass(mixinSpecs(spec));
     }
 };
 

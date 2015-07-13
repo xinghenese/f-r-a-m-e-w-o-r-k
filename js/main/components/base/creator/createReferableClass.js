@@ -11,23 +11,7 @@ var createGenerator = require('./createReactClassGenerator');
 
 //core module to export
 module.exports = createGenerator({
-    mixins: [referable],
-    handleConflict: function(key, value, specValue) {
-        if (key === 'render') {
-            return function() {
-                if (!_.isFunction(value) || !_.isFunction(specValue)) {
-                    return null;
-                }
-
-                var element = specValue.call(this);
-
-                if (!React.isValidElement(element)) {
-                    return null;
-                }
-                return value.call(this. element);
-            };
-        }
-    }
+    mixins: [referable]
 });
 
 //module initialization

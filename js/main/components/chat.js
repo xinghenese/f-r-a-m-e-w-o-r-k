@@ -54,10 +54,15 @@ var Chat = React.createClass({
     },
     render: function() {
         return (
-            <div>
-                <ChatMessageBox />
-                <ConversationBox />
-            </div>
+            <Page>
+                <DataHolder handler={BottomSwitcher} domPath={'/SideList/'}>
+                    <DataHolder handler={TopSearchBar} domPath={'/SideList/'}>
+                        <DataHolder handler={ConversationList} domPath={'/SideList/'}>
+                            <DataHolder handler={ChatMessageList} domPath={'/ChatBox/'}/>
+                        </DataHolder>
+                    </DataHolder>
+                </DataHolder>
+            </Page>
         );
     }
 });

@@ -10,19 +10,9 @@ var composite = require('../../../net/base/composite');
 //private fields
 
 //core module to export
-var FUNCTION_TYPE = 'function';
-var EMPTY_FUNCTION = function(){};
-var DEFAULT_DISPLAY_NAME = 'Component';
-
-var BASE = {
-    displayName: DEFAULT_DISPLAY_NAME
-};
-
-var utils = {
+module.exports = {
     mixinSpecs: mixinSpecs
 };
-
-module.exports = utils;
 
 //module initialization
 

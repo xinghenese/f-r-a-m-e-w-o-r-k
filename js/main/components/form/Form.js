@@ -33,11 +33,12 @@ module.exports = createDownWalkableClass({
     render: function(){
         return (
             <form
-                onSubmit={submit(this)}
+                onSubmit={newSubmit(this)}
                 className={this.props.className}
                 style={makeStyle(this.props.style)}
             >
-            {this.props.children}
+                <div className="sub-form-div">Sub-Form-Div</div>
+                {this.props.children}
             </form>
         )
     }
@@ -58,37 +59,50 @@ function submit(form){
     }
 }
 
-function walkRefs(root, data) {
-    return _.reduce(root.refs, function(memo, element) {
-        if (isValidator(element)) {
-            return memo.then(function(data) {
-                var values = element.validate();
-                if (promise.isPrototypeOf(values)) {
-                    return values.then(function(newData) {
-                        return _.assign(data, newData);
-                    })
-                }
-                return _.assign(data, values);
-            });
-        }
+function newSubmit(form) {
+    console.log('newSubmit');
+    return function(event) {
+        form.walkDescendants(validate).then(function(data) {
+            event.data = data;
+//            form.props.onSubmit(event);
+            React.findDOMNode(form).reset();
+            console.log('data: ', data);
+        });
 
-        //TODO: filter the values of non-input controls
-        var control = React.findDOMNode(element);
-        var value = control.value || control.textContent || control.innerText;
-        var field = element.props.field || element.props.id;
-        if (value && field) {
-            memo = memo.then(function(data) {
-                return _.set(data, field, value);
-            })
-        }
+        event.stopPropagation();
+        event.preventDefault();
+        event.returnValue = false;
+    };
+}
 
-        if (!_.isEmpty(element.refs)) {
-            return memo.then(function(data) {
-                return walkRefs(element, data);
-            });
-        }
-        return memo;
-    }, promise.create(data || {}))
+function validate(element, result) {
+    result = result || promise.create({});
+
+    if (isValidator(element)) {
+        return result.then(function(data) {
+            console.log('inner-data: ', data);
+            var values = element.validate();
+            console.log('values: ', values);
+            if (promise.isPrototypeOf(values)) {
+                return values.then(function(newData) {
+                    return _.assign(data, newData);
+                })
+            }
+            return _.assign(data, values);
+        });
+    }
+
+    //TODO: filter the values of non-input controls
+    var control = React.findDOMNode(element);
+    var value = control.value || control.textContent || control.innerText;
+    var field = element.props.field || element.props.id;
+    if (value && field) {
+        return result.then(function(data) {
+            return _.set(data, field, value);
+        })
+    }
+
+    return result;
 }
 
 function isValidator(element) {
