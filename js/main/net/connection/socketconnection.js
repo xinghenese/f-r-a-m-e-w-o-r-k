@@ -196,8 +196,9 @@ function authorize() {
     if (!authorizePromise) {
         authorizePromise = handshake().then(function() {
             return post({
-                'tag': AUTH_TAG,
-                'data': UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev")
+                tag: AUTH_TAG,
+                data: UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev"),
+                responseTag: SocketRequestResponseTagMap.getResponseTag(AUTH_TAG)
             });
         }).then(function(data) {
             if (!authentication.validateSequence(_.get(data, 'msqsid'))) {
@@ -214,9 +215,10 @@ function authorize() {
 function handshake() {
     if (!handshakePromise) {
         handshakePromise = post({
-            'tag': HANDSHAKE_TAG,
-            'data': _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
-                , keyExchange.getPublicKey())
+            tag: HANDSHAKE_TAG,
+            data: _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
+                , keyExchange.getPublicKey()),
+            responseTag: SocketRequestResponseTagMap.getResponseTag(HANDSHAKE_TAG)
         }).then(function(data) {
             _.set(DEFAULT_CONFIG, 'encryptKey'
                 , keyExchange.getEncryptKey(_.get(data, PUBLIC_KEY_FIELD)));
@@ -236,9 +238,10 @@ function awaitToken() {
 function ping() {
     return authorize().then(function() {
         return post({
-            'tag': PING_TAG,
-            'data': _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
-                , authentication.nextEncodedSequence())
+            tag: PING_TAG,
+            data: _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
+                , authentication.nextEncodedSequence()),
+            responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
         })
     }).then(function(data) {
         console.log('ping: ', data);

@@ -9,6 +9,7 @@ var _ = require('lodash');
 var tagMap = {
     HSK: 'HSK',
     AUTH: 'AUTH',
+    P: 'P',
     TM: 'SFC'
 };
 
