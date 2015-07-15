@@ -68,23 +68,10 @@ function normalizePath(path) {
     });
 }
 
-function f(path) {
-    console.log(/(^|\/)(\/*)(\.|\.{3,})?(?=\/)/g.exec(path));
-    return (path + '').replace(/(^|\/)(\/*)(\.|\.{3,})?(?=\/)/g, function(match, p1, p2, p3) {
-        console.log('match: ', match);
-        console.log('p1: ', p1);
-        console.log('p2: ', p2);
-        if (p1) return ''; //case NOT_AT_THE_BEGINNING_OF_THE_LINE
-        if (p2) return ''; //case AT_THE_BEGINNING_OF_THE_LINE && STARTS_WITH_SLASH
-        if (p3) return '.'; //case AT_THE_BEGINNING_OF_THE_LINE && NOT_STARTS_WITH_SLASH
-        return '';
-    });
-}
-
 function isRelativeToRoot(path) {
     return (path + '')[0] === '/';
 }
 
 function isValidPath(path) {
-    return (/^(\.{0,2}\/)/).test(path + '');
+    return (/^\.{0,2}\//).test(path + '');
 }

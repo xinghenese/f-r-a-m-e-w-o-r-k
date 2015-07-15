@@ -14,13 +14,13 @@ var helper = require('../base/helper/helper');
 module.exports = React.createClass({
     displayName: 'DataHolder',
     updateStateAndNotify: function(data) {
-        this.props.emitter.emit(this.getSeq(), data);
+//        this.props.emitter.emit(this.getSeq(), data);
     },
     componentWillMount: function() {
-        var self = this;
-        this.props.emitter.on(this.props.event, function(data) {
-            self.getTopOwnedNode().setState({data: data});
-        });
+//        var self = this;
+//        this.props.emitter.on(this.props.event, function(data) {
+//            self.getTopOwnedNode().setState({data: data});
+//        });
     },
     render: function() {
         if (!this.props.handler) {

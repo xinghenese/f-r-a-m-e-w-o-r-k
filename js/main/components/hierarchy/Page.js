@@ -16,8 +16,12 @@ var emitter = require('../../utils/eventemitter');
 module.exports = React.createClass({
     _emitter: emitter.create(),
     _domTree: {root: {}},
+    componentDidMount: function() {
+        traverse(this._domTree.root, this.ssRoot);
+    },
     render: function() {
-        helper.traverseSubNodes()
+        this.ssRoot = <div>{this.props.children}</div>;
+        return this.ssRoot;
     }
 });
 
@@ -25,8 +29,10 @@ module.exports = React.createClass({
 
 
 //private functions
-function reconstructElement(root) {
+function reconstructElement(rootElement, domTree) {
     var rootNode;
+
+    return React.cloneElement(rootElement, domTree['SideList']);
 
 //    return _.reduce(root, function(memo, value, key) {
 //        return React.cloneElement(memo, null, )
@@ -36,26 +42,41 @@ function reconstructElement(root) {
 //cache the element in root {module.exports._domTree.root}.
 function cacheElement(root, element, parent) {
     var path = paths.parsePath(element.props.domPath || './');
-    var dir = path.relativeDirectory === paths.ROOT ? [] : element.props.dir;
+    var dir = path.relativeDirectory === paths.CWD && element.props.dir || [];
     var depths = dir.length - path.upwardLevels;
     var elementName = helper.getNodeName(element);
+
+    console.log('dir: ', dir);
+    console.log('depth: ', depth);
+    console.log('elementName: ', elementName);
+
+    console.log('root-before: ', root);
 
     if (depths < 0) {
         //no insertion;
     } else if (depths == 0) {
         //simple append the element to the root of the 'domTree'
-        attachElement(root, element, elementName);
+//        attachElement(root, element, elementName);
+        root[elementName] = element;
     } else {
-        var newDir = _(dir)
+        _(dir)
             .dropRight(path.upwardLevels)
-            .reduce(function(cwd, node) {
-                if (!node) {
-                    return cwd;
+            .reduce(function(cwd, node, nodeName) {
+//                if (!node) {
+//                    return cwd;
+//                }
+//                return attachElement(cwd, node);
+                if (!_.has(cwd, nodeName)) {
+                    _.set(cwd, nodeName, node);
+                } else {
+                    var elements = _.get(cwd, nodeName);
+                    var elementsArray = _.isArray(elements) ? elements : [elements];
+                    elementsArray.push(node);
                 }
-                return attachElement(cwd, node);
-            }, dir);
+            }, root);
     }
 
+    console.log('root-after: ', root);
 }
 
 function attachElement(cwd, element, name) {
@@ -78,44 +99,25 @@ function attachElement(cwd, element, name) {
     return _.set(cwd, name, elementsArray);
 }
 
-function traverse(element, process, filter, remove, thisArg, level) {
-    level = level || [];
 
-//    console.group(getNodeName(element));
-//    console.log(element);
+function traverseDomTree(reactTreeNode, domTreeNode) {
+    return React.cloneElement(
+        reactTreeNode,
+        null,
+        _.map(domTreeNode, function(value, key) {
+            if (key === 'ReactElement') {
+                return value;
+            }
+            return traverseDomTree(React.createElement(key), value);
+        })
+    );
+}
 
-    if (!element.props || !element.props.children) {
-//        console.groupEnd();
-        return void 0;
-    }
 
-    //if children are not objects, such as text nodes, return them as early
-    //as possible, 'cause unnecessary to do the following transverse step,
-    //which would probably lead to errors either.
-    if (!_.isObject(element.props.children)) {
-//        console.groupEnd();
-        return element.props.children;
-    }
+function traverse(root, element) {
+    cacheElement(root, element);
 
-    var children = React.Children.map(element.props.children, function(child, key) {
-        if (_.isFunction(remove) && remove.call(thisArg, child, element)) {
-            return void 0;
-        }
-
-        if (_.isFunction(filter) && !filter.call(thisArg, child, element)) {
-//            console.log('child: ', child);
-            return child;
-        }
-
-        var currentLevel = _(level).slice(0).push(key).value();
-
-        return React.cloneElement(
-            child,
-            process.call(thisArg, child, currentLevel, element),
-            traverse(child, process, filter, remove, thisArg, currentLevel)
-        )
-    }, thisArg || element);
-
-//    console.groupEnd();
-    return children;
+    React.Children.forEach(element.props.children, function(child) {
+       traverse(root, child);
+    });
 }
