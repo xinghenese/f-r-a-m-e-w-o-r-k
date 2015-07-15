@@ -108,6 +108,7 @@ function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
     var responseTag = packet.responseTag;
+    var uuid = _.get(data, 'uuid') || '';
 
     console.group('socket');
     console.log('<=', tag + ": " + JSON.stringify(data));
@@ -124,7 +125,7 @@ function post(packet) {
 
     if (!responseTag) return;
 
-    return socketconnection.once(responseTag, function(data) {
+    return socketconnection.once(responseTag + uuid, function(data) {
         console.log('=>', responseTag + ": " + JSON.stringify(data));
         console.groupEnd();
         return data;
@@ -175,9 +176,10 @@ function onMessageReceived(msg) {
         .then(function(value) {
             var tag = value.tag;
             var data = value.data;
+            var uuid = _.get(data, 'uuid') || '';
 
             //check whether the message is pushed by server or pulled from server.
-            if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
+            if (tag && !_.isEmpty(socketconnection.listeners(tag + uuid))) {
                 socketconnection.emit(tag, data);
             } else {
                 //if the message pushed by server does not have to notify immediately,
