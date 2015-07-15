@@ -18,28 +18,20 @@ var LENTH_REG = /^(\d)+px$/;
 var prefix = 'textarea-';
 var index = 0;
 
-var indexible = {
-  componentWillMount: function() {
-    console.log('indexible mixins');
-    this._seq = prefix + (index ++);
-
-    this.props.children = React.Children.map(this.props.children, function(child, key) {
-      return React.cloneElement(child, {
-        id: 'key-' + key
-      });
-    });
-
-    console.log('children: ', this.props.children);
-  }
-};
-
 //core module to export
 var MultilineInputBox = React.createClass({
-    mixins: [indexible],
+    _generateChildren: function() {
+        return React.Children.map(this.props.children, function(child, key) {
+            return React.cloneElement(child, {
+                id: 'key-' + key
+            });
+        });
+    },
     componentWillMount: function() {
         console.log('original ');
         console.log('this: ', this);
         console.dir(this.constructor);
+        this._seq = prefix + (index++);
     },
     render: function() {
         var props = this.props;
@@ -47,16 +39,16 @@ var MultilineInputBox = React.createClass({
         var visibleWidth = _.find([props.width, style.width, theme.width], function(width) {
             return LENTH_REG.test(width);
         });
-        var actualWidth = visibleWidth && (+ visibleWidth.replace('px', '')) + SCROLLBAR_WIDTH + 'px';
+        var actualWidth = visibleWidth && (+visibleWidth.replace('px', '')) + SCROLLBAR_WIDTH + 'px';
         var wrapperWidthStyle = visibleWidth && {width: visibleWidth};
         var textAreaWidthStyle = actualWidth && {width: actualWidth};
 
         return (
             <div
-              id="wrapper1"
-              className={props.className}
-              style={makeStyle(commonStyle.textarea.wrapper, theme.textarea.wrapper, wrapperWidthStyle)}
-          >
+                id="wrapper1"
+                className={props.className}
+                style={makeStyle(commonStyle.textarea.wrapper, theme.textarea.wrapper, wrapperWidthStyle)}
+                >
               <textarea
                   id="text1"
                   placeholder={props.defaultValue}
@@ -67,11 +59,11 @@ var MultilineInputBox = React.createClass({
                   onBlur={onInputBlur}
                   ref={this._seq}
                   style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
-              ></textarea>
-              {this.props.children}
-          </div>
+                  ></textarea>
+                {this._generateChildren()}
+            </div>
         )
-  }
+    }
 });
 
 module.exports = MultilineInputBox;
@@ -80,16 +72,17 @@ module.exports = MultilineInputBox;
 
 
 //private functions
-function onInputBlur(event){
+function onInputBlur(event) {
 //  setStyle(event.target.style, theme.textarea.blur);
 }
 
-function onInputFocus(event){
+function onInputFocus(event) {
 //  setStyle(event.target.style, theme.textarea.focus);
 }
 
 function submit(event) {
-    if (event.keyCode == 13 && event.ctrlKey) {}
+    if (event.keyCode == 13 && event.ctrlKey) {
+    }
 }
 
 function onChange(box) {

@@ -25,6 +25,8 @@ module.exports = filter.create({
      * @returns {String}
      */
     'processWritable': function(value, options) {
-        return JSON.stringify(value);
+        var result = JSON.stringify(value);
+        console.log("writing - " + result);
+        return result;
     }
 });

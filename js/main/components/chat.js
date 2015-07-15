@@ -37,6 +37,7 @@ var Chat = React.createClass({
             var content = message.getContent();
             console.log(content);
         });
+        MessageActions.sendTalkMessage(null, "100", null, "hello", 1, 0, "1.0", "1.0", "hello");
     },
     componentWillMount: function() {
         // putting it here for test purpose

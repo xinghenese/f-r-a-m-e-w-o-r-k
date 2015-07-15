@@ -10,8 +10,10 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
 var GroupHistoryMessages = require('../datamodel/grouphistorymessages');
 var PrivateHistoryMessages = require('../datamodel/privatehistorymessages');
+var UuidGenerator = require('../utils/uuidgenerator');
 var assign = require('object-assign');
 var myself = require('../datamodel/myself');
+var objects = require('../utils/objects');
 var socketconnection = require('../net/connection/socketconnection');
 
 // exports
@@ -44,6 +46,9 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
         case ActionTypes.REQUEST_HISTORY_MESSAGES:
             _handleHistoryMessagesRequest(action);
             break;
+        case ActionTypes.SEND_TALK_MESSAGE:
+            _handleSendTalkMessage(action);
+            break;
     }
 });
 
@@ -69,6 +74,26 @@ function _handleHistoryMessagesRequest(action) {
     });
 }
 
+function _handleSendTalkMessage(action) {
+    var data = {
+        msg: {
+            t: action.content
+        },
+        rmtp: action.conversationType,
+        msgtp: action.messageType,
+        uuid: UuidGenerator.generate()
+    };
+    objects.copyValuedProp(action, "groupId", data, "msrid");
+    objects.copyValuedProp(action, "toUserId", data, "mstuid");
+    objects.copyValuedProp(action, "atUserId", data, "atuid");
+    socketconnection.request({
+        tag: "TM",
+        data: data
+    }).catch(function() {
+        console.log("message sent failed");
+    });
+}
+
 function _handleHistoryMessagesResponse(response) {
     if (response.data.rmsg && response.data.rmsg.cvs && response.data.rmsg.cvs.length > 0) {
         _handleGroupHistoryMessages(response.data.rmsg.cvs);
@@ -81,6 +106,9 @@ function _handleHistoryMessagesResponse(response) {
     } else {
         console.log("no private history messages!");
     }
+
+    // todo
+    // dmc node not implemented
 }
 
 function _handleGroupHistoryMessages(messages) {
