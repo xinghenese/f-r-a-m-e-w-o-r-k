@@ -16,12 +16,15 @@ var Page  = require('../components/hierarchy/Page');
 var DataHolder = require('../components/hierarchy/DataHolder');
 var React = require('react');
 
+var ConversationList = require('../components/view/conversationlistview/conversationlist');
+var ChatMessageList = require('../components/view/chatview/chatmessagelist');
+
 React.render(
     <Page>
         <DataHolder handler={'BottomSwitcher'} domPath={'/SideList/'}>
             <DataHolder handler={'TopSearchBar'} domPath={'/SideList/'}>
                 <DataHolder handler={'ConversationList'} domPath={'/SideList/'}>
-                    <DataHolder handler={'ChatMessageList'} domPath={'/ChatBox/'}/>
+                    <DataHolder handler={ChatMessageList} domPath={'/ChatBox/'}/>
                 </DataHolder>
             </DataHolder>
         </DataHolder>

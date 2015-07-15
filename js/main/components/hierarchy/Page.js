@@ -45,8 +45,7 @@ function cacheElement(root, element, parent) {
     console.log('element.props.domPath: ', element.props.domPath);
     var path = paths.parsePath(element.props.domPath || './');
     var dir = (path.relativeDirectory === paths.CWD
-        && element.props.dir
-        || []
+        && element.props.dir || []
     ).concat(path.subPath);
     var depth = dir.length - path.upwardLevels;
     var elementName = helper.getNodeName(element);
@@ -61,19 +60,6 @@ function cacheElement(root, element, parent) {
 
     if (depth < 0) {
         //no insertion;
-    } else if (depth == 0) {
-        //simple append the element to the root of the 'domTree'
-//        attachElement(root, element, elementName);
-        if (!_.has(root, elementName)) {
-            _.set(root, elementName, element);
-        } else {
-            var elements = _.get(root, elementName);
-            if (!_.isArray(elements)) {
-                elements = [elements];
-                _.set(root, elementName, elements);
-            }
-            elements.push(element);
-        }
     } else {
         console.log(_(dir)
             .dropRight(path.upwardLevels).value());
@@ -81,33 +67,19 @@ function cacheElement(root, element, parent) {
         var newDir = _(dir)
             .dropRight(path.upwardLevels)
             .reduce(function(cwd, node) {
-                console.log('cwd: ', cwd);
-                console.log('node: ', node);
-                if (!node || !_.has(cwd, node)) {
+                if (!node) {
                     return cwd;
                 }
-//                return attachElement(cwd, node);
-                _.set(cwd, node, {});
-
-
-//                if (!_.has(cwd, nodeName)) {
-//                    _.set(cwd, nodeName, node);
-//                } else {
-//                    var elements = _.get(root, elementName);
-//                    if (!_.isArray(elements)) {
-//                        elements = [elements];
-//                        _.set(root, elementName, elements);
-//                    }
-//                    elements.push(element);
-//                }
+                if (!_.has(cwd, node)) {
+                    _.set(cwd, node, {});
+                }
+                return _.get(cwd, node);
             }, root);
-
-        console.log('newDir: ', _.assign({}, newDir));
 
         if (!_.has(newDir, elementName)) {
             _.set(newDir, elementName, element);
         } else {
-            elements = _.get(newDir, elementName);
+            var elements = _.get(newDir, elementName);
             if (!_.isArray(elements)) {
                 elements = [elements];
                 _.set(newDir, elementName, elements);
@@ -115,6 +87,8 @@ function cacheElement(root, element, parent) {
             elements.push(element);
         }
     }
+
+    console.log('newDir: ', _.assign({}, newDir));
 
     console.log('root-after: ', _.assign({}, root));
     console.groupEnd();
