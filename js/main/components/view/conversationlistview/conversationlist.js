@@ -12,36 +12,37 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //private fields
 var prefix = 'conversation-list-';
-var seq = 0;
+var index = 0;
 
 //core module to export
 var ConversationList = React.createClass({
-  getInitialState: function() {
-      return {selectedIndex: -1};
-  },
-  render: function() {
-    var conversationListItem = _.map(this.props.data, function(data, key){
+    getInitialState: function() {
+        return {selectedIndex: -1};
+    },
+    render: function() {
+        var conversationListItem = _.map(this.props.data, function(data, key) {
+            return (
+                <ConversationListItem
+                    key={prefix + (index++)}
+                    time={data.time}
+                    senderName={data.senderName}
+                    senderAvatar={data.senderAvatar}
+                    index={prefix + key}
+                    onSelect={onselect(this)}
+                    selected={this.state.selectedIndex == key}
+                    >
+                    {data.message}
+                </ConversationListItem>
+            );
+        }, this);
         return (
-            <ConversationListItem
-                time={data.time}
-                senderName={data.senderName}
-                senderAvatar={data.senderAvatar}
-                index={prefix + key}
-                onSelect={onselect(this)}
-                selected={this.state.selectedIndex == key}
-            >
-                {data.message}
-            </ConversationListItem>
-        );
-    }, this);
-    return (
-      <ul className="chat-message-list"
-          style={makeStyle(style.conversationlist, this.props.style)}
-      >
-          {conversationListItem}
-      </ul>
-      )
-  }
+            <ul className="chat-message-list"
+                style={makeStyle(style.conversationlist, this.props.style)}
+                >
+                {conversationListItem}
+            </ul>
+        )
+    }
 });
 
 module.exports = ConversationList;
@@ -51,7 +52,7 @@ module.exports = ConversationList;
 
 //private functions
 function onselect(list) {
-    return function (event) {
+    return function(event) {
         list.setState({selectedIndex: event.currentTarget.id.replace(/\D/g, '')});
     }
 }

@@ -7,28 +7,31 @@ var _ = require('lodash');
 var React = require('react');
 var ChatMessage = require('./chatmessage');
 var makeStyle = require('../../../style/styles').makeStyle;
+var prefix = "chat-message-list-";
+var index = 0;
 
 //core module to export
 var ChatMessageList = React.createClass({
-  render: function(){
-    var chatMessageNodes = _.map(this.props.data, function(data){
-      return (
-        <ChatMessage
-            time={data.time}
-            senderName={data.senderName}
-            senderAvatar={data.senderAvatar}
-            style={this.props.style.chatmessage}
-        >
-            {data.message}
-        </ChatMessage>
-      );
-    }, this);
-    return (
-      <div className="chat-message-list" style={makeStyle(this.props.style)}>
-        {chatMessageNodes}
-      </div>
-    )
-  }
+    render: function() {
+        var chatMessageNodes = _.map(this.props.data, function(data) {
+            return (
+                <ChatMessage
+                    key={prefix + (index++)}
+                    time={data.time}
+                    senderName={data.senderName}
+                    senderAvatar={data.senderAvatar}
+                    style={this.props.style.chatmessage}
+                    >
+                    {data.message}
+                </ChatMessage>
+            );
+        }, this);
+        return (
+            <div className="chat-message-list" style={makeStyle(this.props.style)}>
+                {chatMessageNodes}
+            </div>
+        )
+    }
 });
 
 module.exports = ChatMessageList;
