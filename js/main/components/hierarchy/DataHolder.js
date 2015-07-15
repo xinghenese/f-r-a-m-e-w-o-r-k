@@ -29,7 +29,7 @@ module.exports = React.createClass({
         var children = React.Children.map(this.props.children, function(child) {
             return React.cloneElement(
                 child,
-                {event: this.getSeq(), emitter: this.props.emitter}
+                {event: 'this.getSeq()', emitter: this.props.emitter}
             )
         }, this);
 
