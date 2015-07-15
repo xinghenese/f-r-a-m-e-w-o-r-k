@@ -25,8 +25,12 @@ module.exports = React.createClass({
 
 
 //private functions
-function reconstructElement(element) {
+function reconstructElement(root) {
+    var rootNode;
 
+//    return _.reduce(root, function(memo, value, key) {
+//        return React.cloneElement(memo, null, )
+//    }, rootNode);
 }
 
 //cache the element in root {module.exports._domTree.root}.
@@ -68,21 +72,11 @@ function attachElement(cwd, element, name) {
     if (!_.has(cwd, name)) {
         return _.set(cwd, name, element);
     }
-    var elements = toArray(_.get(cwd, name));
-    elements.push(element);
-    return _.set(cwd, name, elements);
+    var elements = _.get(cwd, name);
+    var elementsArray = _.isArray(elements) ? elements : [elements];
+    elementsArray.push(element);
+    return _.set(cwd, name, elementsArray);
 }
-
-function toArray(arr) {
-    if (_.isArray(arr)) {
-        return arr;
-    }
-    if (_.isArguments(arr)) {
-        return _.toArray(arr);
-    }
-    return [arr];
-}
-
 
 function traverse(element, process, filter, remove, thisArg, level) {
     level = level || [];

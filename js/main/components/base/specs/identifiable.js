@@ -18,6 +18,9 @@ module.exports = {
 
         _.set(indexMap, className, index + 1);
         this._seq = hyphenFormalize(className) + '-' + index + '-';
+    },
+    getSeq: function() {
+        return this._seq;
     }
 };
 

@@ -15,6 +15,7 @@ var repeat = require('../../utils/repeat');
 var authentication = require('./authentication');
 var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
+var SocketRequestResponseTagMap = require('./SocketRequestResponseTagMap');
 
 //private const fields
 var PUBLIC_KEY_FIELD = "pbk";
@@ -106,6 +107,7 @@ function get(tag) {
 function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
+    var responseTag = packet.responseTag;
 
     console.group('socket');
     console.log('<=', tag + ": " + JSON.stringify(data));
@@ -120,7 +122,9 @@ function post(packet) {
             return socket.send(value);
         });
 
-    return socketconnection.once(tag, function(data) {
+    if (!responseTag) return;
+
+    return socketconnection.once(responseTag, function(data) {
         console.log('=>', tag + ": " + JSON.stringify(data));
         console.groupEnd();
         return data;
@@ -130,6 +134,7 @@ function post(packet) {
 function packetFormalize(packet) {
     var tag;
     var data;
+    var responseTag;
 
     if (!packet || _.isEmpty(packet)) {
         throw new Error("empty packet to be sent via socket");
@@ -137,20 +142,22 @@ function packetFormalize(packet) {
     if (_.isPlainObject(packet)) {
         tag = "" + (packet.tag || _.keys(packet)[0]);
         data = packet.data || _.get(packet, tag);
+        responseTag = packet.responseTag || SocketRequestResponseTagMap.getReponseTag(tag);
 
         if (!tag) {
             throw new Error('invalid tag');
         }
         if (data && !_.isEmpty(data)) {
             return {
-                'tag': tag.toUpperCase(),
-                'data': data
+                tag: tag.toUpperCase(),
+                data: data,
+                responseTag: responseTag
             }
         }
     }
     return {
-        'tag': "" + packet.toUpperCase(),
-        'data': null
+        tag: "" + packet.toUpperCase(),
+        data: null
     }
 }
 
