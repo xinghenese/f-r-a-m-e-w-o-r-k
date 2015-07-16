@@ -13,8 +13,10 @@ var keyExchange = require('../crypto/factory').createKeyExchange();
 var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 var authentication = require('./authentication');
+var objects = require('../../utils/objects');
 var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
+var HandlerBuffer = require('./handlerbuffer');
 var SocketRequestResponseTagMap = require('./SocketRequestResponseTagMap');
 
 //private const fields
@@ -47,6 +49,7 @@ var isAuthorized = false;
 
 //core module to export
 var socketconnection = module.exports = connection.extend({
+    _handleBuffer: new HandlerBuffer(),
     /**
      *
      * @param packet {Object|String}
@@ -71,15 +74,26 @@ var socketconnection = module.exports = connection.extend({
             }
         });
     },
-
     ping: ping,
-
     getState: function() {
         return state;
     },
-
     isAuthorized: function() {
         return isAuthorized;
+    },
+    buildProcessor: function(tag) {
+        var self = this;
+        return function(data) {
+            console.log('=>', tag + ": " + JSON.stringify(data));
+            console.groupEnd();
+            self._handlerBuffer.processData(tag, data);
+            if (self._handlerBuffer.hasMoreHandlers(tag)) {
+                self.addOnceHandler(tag);
+            }
+        };
+    },
+    addOnceHandler: function(tag) {
+        return this.once(tag, this.buildProcessor(tag));
     }
 });
 
@@ -108,7 +122,6 @@ function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
     var responseTag = packet.responseTag;
-    var uuid = _.get(data, 'uuid') || '';
 
     console.group('socket');
     console.log('<=', tag + ": " + JSON.stringify(data));
@@ -125,17 +138,12 @@ function post(packet) {
 
     if (!responseTag) return;
 
-    return socketconnection.once(responseTag + uuid, function(data) {
-        console.log('=>', responseTag + ": " + JSON.stringify(data));
-        console.groupEnd();
-        return data;
-    });
+    return socketconnection.addOnceHandler(responseTag);
 }
 
 function packetFormalize(packet) {
     var tag;
     var data;
-    var responseTag;
 
     if (!packet || _.isEmpty(packet)) {
         throw new Error("empty packet to be sent via socket");
@@ -143,17 +151,17 @@ function packetFormalize(packet) {
     if (_.isPlainObject(packet)) {
         tag = "" + (packet.tag || _.keys(packet)[0]);
         data = packet.data || _.get(packet, tag);
-        responseTag = packet.responseTag || SocketRequestResponseTagMap.getResponseTag(tag);
 
         if (!tag) {
             throw new Error('invalid tag');
         }
         if (data && !_.isEmpty(data)) {
-            return {
+            var result = {
                 tag: tag.toUpperCase(),
-                data: data,
-                responseTag: responseTag
-            }
+                data: data
+            };
+            objects.copyValuedProp(packet, "responseTag", result, "responseTag");
+            return result;
         }
     }
     return {
@@ -176,10 +184,9 @@ function onMessageReceived(msg) {
         .then(function(value) {
             var tag = value.tag;
             var data = value.data;
-            var uuid = _.get(data, 'uuid') || '';
 
             //check whether the message is pushed by server or pulled from server.
-            if (tag && !_.isEmpty(socketconnection.listeners(tag + uuid))) {
+            if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
                 socketconnection.emit(tag, data);
             } else {
                 //if the message pushed by server does not have to notify immediately,
@@ -219,8 +226,7 @@ function handshake() {
         handshakePromise = post({
             tag: HANDSHAKE_TAG,
             data: _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
-                , keyExchange.getPublicKey()),
-            responseTag: SocketRequestResponseTagMap.getResponseTag(HANDSHAKE_TAG)
+                , keyExchange.getPublicKey())
         }).then(function(data) {
             _.set(DEFAULT_CONFIG, 'encryptKey'
                 , keyExchange.getEncryptKey(_.get(data, PUBLIC_KEY_FIELD)));

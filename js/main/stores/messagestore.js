@@ -56,6 +56,7 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 function _handleHistoryMessagesRequest(action) {
     socketconnection.request({
         tag: "HM",
+        responseTag: "HM",
         data: {
             data: {
                 msich: {
