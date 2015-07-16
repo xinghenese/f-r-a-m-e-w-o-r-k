@@ -6,6 +6,7 @@
 var _ = require('lodash');
 var React = require('react');
 var helper = require('../base/helper/helper');
+var eventEmitter = require('../../utils/eventemitter');
 var createReferableClass = require('../base/creator/createReferableClass');
 
 //private fields
@@ -15,30 +16,37 @@ var createReferableClass = require('../base/creator/createReferableClass');
 module.exports = createReferableClass({
     displayName: 'DataHolder',
     updateStateAndNotify: function(data) {
+        if (this.props.updateEvent && eventEmitter.isPrototypeOf(this.props.emitter)) {
+            this.props.emitter.emit(this.props.updateEvent, data);
+        }
 //        this.props.emitter.emit(this.getSeq(), data);
     },
     componentWillMount: function() {
         console.log(this.constructor.displayName + '#props: ', this.props);
-//        var self = this;
-//        this.props.emitter.on(this.props.event, function(data) {
-//            self.getTopOwnedNode().setState({data: data});
-//        });
+        if (this.props.superUpdateEvent && eventEmitter.isPrototypeOf(this.props.emitter)) {
+            var self = this;
+            this.props.emitter.on(this.props.superUpdateEvent, function(data) {
+                self.getTopOwnedNode().setState({data: data});
+            });
+        }
     },
     render: function() {
         if (!this.props.handler) {
             return null;
         }
-        var children = React.Children.map(this.props.children, function(child) {
-            return React.cloneElement(
-                child,
-                {event: this.getSeq(), emitter: this.props.emitter}
-            )
-        }, this);
+        console.log('seq: ', this.getSeq());
+//        var children = React.Children.map(this.props.children, function(child) {
+//            return React.cloneElement(
+//                child,
+//                {event: this.getSeq(), emitter: this.props.emitter}
+//            )
+//        }, this);
+
+        var props = _.assign({}, this.props, {event: this.getSeq(), emitter: this.props.emitter});
 
         return React.createElement(
             this.props.handler,
-            this.props,
-            children
+            props
         );
     }
 });

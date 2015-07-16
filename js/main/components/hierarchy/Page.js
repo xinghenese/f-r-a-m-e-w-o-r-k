@@ -44,7 +44,7 @@ function reconstructElement(domTree) {
 function cacheElement(element, parent, root) {
     var path = paths.parsePath(element.props.domPath || './');
     var dir = (path.relativeDirectory === paths.CWD
-        && element.props.dir || []
+            && element.props.dir || []
         ).concat(path.subPath);
     var depth = dir.length - path.upwardLevels;
     var elementName = helper.getNodeName(element);
@@ -63,8 +63,10 @@ function cacheElement(element, parent, root) {
         _(dir)
             .dropRight(path.upwardLevels)
             .reduce(function(cwd, node) {
+                //reach the end of dir array.
                 if (!node) {
                     var pos2 = findChildByType(cwd.children, element);
+
                     if (pos2 < 0) {
                         pos2 = cwd.children.push({
                             entity: element,
@@ -151,15 +153,24 @@ function traverse(element, parent, root) {
             children: []
         });
     } else {
-        cacheElement(element, {}, root);
+        cacheElement(element, parent, root);
     }
 
     React.Children.forEach(element.props.children, function(child) {
         console.log('traverse-foreach#element: ', element);
+        var props = _({})
+            .assign(element.props, child.props, {
+                    superUpdateEvent: 'event',
+                    updateEvent: 'event'
+                })
+            .omit(['children', 'domPath', 'handler'])
+            .value()
+        ;
+        console.log('traverse#props: ', props);
         traverse(React.cloneElement(
-            child, 
-            _.assign({}, element.props, child.props)
-        ), root);
+            child,
+            props
+        ), element, root);
     });
 
     return root;
