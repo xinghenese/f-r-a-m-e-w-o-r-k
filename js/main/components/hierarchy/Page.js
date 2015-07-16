@@ -5,7 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var helper = require('../base/helper');
+var helper = require('../base/helper/helper');
 var paths = require('../../utils/paths');
 var emitter = require('../../utils/eventemitter');
 
@@ -15,9 +15,9 @@ var emitter = require('../../utils/eventemitter');
 //core module to export
 module.exports = React.createClass({
     _emitter: emitter.create(),
-    _domTree: {root: {}},
+    _domTree: {},
     componentDidMount: function() {
-        traverse(this._domTree.root, this.ssRoot);
+        traverse(this._domTree, this.ssRoot);
     },
     render: function() {
         this.ssRoot = <div>{this.props.children}</div>;
@@ -29,14 +29,8 @@ module.exports = React.createClass({
 
 
 //private functions
-function reconstructElement(rootElement, domTree) {
-    var rootNode;
-
-    return React.cloneElement(rootElement, domTree['SideList']);
-
-//    return _.reduce(root, function(memo, value, key) {
-//        return React.cloneElement(memo, null, )
-//    }, rootNode);
+function reconstructElement(domTree) {
+    return traverseAndConstruct(domTree);
 }
 
 //cache the element in root {module.exports._domTree.root}.
@@ -94,6 +88,62 @@ function cacheElement(root, element, parent) {
     console.groupEnd();
 }
 
+
+function cacheElement2(root, element) {
+    console.group('cache');
+    console.log('element.props.domPath: ', element.props.domPath);
+    var path = paths.parsePath(element.props.domPath || './');
+    var dir = (path.relativeDirectory === paths.CWD
+        && element.props.dir || []
+        ).concat(path.subPath);
+    var depth = dir.length - path.upwardLevels;
+    var elementName = helper.getNodeName(element);
+
+    console.log('path: ', path);
+    console.log('dir: ', dir);
+    console.log('depth: ', depth);
+    console.log('elementName: ', elementName);
+    console.log('elementHandler: ', element.props.handler);
+
+    console.log('root-before: ', _.assign({}, root));
+
+    if (depth < 0) {
+        //no insertion;
+    } else {
+        console.log(_(dir)
+            .dropRight(path.upwardLevels).value());
+
+        var newDir = _(dir)
+            .dropRight(path.upwardLevels)
+            .reduce(function(cwd, node) {
+                if (!node) {
+                    return cwd;
+                }
+                if (!_.has(cwd, node)) {
+                    _.set(cwd, node, {});
+                }
+                return _.get(cwd, node);
+            }, root);
+
+        if (!_.has(newDir, elementName)) {
+            _.set(newDir, elementName, element);
+        } else {
+            var elements = _.get(newDir, elementName);
+            if (!_.isArray(elements)) {
+                elements = [elements];
+                _.set(newDir, elementName, elements);
+            }
+            elements.push(element);
+        }
+    }
+
+    console.log('newDir: ', _.assign({}, newDir));
+
+    console.log('root-after: ', _.assign({}, root));
+    console.groupEnd();
+}
+
+
 function attachElement(cwd, element, name) {
     name = name || helper.getNodeName(element);
 
@@ -129,11 +179,41 @@ function traverseDomTree(reactTreeNode, domTreeNode) {
 }
 
 
+function traverseAndConstruct(element) {
+    if (!element || _.isEmpty(element) || !React.isValidElement(element.entity)) {
+        return void 0;
+    }
+    if (!element.children || _.isEmpty(element.children)) {
+        return element.entity;
+    }
+
+    var children ;
+
+    if (_.isArray(element.children)) {
+        children = _.map(element.children, function(child) {
+            return traverseAndConstruct(child);
+        })
+    } else {
+        children = traverseAndConstruct(element.children);
+    }
+
+    return React.cloneElement(element.entity, null, children);
+}
+
+
 function traverse(root, element) {
+    console.log('traverse-element: ', element);
     cacheElement(root, element);
 
     React.Children.forEach(element.props.children, function(child) {
 //        var newChild = React.cloneElement(child, {});
        traverse(root, child);
     });
+}
+
+function walk(tree, element) {
+    if (_.isEmpty(tree)) {
+        _.assign(tree, {entity: element, children: {}})
+    }
+    return _.get(tree, 'children');
 }
