@@ -121,7 +121,6 @@ function get(tag) {
 function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
-    var responseTag = packet.responseTag;
 
     console.group('socket');
     console.log('<=', tag + ": " + JSON.stringify(data));
@@ -136,9 +135,7 @@ function post(packet) {
             return socket.send(value);
         });
 
-    if (!responseTag) return;
-
-    return socketconnection.addOnceHandler(responseTag);
+    return socketconnection.addOnceHandler(tag);
 }
 
 function packetFormalize(packet) {
