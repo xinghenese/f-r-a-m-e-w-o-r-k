@@ -6,17 +6,19 @@
 var _ = require('lodash');
 var React = require('react');
 var helper = require('../base/helper/helper');
+var createReferableClass = require('../base/creator/createReferableClass');
 
 //private fields
 
 
 //core module to export
-module.exports = React.createClass({
+module.exports = createReferableClass({
     displayName: 'DataHolder',
     updateStateAndNotify: function(data) {
 //        this.props.emitter.emit(this.getSeq(), data);
     },
     componentWillMount: function() {
+        console.log(this.constructor.displayName + '#props: ', this.props);
 //        var self = this;
 //        this.props.emitter.on(this.props.event, function(data) {
 //            self.getTopOwnedNode().setState({data: data});
@@ -29,7 +31,7 @@ module.exports = React.createClass({
         var children = React.Children.map(this.props.children, function(child) {
             return React.cloneElement(
                 child,
-                {event: 'this.getSeq()', emitter: this.props.emitter}
+                {event: this.getSeq(), emitter: this.props.emitter}
             )
         }, this);
 

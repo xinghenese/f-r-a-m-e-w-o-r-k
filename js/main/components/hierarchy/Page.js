@@ -17,14 +17,17 @@ module.exports = React.createClass({
     _emitter: emitter.create(),
     _domTree: {},
     componentDidMount: function() {
-        traverse(this._domTree, this.ssRoot);
+        traverse(this.ssRoot, this, this._domTree);
         console.log('this._domTree: ', this._domTree);
         var root = reconstructElement(this._domTree);
         console.log('root: ', root);
         React.render(root, document.getElementById('content1'));
     },
     render: function() {
-        this.ssRoot = <div>{this.props.children}</div>;
+        var children = React.Children.map(this.props.children, function(child) {
+            return React.cloneElement(child, {emitter: this._emitter});
+        }, this);
+        this.ssRoot = <div {...this.props}>{children}</div>;
         return this.ssRoot;
     }
 });
@@ -38,64 +41,7 @@ function reconstructElement(domTree) {
 }
 
 //cache the element in root {module.exports._domTree.root}.
-function cacheElement(root, element, parent) {
-    console.group('cache');
-    console.log('element.props.domPath: ', element.props.domPath);
-    var path = paths.parsePath(element.props.domPath || './');
-    var dir = (path.relativeDirectory === paths.CWD
-        && element.props.dir || []
-    ).concat(path.subPath);
-    var depth = dir.length - path.upwardLevels;
-    var elementName = helper.getNodeName(element);
-
-    console.log('path: ', path);
-    console.log('dir: ', dir);
-    console.log('depth: ', depth);
-    console.log('elementName: ', elementName);
-    console.log('elementHandler: ', element.props.handler);
-
-    console.log('root-before: ', _.assign({}, root));
-
-    if (depth < 0) {
-        //no insertion;
-    } else {
-        console.log(_(dir)
-            .dropRight(path.upwardLevels).value());
-
-        var newDir = _(dir)
-            .dropRight(path.upwardLevels)
-            .reduce(function(cwd, node) {
-                if (!node) {
-                    return cwd;
-                }
-                if (!_.has(cwd, node)) {
-                    _.set(cwd, node, {});
-                }
-                return _.get(cwd, node);
-            }, root);
-
-        if (!_.has(newDir, elementName)) {
-            _.set(newDir, elementName, element);
-        } else {
-            var elements = _.get(newDir, elementName);
-            if (!_.isArray(elements)) {
-                elements = [elements];
-                _.set(newDir, elementName, elements);
-            }
-            elements.push(element);
-        }
-    }
-
-    console.log('newDir: ', _.assign({}, newDir));
-
-    console.log('root-after: ', _.assign({}, root));
-    console.groupEnd();
-}
-
-
-function cacheElement2(root, element) {
-    console.group('cache');
-    console.log('element.props.domPath: ', element.props.domPath);
+function cacheElement(element, parent, root) {
     var path = paths.parsePath(element.props.domPath || './');
     var dir = (path.relativeDirectory === paths.CWD
         && element.props.dir || []
@@ -103,41 +49,36 @@ function cacheElement2(root, element) {
     var depth = dir.length - path.upwardLevels;
     var elementName = helper.getNodeName(element);
 
-    console.log('path: ', path);
-    console.log('dir: ', dir);
-    console.log('depth: ', depth);
-    console.log('elementName: ', elementName);
-    console.log('elementHandler: ', element.props.handler);
-
-    console.log('root-before: ', _.assign({}, root));
+    console.group(elementName, ': '
+        + _.isString(element.props.handler)
+            ? element.props.handler
+            : helper.getNodeName(element.props.handler)
+    );
+    console.log('props: ', element.props);
+    console.log('parent: ', parent);
 
     if (depth < 0) {
         //no insertion;
     } else {
-        console.log(_(dir)
-            .dropRight(path.upwardLevels).value());
-
-        var newDir = _(dir)
+        _(dir)
             .dropRight(path.upwardLevels)
             .reduce(function(cwd, node) {
                 if (!node) {
-                    console.log('cwd2: ', cwd);
                     var pos2 = findChildByType(cwd.children, element);
-                    console.log('pos2: ', pos2);
                     if (pos2 < 0) {
                         pos2 = cwd.children.push({
-                            entity: element,
+                            entity: React.cloneElement(element, parent.props),
                             children: []
                         }) - 1;
                     }
                     return cwd.children[pos2];
                 }
-                console.log('cwd: ', cwd);
+
                 var pos = findChildByType(cwd.children, node);
-                console.log('pos: ', pos);
                 if (pos < 0) {
                     pos = cwd.children.push({
                         entity: node,
+                        props: null,
                         children: []
                     }) - 1;
                 }
@@ -147,10 +88,6 @@ function cacheElement2(root, element) {
 
 
     }
-
-    console.log('newDir: ', _.assign({}, newDir));
-
-    console.log('root-after: ', _.assign({}, root));
     console.groupEnd();
 }
 
@@ -185,88 +122,44 @@ function findChildByType(children, type) {
     return -1;
 }
 
-
-function traverseDomTree(reactTreeNode, domTreeNode) {
-    return React.cloneElement(
-        reactTreeNode,
-        null,
-        _.map(domTreeNode, function(value, key) {
-            if (key === 'ReactElement') {
-                return value;
-            }
-            return traverseDomTree(React.createElement(key), value);
-        })
-    );
-}
-
-
 function traverseAndConstruct(element) {
-    console.log('construct: ', element);
-
     if (!element || _.isEmpty(element) || !element.entity) {
         return void 0;
     }
-    if (!element.children || _.isEmpty(element.children)) {
+    if (!element.children || !_.isArray(element.children)) {
         return element.entity;
     }
 
-    var children ;
+    var children;
 
-    if (_.isArray(element.children)) {
+    if (!_.isEmpty(element.children) ) {
         children = _.map(element.children, function(child) {
             return traverseAndConstruct(child);
-        })
-    } else {
-        children = traverseAndConstruct(element.children);
+        });
     }
 
     if (React.isValidElement(element.entity)) {
-        console.group('Reconstructr: ', helper.getNodeName(element.entity));
-        console.log('old-children: ', element.entity.props.children);
-        console.log('replace-children: ', children);
-        var ele = React.cloneElement(element.entity, null, children);
-        console.log('new-children: ', ele.props.children);
-        console.groupEnd();
-        return ele;
+        return React.cloneElement(element.entity, element.props, children);
     }
-    return React.createElement(element.entity, null, children);
+    return React.createElement(element.entity, element.props, children);
 }
 
 
-function traverse(root, element) {
-
-    console.log('traverse-element: ', element);
-    console.log('root: ', root);
-
+function traverse(element, parent, root) {
     if (!_.has(root, 'children')) {
-//        var tree = root;
-//        root = {
-//            entity: element,
-//            children: []
-//        };
         _.assign(root, {
             entity: element,
+            props: _.omit(parent.props, 'children'),
             children: []
         });
     } else {
-        cacheElement2(root, element);
+        cacheElement(element, {}, root);
     }
 
     React.Children.forEach(element.props.children, function(child) {
-//        var newChild = React.cloneElement(child, {});
-       traverse(root, child);
+        console.log('traverse-foreach#element: ', element);
+        traverse(child, element, root);
     });
-}
 
-function walk(tree, element) {
-    var root = tree;
-
-    if (!_.has(tree, 'children')) {
-        root = {
-            entity: element,
-            children: []
-        };
-        _.assign(tree, root);
-    }
     return root;
 }

@@ -20,7 +20,7 @@ var ConversationList = require('../components/view/conversationlistview/conversa
 var ChatMessageList = require('../components/view/chatview/chatmessagelist');
 
 React.render(
-    <Page>
+    <Page className="testPage">
         <DataHolder handler={'BottomSwitcher'} domPath={'/SideList/'}>
             <DataHolder handler={'TopSearchBar'} domPath={'/SideList/'}>
                 <DataHolder handler={'ConversationList'} domPath={'/SideList/'}>
