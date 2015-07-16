@@ -76,20 +76,27 @@ function _handleHistoryMessagesRequest(action) {
 }
 
 function _handleSendTalkMessage(action) {
+    var uuid = UuidGenerator.generate();
     var data = {
         msg: {
             t: action.content
         },
         rmtp: action.conversationType,
         msgtp: action.messageType,
-        uuid: UuidGenerator.generate()
+        uuid: uuid
     };
     objects.copyValuedProp(action, "groupId", data, "msrid");
     objects.copyValuedProp(action, "toUserId", data, "mstuid");
     objects.copyValuedProp(action, "atUserId", data, "atuid");
     socketconnection.request({
         tag: "TM",
-        data: data
+        data: data,
+        responseTag: "SCF",
+        predicate: function(data) {
+            return data["uuid"] === uuid;
+        }
+    }).then(function(msg) {
+        console.log("received confirm - " + uuid);
     }).catch(function() {
         console.log("message sent failed");
     });

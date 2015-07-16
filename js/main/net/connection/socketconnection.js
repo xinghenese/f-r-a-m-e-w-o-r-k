@@ -16,7 +16,7 @@ var authentication = require('./authentication');
 var objects = require('../../utils/objects');
 var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
-//var HandlerBuffer = require('./handlerbuffer');
+var MessageConstants = require('../../constants/messageconstants');
 var SocketRequestResponseTagMap = require('./SocketRequestResponseTagMap');
 
 //private const fields
@@ -96,9 +96,7 @@ state = State.INITIALIZED;
 //just listen to data reception with tag.
 function get(tag) {
     return socketconnection.on(tag, function(data) {
-        console.group('socket');
         console.log('=>', tag + ": " + JSON.stringify(data));
-        console.groupEnd();
         return data;
     });
 }
@@ -107,7 +105,6 @@ function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
 
-    console.group('socket');
     console.log('<=', tag + ": " + JSON.stringify(data));
 
     if (session.has(tag)) {
@@ -120,7 +117,14 @@ function post(packet) {
             return socket.send(value);
         });
 
-    return socketconnection.once(tag);
+    if ("responseTag" in packet && "predicate" in packet) {
+        return socketconnection.conditionalOnce(packet.responseTag, packet.predicate,
+            MessageConstants.MESSAGE_CONFIRM_TIMEOUT);
+    } else if ("responseTag" in packet) {
+        return socketconnection.once(packet.responseTag);
+    } else {
+        return socketconnection.once(tag);
+    }
 }
 
 function packetFormalize(packet) {
@@ -179,8 +183,7 @@ function onMessageReceived(msg) {
                     session.cache(tag, data);
                 }
             }
-        })
-        ;
+        });
 }
 
 function authorize() {
@@ -247,5 +250,5 @@ function notifyImmediately(tag, data) {
     console.log('notifyImmediately: ', JSON.stringify({
         'tag': tag,
         'data': data
-    }))
+    }));
 }

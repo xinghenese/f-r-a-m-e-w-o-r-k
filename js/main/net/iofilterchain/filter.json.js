@@ -16,9 +16,8 @@ module.exports = filter.create({
      * @returns {Object}
      */
     'processReadable': function(value, options) {
-        var result = JSON.parse(value.replace(/^[^{]*?\{/, '{').replace(/[\r\n]/gm, ''));
-        console.log("received - " + result);
-        return result;
+        console.log("received - " + value);
+        return JSON.parse(value.replace(/^[^{]*?\{/, '{').replace(/[\r\n]/gm, ''));
     },
     /**
      * transfer the value into a string
