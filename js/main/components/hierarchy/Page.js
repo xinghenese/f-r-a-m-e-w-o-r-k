@@ -18,6 +18,10 @@ module.exports = React.createClass({
     _domTree: {},
     componentDidMount: function() {
         traverse(this._domTree, this.ssRoot);
+        console.log('this._domTree: ', this._domTree);
+        var root = reconstructElement(this._domTree);
+        console.log('root: ', root);
+        React.render(root, document.getElementById('content1'));
     },
     render: function() {
         this.ssRoot = <div>{this.props.children}</div>;
@@ -117,24 +121,31 @@ function cacheElement2(root, element) {
             .dropRight(path.upwardLevels)
             .reduce(function(cwd, node) {
                 if (!node) {
-                    return cwd;
+                    console.log('cwd2: ', cwd);
+                    var pos2 = findChildByType(cwd.children, element);
+                    console.log('pos2: ', pos2);
+                    if (pos2 < 0) {
+                        pos2 = cwd.children.push({
+                            entity: element,
+                            children: []
+                        }) - 1;
+                    }
+                    return cwd.children[pos2];
                 }
-                if (!_.has(cwd, node)) {
-                    _.set(cwd, node, {});
+                console.log('cwd: ', cwd);
+                var pos = findChildByType(cwd.children, node);
+                console.log('pos: ', pos);
+                if (pos < 0) {
+                    pos = cwd.children.push({
+                        entity: node,
+                        children: []
+                    }) - 1;
                 }
-                return _.get(cwd, node);
+                return cwd.children[pos];
+
             }, root);
 
-        if (!_.has(newDir, elementName)) {
-            _.set(newDir, elementName, element);
-        } else {
-            var elements = _.get(newDir, elementName);
-            if (!_.isArray(elements)) {
-                elements = [elements];
-                _.set(newDir, elementName, elements);
-            }
-            elements.push(element);
-        }
+
     }
 
     console.log('newDir: ', _.assign({}, newDir));
@@ -165,6 +176,16 @@ function attachElement(cwd, element, name) {
 }
 
 
+function findChildByType(children, type) {
+    for (var i = 0, len = children.length; i < len; i ++) {
+        if (children[i] && children[i].entity === type) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
 function traverseDomTree(reactTreeNode, domTreeNode) {
     return React.cloneElement(
         reactTreeNode,
@@ -180,7 +201,9 @@ function traverseDomTree(reactTreeNode, domTreeNode) {
 
 
 function traverseAndConstruct(element) {
-    if (!element || _.isEmpty(element) || !React.isValidElement(element.entity)) {
+    console.log('construct: ', element);
+
+    if (!element || _.isEmpty(element) || !element.entity) {
         return void 0;
     }
     if (!element.children || _.isEmpty(element.children)) {
@@ -197,13 +220,37 @@ function traverseAndConstruct(element) {
         children = traverseAndConstruct(element.children);
     }
 
-    return React.cloneElement(element.entity, null, children);
+    if (React.isValidElement(element.entity)) {
+        console.group('Reconstructr: ', helper.getNodeName(element.entity));
+        console.log('old-children: ', element.entity.props.children);
+        console.log('replace-children: ', children);
+        var ele = React.cloneElement(element.entity, null, children);
+        console.log('new-children: ', ele.props.children);
+        console.groupEnd();
+        return ele;
+    }
+    return React.createElement(element.entity, null, children);
 }
 
 
 function traverse(root, element) {
+
     console.log('traverse-element: ', element);
-    cacheElement(root, element);
+    console.log('root: ', root);
+
+    if (!_.has(root, 'children')) {
+//        var tree = root;
+//        root = {
+//            entity: element,
+//            children: []
+//        };
+        _.assign(root, {
+            entity: element,
+            children: []
+        });
+    } else {
+        cacheElement2(root, element);
+    }
 
     React.Children.forEach(element.props.children, function(child) {
 //        var newChild = React.cloneElement(child, {});
@@ -212,8 +259,14 @@ function traverse(root, element) {
 }
 
 function walk(tree, element) {
-    if (_.isEmpty(tree)) {
-        _.assign(tree, {entity: element, children: {}})
+    var root = tree;
+
+    if (!_.has(tree, 'children')) {
+        root = {
+            entity: element,
+            children: []
+        };
+        _.assign(tree, root);
     }
-    return _.get(tree, 'children');
+    return root;
 }
