@@ -16,7 +16,7 @@ var authentication = require('./authentication');
 var objects = require('../../utils/objects');
 var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
-var HandlerBuffer = require('./handlerbuffer');
+//var HandlerBuffer = require('./handlerbuffer');
 var SocketRequestResponseTagMap = require('./SocketRequestResponseTagMap');
 
 //private const fields
@@ -49,7 +49,6 @@ var isAuthorized = false;
 
 //core module to export
 var socketconnection = module.exports = connection.extend({
-    _handleBuffer: new HandlerBuffer(),
     /**
      *
      * @param packet {Object|String}
@@ -80,20 +79,6 @@ var socketconnection = module.exports = connection.extend({
     },
     isAuthorized: function() {
         return isAuthorized;
-    },
-    buildProcessor: function(tag) {
-        var self = this;
-        return function(data) {
-            console.log('=>', tag + ": " + JSON.stringify(data));
-            console.groupEnd();
-            self._handlerBuffer.processData(tag, data);
-            if (self._handlerBuffer.hasMoreHandlers(tag)) {
-                self.addOnceHandler(tag);
-            }
-        };
-    },
-    addOnceHandler: function(tag) {
-        return this.once(tag, this.buildProcessor(tag));
     }
 });
 
@@ -135,7 +120,7 @@ function post(packet) {
             return socket.send(value);
         });
 
-    return socketconnection.addOnceHandler(tag);
+    return socketconnection.once(tag);
 }
 
 function packetFormalize(packet) {
