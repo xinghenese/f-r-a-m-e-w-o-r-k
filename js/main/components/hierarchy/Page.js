@@ -67,7 +67,7 @@ function cacheElement(element, parent, root) {
                     var pos2 = findChildByType(cwd.children, element);
                     if (pos2 < 0) {
                         pos2 = cwd.children.push({
-                            entity: React.cloneElement(element, parent.props),
+                            entity: element,
                             children: []
                         }) - 1;
                     }
@@ -78,7 +78,6 @@ function cacheElement(element, parent, root) {
                 if (pos < 0) {
                     pos = cwd.children.push({
                         entity: node,
-                        props: null,
                         children: []
                     }) - 1;
                 }
@@ -149,7 +148,6 @@ function traverse(element, parent, root) {
     if (!_.has(root, 'children')) {
         _.assign(root, {
             entity: element,
-            props: _.omit(parent.props, 'children'),
             children: []
         });
     } else {
@@ -158,7 +156,10 @@ function traverse(element, parent, root) {
 
     React.Children.forEach(element.props.children, function(child) {
         console.log('traverse-foreach#element: ', element);
-        traverse(child, element, root);
+        traverse(React.cloneElement(
+            child, 
+            _.assign({}, element.props, child.props)
+        ), root);
     });
 
     return root;
