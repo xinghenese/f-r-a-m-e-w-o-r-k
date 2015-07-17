@@ -7,6 +7,7 @@ var React = require('react');
 var mixinSpecs = require('./mixinSpecs');
 var traverse = require('./traverseSubNodes');
 var modify = require('./modifySubNodes');
+var reconstruct = require('./reconstructSubNodes');
 
 //private fields
 
@@ -23,6 +24,8 @@ module.exports = {
     modifyOwnedTopNode: modify.modifyOwnedTopNode,
     modifyOwnedNodes: modify.modifyOwnedNodes,
     modifyDescendants: modify.modifyDescendants,
+
+    reconstruct: reconstruct.reconstruct,
 
     getNodeName: traverse.getNodeName
 };

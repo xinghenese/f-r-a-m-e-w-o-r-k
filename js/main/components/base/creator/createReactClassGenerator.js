@@ -6,6 +6,8 @@
 var _ = require('lodash');
 var React = require('react');
 var mixinSpecs = require('./../helper/helper').mixinSpecs;
+var identifiable = require('./../specs/identifiable');
+var topOwnedNodeReferable = require('./../specs/topownednodereferable');
 
 //private fields
 
@@ -15,7 +17,11 @@ module.exports = function(configs) {
         if (configs && configs.mixins && configs.mixins.push) {
             spec = _.assign({}, configs, {
               //have a copy of mixins to make configs immutable.
-              mixins: _(configs.mixins).slice(0).push(spec).value()
+              mixins: _(configs.mixins)
+                  .slice(0)
+                  .push(spec)
+                  .unshift(identifiable, topOwnedNodeReferable)
+                  .value()
             });
         }
         return React.createClass(mixinSpecs(spec));
