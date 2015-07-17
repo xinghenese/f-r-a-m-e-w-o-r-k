@@ -14,6 +14,7 @@ var UuidGenerator = require('../utils/uuidgenerator');
 var assign = require('object-assign');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
+var predicates = require('../utils/predicates');
 var socketconnection = require('../net/connection/socketconnection');
 
 // exports
@@ -92,13 +93,15 @@ function _handleSendTalkMessage(action) {
         tag: "TM",
         data: data,
         responseTag: "SCF",
-        predicate: function(data) {
-            return data["uuid"] === uuid;
-        }
+        predicate: predicates.uuidPredicate(uuid)
     }).then(function(msg) {
-        console.log("received confirm - " + uuid);
-    }).catch(function() {
-        console.log("message sent failed");
+        if (msg["uuid"] !== uuid) {
+            console.log("wrong confirm, expect: " + uuid + ", actual: " + msg["uuid"]);
+        } else {
+            console.log("received confirm: " + uuid);
+        }
+    }).catch(function(error) {
+        console.log("message sent failed: " + error);
     });
 }
 

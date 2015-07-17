@@ -10,9 +10,10 @@ var repeat = require('./repeat');
 
 //core module to export
 module.exports = eventEmitter.extend({
-    'on': on,
-    'once': once
-}, ['on', 'once']);
+    on: on,
+    once: once,
+    conditionalOnce: conditionalOnce
+}, ['on', 'once', 'conditionalOnce']);
 
 function on(event, callback) {
     if (this._onceTag) {
@@ -63,8 +64,8 @@ function conditionalOnce(event, predicate, timeout, callback) {
         var timer = _.delay(reject, timeout, "timeout");
         var callback = function(msg) {
             if (predicate(msg)) {
-                _clearTimeout(timer);
-                eventEmitter.removeListener(event, callback);
+                clearTimeout(timer);
+                eventEmitter.removeListener.call(self, event, callback);
                 resolve(msg);
             }
         };

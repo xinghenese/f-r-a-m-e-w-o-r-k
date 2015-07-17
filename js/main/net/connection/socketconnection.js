@@ -112,10 +112,9 @@ function post(packet) {
     }
 
     //process and write data to session and then send via socket.
-    session.write(prepareRequestPacket(tag, data), _.assign({}, DEFAULT_CONFIG))
-        .then(function(value) {
-            return socket.send(value);
-        });
+    session.write(prepareRequestPacket(tag, data), _.assign({}, DEFAULT_CONFIG)).then(function(value) {
+        return socket.send(value);
+    });
 
     if ("responseTag" in packet && "predicate" in packet) {
         return socketconnection.conditionalOnce(packet.responseTag, packet.predicate,
@@ -146,7 +145,7 @@ function packetFormalize(packet) {
                 tag: tag.toUpperCase(),
                 data: data
             };
-            objects.copyValuedProp(packet, "responseTag", result, "responseTag");
+            objects.copyPropsExcept(packet, result, ["tag", "data"]);
             return result;
         }
     }
@@ -166,24 +165,23 @@ function prepareRequestPacket(tag, data) {
 }
 
 function onMessageReceived(msg) {
-    return session.read(msg, _.assign({}, DEFAULT_CONFIG))
-        .then(function(value) {
-            var tag = value.tag;
-            var data = value.data;
+    return session.read(msg, _.assign({}, DEFAULT_CONFIG)).then(function(value) {
+        var tag = value.tag;
+        var data = value.data;
 
-            //check whether the message is pushed by server or pulled from server.
-            if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
-                socketconnection.emit(tag, data);
+        //check whether the message is pushed by server or pulled from server.
+        if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
+            socketconnection.emit(tag, data);
+        } else {
+            //if the message pushed by server does not have to notify immediately,
+            //then cache it into the session for later use.
+            if (shouldNotify(tag)) {
+                notifyImmediately(tag, data);
             } else {
-                //if the message pushed by server does not have to notify immediately,
-                //then cache it into the session for later use.
-                if (shouldNotify(tag)) {
-                    notifyImmediately(tag, data);
-                } else {
-                    session.cache(tag, data);
-                }
+                session.cache(tag, data);
             }
-        });
+        }
+    });
 }
 
 function authorize() {

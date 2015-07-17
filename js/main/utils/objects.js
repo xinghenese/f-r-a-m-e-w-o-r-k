@@ -3,9 +3,17 @@
  */
 'use strict';
 
+var _ = require('lodash');
+
 module.exports = {
     containsValuedProp: function(obj, prop) {
         return obj[prop] ? true : false;
+    },
+    copyPropsExcept: function(src, dst, exceptKeys) {
+        var interestedKeys = _.difference(_.keys(src), exceptKeys);
+        _.forEach(interestedKeys, function(key) {
+            dst[key] = src[key];
+        });
     },
     copyValuedProp: function(src, srcAttr, dst, dstAttr) {
         if (this.containsValuedProp(src, srcAttr)) {
