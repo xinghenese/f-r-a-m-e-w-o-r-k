@@ -1,19 +1,17 @@
 /**
- * Created by Administrator on 2015/7/10.
+ * Created by Administrator on 2015/7/17.
  */
 
 //dependencies
-var referable = require('./../specs/referable');
 var createGenerator = require('./createReactClassGenerator');
-var descendantsWalkable = require('./../specs/descendantswalkable');
-
+var reconstructable = require('./../specs/reconstructable');
 
 //private fields
 
 
 //core module to export
 module.exports = createGenerator({
-    mixins: [descendantsWalkable, referable]
+    mixins: [reconstructable]
 });
 
 //module initialization

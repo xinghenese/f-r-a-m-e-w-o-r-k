@@ -8,30 +8,19 @@ var React = require('react');
 var helper = require('../base/helper/helper');
 var paths = require('../../utils/paths');
 var emitter = require('../../utils/eventemitter');
+var createReconstructableClass = require('../base/creator/createReconstructableClass');
 
 //private fields
 
 
 //core module to export
-module.exports = React.createClass({
+module.exports = createReconstructableClass({
     _emitter: emitter.create(),
-    _domTree: {},
-    componentDidMount: function() {
-//        var ret = traverse(this.ssRoot, this);
-//        console.log('returnValue of traverse: ', ret);
-//        console.log('this._domTree: ', this._domTree);
-//        console.log('equal: ', ret === this._domTree);
-        var root = reconstructElement(this.ssRoot, this);
-
-        console.log('root: ', root);
-        React.render(root, document.getElementById('content1'));
-    },
     render: function() {
         var children = React.Children.map(this.props.children, function(child) {
             return React.cloneElement(child, {emitter: this._emitter});
         }, this);
-        this.ssRoot = <div {...this.props}>{children}</div>;
-        return this.ssRoot;
+        return <div {...this.props}>{children}</div>;
     }
 });
 
@@ -166,8 +155,8 @@ function traverse(element, parent, root) {
         console.log('traverse-foreach#element: ', element);
         var props = _({})
             .assign(element.props, child.props, {
-                    superUpdateEvent: 'event',
-                    updateEvent: 'event'
+                    superUpdateEvent: generateEventTypeByElement(element),
+                    updateEvent: generateEventTypeByElement(child)
                 })
             .omit(['children', 'domPath', 'handler'])
             .value()
@@ -180,4 +169,16 @@ function traverse(element, parent, root) {
     });
 
     return root;
+}
+
+function generateEventTypeByElement(element) {
+    var path = element.props.domPath || '';
+    var nodeName = helper.getNodeName(element) + '/';
+    var handler = element.props.handler;
+    var handlerName = handler || '';
+    if (_.has(handler, 'displayName')) {
+        handlerName = handler.displayName || '';
+    }
+
+    return path + nodeName + handlerName;
 }

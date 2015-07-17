@@ -42,11 +42,10 @@ module.exports = createReferableClass({
 //            )
 //        }, this);
 
-        var props = _.assign({}, this.props, {event: this.getSeq(), emitter: this.props.emitter});
+//        var props = _.assign({}, this.props, {event: this.getSeq(), emitter: this.props.emitter});
 
         return React.createElement(
-            this.props.handler,
-            props
+            this.props.handler
         );
     }
 });
