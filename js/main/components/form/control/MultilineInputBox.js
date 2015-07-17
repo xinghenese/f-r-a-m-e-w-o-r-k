@@ -28,9 +28,6 @@ var MultilineInputBox = React.createClass({
         });
     },
     componentWillMount: function() {
-        console.log('original ');
-        console.log('this: ', this);
-        console.dir(this.constructor);
         this._seq = prefix + (index++);
     },
     render: function() {
@@ -67,9 +64,6 @@ var MultilineInputBox = React.createClass({
 });
 
 module.exports = MultilineInputBox;
-
-//module initialization
-
 
 //private functions
 function onInputBlur(event) {

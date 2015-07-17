@@ -63,7 +63,6 @@ var socketconnection = module.exports = connection.extend({
             });
         }
         return authorize().then(function(value) {
-            console.log('authorize.then: ', value);
             //avoid duplicate handshake authorization request.
             if (HANDSHAKE_TAG == packet.tag || AUTH_TAG == packet.tag) {
                 return value;
@@ -104,8 +103,6 @@ function get(tag) {
 function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
-
-    console.log('<=', tag + ": " + JSON.stringify(data));
 
     if (session.has(tag)) {
         return promise.create(session.fetch(tag));
@@ -235,7 +232,6 @@ function ping() {
             responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
         })
     }).then(function(data) {
-        console.log('ping: ', data);
         return data;
     });
 }

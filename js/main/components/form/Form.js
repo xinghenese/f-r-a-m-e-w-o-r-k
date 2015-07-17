@@ -48,7 +48,6 @@ function submit(form) {
     return function(event) {
         form.walkDescendants(validate).then(function(data) {
             event.data = data;
-            console.log(form.props.className + ' submit: ', data);
             form.props.onSubmit(event);
             React.findDOMNode(form).reset();
         });

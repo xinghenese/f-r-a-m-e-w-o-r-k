@@ -9,8 +9,6 @@ var _ = require('lodash');
 //private fields
 var sessioncache = {};
 
-console.log(session);
-
 //core module to export
 module.exports = session.extend({
   'cache': function(tag, data){

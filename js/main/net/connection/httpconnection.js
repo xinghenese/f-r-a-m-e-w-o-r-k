@@ -26,7 +26,7 @@ var DEFAULT_CONFIG = {
     'needDecompress': true,
     'needEncode': false,
     'needDecode': false,
-    'needToken' : true,
+    'needToken': true,
     'needWrap': true,
     'needUnwrap': true,
     'encryptKey': "",
@@ -118,34 +118,24 @@ state = State.INITIALIZED;
 //private functions
 function post(url, data, options) {
     console.group('http post -', url);
-    console.log('<=', data ? JSON.stringify(data) : 'empty data sent');
-    return session.write(data, options)
-        .then(function(value) {
-            console.log(value);
-            return http.post(url, value);
-        })
-        .then(function(value) {
-            return session.read(value, options);
-        })
-        .then(function(data) {
-            console.log('=>', data ? JSON.stringify(data) : 'empty data received');
-            console.groupEnd();
-            return data;
-        });
+    return session.write(data, options).then(function(value) {
+        return http.post(url, value);
+    }).then(function(value) {
+        return session.read(value, options);
+    }).then(function(data) {
+        console.groupEnd();
+        return data;
+    });
 }
 
 function get(url, options) {
     console.group('http get -', url);
-    console.log('<=');
-    return http.get(url)
-        .then(function(value) {
-            return session.read(value, options);
-        })
-        .then(function(data) {
-            console.log(url, '=>', data ? JSON.stringify(data) : 'empty data received');
-            console.groupEnd();
-            return data;
-        });
+    return http.get(url).then(function(value) {
+        return session.read(value, options);
+    }).then(function(data) {
+        console.groupEnd();
+        return data;
+    });
 }
 
 function authorize() {
