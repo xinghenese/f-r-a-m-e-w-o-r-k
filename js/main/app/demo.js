@@ -21,10 +21,10 @@ var ChatMessageList = require('../components/view/chatview/chatmessagelist');
 
 React.render(
     <Page className="testPage">
-        <DataHolder handler={'BottomSwitcher'} domPath={'/SideList/'}>
-            <DataHolder handler={'TopSearchBar'} domPath={'/SideList/'}>
-                <DataHolder handler={'ConversationList'} domPath={'/SideList/'}>
-                    <DataHolder handler={ChatMessageList} domPath={'/ChatBox/'}/>
+        <DataHolder handler={'BottomSwitcher'} domPath={'/div#SideList.slide1/'}>
+            <DataHolder handler={'TopSearchBar'} domPath={'/div#SideList.slide1/'}>
+                <DataHolder handler={'ConversationList'} domPath={'/div#SideList.slide1/'}>
+                    <DataHolder handler={ChatMessageList} domPath={'/div#ChatBox.box1/'}/>
                 </DataHolder>
             </DataHolder>
         </DataHolder>
