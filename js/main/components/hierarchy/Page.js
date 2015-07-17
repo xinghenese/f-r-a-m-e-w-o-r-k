@@ -17,9 +17,12 @@ module.exports = React.createClass({
     _emitter: emitter.create(),
     _domTree: {},
     componentDidMount: function() {
-        traverse(this.ssRoot, this, this._domTree);
-        console.log('this._domTree: ', this._domTree);
-        var root = reconstructElement(this._domTree);
+//        var ret = traverse(this.ssRoot, this);
+//        console.log('returnValue of traverse: ', ret);
+//        console.log('this._domTree: ', this._domTree);
+//        console.log('equal: ', ret === this._domTree);
+        var root = reconstructElement(this.ssRoot, this);
+
         console.log('root: ', root);
         React.render(root, document.getElementById('content1'));
     },
@@ -36,7 +39,8 @@ module.exports = React.createClass({
 
 
 //private functions
-function reconstructElement(domTree) {
+function reconstructElement(topOwnedNode, OwnerNode) {
+    var domTree = traverse(topOwnedNode, OwnerNode);
     return traverseAndConstruct(domTree);
 }
 
@@ -147,6 +151,8 @@ function traverseAndConstruct(element) {
 
 
 function traverse(element, parent, root) {
+    root = root || {};
+
     if (!_.has(root, 'children')) {
         _.assign(root, {
             entity: element,
