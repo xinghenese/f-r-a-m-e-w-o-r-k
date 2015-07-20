@@ -16,15 +16,10 @@ module.exports = {
             throw new Error('the component ' + this.displayName + ' is not mounted yet.'
                 + ' No owned nodes can be accessed.');
         }
-        return this.refs[this.getSeq()];
+        return this.refs[this.getSeq() || 'top-owned-node'];
     },
-    render: function(element) {
-        if (!React.isValidElement(element)) {
-            return null;
-        }
-        return React.cloneElement(element, {
-            ref: this.getSeq()
-        }, element.props.children);
+    topOwnedNodeProps: function() {
+        return {ref: this.getSeq() || 'top-owned-node'};
     }
 };
 

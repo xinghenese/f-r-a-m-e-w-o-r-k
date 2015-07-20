@@ -62,6 +62,7 @@ function traverseAndRecreateDomTreeObject(element, parent, root) {
     }
 
     React.Children.forEach(element.props.children, function(child) {
+        console.log('traverse-foreach#element: ', element);
         var props = _({})
                 .assign(element.props, child.props, {
                     superUpdateEvent: generateEventTypeByElement(element),
@@ -70,6 +71,7 @@ function traverseAndRecreateDomTreeObject(element, parent, root) {
                 .omit(['children', 'domPath', 'handler'])
                 .value()
             ;
+        console.log('traverse#props: ', props);
         traverseAndRecreateDomTreeObject(React.cloneElement(
             child,
             props
@@ -88,7 +90,17 @@ function cacheElementInDomTreeObject(element, parent, root) {
     var depth = dir.length - path.upwardLevels;
     var elementName = helper.getNodeName(element);
 
-    if (depth >= 0) {
+    console.group(elementName, ': '
+            + _.isString(element.props.handler)
+            ? element.props.handler
+            : helper.getNodeName(element.props.handler)
+    );
+    console.log('props: ', element.props);
+    console.log('parent: ', parent);
+
+    if (depth < 0) {
+        //no insertion;
+    } else {
         _(dir)
             .dropRight(path.upwardLevels)
             .reduce(function(cwd, node) {
@@ -115,7 +127,10 @@ function cacheElementInDomTreeObject(element, parent, root) {
                 return cwd.children[pos];
 
             }, root);
+
+
     }
+    console.groupEnd();
 }
 
 function findChildByType(children, type) {
@@ -141,6 +156,9 @@ function generateEventTypeByElement(element) {
 
 function modifyElement(element) {
     var infos = element.entity.match(/^(.+?)([#.])(.*)$/) || ['', element.entity];
+
+    console.log('element.entity: ', element.entity);
+    console.log('infos: ', infos);
 
     element.entity = _.has(React.DOM, infos[1]) ? infos[1] : 'div';
 
