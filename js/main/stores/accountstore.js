@@ -2,13 +2,13 @@
 
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var EventEmitter = require('events').EventEmitter;
-var assign = require('object-assign');
 var HttpConnection = require('../net/connection/httpconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
 var Config = require('../etc/config');
+var ChangeableStore = require('./changeablestore');
+var keyMirror = require('keymirror');
 var myself = require('../datamodel/myself');
 var userconfig = require('../net/userconfig/userconfig');
 
@@ -19,7 +19,13 @@ var _requestAccount = {
     requestType: 1
 };
 
-var AccountStore = assign({}, EventEmitter.prototype, {
+var VerificationCodeState = keyMirror({
+    NOT_SENT: null,
+    SENT: null,
+    SENT_FAILED: null
+});
+
+var AccountStore = ChangeableStore.extend({
     Events: {
         CHECK_PHONE_STATUS_SUCCESS: 'checkPhoneStatusSuccess',
         CHECK_PHONE_STATUS_ERROR: 'checkPhoneStatusError',
@@ -34,6 +40,8 @@ var AccountStore = assign({}, EventEmitter.prototype, {
         VERIFICATION_CODE_SENT: 'verificationCodeSent',
         VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
     },
+    _error: null,
+    _verificationCodeState: VerificationCodeState.NOT_SENT,
     getCode: function() {
         return _requestAccount.code;
     },
@@ -42,12 +50,17 @@ var AccountStore = assign({}, EventEmitter.prototype, {
     },
     getRequestType: function() {
         return _requestAccount.requestType;
+    },
+    getVerificationCodeState: function() {
+        return this._verificationCodeState;
     }
 });
 
 module.exports = AccountStore;
 
 // module modifications
+AccountStore.VerificationCodeState = VerificationCodeState;
+
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.LOGIN:
@@ -204,7 +217,8 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
         url: "sms/sc",
         data: data
     }).then(function(response) {
-        AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_SENT);
+        AccountStore._verificationCodeState = VerificationCodeState.SENT;
+        AccountStore.emitChange();
     }, function(error) {
         switch (error) {
             case 1: // failed
@@ -219,7 +233,8 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
                 console.log(error);
                 break;
         }
-        AccountStore.emit(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, Lang.requestVerificationCodeFailed);
+        AccountStore._error = Lang.requestVerificationCodeFailed;
+        AccountStore.emitChange();
     });
 }
 
@@ -240,4 +255,3 @@ function _updateAccount(action) {
     _requestAccount.phone = action.phone;
     _requestAccount.requestType = action.requestType;
 }
-

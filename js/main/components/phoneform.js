@@ -12,6 +12,7 @@ var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
+var stores = require('../utils/stores');
 
 var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
@@ -245,6 +246,7 @@ var Countries = [
 ];
 var codeRegex = /\+86/;
 var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
+var requested = false;
 
 var PhoneForm = React.createClass({
     getInitialState: function() {
@@ -252,7 +254,8 @@ var PhoneForm = React.createClass({
             countryName: "中国",
             countryCode: "+86",
             phoneNumber: "",
-            promptInvalidPhone: false
+            promptInvalidPhone: false,
+            verificationState: null
         };
     },
     _focusPhoneInput: function() {
@@ -280,6 +283,12 @@ var PhoneForm = React.createClass({
         });
     },
     _handleSubmit: function() {
+        if (requested) {
+            return;
+        } else {
+            requested = true;
+        }
+
         AccountActions.requestVerificationCode(
             this.state.countryCode,
             this.state.phoneNumber
@@ -316,14 +325,23 @@ var PhoneForm = React.createClass({
         this._focusPhoneInput();
     },
     componentWillMount: function() {
-        AccountStore.on(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
-        AccountStore.on(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
-    },
-    componentWillUnmount: function() {
-        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_SENT, this._handleVerificationCodeSent);
-        AccountStore.removeListener(AccountStore.Events.VERIFICATION_CODE_NOT_SENT, this._handleVerificationCodeNotSent);
+        var self = this;
+        stores.observe(AccountStore, function() {
+            return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
+        }).then(function() {
+            self._handleVerificationCodeSent();
+        });
+        stores.observe(AccountStore, function() {
+            return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.FAILED;
+        }).then(function() {
+            self._handleVerificationCodeNotSent();
+        });
     },
     render: function() {
+        if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {
+            this._handleVerificationCodeSent();
+        }
+
         var login = style.login;
         var loginForm = login.form;
 
