@@ -19,11 +19,17 @@ var _requestAccount = {
     requestType: 1
 };
 
-var VerificationCodeState = keyMirror({
-    NOT_SENT: null,
-    SENT: null,
-    SENT_FAILED: null
-});
+var VerificationCodeState = {
+    NOT_SENT: 0,
+    SENT: 1,
+    SENT_FAILED: 2
+};
+
+var LoginState = {
+    DEFAULT: 0,
+    SUCCESS: 1,
+    FAILED: 2
+};
 
 var AccountStore = ChangeableStore.extend({
     Events: {
@@ -33,17 +39,17 @@ var AccountStore = ChangeableStore.extend({
         CHECK_VERIFICATION_CODE_FAILED: 'checkVerificationCodeFailed',
         REGISTER_SUCCESS: "registerSuccess",
         REGISTER_FAILED: "registerFailed",
-        LOGIN_SUCCESS: 'loginSuccess',
-        LOGIN_FAILED: 'loginFailed',
         LOGOUT_SUCCESS: 'logoutSuccess',
-        LOGOUT_FAILED: 'logoutFailed',
-        VERIFICATION_CODE_SENT: 'verificationCodeSent',
-        VERIFICATION_CODE_NOT_SENT: 'verificationCodeNotSent'
+        LOGOUT_FAILED: 'logoutFailed'
     },
     _error: null,
     _verificationCodeState: VerificationCodeState.NOT_SENT,
+    _loginState: LoginState.DEFAULT,
     getCode: function() {
         return _requestAccount.code;
+    },
+    getLoginState: function() {
+        return this._loginState;
     },
     getPhone: function() {
         return _requestAccount.phone;
@@ -60,6 +66,7 @@ module.exports = AccountStore;
 
 // module modifications
 AccountStore.VerificationCodeState = VerificationCodeState;
+AccountStore.LoginState = LoginState;
 
 AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
@@ -95,9 +102,11 @@ function _handleLoginRequest(action) {
     }).then(function(response) {
         _handleLoginSuccess(response);
         _afterLogin();
-        AccountStore.emit(AccountStore.Events.LOGIN_SUCCESS);
+        AccountStore._loginState = LoginState.SUCCESS;
+        AccountStore.emitChange();
     }, function() {
-        AccountStore.emit(AccountStore.Events.LOGIN_FAILED, Lang.loginFailed);
+        AccountStore._loginState = LoginState.FAILED;
+        AccountStore.emitChange();
     });
 }
 
@@ -203,7 +212,7 @@ function _handleRegisterRequest(action) {
     });
 }
 
-function _handleVerificationCodeRequest(action, successCallback, failureCallback) {
+function _handleVerificationCodeRequest(action) {
     _updateAccount(action);
 
     var code = _removeLeadingPlusSignOfCode(action.code);
@@ -216,7 +225,7 @@ function _handleVerificationCodeRequest(action, successCallback, failureCallback
     HttpConnection.request({
         url: "sms/sc",
         data: data
-    }).then(function(response) {
+    }).then(function() {
         AccountStore._verificationCodeState = VerificationCodeState.SENT;
         AccountStore.emitChange();
     }, function(error) {
