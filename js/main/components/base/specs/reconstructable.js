@@ -11,10 +11,15 @@ var helper = require('../helper/helper');
 
 //core module to export
 module.exports = {
+    componentWillMount: function() {
+        this.shouldReconstruct = true;
+        this.reconstructed = false;
+    },
     render: function(element) {
         if (!React.isValidElement(element)) {
             return null;
         }
+        this.reconstructed = true;
 
         return helper.reconstruct(element, this);
     }

@@ -8,6 +8,7 @@ var React = require('react');
 var mixinSpecs = require('./../helper/helper').mixinSpecs;
 var identifiable = require('./../specs/identifiable');
 var topOwnedNodeReferable = require('./../specs/topownednodereferable');
+var modifiable = require('./../specs/modifiable');
 
 //private fields
 
@@ -20,7 +21,7 @@ module.exports = function(configs) {
               mixins: _(configs.mixins)
                   .slice(0)
                   .push(spec)
-                  .unshift(identifiable, topOwnedNodeReferable)
+                  .unshift(identifiable, modifiable, topOwnedNodeReferable)
                   .value()
             });
         }

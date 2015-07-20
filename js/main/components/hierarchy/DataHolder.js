@@ -44,11 +44,16 @@ module.exports = createReferableClass({
 
 //        var props = _.assign({}, this.props, {event: this.getSeq(), emitter: this.props.emitter});
 
+        var props = _.omit(this.props, ['domPath', 'handler']);
+
         if (React.isValidElement(this.props.handler)) {
-            return this.props.handler;
+            console.log('DataHolder#render#isElement');
+            return React.cloneElement(this.props.handler, props);
         }
+        console.log('DataHolder#render#isClass');
         return React.createElement(
-            this.props.handler
+            this.props.handler,
+            props
         );
     }
 });
