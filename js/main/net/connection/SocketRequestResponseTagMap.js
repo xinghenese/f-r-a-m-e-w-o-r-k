@@ -9,12 +9,13 @@ var _ = require('lodash');
 var tagMap = {
     HSK: 'HSK',
     AUTH: 'AUTH',
+    P: 'P',
     TM: 'SFC'
 };
 
 //core module to export
 module.exports = {
-    getReponseTag: function(tag) {
+    getResponseTag: function(tag) {
         return _.get(tagMap, tag);
     }
 };

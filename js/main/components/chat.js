@@ -36,9 +36,9 @@ var Chat = React.createClass({
         var groupHistoryMessages = MessageStore.getGroupHistoryMessages(426);
         var messages = groupHistoryMessages.getMessages();
         _.forEach(messages, function(message) {
-            var content = message.getContent();
-            console.log(content);
+            //console.log(message);
         });
+        MessageActions.sendTalkMessage(null, "100", null, "1", 1, 0, "1.0");
     },
     componentWillMount: function() {
         // putting it here for test purpose

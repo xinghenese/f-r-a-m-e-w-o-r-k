@@ -8,6 +8,7 @@ var objects = require('../utils/objects');
 
 // exports
 var MessageConstants = {
+    MESSAGE_CONFIRM_TIMEOUT: 5 * 60 * 1000, // 5 minutes
     NEW_TO_OLD: 1,
     OLD_TO_NEW: 2,
     parseMessageDirection: function(direction) {

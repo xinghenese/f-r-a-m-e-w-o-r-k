@@ -12,7 +12,8 @@ var ActionTypes = keyMirror({
     REQUEST_GROUP_MEMBERS: null,
     REQUEST_HISTORY_MESSAGES: null,
     REQUEST_VERIFICATION_CODE: null,
-    REQUEST_VOICE_VERIFICATION_CODE: null
+    REQUEST_VOICE_VERIFICATION_CODE: null,
+    SEND_TALK_MESSAGE: null
 });
 
 module.exports = ActionTypes;

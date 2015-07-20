@@ -16,6 +16,7 @@ module.exports = filter.create({
      * @returns {Object}
      */
     'processReadable': function(value, options) {
+        console.log("=> " + value);
         return JSON.parse(value.replace(/^[^{]*?\{/, '{').replace(/[\r\n]/gm, ''));
     },
     /**
@@ -25,6 +26,8 @@ module.exports = filter.create({
      * @returns {String}
      */
     'processWritable': function(value, options) {
-        return JSON.stringify(value);
+        var result = JSON.stringify(value);
+        console.log("<= " + result);
+        return result;
     }
 });

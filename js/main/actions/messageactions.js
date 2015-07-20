@@ -13,5 +13,17 @@ module.exports = {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_HISTORY_MESSAGES
         });
+    },
+    sendTalkMessage: function(groupId, toUserId, atUserId, content, conversationType, messageType, version) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.SEND_TALK_MESSAGE,
+            groupId: groupId,
+            toUserId: toUserId,
+            atUserId: atUserId,
+            content: content,
+            conversationType: conversationType,
+            messageType: messageType,
+            version: version
+        });
     }
 };

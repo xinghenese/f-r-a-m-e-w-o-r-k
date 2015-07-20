@@ -79,11 +79,13 @@ module.exports = {
 
 //private functions
 function chain() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduce(args, function(memo, method) {
+        var args = _.toArray(arguments);
+        return _.reduce(methods, function(memo, method) {
             if (_.isFunction(method)) {
+//                return method.apply(this, _.unshift(args, memo));
                 return method.call(this, memo);
             }
             return memo;
@@ -92,11 +94,13 @@ function chain() {
 }
 
 function chainRight() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduceRight(args, function(memo, method) {
+        var args = _.toArray(arguments);
+        return _.reduceRight(methods, function(memo, method) {
             if (_.isFunction(method)) {
+//                return method.apply(this, _.unshift(args, memo));
                 return method.call(this, memo);
             }
             return memo;
@@ -105,68 +109,74 @@ function chainRight() {
 }
 
 function sequence() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduce(args, function(memo, method) {
+        var args = _.toArray(arguments);
+        return _.reduce(methods, function(memo, method) {
             if (_.isFunction(method)) {
-                method.call(this);
+                method.apply(this, args);
             }
         }, void 0, this);
     };
 }
 
 function sequenceRight() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduceRight(args, function(memo, method) {
+        var args = _.toArray(arguments);
+        return _.reduceRight(methods, function(memo, method) {
             if (_.isFunction(method)) {
-                method.call(this);
+                method.apply(this, args);
             }
         }, void 0, this);
     };
 }
 
 function merge() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduce(args, function(memo, method) {
-            method = _.isFunction(method) ? method.call(this) : method;
+        var args = _.toArray(arguments);
+        return _.reduce(methods, function(memo, method) {
+            method = _.isFunction(method) ? method.apply(this, args) : method;
             return _.assign(memo, _.toPlainObject(method));
         }, {}, this);
     };
 }
 
 function mergeRight() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduceRight(args, function(memo, method) {
-            method = _.isFunction(method) ? method.call(this) : method;
+        var args = _.toArray(arguments);
+        return _.reduceRight(methods, function(memo, method) {
+            method = _.isFunction(method) ? method.apply(this, args) : method;
             return _.assign(memo, _.toPlainObject(method));
         }, {}, this);
     };
 }
 
 function queue() {
-    var args = _.toArray(arguments);
+    var methods = _(arguments).rest().value();
 
     return function() {
-        return _.reduce(args, function(memo, method) {
-            method = _.isFunction(method) ? method.call(this) : method;
+        var args = _.toArray(arguments);
+        return _.reduce(methods, function(memo, method) {
+            method = _.isFunction(method) ? method.apply(this, args) : method;
             return _(memo).push(method).value();
         }, [], this);
     };
 }
 
 function queueRight() {
-    var args = _.toArray(arguments);
+    var methods = _.toArray(arguments);
 
     return function() {
-        return _.reduceRight(args, function(memo, method) {
-            method = _.isFunction(method) ? method.call(this) : method;
+        var args = _.toArray(arguments);
+        return _.reduceRight(methods, function(memo, method) {
+            method = _.isFunction(method) ? method.apply(this, args) : method;
             return _(memo).push(method).value();
         }, [], this);
     };

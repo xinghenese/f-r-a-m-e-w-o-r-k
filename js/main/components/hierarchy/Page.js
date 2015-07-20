@@ -5,20 +5,24 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var helper = require('../base/helper/helper');
-var paths = require('../../utils/paths');
-var emitter = require('../../utils/eventemitter');
-var createReconstructableClass = require('../base/creator/createReconstructableClass');
+var eventEmitter = require('../../utils/eventemitter');
+var createGenerator = require('../base/creator/createReactClassGenerator');
+var reconstructable = require('../base/specs/reconstructable');
+//var modifiable = require('../base/specs/modifiable');
+var namespaceEnable = require('../base/specs/namespaceEnable');
+var stylizable = require('../base/specs/stylizable');
 
 //private fields
-
+var createReconstructableClass = createGenerator({
+    mixins: [stylizable, namespaceEnable, reconstructable]
+});
 
 //core module to export
 module.exports = createReconstructableClass({
-    _emitter: emitter.create(),
     render: function() {
+        var emitter = eventEmitter.create();
         var children = React.Children.map(this.props.children, function(child) {
-            return React.cloneElement(child, {emitter: this._emitter});
+            return React.cloneElement(child, {emitter: emitter});
         }, this);
         return <div {...this.props}>{children}</div>;
     }
@@ -28,157 +32,3 @@ module.exports = createReconstructableClass({
 
 
 //private functions
-function reconstructElement(topOwnedNode, OwnerNode) {
-    var domTree = traverse(topOwnedNode, OwnerNode);
-    return traverseAndConstruct(domTree);
-}
-
-//cache the element in root {module.exports._domTree.root}.
-function cacheElement(element, parent, root) {
-    var path = paths.parsePath(element.props.domPath || './');
-    var dir = (path.relativeDirectory === paths.CWD
-            && element.props.dir || []
-        ).concat(path.subPath);
-    var depth = dir.length - path.upwardLevels;
-    var elementName = helper.getNodeName(element);
-
-    console.group(elementName, ': '
-        + _.isString(element.props.handler)
-            ? element.props.handler
-            : helper.getNodeName(element.props.handler)
-    );
-    console.log('props: ', element.props);
-    console.log('parent: ', parent);
-
-    if (depth < 0) {
-        //no insertion;
-    } else {
-        _(dir)
-            .dropRight(path.upwardLevels)
-            .reduce(function(cwd, node) {
-                //reach the end of dir array.
-                if (!node) {
-                    var pos2 = findChildByType(cwd.children, element);
-
-                    if (pos2 < 0) {
-                        pos2 = cwd.children.push({
-                            entity: element,
-                            children: []
-                        }) - 1;
-                    }
-                    return cwd.children[pos2];
-                }
-
-                var pos = findChildByType(cwd.children, node);
-                if (pos < 0) {
-                    pos = cwd.children.push({
-                        entity: node,
-                        children: []
-                    }) - 1;
-                }
-                return cwd.children[pos];
-
-            }, root);
-
-
-    }
-    console.groupEnd();
-}
-
-
-function attachElement(cwd, element, name) {
-    name = name || helper.getNodeName(element);
-
-    if (React.isValidElement(cwd)) {
-        return React.cloneElement(
-            cwd,
-            null,
-            cwd.props.children,
-            element
-        )
-    }
-    if (!_.has(cwd, name)) {
-        return _.set(cwd, name, element);
-    }
-    var elements = _.get(cwd, name);
-    var elementsArray = _.isArray(elements) ? elements : [elements];
-    elementsArray.push(element);
-    return _.set(cwd, name, elementsArray);
-}
-
-
-function findChildByType(children, type) {
-    for (var i = 0, len = children.length; i < len; i ++) {
-        if (children[i] && children[i].entity === type) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-function traverseAndConstruct(element) {
-    if (!element || _.isEmpty(element) || !element.entity) {
-        return void 0;
-    }
-    if (!element.children || !_.isArray(element.children)) {
-        return element.entity;
-    }
-
-    var children;
-
-    if (!_.isEmpty(element.children) ) {
-        children = _.map(element.children, function(child) {
-            return traverseAndConstruct(child);
-        });
-    }
-
-    if (React.isValidElement(element.entity)) {
-        return React.cloneElement(element.entity, element.props, children);
-    }
-    return React.createElement(element.entity, element.props, children);
-}
-
-
-function traverse(element, parent, root) {
-    root = root || {};
-
-    if (!_.has(root, 'children')) {
-        _.assign(root, {
-            entity: element,
-            children: []
-        });
-    } else {
-        cacheElement(element, parent, root);
-    }
-
-    React.Children.forEach(element.props.children, function(child) {
-        console.log('traverse-foreach#element: ', element);
-        var props = _({})
-            .assign(element.props, child.props, {
-                    superUpdateEvent: generateEventTypeByElement(element),
-                    updateEvent: generateEventTypeByElement(child)
-                })
-            .omit(['children', 'domPath', 'handler'])
-            .value()
-        ;
-        console.log('traverse#props: ', props);
-        traverse(React.cloneElement(
-            child,
-            props
-        ), element, root);
-    });
-
-    return root;
-}
-
-function generateEventTypeByElement(element) {
-    var path = element.props.domPath || '';
-    var nodeName = helper.getNodeName(element) + '/';
-    var handler = element.props.handler;
-    var handlerName = handler || '';
-    if (_.has(handler, 'displayName')) {
-        handlerName = handler.displayName || '';
-    }
-
-    return path + nodeName + handlerName;
-}

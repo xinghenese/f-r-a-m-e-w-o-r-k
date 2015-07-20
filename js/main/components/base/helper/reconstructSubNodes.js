@@ -68,7 +68,7 @@ function traverseAndRecreateDomTreeObject(element, parent, root) {
                     superUpdateEvent: generateEventTypeByElement(element),
                     updateEvent: generateEventTypeByElement(child)
                 })
-                .omit(['children', 'domPath', 'handler'])
+                .omit(['children', 'domPath', 'handler', 'className', 'style', 'id'])
                 .value()
             ;
         console.log('traverse#props: ', props);
@@ -83,7 +83,10 @@ function traverseAndRecreateDomTreeObject(element, parent, root) {
 
 //cache the element in root {module.exports._domTree.root}.
 function cacheElementInDomTreeObject(element, parent, root) {
-    var path = paths.parsePath(element.props.domPath || './');
+    var path = paths.parsePath(element.props.domPath
+        && element.props.domPath + '/'
+        || './'
+    );
     var dir = (path.relativeDirectory === paths.CWD
         && element.props.dir || []
         ).concat(path.subPath);
@@ -156,6 +159,9 @@ function generateEventTypeByElement(element) {
 
 function modifyElement(element) {
     var infos = element.entity.match(/^(.+?)([#.])(.*)$/) || ['', element.entity];
+
+    console.log('element.entity: ', element.entity);
+    console.log('infos: ', infos);
 
     element.entity = _.has(React.DOM, infos[1]) ? infos[1] : 'div';
 

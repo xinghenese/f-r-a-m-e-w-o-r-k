@@ -17,10 +17,10 @@ module.exports = {
         var index = _.get(indexMap, className) || 0;
 
         _.set(indexMap, className, index + 1);
-        this._seq = hyphenFormalize(className) + '-' + index + '-';
+        this._seq = this._seq || hyphenFormalize(className) + '-' + index + '-';
     },
     getSeq: function() {
-        return this._seq;
+        return createSeqIfNotExists(this);
     }
 };
 
@@ -28,6 +28,17 @@ module.exports = {
 
 
 //private functions
+function createSeqIfNotExists(component) {
+    if (!component._seq) {
+        var className = component.constructor.displayName;
+        var index = _.get(indexMap, className) || 0;
+
+        _.set(indexMap, className, index + 1);
+        component._seq = hyphenFormalize(className) + '-' + index + '-';
+    }
+    return component._seq;
+}
+
 function hyphenFormalize(str) {
     return ('' + str).replace(/[A-Z]/g, function(match, offset) {
         return (offset ? '-' : '') + match.toLowerCase();
