@@ -37,15 +37,6 @@ var Chat = React.createClass({
             //console.log(message);
         });
         MessageActions.sendTalkMessage(null, "100", null, "1", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "2", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "3", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "4", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "5", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "6", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "7", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "8", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "9", 1, 0, "1.0");
-        MessageActions.sendTalkMessage(null, "100", null, "10", 1, 0, "1.0");
     },
     componentWillMount: function() {
         // putting it here for test purpose
