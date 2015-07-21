@@ -30,6 +30,8 @@ module.exports = createReferableClass({
 
         if (event && eventEmitter.isPrototypeOf(emitter)) {
             emitter.on(event, function(data) {
+                console.log('event: ', event);
+                console.log('data: ', data);
                 self.getTopOwnedNode().setState({data: data});
             });
         }
@@ -38,6 +40,7 @@ module.exports = createReferableClass({
         if (!this.props.handler) {
             return null;
         }
+        console.log('seq: ', this.getSeq());
 
         var className = this.props.className || getTagName(this.props.handler).toLowerCase();
         var props = _(this.props)
@@ -57,6 +60,8 @@ module.exports = createReferableClass({
                 _.set(props, hook, this._updateStateAndNotify);
             }, this);
         }
+
+        console.log('props: ', props);
 
         if (React.isValidElement(this.props.handler)) {
             return React.cloneElement(this.props.handler, props);

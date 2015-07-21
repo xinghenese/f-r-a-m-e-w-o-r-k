@@ -15,6 +15,7 @@ module.exports = {
         console.log('stylizable#className: ', child.props.className);
 
         var style = child.props.style;
+        console.log('style: ', style);
         if (!style || _.isEmpty(style)) {
             return;
         }
