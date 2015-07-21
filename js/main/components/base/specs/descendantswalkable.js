@@ -8,9 +8,9 @@ var React = require('react');
 var helper = require('../helper/helper');
 
 //core module to export
-module.exports = helper.modifyDescendants({
+module.exports = {
     displayName: 'DescendantsWalkable',
-    modifyDescendants: function(child, path) {
+    descendantsProps: function(child, path) {
         return {
             ref: (this._seq || '') + 'child-' + path.join('-')
         }
@@ -20,4 +20,4 @@ module.exports = helper.modifyDescendants({
             return process.call(this, element, memo);
         }, result, this);
     }
-});
+};

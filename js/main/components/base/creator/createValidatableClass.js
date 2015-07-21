@@ -15,7 +15,7 @@ var createGenerator = require('./createReactClassGenerator');
 
 //core module to export
 module.exports = createGenerator({
-    mixins: [referable, validatable]
+    mixins: [validatable]
 });
 
 //module initialization
