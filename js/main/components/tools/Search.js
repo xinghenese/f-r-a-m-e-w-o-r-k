@@ -15,7 +15,6 @@ var emitter = require('../../utils/eventemitter.thenable');
 //core module to export
 var Search = React.createClass({
     propTypes: {
-        datasource: React.PropTypes.array,
         searchFunction: React.PropTypes.func
     },
     render: function() {
@@ -34,29 +33,16 @@ var Search = React.createClass({
 
 module.exports = Search;
 
-//module initialization
-//var hierarchy = (
-//    <Store>
-//        <BottomSwitcher handler={super.data.switch}>
-//            <TopSearchBar handler={super.data.search}>
-//                <LeftListSwitcher handler={super.data.switch}>
-//                    <RightList />
-//                </LeftListSwitcher>
-//            </TopSearchBar>
-//        </BottomSwitcher>
-//    </Store>
-//);
-
 //private functions
 function startSearch(search, event) {
     var searchText = event.target.value;
-    var searchFunction = search.props.searchFunction || function(data) {
-        return _.some(data, function(value) {
-            return ('' + value).indexOf(searchText) > -1;
-        })
+    var searchFunction = search.props.searchFunction || function(datas, key) {
+        return ('' + key).indexOf(searchText) > -1;
     };
 
     if (search.props.datasource) {
+        console.log('datasource: ', search.props.datasource);
+
         return _.filter(search.props.datasource, searchFunction);
     }
     return null;
@@ -68,6 +54,6 @@ function onchange(search) {
         var result = startSearch(search, event);
         console.log('result: ', result);
         console.groupEnd();
-        emitter.emit('changeList', result);
+        search.props.onChange(result);
     }
 }

@@ -11,13 +11,18 @@ var State = Router.State;
 var ChatActions = require('../actions/chatactions');
 var ChatStore = require('../stores/chatstore');
 var GroupActioins = require('../actions/groupactions');
-var ConversationBox = require('./view/conversationlistview/conversationbox');
-var ChatMessageBox = require('./view/chatview/chatmessagebox');
 var MessageActions = require('../actions/messageactions');
 var MessageStore = require('../stores/messagestore');
 var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
+var Lang = require('../locales/zh-cn');
+var Page  = require('./hierarchy/Page');
+var DataHolder = require('./hierarchy/DataHolder');
+var Search = require('./tools/Search');
+var ConversationList = require('./view/conversationlistview/conversationlist');
+var ChatMessageList = require('./view/chatview/chatmessagelist');
+var ConversationAndUserStore = require('../stores/ConversationAndUserStore');
 
 // exports
 var Chat = React.createClass({
@@ -53,11 +58,29 @@ var Chat = React.createClass({
         MessageStore.removeListener(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
     },
     render: function() {
+        var data = _.get(ConversationAndUserStore, 'ConversationStore');
+        var style = {
+            conversationBox: require('../style/conversationlist'),
+            chatBox: require('../style/chatmessage')
+        };
         return (
-            <div>
-                <ChatMessageBox />
-                <ConversationBox />
-            </div>
+            <Page className="chat" store={data} namespace="chat" style={style}>
+                <DataHolder
+                    handler={Search}
+                    props={{defaultValue: Lang.search}}
+                    updateHook={'onChange'}
+                    domPath={'/div#SideList.conversation-box/div.header/div.searchbar'}
+                >
+                    <DataHolder
+                        handler={ConversationList}
+                        domPath={'/div#SideList.conversation-box/'}
+                        updateHook={'onSelect'}
+                    >
+                        <div className={'header'} domPath={'/div#mainBox.chat-box/'} />
+                        <DataHolder handler={ChatMessageList} domPath={'/div#mainBox.chat-box/'} />
+                    </DataHolder>
+                </DataHolder>
+            </Page>
         );
     }
 });
@@ -69,6 +92,7 @@ function modifyPageStyle() {
     setStyle(document.body.style, {background: '#e7ebf0'});
     setStyle(document.getElementById('header').style, {display: 'none'});
     setStyle(document.getElementById('content').style, {
+        position: 'relative',
         width: '1000px',
         margin: '0 auto',
         background: '#fff'
