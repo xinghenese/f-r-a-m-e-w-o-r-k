@@ -3,7 +3,9 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
+var helper = require('../helper/helper');
 
 //private fields
 
@@ -19,8 +21,13 @@ module.exports = {
         var props;
 
         if (_.isFunction(this.descendantsProps)) {
-            children = traverse.processAllSubNodes(
-                this, this.descendantsProps, this
+            children = helper.processAllSubNodes(
+                //element.props.children would refer to the new children structure
+                //while this.props.children holds the original one. so it's necessary
+                //to pick out the right root where the traverse starts.
+                this.shouldReconstruct && this.reconstructed ? element : this,
+                this.descendantsProps,
+                this
             );
         }
 

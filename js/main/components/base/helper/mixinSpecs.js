@@ -12,6 +12,8 @@ var policyName = composite.policyName;
 var defaultConflictPolicy = {
     getInitialState: policyName.MERGE,
     getDefaultProps: policyName.MERGE,
+    descendantsProps: policyName.MERGE,
+    topOwnedNodeProps: policyName.MERGE,
     componentWillMount: policyName.SEQUENCE,
     componentDidMount: policyName.SEQUENCE,
     componentWillReceiveProps: policyName.SEQUENCE,
