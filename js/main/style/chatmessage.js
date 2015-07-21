@@ -4,9 +4,10 @@
 
 //core module to export
 module.exports = {
-    float: "right",
+    position: 'absolute',
     width: "700px",
-    position: "relative",
+    top: '0',
+    right: '0',
     //header
     header: {
         background: "#fafafa",

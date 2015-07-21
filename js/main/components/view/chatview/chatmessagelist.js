@@ -12,22 +12,31 @@ var index = 0;
 
 //core module to export
 var ChatMessageList = React.createClass({
+    getInitialState: function() {
+        return {data: null};
+    },
     render: function() {
-        var chatMessageNodes = _.map(this.props.data, function(data) {
-            return (
-                <ChatMessage
+        var inlineStyle = this.props.style || {};
+        var chatMessageNodes = null;
+
+        if (this.state.data) {
+            chatMessageNodes = _.map(this.state.data, function(data) {
+                return (
+                    <ChatMessage
                     key={prefix + (index++)}
                     time={data.time}
                     senderName={data.senderName}
                     senderAvatar={data.senderAvatar}
-                    style={this.props.style.chatmessage}
+                    style={inlineStyle.chatmessage}
                     >
                     {data.message}
-                </ChatMessage>
-            );
-        }, this);
+                    </ChatMessage>
+                    );
+            }, this);
+        }
+
         return (
-            <div className="chat-message-list" style={makeStyle(this.props.style)}>
+            <div className="chat-message-list" style={makeStyle(inlineStyle)}>
                 {chatMessageNodes}
             </div>
         )

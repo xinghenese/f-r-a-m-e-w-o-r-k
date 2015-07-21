@@ -23,12 +23,8 @@ module.exports = {
         var inheritedStyle = parentStyle && !_.isEmpty(parentStyle) ? parentStyle : rootStyle;
         var camelClassName = _.camelCase(className);
 
-        console.log('inheritedStyle: ', inheritedStyle);
-        console.log('camelClassName: ', camelClassName);
-
         if (_.has(inheritedStyle, camelClassName)) {
             var rawStyle = _.get(inheritedStyle, camelClassName);
-            console.log('style: ', rawStyle);
             _.assign(props, {
                 rawStyle: rawStyle,
                 style: rawStyle

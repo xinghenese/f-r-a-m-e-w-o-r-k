@@ -11,7 +11,7 @@ var makeStyle = require('../../../style/styles').makeStyle;
 //core module to export
 var ChatMessage =  React.createClass({
   render: function(){
-    var inlineStyle = this.props.style;
+    var inlineStyle = this.props.style || {};
     return (
       <div className="chat-message" style={makeStyle(style, inlineStyle)}>
         <a
