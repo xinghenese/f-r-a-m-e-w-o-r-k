@@ -24,7 +24,7 @@ User.prototype.listedInContacts = function() {
 };
 
 User.prototype.getNickname = function() {
-    return this._data["nn"];
+    return this._data["unk"];
 };
 
 User.prototype.picture = function() {

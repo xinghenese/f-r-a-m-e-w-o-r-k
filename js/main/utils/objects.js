@@ -31,6 +31,20 @@ module.exports = {
         }
         return false;
     },
+    hasHierarchicalProps: function(obj, hierarchicalProps) {
+        var first = _.first(hierarchicalProps);
+        var rest = _.rest(hierarchicalProps);
+        if (!this.hasProperty(obj, first)) {
+            return false;
+        } else if (_.isEmpty(rest)) {
+            return true;
+        } else {
+            return this.hasHierarchicalProps(obj[first], rest);
+        }
+    },
+    hasProperty: function(obj, prop) {
+        return _.isPlainObject(obj) && prop in obj;
+    },
     mergeObjects: function(obj1, obj2) {
         var result = {};
         for (var attr in obj1) {

@@ -11,6 +11,7 @@ var makeStyle = require('../../../style/styles').makeStyle;
 var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
 var groups = require('../../../datamodel/groups');
+var users = require('../../../datamodel/users');
 var MessageStore = require('../../../stores/messagestore');
 
 //core module to export
@@ -22,8 +23,6 @@ var ConversationBox = React.createClass({
     },
     _updateMessages: function() {
         var messages = _getLastMessages();
-        console.log("update list");
-        console.log(messages);
         this.setState({
             data: messages
         });
@@ -66,21 +65,53 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = _.map(lastMessages, function(item) {
+    var result = [];
+    _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
-            var group = groups.getGroup(item.groupId);
-            var groupName = group.name();
-            var avatar = group.picture();
-            var message = item.message.getContent();
-            var time = (new Date()).toLocaleTimeString();
-            return {
-                senderName: groupName,
-                senderAvatar: avatar,
-                message: message,
-                time: time
-            };
+            _buildGroupRenderObject(item, result);
+        } else {
+            _buildUserRenderObject(item, result);
         }
     });
-    console.log(result);
     return result;
+}
+
+function _buildGroupRenderObject(item, collector) {
+    var group = groups.getGroup(item.groupId);
+    if (!group) {
+        return;
+    }
+    var groupName = group.name();
+    var avatar = group.picture();
+    var message = "";
+    if (item.message) {
+        message = item.message.getContent();
+    }
+    var time = (new Date()).toLocaleTimeString();
+    collector.push({
+        senderName: groupName,
+        senderAvatar: avatar,
+        message: message,
+        time: time
+    });
+}
+
+function _buildUserRenderObject(item, collector) {
+    var user = users.getUser(item.userId);
+    if (!user) {
+        return;
+    }
+    var userName = user.getNickname();
+    var avatar = user.picture();
+    var message = "";
+    if (item.message) {
+        message = item.message.getContent();
+    }
+    var time = (new Date()).toLocaleTimeString();
+    collector.push({
+        senderName: userName,
+        senderAvatar: avatar,
+        message: message,
+        time: time
+    });
 }
