@@ -4,7 +4,7 @@
 
 //dependencies
 var React = require('react');
-var style = require('../../../style/conversationlist');
+//var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
 
@@ -14,22 +14,23 @@ var setStyle = require('../../../style/styles').setStyle;
 //core module to export
 var ConversationListItem = React.createClass({
     render: function() {
-        var currentStyle = style.conversationlist.item.default;
+        var itemStyle = this.props.style || {};
+        var currentStyle = itemStyle.default;
 
         if (this.props.selected) {
-            currentStyle = style.conversationlist.item.active;
+            currentStyle = itemStyle.active;
         }
 
         return (
           <li className="conversation-list-item"
               id={this.props.index}
-              style={makeStyle(style.conversationlist.item, currentStyle)}
+              style={makeStyle(itemStyle, currentStyle)}
               onClick={this.props.onSelect}
               onMouseEnter={onhoverin(this)}
               onMouseLeave={onhoverout(this)}>
               <a
                   className="conversation-list-item-avatar"
-                  style={makeStyle(style.conversationlist.item.avatar)}
+                  style={makeStyle(itemStyle.avatar)}
               >
                 <img
                     alt={this.props.senderName}
@@ -40,17 +41,17 @@ var ConversationListItem = React.createClass({
               </a>
               <div
                   className="conversation-list-item-time"
-                  style={makeStyle(style.conversationlist.item.time)}
+                  style={makeStyle(itemStyle.time)}
               >
                   {this.props.time}
               </div>
               <div className="conversation-list-item-body">
                   <div className="conversation-list-item-nickname"
-                  style={makeStyle(style.conversationlist.item.title)}>
+                  style={makeStyle(itemStyle.title)}>
                       {this.props.senderName}
                   </div>
                   <p className="conversation-list-item-content"
-                      style={makeStyle(style.conversationlist.item.message)}>
+                      style={makeStyle(itemStyle.message)}>
                       {this.props.children}
                   </p>
               </div>
@@ -68,7 +69,7 @@ module.exports = ConversationListItem;
 function onhoverin(item) {
     return function(event) {
         if (!item.props.selected) {
-            setStyle(event.currentTarget.style, style.conversationlist.item.hover);
+            setStyle(event.currentTarget.style, item.props.style.hover);
         }
     };
 }
@@ -76,7 +77,7 @@ function onhoverin(item) {
 function onhoverout(item) {
     return function(event) {
         if (!item.props.selected) {
-            setStyle(event.currentTarget.style, style.conversationlist.item.default);
+            setStyle(event.currentTarget.style, item.props.style.default);
         }
     };
 }

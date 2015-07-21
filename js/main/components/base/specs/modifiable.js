@@ -17,8 +17,8 @@ module.exports = {
             return null;
         }
 
-        var children;
-        var props;
+        var children = element.props.children;
+        var props = null;
 
         if (_.isFunction(this.descendantsProps)) {
             children = helper.processAllSubNodes(

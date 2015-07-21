@@ -18,11 +18,10 @@ var groups = {
         return this._cursor;
     },
     getGroup: function(groupId) {
+        var groupIdInt = parseInt(groupId);
         var group = _.find(this._groups, function(group) {
-            return group.getGroupId() === groupId;
+            return group.getGroupId() === groupIdInt;
         });
-        console.log("group");
-        console.log(group);
         return group;
     },
     removeGroup: function(groupId) {

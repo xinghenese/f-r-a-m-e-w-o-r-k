@@ -5,6 +5,7 @@
 
 // dependencies
 var _ = require('lodash');
+var objects = require('../utils/objects');
 
 // exports
 function Message(data) {
@@ -31,7 +32,13 @@ Message.prototype.getAtUserId = function() {
 };
 
 Message.prototype.getContent = function() {
-    return this._data["msg"]["t"];
+    if (objects.hasHierarchicalProps(this._data, ["msg", "t"])) {
+        return this._data["msg"]["t"];
+    } else {
+        // todo
+        // generate content
+        return "非文本消息";
+    }
 };
 
 Message.prototype.getUuid = function() {

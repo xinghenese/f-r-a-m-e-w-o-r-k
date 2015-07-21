@@ -8,6 +8,7 @@ var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
+var stores = require('../utils/stores');
 
 var CodeForm = React.createClass({
     getInitialState: function() {
@@ -49,12 +50,17 @@ var CodeForm = React.createClass({
         this._focusInput();
     },
     componentWillMount: function() {
-        AccountStore.on(AccountStore.Events.LOGIN_SUCCESS, this.props.onLoginSuccess);
-        AccountStore.on(AccountStore.Events.LOGIN_FAILED, this._handleLoginFailed);
-    },
-    componentWillUnmount: function() {
-        AccountStore.removeListener(AccountStore.Events.LOGIN_SUCCESS, this.props.onLoginSuccess);
-        AccountStore.removeListener(AccountStore.Events.LOGIN_FAILED, this._handleLoginFailed);
+        var self = this;
+        stores.observe(AccountStore, function() {
+            return AccountStore.getLoginState() === AccountStore.LoginState.SUCCESS;
+        }).then(function() {
+            self.props.onLoginSuccess();
+        });
+        stores.observe(AccountStore, function() {
+            return AccountStore.getLoginState() === AccountStore.LoginState.FAILED;
+        }).then(function() {
+            self._handleLoginFailed();
+        });
     },
     render: function() {
         var login = style.login;

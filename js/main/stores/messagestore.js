@@ -16,9 +16,10 @@ var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
 var socketconnection = require('../net/connection/socketconnection');
+var ChangeableStore = require('./changeablestore');
 
 // exports
-var MessageStore = assign({}, EventEmitter.prototype, {
+var MessageStore = ChangeableStore.extend({
     Events: {
         HISTORY_MESSAGES_RECEIVED: "historyMessagesReceived",
         HISTORY_MESSAGES_MISSED: "historyMessagesMissed"
@@ -33,6 +34,9 @@ var MessageStore = assign({}, EventEmitter.prototype, {
     },
     getGroupHistoryMessages: function(groupId) {
         return this._groupHistoryMessages[groupId];
+    },
+    getLastMessages: function() {
+        return _collectLastMessages();
     },
     getPrivateHistoryMessages: function(userId) {
         return this._privateHistoryMessages[userId];
@@ -54,6 +58,27 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 });
 
 // private functions
+function _collectLastMessages() {
+    var messages = [];
+    _.forEach(MessageStore._groupHistoryMessages, function(value, key) {
+        if (!_.isEmpty(value)) {
+            messages.push({
+                groupId: key,
+                message: _.last(value.getMessages())
+            });
+        }
+    });
+    _.forEach(MessageStore._privateHistoryMessages, function(value, key) {
+        if (!_.isEmpty(value)) {
+            messages.push({
+                userId: key,
+                message: _.last(value.getMessages())
+            });
+        }
+    });
+    return messages;
+}
+
 function _handleHistoryMessagesRequest(action) {
     socketconnection.request({
         tag: "HM",
@@ -70,7 +95,7 @@ function _handleHistoryMessagesRequest(action) {
         }
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
-        MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_RECEIVED);
+        MessageStore.emitChange();
     }, function(error) {
         MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_MISSED, error);
     });

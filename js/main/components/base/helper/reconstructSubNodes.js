@@ -66,9 +66,10 @@ function traverseAndRecreateDomTreeObject(element, parent, root) {
         var props = _({})
                 .assign(element.props, child.props, {
                     superUpdateEvent: generateEventTypeByElement(element),
-                    updateEvent: generateEventTypeByElement(child)
+                    updateEvent: generateEventTypeByElement(child),
+                    data: element.props.data || element.props.store
                 })
-                .omit(['children', 'domPath', 'handler', 'className', 'style', 'id'])
+                .omit(['children', 'domPath', 'handler', 'className', 'style', 'id', 'props'])
                 .value()
             ;
         console.log('traverse#props: ', props);
@@ -114,7 +115,11 @@ function cacheElementInDomTreeObject(element, parent, root) {
                     if (pos2 < 0) {
                         pos2 = cwd.children.push({
                             entity: element,
-                            children: []
+                            children: [],
+                            props: {
+                                className: element.props.className
+                                    || getHandlerName(element.props.handler).toLowerCase()
+                            }
                         }) - 1;
                     }
                     return cwd.children[pos2];
@@ -148,11 +153,7 @@ function findChildByType(children, type) {
 function generateEventTypeByElement(element) {
     var path = element.props.domPath || '';
     var nodeName = helper.getNodeName(element) + '/';
-    var handler = element.props.handler;
-    var handlerName = handler || '';
-    if (_.has(handler, 'displayName')) {
-        handlerName = handler.displayName || '';
-    }
+    var handlerName = getHandlerName(element.props.handler);
 
     return path + nodeName + handlerName;
 }
@@ -186,4 +187,17 @@ function modifyElement(element) {
     }
 
     return element;
+}
+
+function getHandlerName(handler) {
+    if (!handler) {
+        return '';
+    }
+    if (_.isString(handler)) {
+        return handler;
+    }
+    if (_.isFunction(handler)) {
+        return handler.displayName || handler.tagName || 'component'
+    }
+    return helper.getNodeName(handler);
 }
