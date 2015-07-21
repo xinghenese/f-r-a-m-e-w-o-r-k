@@ -117,7 +117,7 @@ function _afterLogin() {
 
 function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "uid", myself, "uid");
-    objects.copyValuedProp(response, "nn", myself, "nickname");
+    objects.copyValuedProp(response, "unk", myself, "nickname");
     objects.copyValuedProp(response, "pt", myself, "avatar");
     objects.setTruePropIfNotZero(myself, "hasPassword", response.hp);
     objects.setTruePropIfNotZero(myself, "autoPlayDynamicEmotion", response.eape);
@@ -170,7 +170,7 @@ function _handleRegisterRequest(action) {
     var data = {
         mid: action.phone,
         cc: code,
-        nn: action.nickname,
+        unk: action.nickname,
         dv: action.device,
         di: action.deviceInfo,
         os: action.os
