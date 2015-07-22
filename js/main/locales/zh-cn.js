@@ -27,5 +27,17 @@ module.exports = {
     "send": "发送",
     "accessory": "附",
     "chatMessageInputTips": "按下Enter换行，Ctrl+Enter发送",
-    "search": "搜索"
+    "search": "搜索",
+
+    // text alternatives of non-text messages
+    "unknownMessage": "[未知消息]",
+    "pictureMessage": "[图片消息]",
+    "audioMessage": "[声音消息]",
+    "locationMessage": "[位置消息]",
+    "vibrationMessage": "[震]",
+    "systemMessage": "[系统消息]",
+    "emotionMessage": "[表情消息]",
+    "predefinedMessage": "[预定义消息]",
+    "contactMessage": "[名片消息]",
+    "groupCardMessage": "[群名片消息]"
 };

@@ -85,7 +85,7 @@ function _buildGroupRenderObject(item, collector) {
     var avatar = group.picture();
     var message = "";
     if (item.message) {
-        message = item.message.getContent();
+        message = item.message.getBriefText();
     }
     var time = (new Date()).toLocaleTimeString();
     collector.push({
@@ -105,7 +105,7 @@ function _buildUserRenderObject(item, collector) {
     var avatar = user.picture();
     var message = "";
     if (item.message) {
-        message = item.message.getContent();
+        message = item.message.getBriefText();
     }
     var time = (new Date()).toLocaleTimeString();
     collector.push({
