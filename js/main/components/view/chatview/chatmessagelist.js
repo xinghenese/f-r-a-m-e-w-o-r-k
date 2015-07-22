@@ -13,19 +13,26 @@ var index = 0;
 //core module to export
 var ChatMessageList = React.createClass({
     render: function() {
-        var chatMessageNodes = _.map(this.props.data, function(data) {
-            return (
-                <ChatMessage
+        var chatMessageNodes = null;
+
+        if (this.props.data && !_.isEmpty(this.props.data)) {
+            chatMessageNodes = _.map(this.props.data, function(data) {
+                if (!isValidMessageData(data)) {
+                    return null;
+                }
+                return (
+                    <ChatMessage
                     key={prefix + (index++)}
                     time={data.time}
                     senderName={data.senderName}
                     senderAvatar={data.senderAvatar}
                     style={this.props.style.chatmessage}
-                >
+                    >
                     {data.message}
-                </ChatMessage>
-            );
-        }, this);
+                    </ChatMessage>
+                    );
+            }, this);
+        }
 
         return (
             <div className="chat-message-list" style={makeStyle(this.props.style)}>
@@ -36,3 +43,8 @@ var ChatMessageList = React.createClass({
 });
 
 module.exports = ChatMessageList;
+
+//private function
+function isValidMessageData(data) {
+    return data && !_.isEmpty(data) && data.senderName && data.message;
+}

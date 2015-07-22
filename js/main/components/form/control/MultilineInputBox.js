@@ -87,6 +87,8 @@ function onChange(box) {
         target.style.height = 0;
         target.style.height = target.scrollHeight + 'px';
 
+        box.value = target.value;
+
         if (_.isFunction(box.props.onChange)) {
             box.props.onChange(event);
         }
