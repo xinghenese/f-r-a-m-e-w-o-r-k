@@ -54,6 +54,8 @@ function onchange(search) {
         var result = startSearch(search, event);
         console.log('result: ', result);
         console.groupEnd();
-        search.props.onChange(result);
+        if (_.isFunction(search.props.onChange)) {
+            search.props.onChange(result);
+        }
     }
 }
