@@ -53,10 +53,6 @@ var Chat = React.createClass({
         MessageStore.removeListener(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
     },
     render: function() {
-        var style = {
-            conversationBox: require('../style/conversationlist'),
-            chatBox: require('../style/chatmessage')
-        };
         return (
             <div>
                 <ChatMessageBox />
