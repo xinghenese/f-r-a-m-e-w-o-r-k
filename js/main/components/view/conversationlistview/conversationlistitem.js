@@ -32,7 +32,7 @@ var ConversationListItem = React.createClass({
                 <Avatar
                     className="conversation-list-item-avatar"
                     style={style.conversationlist.item.avatar}
-                    name={this.props.senderName[0] || ''}
+                    name={this.props.senderName}
                     src={this.props.senderAvatar}
                     index={this.props.index}
                 />

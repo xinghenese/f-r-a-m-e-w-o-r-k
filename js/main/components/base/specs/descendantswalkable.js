@@ -11,11 +11,11 @@ var helper = require('../helper/helper');
 module.exports = {
     displayName: 'DescendantsWalkable',
     descendantsProps: function(child, path) {
-        if (child.ref) {
-            return null;
-        }
+//        if (child.ref) {
+//            return null;
+//        }
         return {
-            ref: (this._seq || '') + 'child-' + path.join('-')
+            ref: child.ref || ((this._seq || '') + 'child-' + path.join('-'))
         }
     },
     walkDescendants: function(process, result) {
