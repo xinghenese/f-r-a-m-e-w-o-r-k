@@ -30,13 +30,13 @@ var ValidatorClassString = [
 //module initialization
 module.exports = createDownWalkableClass({
     displayName: 'Form',
-    render: function(){
+    render: function() {
         return (
             <form
                 onSubmit={submit(this)}
                 className={this.props.className}
                 style={makeStyle(this.props.style)}
-            >
+                >
                 {this.props.children}
             </form>
         )
@@ -87,7 +87,7 @@ function validate(element, result) {
 }
 
 function isValidator(element) {
-    for (var i = 0, len = ValidatorClassString.length; i < len; i ++) {
+    for (var i = 0, len = ValidatorClassString.length; i < len; i++) {
         if (element.constructor.displayName === ValidatorClassString[i]) {
             return true;
         }
