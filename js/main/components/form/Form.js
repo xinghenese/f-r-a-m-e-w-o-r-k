@@ -78,6 +78,7 @@ function validate(element, result) {
     var value = element.value || control.value || control.textContent || control.innerText;
     var field = element.props.field || element.props.id;
     if (value && field) {
+        element.value = '';
         return result.then(function(data) {
             return _.set(data, field, value);
         })
