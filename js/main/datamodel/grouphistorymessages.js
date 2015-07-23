@@ -24,12 +24,19 @@ function GroupHistoryMessages(data) {
 module.exports = GroupHistoryMessages;
 
 // module initialization
+GroupHistoryMessages.prototype.appendMessage = function(message) {
+    this._messages.push(message);
+};
+
 GroupHistoryMessages.prototype.getGroupId = function() {
-    return this._data["rid"];
+    return parseInt(this._data["rid"]);
 };
 
 GroupHistoryMessages.prototype.getUnreadMessageCount = function() {
-    return this._data["urc"];
+    if (!"urc" in this._data) {
+        return 0;
+    }
+    return parseInt(this._data["urc"]);
 };
 
 GroupHistoryMessages.prototype.noMoreMessages = function() {

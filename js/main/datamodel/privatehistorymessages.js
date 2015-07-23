@@ -18,12 +18,16 @@ function PrivateHistoryMessages(data) {
 module.exports = PrivateHistoryMessages;
 
 // module initialization
+PrivateHistoryMessages.prototype.appendMessage = function(message) {
+    this._messages.push(message);
+};
+
 PrivateHistoryMessages.prototype.getUserId = function() {
-    return this._data["uid"];
+    return parseInt(this._data["uid"]);
 };
 
 PrivateHistoryMessages.prototype.getUnreadMessageCount = function() {
-    return this._data["urc"];
+    return parseInt(this._data["urc"]);
 };
 
 PrivateHistoryMessages.prototype.noMoreMessages = function() {

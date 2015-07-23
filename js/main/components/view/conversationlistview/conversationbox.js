@@ -12,7 +12,10 @@ var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
 var groups = require('../../../datamodel/groups');
 var users = require('../../../datamodel/users');
+var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
+
+var messageIndex = 0;
 
 //core module to export
 var ConversationBox = React.createClass({
@@ -22,10 +25,18 @@ var ConversationBox = React.createClass({
         };
     },
     _updateMessages: function() {
+        console.log("update messages");
         var messages = _getLastMessages();
+        console.log(messages);
         this.setState({
             data: messages
         });
+        if (messageIndex > 5) {
+            return;
+        }
+        _.delay(function() {
+            MessageActions.sendTalkMessage(null, "100", null, (++messageIndex).toString(), 1, 0, "1.0")
+        }, 1000);
     },
     componentWillMount: function() {
         MessageStore.addChangeListener(this._updateMessages);
