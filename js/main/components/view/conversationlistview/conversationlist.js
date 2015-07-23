@@ -9,6 +9,7 @@ var ConversationListItem = require('./conversationlistitem');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
+var emitter = require('../../../utils/eventemitter');
 
 //private fields
 var prefix = 'conversation-list-';
@@ -20,9 +21,15 @@ var ConversationList = React.createClass({
         return {selectedIndex: -1};
     },
     render: function() {
-        var conversationListItem = _.map(this.props.data, function(data, key) {
-            return (
-                <ConversationListItem
+        var conversationListItem = null;
+
+        if (this.props.data && !_.isEmpty(this.props.data)) {
+            conversationListItem = _.map(this.props.data, function(data, key) {
+                if (!isValidConversationData(data)) {
+                    return null;
+                }
+                return (
+                    <ConversationListItem
                     key={prefix + index++}
                     time={data.time}
                     senderName={data.senderName}
@@ -30,11 +37,12 @@ var ConversationList = React.createClass({
                     index={prefix + key}
                     onSelect={onselect(this)}
                     selected={this.state.selectedIndex == key}
-                >
+                    >
                     {data.message}
-                </ConversationListItem>
-                );
-        }, this);
+                    </ConversationListItem>
+                    );
+            }, this);
+        }
 
         return (
             <ul className="chat-message-list"
@@ -54,6 +62,15 @@ module.exports = ConversationList;
 //private functions
 function onselect(list) {
     return function(event) {
-        list.setState({selectedIndex: event.currentTarget.id.replace(/\D/g, '')});
+        var index = event.currentTarget.id.replace(/\D/g, '');
+        list.setState({selectedIndex: index});
+        emitter.emit('select', {
+            id: index,
+            type: _.get(list.props.data, index).type
+        });
     }
+}
+
+function isValidConversationData(data) {
+    return data && !_.isEmpty(data) && data.senderName && data.message;
 }

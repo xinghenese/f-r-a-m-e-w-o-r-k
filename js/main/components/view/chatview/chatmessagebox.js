@@ -9,6 +9,8 @@ var ChatMessageList = require('./chatmessagelist');
 var ChatMessageToolbar = require('./chatmessagetoolbar');
 var style = require('../../../style/chatmessage');
 var makeStyle = require('../../../style/styles').makeStyle;
+var MessageStore = require('../../../stores/messagestore');
+var emitter = require('../../../utils/eventemitter');
 
 //core module to export
 var ChatMessageBox = React.createClass({
@@ -30,20 +32,20 @@ var ChatMessageBox = React.createClass({
     });
   },
   componentWillMount: function() {
-    this.setState(function(previousState) {
-      previousState.data.push({
-        senderName: 'xinghenese',
-        senderAvatar: '',
-        message: 'event.data',
-        time: (new Date()).toLocaleTimeString()
-      }, {
-        senderName: 'kim',
-        senderAvatar: '',
-        message: 'ok，3Q &lt;br/&gt; HTTP API 协议文档 上能否写下',
-        time: (new Date()).toLocaleTimeString()
+      var self = this;
+      emitter.on('select', function(info) {
+          var data;
+
+          if (info.type === 'group') {
+              data = MessageStore.getGroupHistoryMessages(info.id);
+          } else if (info.type === 'private') {
+              data = MessageStore.getPrivateHistoryMessages(info.id);
+          }
+
+          if (data) {
+              self.setState({data: data});
+          }
       });
-      return previousState;
-    });
   },
   render: function(){
     return (

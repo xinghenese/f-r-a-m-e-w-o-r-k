@@ -17,6 +17,7 @@ var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
 var socketconnection = require('../net/connection/socketconnection');
 var ChangeableStore = require('./changeablestore');
+var Message = require('../datamodel/message');
 
 // exports
 var MessageStore = ChangeableStore.extend({
@@ -31,6 +32,26 @@ var MessageStore = ChangeableStore.extend({
     },
     addPrivateHistoryMessages: function(userId, privateHistoryMessages) {
         this._privateHistoryMessages[userId] = privateHistoryMessages;
+    },
+    appendGroupMessage: function(groupId, message) {
+        if (groupId in this._groupHistoryMessages) {
+            this._groupHistoryMessages[groupId].appendMessage(message);
+        } else {
+            var historyMessages = new GroupHistoryMessages({rid: groupId});
+            this._groupHistoryMessages[groupId] = historyMessages;
+        }
+
+        this.emitChange();
+    },
+    appendPrivateMessage: function(userId, message) {
+        if (userId in this._privateHistoryMessages) {
+            this._privateHistoryMessages[userId].appendMessage(message);
+        } else {
+            var historyMessages = new PrivateHistoryMessages({uid: userId});
+            this._privateHistoryMessages[userId] = historyMessages;
+        }
+
+        this.emitChange();
     },
     getGroupHistoryMessages: function(groupId) {
         return this._groupHistoryMessages[groupId];
@@ -58,6 +79,15 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 });
 
 // private functions
+function _appendMessage(data) {
+    data["tmstp"] = new Date().valueOf();
+    if (objects.containsValuedProp(data, "msrid")) {
+        MessageStore.appendGroupMessage(parseInt(data["msrid"]), new Message(data));
+    } else {
+        MessageStore.appendPrivateMessage(parseInt(data["mstuid"]), new Message(data));
+    }
+}
+
 function _collectLastMessages() {
     var messages = [];
     _.forEach(MessageStore._groupHistoryMessages, function(value, key) {
@@ -111,9 +141,14 @@ function _handleSendTalkMessage(action) {
         msgtp: action.messageType,
         uuid: uuid
     };
+
     objects.copyValuedProp(action, "groupId", data, "msrid");
     objects.copyValuedProp(action, "toUserId", data, "mstuid");
     objects.copyValuedProp(action, "atUserId", data, "atuid");
+    console.log("before append");
+    _appendMessage(_.cloneDeep(data));
+    console.log("after append");
+
     socketconnection.request({
         tag: "TM",
         data: data,

@@ -75,7 +75,7 @@ function validate(element, result) {
 
     //TODO: filter the values of non-input controls
     var control = React.findDOMNode(element);
-    var value = control.value || control.textContent || control.innerText;
+    var value = element.value || control.value || control.textContent || control.innerText;
     var field = element.props.field || element.props.id;
     if (value && field) {
         return result.then(function(data) {

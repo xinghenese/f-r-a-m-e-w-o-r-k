@@ -12,7 +12,10 @@ var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
 var groups = require('../../../datamodel/groups');
 var users = require('../../../datamodel/users');
+var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
+
+var messageIndex = 0;
 
 //core module to export
 var ConversationBox = React.createClass({
@@ -22,10 +25,18 @@ var ConversationBox = React.createClass({
         };
     },
     _updateMessages: function() {
+        console.log("update messages");
         var messages = _getLastMessages();
+        console.log(messages);
         this.setState({
             data: messages
         });
+        if (messageIndex > 5) {
+            return;
+        }
+        _.delay(function() {
+            MessageActions.sendTalkMessage(null, "100", null, (++messageIndex).toString(), 1, 0, "1.0")
+        }, 1000);
     },
     componentWillMount: function() {
         MessageStore.addChangeListener(this._updateMessages);
@@ -65,8 +76,7 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    console.log(lastMessages);
-    var result = [];
+    var result = {};
     _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
@@ -90,11 +100,13 @@ function _buildGroupRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = (new Date(item.message.getTimestamp())).toLocaleTimeString();
     }
-    collector.push({
+    var time = (new Date()).toLocaleTimeString();
+    _.set(collector, item.groupId, {
         senderName: groupName,
         senderAvatar: avatar,
         message: message,
-        time: time
+        time: time,
+        type: 'group'
     });
 }
 
@@ -111,10 +123,12 @@ function _buildUserRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = (new Date(item.message.getTimestamp())).toLocaleTimeString();
     }
-    collector.push({
+    var time = (new Date()).toLocaleTimeString();
+    _.set(collector, item.userId, {
         senderName: userName,
         senderAvatar: avatar,
         message: message,
-        time: time
+        time: time,
+        type: 'private'
     });
 }
