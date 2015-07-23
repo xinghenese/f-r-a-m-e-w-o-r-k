@@ -3,20 +3,9 @@
  */
 'use strict';
 
-// dependencies
-
-
-// private fields
-
-
 // exports
 module.exports = {
     formatTime: function(milliseconds) {
-
+        return new Date(milliseconds).toLocaleTimeString();
     }
 };
-
-// module initialization
-
-
-// private functions

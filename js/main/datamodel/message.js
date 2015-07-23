@@ -97,7 +97,5 @@ Message.prototype.getAltText = function() {
 };
 
 Message.prototype.getTimestamp = function() {
-    console.log("timestamp");
-    console.log(this._data["tmstp"]);
     return parseInt(this._data["tmstp"]);
 };

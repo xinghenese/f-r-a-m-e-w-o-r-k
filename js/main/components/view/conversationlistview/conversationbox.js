@@ -14,6 +14,7 @@ var groups = require('../../../datamodel/groups');
 var users = require('../../../datamodel/users');
 var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
+var Formats = require('../../../utils/formats');
 
 var messageIndex = 0;
 
@@ -25,9 +26,7 @@ var ConversationBox = React.createClass({
         };
     },
     _updateMessages: function() {
-        console.log("update messages");
         var messages = _getLastMessages();
-        console.log(messages);
         this.setState({
             data: messages
         });
@@ -35,7 +34,7 @@ var ConversationBox = React.createClass({
             return;
         }
         _.delay(function() {
-            MessageActions.sendTalkMessage(null, "100", null, (++messageIndex).toString(), 1, 0, "1.0")
+            MessageActions.sendTalkMessage("680", null, null, (++messageIndex).toString(), 1, 0, "1.0")
         }, 1000);
     },
     componentWillMount: function() {
@@ -98,9 +97,8 @@ function _buildGroupRenderObject(item, collector) {
     var time = "";
     if (item.message) {
         message = item.message.getBriefText();
-        time = (new Date(item.message.getTimestamp())).toLocaleTimeString();
+        time = Formats.formatTime(item.message.getTimestamp());
     }
-    var time = (new Date()).toLocaleTimeString();
     _.set(collector, item.groupId, {
         senderName: groupName,
         senderAvatar: avatar,
@@ -121,9 +119,8 @@ function _buildUserRenderObject(item, collector) {
     var time = "";
     if (item.message) {
         message = item.message.getBriefText();
-        time = (new Date(item.message.getTimestamp())).toLocaleTimeString();
+        time = Formats.formatTime(item.message.getTimestamp());
     }
-    var time = (new Date()).toLocaleTimeString();
     _.set(collector, item.userId, {
         senderName: userName,
         senderAvatar: avatar,

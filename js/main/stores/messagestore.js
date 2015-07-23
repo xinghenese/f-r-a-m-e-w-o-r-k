@@ -145,9 +145,7 @@ function _handleSendTalkMessage(action) {
     objects.copyValuedProp(action, "groupId", data, "msrid");
     objects.copyValuedProp(action, "toUserId", data, "mstuid");
     objects.copyValuedProp(action, "atUserId", data, "atuid");
-    console.log("before append");
     _appendMessage(_.cloneDeep(data));
-    console.log("after append");
 
     socketconnection.request({
         tag: "TM",
