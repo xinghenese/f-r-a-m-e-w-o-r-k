@@ -2,7 +2,8 @@
  * Created by Reco on 2015/6/23.
  */
 
-//dependencies
+//dependencie
+var _ = require('lodash');
 var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var Form = require('./../../form/Form');
@@ -27,7 +28,8 @@ var toolbar = module.exports = React.createClass({
         })
     },
     _handleSubmit: function(event) {
-        if (objects.containsValuedProp(event.data, "chat-message-input")) {
+        if (objects.containsValuedProp(event.data, "chat-message-input") &&
+            _.trim(event.data["chat-message-input"]).length > 0) {
             this.props.onSubmit(event);
         }
     },
