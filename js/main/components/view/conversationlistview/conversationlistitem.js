@@ -29,10 +29,10 @@ var ConversationListItem = React.createClass({
               onMouseLeave={onhoverout(this)}>
               <a
                   className="conversation-list-item-avatar"
-                  style={makeStyle(style.conversationlist.item.avatar)}
+                  style={makeStyle(style.conversationlist.item.avatar, {backgroundColor: generateRandomColor()})}
               >
                 <img
-                    alt={this.props.senderName}
+                    alt={this.props.senderName[0] || ''}
                     src={this.props.senderAvatar}
                     width="100%"
                     height="100%"
@@ -79,4 +79,8 @@ function onhoverout(item) {
             setStyle(event.currentTarget.style, style.conversationlist.item.default);
         }
     };
+}
+
+function generateRandomColor() {
+    return '#' + (~~(Math.random() * 0x1000000)).toString(16);
 }
