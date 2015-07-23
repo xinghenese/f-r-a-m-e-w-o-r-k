@@ -3,13 +3,14 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
 
 //private fields
-
+var avatarColors = {};
 
 //core module to export
 var ConversationListItem = React.createClass({
@@ -29,7 +30,7 @@ var ConversationListItem = React.createClass({
               onMouseLeave={onhoverout(this)}>
               <a
                   className="conversation-list-item-avatar"
-                  style={makeStyle(style.conversationlist.item.avatar, {backgroundColor: generateRandomColor()})}
+                  style={makeStyle(style.conversationlist.item.avatar, {backgroundColor: getColor(this.props.index)})}
               >
                 <img
                     alt={this.props.senderName[0] || ''}
@@ -79,6 +80,13 @@ function onhoverout(item) {
             setStyle(event.currentTarget.style, style.conversationlist.item.default);
         }
     };
+}
+
+function getColor(id) {
+    if (!_.has(avatarColors, id)) {
+        _.set(avatarColors, id, generateRandomColor());
+    }
+    return _.get(avatarColors, id)
 }
 
 function generateRandomColor() {
