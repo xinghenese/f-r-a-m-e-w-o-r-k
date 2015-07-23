@@ -17,20 +17,19 @@ var ChatMessageList = React.createClass({
 
         if (this.props.data && !_.isEmpty(this.props.data)) {
             chatMessageNodes = _.map(this.props.data, function(data) {
-                if (!isValidMessageData(data)) {
-                    return null;
-                }
-                return (
-                    <ChatMessage
-                    key={prefix + (index++)}
-                    time={data.time}
-                    senderName={data.senderName}
-                    senderAvatar={data.senderAvatar}
-                    style={this.props.style.chatmessage}
-                    >
-                    {data.message}
-                    </ChatMessage>
+                if (isValidMessageData(data)) {
+                    return (
+                        <ChatMessage
+                            key={prefix + (index++)}
+                            time={data.time}
+                            senderName={data.senderName}
+                            senderAvatar={data.senderAvatar}
+                            style={this.props.style.chatmessage}
+                        >
+                            {data.message}
+                        </ChatMessage>
                     );
+                }
             }, this);
         }
 

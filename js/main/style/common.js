@@ -56,6 +56,12 @@ module.exports = {
         overflow: "hidden",
         whiteSpace: "nowrap",
         textOverflow: "ellipsis"
+    },
+    avatar: {
+        borderRadius: '50%',
+        textAlign: 'center',
+        overflow: 'hidden',
+        pointer: 'cursor'
     }
 };
 

@@ -63,12 +63,7 @@ module.exports = {
                 width: itemHeight,
                 lineHeight: itemHeight,
                 height: itemHeight,
-                borderRadius: "50%",
-                float: "left",
-                background: "#4d91c7",
-                textAlign: "center",
-                marginRight: "14px",
-                overflow: "hidden"
+                marginRight: "14px"
             },
             //title
             title: {

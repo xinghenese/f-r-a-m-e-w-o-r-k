@@ -5,6 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var Avatar = require('../../avatar');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -22,40 +23,40 @@ var ConversationListItem = React.createClass({
         }
 
         return (
-          <li className="conversation-list-item"
-              id={this.props.index}
-              style={makeStyle(style.conversationlist.item, currentStyle)}
-              onClick={this.props.onSelect}
-              onMouseEnter={onhoverin(this)}
-              onMouseLeave={onhoverout(this)}>
-              <a
-                  className="conversation-list-item-avatar"
-                  style={makeStyle(style.conversationlist.item.avatar, {backgroundColor: getColor(this.props.index)})}
-              >
-                <img
-                    alt={this.props.senderName[0] || ''}
+            <li className="conversation-list-item"
+                id={this.props.index}
+                style={makeStyle(style.conversationlist.item, currentStyle)}
+                onClick={this.props.onSelect}
+                onMouseEnter={onhoverin(this)}
+                onMouseLeave={onhoverout(this)}>
+                <Avatar
+                    className="conversation-list-item-avatar"
+                    style={style.conversationlist.item.avatar}
+                    name={this.props.senderName[0] || ''}
                     src={this.props.senderAvatar}
-                    width="100%"
-                    height="100%"
+                    index={this.props.index}
                 />
-              </a>
-              <div
-                  className="conversation-list-item-time"
-                  style={makeStyle(style.conversationlist.item.time)}
-              >
-                  {this.props.time}
-              </div>
-              <div className="conversation-list-item-body">
-                  <div className="conversation-list-item-nickname"
-                  style={makeStyle(style.conversationlist.item.title)}>
-                      {this.props.senderName}
-                  </div>
-                  <p className="conversation-list-item-content"
-                      style={makeStyle(style.conversationlist.item.message)}>
-                      {this.props.children}
-                  </p>
-              </div>
-          </li>
+                <div
+                    className="conversation-list-item-time"
+                    style={makeStyle(style.conversationlist.item.time)}
+                >
+                    {this.props.time}
+                </div>
+                <div className="conversation-list-item-body">
+                    <div
+                        className="conversation-list-item-nickname"
+                        style={makeStyle(style.conversationlist.item.title)}
+                    >
+                        {this.props.senderName}
+                    </div>
+                    <p
+                        className="conversation-list-item-content"
+                        style={makeStyle(style.conversationlist.item.message)}
+                    >
+                        {this.props.children}
+                    </p>
+                </div>
+            </li>
         )
     }
 });

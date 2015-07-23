@@ -70,6 +70,10 @@ Message.prototype.getUuid = function() {
     return this._data["uuid"];
 };
 
+Message.prototype.getUserNickname = function() {
+    return this._data["unk"];
+};
+
 /**
  * Conversation type of string, 0 for group, 1 for private.
  */

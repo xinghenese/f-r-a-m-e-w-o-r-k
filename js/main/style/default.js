@@ -52,7 +52,11 @@ module.exports = {
             color: "#4c83b5",
             margin: "0 32px 22px 0"
         }
-  }
+    },
+    avatar: {
+        float: 'left',
+        color: '#fff'
+    }
 };
 
 //module initialization
