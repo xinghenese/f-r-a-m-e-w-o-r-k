@@ -95,3 +95,9 @@ Message.prototype.getMinVersion = function() {
 Message.prototype.getAltText = function() {
     return this._data["alt"];
 };
+
+Message.prototype.getTimestamp = function() {
+    console.log("timestamp");
+    console.log(this._data["tmstp"]);
+    return parseInt(this._data["tmstp"]);
+};

@@ -65,6 +65,7 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
+    console.log(lastMessages);
     var result = [];
     _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
@@ -84,10 +85,11 @@ function _buildGroupRenderObject(item, collector) {
     var groupName = group.name();
     var avatar = group.picture();
     var message = "";
+    var time = "";
     if (item.message) {
         message = item.message.getBriefText();
+        time = (new Date(item.message.getTimestamp())).toLocaleTimeString();
     }
-    var time = (new Date()).toLocaleTimeString();
     collector.push({
         senderName: groupName,
         senderAvatar: avatar,
@@ -104,10 +106,11 @@ function _buildUserRenderObject(item, collector) {
     var userName = user.getNickname();
     var avatar = user.picture();
     var message = "";
+    var time = "";
     if (item.message) {
         message = item.message.getBriefText();
+        time = (new Date(item.message.getTimestamp())).toLocaleTimeString();
     }
-    var time = (new Date()).toLocaleTimeString();
     collector.push({
         senderName: userName,
         senderAvatar: avatar,
