@@ -76,7 +76,7 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = [];
+    var result = {};
     _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
@@ -99,11 +99,12 @@ function _buildGroupRenderObject(item, collector) {
         message = item.message.getBriefText();
     }
     var time = (new Date()).toLocaleTimeString();
-    collector.push({
+    _.set(collector, item.groupId, {
         senderName: groupName,
         senderAvatar: avatar,
         message: message,
-        time: time
+        time: time,
+        type: 'group'
     });
 }
 
@@ -119,10 +120,11 @@ function _buildUserRenderObject(item, collector) {
         message = item.message.getBriefText();
     }
     var time = (new Date()).toLocaleTimeString();
-    collector.push({
+    _.set(collector, item.userId, {
         senderName: userName,
         senderAvatar: avatar,
         message: message,
-        time: time
+        time: time,
+        type: 'private'
     });
 }
