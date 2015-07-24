@@ -62,7 +62,7 @@ function startSearch(search, event) {
 
         _.forEach(fields, function(field) {
             var subResult = _.reduce(datasource, function(memo, data, key) {
-                if (data[field].indexOf(searchText) > -1) {
+                if (data[field] && (data[field] + '').indexOf(searchText) > -1) {
                     return _.set(memo, key, data);
                 }
                 return memo;
