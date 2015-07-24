@@ -30,10 +30,13 @@ var ValidatorClassString = [
 //module initialization
 module.exports = createDownWalkableClass({
     displayName: 'Form',
+    submit: function(event) {
+        doSubmit(this)(event);
+    },
     render: function() {
         return (
             <form
-                onSubmit={submit(this)}
+                onSubmit={doSubmit(this)}
                 className={this.props.className}
                 style={makeStyle(this.props.style)}
                 >
@@ -44,7 +47,7 @@ module.exports = createDownWalkableClass({
 });
 
 //private functions
-function submit(form) {
+function doSubmit(form) {
     return function(event) {
         form.walkDescendants(validate).then(function(data) {
             event.data = data;

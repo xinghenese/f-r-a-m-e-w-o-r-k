@@ -9,6 +9,7 @@ var commonStyle = require('../../../style/common');
 var theme = require('../../../style/default');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
+var KeyCodes = require('../../../constants/keycodes');
 
 //private fields
 //@link: <a href="http://www.textfixer.com/tutorials/browser-scrollbar-width"></a>
@@ -26,6 +27,23 @@ var MultilineInputBox = React.createClass({
                 id: 'key-' + key
             });
         });
+    },
+    _handleSubmit: function(event) {
+        this.props.onSubmit(event);
+    },
+    _onInputBlur: function(event) {
+        event.target.placeholder = this.props.defaultValue;
+    },
+    _onInputFocus: function(event) {
+        event.target.placeholder = "";
+    },
+    _onKeyDown: function(event) {
+        console.log(event);
+        if (event.keyCode == KeyCodes.ENTER && !event.ctrlKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            this._handleSubmit(event);
+        }
     },
     componentWillMount: function() {
         this._seq = prefix + (index++);
@@ -46,17 +64,18 @@ var MultilineInputBox = React.createClass({
                 className={props.className}
                 style={makeStyle(commonStyle.textarea.wrapper, theme.textarea.wrapper, wrapperWidthStyle)}
                 >
-              <textarea
-                  id="text1"
-                  placeholder={props.defaultValue}
-                  rows={props.initialRows || 1}
-                  onChange={onChange(this)}
-                  onKeyDown={submit}
-                  onFocus={onInputFocus}
-                  onBlur={onInputBlur}
-                  ref={this._seq}
-                  style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
-                  ></textarea>
+                <textarea
+                    id="text1"
+                    placeholder={props.defaultValue}
+                    rows={props.initialRows || 1}
+                    onChange={onChange(this)}
+                    onKeyDown={this._onKeyDown}
+                    onFocus={this._onInputFocus}
+                    onBlur={this._onInputBlur}
+                    ref={this._seq}
+                    style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
+                    >
+                </textarea>
                 {this._generateChildren()}
             </div>
         )
@@ -66,19 +85,6 @@ var MultilineInputBox = React.createClass({
 module.exports = MultilineInputBox;
 
 //private functions
-function onInputBlur(event) {
-//  setStyle(event.target.style, theme.textarea.blur);
-}
-
-function onInputFocus(event) {
-//  setStyle(event.target.style, theme.textarea.focus);
-}
-
-function submit(event) {
-    if (event.keyCode == 13 && event.ctrlKey) {
-    }
-}
-
 function onChange(box) {
     return function(event) {
         var target = event.currentTarget;

@@ -168,13 +168,16 @@ function onMessageReceived(msg) {
 
         //check whether the message is pushed by server or pulled from server.
         if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
+            console.log("emitting - " + tag);
             socketconnection.emit(tag, data);
         } else {
             //if the message pushed by server does not have to notify immediately,
             //then cache it into the session for later use.
             if (shouldNotify(tag)) {
+                console.log("notifyImmediately - " + tag);
                 notifyImmediately(tag, data);
             } else {
+                console.log("cache - " + tag);
                 session.cache(tag, data);
             }
         }

@@ -27,6 +27,9 @@ var toolbar = module.exports = React.createClass({
             message: event.target.value
         })
     },
+    _handleTextAreaSubmit: function(event) {
+        this.refs.form.submit(event);
+    },
     _handleSubmit: function(event) {
         if (objects.containsValuedProp(event.data, "chat-message-input") &&
             _.trim(event.data["chat-message-input"]).length > 0) {
@@ -40,6 +43,7 @@ var toolbar = module.exports = React.createClass({
                 className="chat-message-toolbar"
                 style={style}
                 onSubmit={this._handleSubmit}
+                ref="form"
                 >
                 <Button
                     value={Lang.accessory}
@@ -63,6 +67,7 @@ var toolbar = module.exports = React.createClass({
                     className="chat-message-toolbar-input"
                     defaultValue={Lang.chatMessageInputTips}
                     style={style.input}
+                    onSubmit={this._handleTextAreaSubmit}
                     >
                     <div className="dev"/>
                 </TextArea>

@@ -26,7 +26,7 @@ module.exports = {
     "cancel": "取消",
     "send": "发送",
     "accessory": "附",
-    "chatMessageInputTips": "按下Enter换行，Ctrl+Enter发送",
+    "chatMessageInputTips": "Enter发送，Ctrl+Enter换行",
     "search": "搜索",
 
     // text alternatives of non-text messages

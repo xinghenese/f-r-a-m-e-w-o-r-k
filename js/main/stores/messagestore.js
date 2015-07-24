@@ -21,10 +21,6 @@ var Message = require('../datamodel/message');
 
 // exports
 var MessageStore = ChangeableStore.extend({
-    Events: {
-        HISTORY_MESSAGES_RECEIVED: "historyMessagesReceived",
-        HISTORY_MESSAGES_MISSED: "historyMessagesMissed"
-    },
     _groupHistoryMessages: {},
     _privateHistoryMessages: {},
     addGroupHistoryMessages: function(groupId, groupHistoryMessages) {

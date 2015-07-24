@@ -14,7 +14,6 @@ var GroupActioins = require('../actions/groupactions');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var ChatMessageBox = require('./view/chatview/chatmessagebox');
 var MessageActions = require('../actions/messageactions');
-var MessageStore = require('../stores/messagestore');
 var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
@@ -36,7 +35,6 @@ var Chat = React.createClass({
         _.forEach(messages, function(message) {
             //console.log(message);
         });
-        MessageActions.sendTalkMessage(null, "100", null, "1", 1, 0, "1.0");
     },
     componentWillMount: function() {
         // putting it here for test purpose
@@ -44,13 +42,11 @@ var Chat = React.createClass({
         ChatActions.getChatList(1);
         ChatStore.on(ChatStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ChatStore.on(ChatStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
-        MessageStore.on(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
         modifyPageStyle();
     },
     componentWillUnmount: function() {
         ChatStore.removeListener(ChatStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ChatStore.removeListener(ChatStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
-        MessageStore.removeListener(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
     },
     render: function() {
         return (

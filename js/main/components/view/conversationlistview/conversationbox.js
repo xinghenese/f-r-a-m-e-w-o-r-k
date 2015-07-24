@@ -30,7 +30,7 @@ var ConversationBox = React.createClass({
         this.setState({
             data: messages
         });
-        if (messageIndex > 5) {
+        if (messageIndex > 2) {
             return;
         }
         _.delay(function() {
