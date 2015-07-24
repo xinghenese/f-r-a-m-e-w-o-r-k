@@ -31,7 +31,6 @@ var ChatMessageBox = React.createClass({
         if (this.state.id && data) {
             MessageActions.sendTalkMessage(this.state.id, null, null, (_.values(event.data)[0]).toString(), 1, 0, "1.0");
         }
-
     },
     _updateMessages: function(id, type) {
         id = id || this.state.id;

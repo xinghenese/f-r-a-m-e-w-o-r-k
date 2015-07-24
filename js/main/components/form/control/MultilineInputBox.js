@@ -14,7 +14,7 @@ var KeyCodes = require('../../../constants/keycodes');
 //private fields
 //@link: <a href="http://www.textfixer.com/tutorials/browser-scrollbar-width"></a>
 var SCROLLBAR_WIDTH = 17;
-var LENTH_REG = /^(\d)+px$/;
+var LENGTH_REG = /^(\d)+px$/;
 
 var prefix = 'textarea-';
 var index = 0;
@@ -38,9 +38,7 @@ var MultilineInputBox = React.createClass({
         event.target.placeholder = "";
     },
     _onKeyDown: function(event) {
-//        console.log(event);
-        if (event.keyCode == KeyCodes.ENTER && event.ctrlKey) {
-            console.log('kyedown.submit');
+        if (event.keyCode == KeyCodes.ENTER && !event.ctrlKey) {
             event.preventDefault();
             event.stopPropagation();
             this._handleSubmit(event);
@@ -53,7 +51,7 @@ var MultilineInputBox = React.createClass({
         var props = this.props;
         var style = props.style || {};
         var visibleWidth = _.find([props.width, style.width, theme.width], function(width) {
-            return LENTH_REG.test(width);
+            return LENGTH_REG.test(width);
         });
         var actualWidth = visibleWidth && (+visibleWidth.replace('px', '')) + SCROLLBAR_WIDTH + 'px';
         var wrapperWidthStyle = visibleWidth && {width: visibleWidth};

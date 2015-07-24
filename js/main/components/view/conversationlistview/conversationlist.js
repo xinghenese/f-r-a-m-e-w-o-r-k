@@ -30,17 +30,17 @@ var ConversationList = React.createClass({
                 }
                 return (
                     <ConversationListItem
-                    key={prefix + index++}
-                    time={data.time}
-                    senderName={data.senderName}
-                    senderAvatar={data.senderAvatar}
-                    index={prefix + key}
-                    onSelect={onselect(this)}
-                    selected={this.state.selectedIndex == key}
-                    >
-                    {data.message}
+                        key={prefix + index++}
+                        time={data.time}
+                        senderName={data.senderName}
+                        senderAvatar={data.senderAvatar}
+                        index={prefix + key}
+                        onSelect={onselect(this)}
+                        selected={this.state.selectedIndex == key}
+                        >
+                        {data.message}
                     </ConversationListItem>
-                    );
+                );
             }, this);
         }
 
