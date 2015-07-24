@@ -6,12 +6,35 @@
 module.exports = {
     position: 'absolute',
     width: "700px",
+    height: "100%",
     top: '0',
     right: '0',
     //header
     header: {
         background: "#fafafa",
         height: "48px"
+    },
+    //chattips
+    chattips: {
+        position: 'absolute',
+        width: '40%',
+        height: '32px',
+        lineHeight: '32px',
+        top: '40%',
+        left: '30%',
+        textAlign: 'center',
+        fontSize: '14px',
+        background: '#888',
+        color: '#fff',
+        borderRadius: '4px'
+    },
+    //footer
+    footer: {
+        position: "absolute",
+        bottom: "0",
+        height: "58px",
+        width: '100%',
+        background: "#fafafa"
     },
     //chatmessagelist
     chatmessagelist: {

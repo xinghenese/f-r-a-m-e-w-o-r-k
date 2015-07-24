@@ -29,6 +29,8 @@ module.exports = {
     "chatMessageInputTips": "Enter发送，Ctrl+Enter换行",
     "search": "搜索",
 
+    "chatBoxTips": "请选择会话",
+
     // text alternatives of non-text messages
     "unknownMessage": "[未知消息]",
     "pictureMessage": "[图片消息]",

@@ -74,11 +74,21 @@ var ChatMessageBox = React.createClass({
         removeConversationListSelectedHandler(this);
     },
     render: function(){
+        if (this.state.id) {
+            return (
+                <div className="chat-message-box" style={makeStyle(style)}>
+                    <div className="chat-message-box-header" style={makeStyle(style.header)}/>
+                    <ChatMessageList data={this.state.data} style={style.chatmessagelist}/>
+                    <ChatMessageToolbar onSubmit={this._handleSubmit} style={style.toolbar}/>
+                </div>
+            );
+        }
+
         return (
             <div className="chat-message-box" style={makeStyle(style)}>
                 <div className="chat-message-box-header" style={makeStyle(style.header)}/>
-                <ChatMessageList data={this.state.data} style={style.chatmessagelist}/>
-                <ChatMessageToolbar onSubmit={this._handleSubmit} style={style.toolbar}/>
+                <div style={style.chattips}>{Lang.chatBoxTips}</div>
+                <div className="chat-message-box-header" style={makeStyle(style.footer)}/>
             </div>
         );
   }
