@@ -21,16 +21,16 @@ var ConversationList = React.createClass({
         return {selectedIndex: -1};
     },
     render: function() {
-        var conversationListItem = null;
+        var conversationList = null;
 
         if (this.props.data && !_.isEmpty(this.props.data)) {
-            conversationListItem = _.map(this.props.data, function(data, key) {
+            conversationList = _.map(this.props.data, function(data, key) {
                 if (!isValidConversationData(data)) {
                     return null;
                 }
                 return (
                     <ConversationListItem
-                        key={prefix + index++}
+                        key={prefix + key}
                         time={data.time}
                         senderName={data.senderName}
                         senderAvatar={data.senderAvatar}
@@ -48,7 +48,7 @@ var ConversationList = React.createClass({
             <ul className="chat-message-list"
                 style={makeStyle(style.conversationlist, this.props.style)}
                 >
-                {conversationListItem}
+                {conversationList}
             </ul>
         )
     }
@@ -72,5 +72,6 @@ function onselect(list) {
 }
 
 function isValidConversationData(data) {
-    return data && !_.isEmpty(data) && data.senderName && data.message;
+    //TODO: why data.message here can be empty.
+    return data && !_.isEmpty(data) && data.senderName;
 }

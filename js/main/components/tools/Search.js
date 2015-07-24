@@ -54,7 +54,7 @@ function startSearch(search, event) {
     }
 
     if (_.isFunction(searchFunction)) {
-        result = searchFunction.call(search, datasource);
+        result = searchFunction.call(search, datasource, searchText);
     } else if (fields) {
         if (!_.isArray(fields)) {
             fields = [fields];
@@ -79,7 +79,7 @@ function startSearch(search, event) {
 function onchange(search) {
     return function(event) {
         var result = startSearch(search, event);
-        if (result && _.isFunction(search.props.onSearch)) {
+        if (_.isFunction(search.props.onSearch)) {
             search.props.onSearch(result);
         }
     }
