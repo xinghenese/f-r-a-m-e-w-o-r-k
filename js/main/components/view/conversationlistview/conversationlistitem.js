@@ -37,10 +37,11 @@ var ConversationListItem = React.createClass({
                     index={this.props.index}
                 />
                 <div
-                    className="conversation-list-item-time"
-                    style={makeStyle(style.conversationlist.item.time)}
+                    className="conversation-list-item-info"
+                    style={makeStyle(style.conversationlist.item.info)}
                 >
-                    {this.props.time}
+                    <div className="conversation-list-item-time" style={makeStyle(style.conversationlist.item.time)}>{this.props.time}</div>
+                    <div className="conversation-list-item-unread-count" style={makeStyle(style.conversationlist.item.unread)}>{this.props.unreadCount || 0}</div>
                 </div>
                 <div className="conversation-list-item-body">
                     <div

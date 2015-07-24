@@ -38,8 +38,9 @@ var MultilineInputBox = React.createClass({
         event.target.placeholder = "";
     },
     _onKeyDown: function(event) {
-        console.log(event);
-        if (event.keyCode == KeyCodes.ENTER && !event.ctrlKey) {
+//        console.log(event);
+        if (event.keyCode == KeyCodes.ENTER && event.ctrlKey) {
+            console.log('kyedown.submit');
             event.preventDefault();
             event.stopPropagation();
             this._handleSubmit(event);

@@ -30,6 +30,7 @@ var Avatar = React.createClass({
 
         return (
             <a
+                title={this.props.name}
                 className={this.props.className}
                 style={makeStyle(
                     commonStyle.avatar,

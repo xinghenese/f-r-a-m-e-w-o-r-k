@@ -70,12 +70,29 @@ module.exports = {
                 lineHeight: "1.6em",
                 '@mixin': commonStyle.singleLineText
             },
-            //time
-            time: {
+            //info
+            info: {
                 float: "right",
                 color: "#d1d1d1",
                 fontSize: "12px",
                 height: itemHeight
+            },
+            //time
+            time: {
+                lineHeight: "1.8em",
+                '@mixin': commonStyle.singleLineText
+            },
+            //unread
+            unread: {
+                fontSize: "12px",
+                lineHeight: "1.8em",
+                color: '#fff',
+                background: '#6fc766',
+                borderRadius: '3px',
+                float: 'right',
+                textAlign: 'center',
+                width: '40px',
+                '@mixin': commonStyle.singleLineText
             },
             //message
             message: {

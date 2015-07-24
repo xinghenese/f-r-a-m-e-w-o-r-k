@@ -11,9 +11,6 @@ var helper = require('../helper/helper');
 module.exports = {
     displayName: 'DescendantsWalkable',
     descendantsProps: function(child, path) {
-//        if (child.ref) {
-//            return null;
-//        }
         return {
             ref: child.ref || ((this._seq || '') + 'child-' + path.join('-'))
         }

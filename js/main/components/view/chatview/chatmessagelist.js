@@ -16,11 +16,11 @@ var ChatMessageList = React.createClass({
         var chatMessageNodes = null;
 
         if (this.props.data && !_.isEmpty(this.props.data)) {
-            chatMessageNodes = _.map(this.props.data, function(data) {
+            chatMessageNodes = _.map(this.props.data, function(data, key) {
                 if (isValidMessageData(data)) {
                     return (
                         <ChatMessage
-                            key={prefix + (index++)}
+                            key={prefix + key}
                             time={data.time}
                             senderName={data.senderName}
                             senderAvatar={data.senderAvatar}
