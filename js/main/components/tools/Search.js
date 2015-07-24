@@ -17,6 +17,14 @@ var Search = React.createClass({
     propTypes: {
         searchFunction: React.PropTypes.func
     },
+    componentWillMount: function() {
+        onchange(this)();
+    },
+    componentWillReceiveProps: function(nextProps) {
+        if (!_.isEqual(nextProps.datasource, this.props.datasource)) {
+            onchange(this)();
+        }
+    },
     render: function() {
         return (
             <input
@@ -35,27 +43,44 @@ module.exports = Search;
 
 //private functions
 function startSearch(search, event) {
-    var searchText = event.target.value;
-    var searchFunction = search.props.searchFunction || function(datas, key) {
-        return ('' + key).indexOf(searchText) > -1;
-    };
+    var result = {};
+    var datasource = search.props.datasource;
+    var searchFunction = search.props.searchFunction;
+    var fields = search.props.fields;
+    var searchText = event && event.target && event.target.value || '';
 
-    if (search.props.datasource) {
-        console.log('datasource: ', search.props.datasource);
-
-        return _.filter(search.props.datasource, searchFunction);
+    if (!datasource || (!_.isFunction(searchFunction) && !fields)) {
+        return null;
     }
-    return null;
+
+    if (_.isFunction(searchFunction)) {
+        result = searchFunction.call(search, datasource);
+    } else if (fields) {
+        if (!_.isArray(fields)) {
+            fields = [fields];
+        }
+
+        _.forEach(fields, function(field) {
+            var subResult = _.reduce(datasource, function(memo, data, key) {
+                if (data[field].indexOf(searchText) > -1) {
+                    return _.set(memo, key, data);
+                }
+                return memo;
+            }, {});
+            if (subResult && !_.isEmpty(subResult)) {
+                result[field] = subResult;
+            }
+        });
+    }
+
+    return result && !_.isEmpty(result) ? result : null;
 }
 
 function onchange(search) {
     return function(event) {
-        console.group('searched');
         var result = startSearch(search, event);
-        console.log('result: ', result);
-        console.groupEnd();
-        if (_.isFunction(search.props.onChange)) {
-            search.props.onChange(result);
+        if (result && _.isFunction(search.props.onSearch)) {
+            search.props.onSearch(result);
         }
     }
 }

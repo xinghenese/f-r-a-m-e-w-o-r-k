@@ -21,9 +21,17 @@ var messageIndex = 0;
 //core module to export
 var ConversationBox = React.createClass({
     getInitialState: function() {
+        var messages = _getLastMessages();
         return {
-            data: _getLastMessages()
+            data: messages,
+            displayData: messages
         };
+    },
+    _filterData: function(data) {
+        if (!data || !data.name || _.isEmpty(data.name)) {
+            return;
+        }
+        this.setState({displayData: data.name});
     },
     _updateMessages: function() {
         var messages = _getLastMessages();
@@ -56,11 +64,13 @@ var ConversationBox = React.createClass({
                         <Search
                             defaultValue={Lang.search}
                             datasource={this.state.data}
+                            fields={['name', 'message']}
+                            onSearch={this._filterData}
                             style={style.header.searchbar.search}
                             />
                     </div>
                 </div>
-                <ConversationList data={this.state.data}/>
+                <ConversationList data={this.state.displayData}/>
 
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}>
@@ -100,10 +110,12 @@ function _buildGroupRenderObject(item, collector) {
         time = Formats.formatTime(item.message.getTimestamp());
     }
     _.set(collector, item.groupId, {
+        name: groupName,
         senderName: groupName,
         senderAvatar: avatar,
         message: message,
         time: time,
+        id: item.groupId,
         type: 'group'
     });
 }
@@ -122,10 +134,12 @@ function _buildUserRenderObject(item, collector) {
         time = Formats.formatTime(item.message.getTimestamp());
     }
     _.set(collector, item.userId, {
+        name: userName,
         senderName: userName,
         senderAvatar: avatar,
         message: message,
         time: time,
+        id: item.userId,
         type: 'private'
     });
 }
