@@ -28,10 +28,9 @@ var ConversationBox = React.createClass({
         };
     },
     _filterData: function(data) {
-        if (!data || !data.name || _.isEmpty(data.name)) {
-            return;
+        if (data) {
+            this.setState({displayData: data.name});
         }
-        this.setState({displayData: data.name});
     },
     _updateMessages: function() {
         var messages = _getLastMessages();
