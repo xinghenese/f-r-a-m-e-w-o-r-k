@@ -47,7 +47,7 @@ var ChatMessageBox = React.createClass({
                 groupId: id,
                 messages: MessageStore.getGroupHistoryMessages(id).getMessages()
             };
-        } else if (info.type === 'private') {
+        } else if (type === 'private') {
             data = {
                 userId: id,
                 messages: MessageStore.getPrivateHistoryMessages(id).getMessages()
