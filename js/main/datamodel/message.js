@@ -7,6 +7,7 @@
 var _ = require('lodash');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
+var MessageConstants = require('../constants/messageconstants');
 
 // exports
 function Message(data) {
@@ -102,4 +103,16 @@ Message.prototype.getAltText = function() {
 
 Message.prototype.getTimestamp = function() {
     return parseInt(this._data["tmstp"]);
+};
+
+Message.prototype.getStatus = function() {
+    if (!objects.containsValuedProp(this, "_status")) {
+        return MessageConstants.Status.UNKNOWN;
+    }
+
+    return this._status;
+};
+
+Message.prototype.setStatus = function(status) {
+    this._status = status;
 };

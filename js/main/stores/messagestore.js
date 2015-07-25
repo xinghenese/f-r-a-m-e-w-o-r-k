@@ -18,6 +18,7 @@ var predicates = require('../utils/predicates');
 var socketconnection = require('../net/connection/socketconnection');
 var ChangeableStore = require('./changeablestore');
 var Message = require('../datamodel/message');
+var MessageConstants = require('../constants/messageconstants');
 
 // exports
 var MessageStore = ChangeableStore.extend({
@@ -77,11 +78,15 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 // private functions
 function _appendMessage(data) {
     data["tmstp"] = new Date().valueOf();
+    var message = new Message(data);
+
     if (objects.containsValuedProp(data, "msrid")) {
-        MessageStore.appendGroupMessage(parseInt(data["msrid"]), new Message(data));
+        MessageStore.appendGroupMessage(parseInt(data["msrid"]), message);
     } else {
-        MessageStore.appendPrivateMessage(parseInt(data["mstuid"]), new Message(data));
+        MessageStore.appendPrivateMessage(parseInt(data["mstuid"]), message);
     }
+
+    return message;
 }
 
 function _collectLastMessages() {
@@ -141,7 +146,7 @@ function _handleSendTalkMessage(action) {
     objects.copyValuedProp(action, "groupId", data, "msrid");
     objects.copyValuedProp(action, "toUserId", data, "mstuid");
     objects.copyValuedProp(action, "atUserId", data, "atuid");
-    _appendMessage(_.cloneDeep(data));
+    var message = _appendMessage(_.cloneDeep(data));
 
     socketconnection.request({
         tag: "TM",
@@ -152,7 +157,8 @@ function _handleSendTalkMessage(action) {
         if (msg["uuid"] !== uuid) {
             console.log("wrong confirm, expect: " + uuid + ", actual: " + msg["uuid"]);
         } else {
-            console.log("received confirm: " + uuid);
+            message.setStatus(MessageConstants.Status.RECEIVED);
+            MessageStore.emitChange();
         }
     }).catch(function(error) {
         console.log("message sent failed: " + error);

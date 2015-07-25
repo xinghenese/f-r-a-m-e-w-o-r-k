@@ -16,8 +16,6 @@ var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
 var Formats = require('../../../utils/formats');
 
-var messageIndex = 0;
-
 //core module to export
 var ConversationBox = React.createClass({
     getInitialState: function() {
@@ -35,14 +33,9 @@ var ConversationBox = React.createClass({
     _updateMessages: function() {
         var messages = _getLastMessages();
         this.setState({
-            data: messages
+            data: messages,
+            displayData: messages
         });
-        if (messageIndex > 2) {
-            return;
-        }
-        _.delay(function() {
-            MessageActions.sendTalkMessage("680", null, null, (++messageIndex).toString(), 1, 0, "1.0")
-        }, 1000);
     },
     componentWillMount: function() {
         MessageStore.addChangeListener(this._updateMessages);
