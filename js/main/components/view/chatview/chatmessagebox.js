@@ -19,7 +19,7 @@ var MessageActions = require('../../../actions/messageactions');
 
 //core module to export
 var ChatMessageBox = React.createClass({
-    getInitialState: function(){
+    getInitialState: function() {
         return {
             id: '',
             type: '',
@@ -61,9 +61,7 @@ var ChatMessageBox = React.createClass({
             _buildUserRenderObject(data, result);
         }
 
-        if (!_.isEmpty(result)) {
-            this.setState({data: result, id: id, type: type});
-        }
+        this.setState({data: result, id: id, type: type});
     },
     componentWillMount: function() {
         MessageStore.addChangeListener(this._updateMessages);
@@ -73,7 +71,7 @@ var ChatMessageBox = React.createClass({
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
     },
-    render: function(){
+    render: function() {
         if (this.state.id) {
             return (
                 <div className="chat-message-box" style={makeStyle(style)}>
@@ -91,7 +89,7 @@ var ChatMessageBox = React.createClass({
                 <div className="chat-message-box-header" style={makeStyle(style.footer)}/>
             </div>
         );
-  }
+    }
 });
 
 module.exports = ChatMessageBox;

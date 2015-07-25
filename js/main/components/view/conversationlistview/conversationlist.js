@@ -68,7 +68,7 @@ function onselect(list) {
             id: index,
             type: _.get(list.props.data, index).type
         });
-    }
+    };
 }
 
 function isValidConversationData(data) {

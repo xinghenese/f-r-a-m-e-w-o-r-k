@@ -184,6 +184,10 @@ function _handleHistoryMessagesResponse(response) {
 
 function _handleGroupHistoryMessages(messages) {
     _.forEach(messages, function(v) {
+        if (!_isValidGroup(v["rid"])) {
+            return;
+        }
+
         var groupHistoryMessages = new GroupHistoryMessages(v);
         MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
     });
@@ -193,5 +197,9 @@ function _handlePrivateHistoryMessages(messages) {
     _.forEach(messages, function(v) {
         var privateHistoryMessages = new PrivateHistoryMessages(v);
         MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
-    })
+    });
+}
+
+function _isValidGroup(groupId) {
+    return groupId && parseInt(groupId) > 0;
 }
