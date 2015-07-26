@@ -20,6 +20,14 @@ module.exports = {
             borderBottom: "1px solid " + COLOR_LIGHT
         }
     },
+    search: {
+        blur: {
+            outline: "0 none"
+        },
+        focus: {
+            outline: "1px solid " + COLOR_LIGHT
+        }
+    },
     textarea: {
         width: "200px",
         fontSize: "12px",

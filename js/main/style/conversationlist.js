@@ -22,8 +22,11 @@ module.exports = {
             padding: "9px 23px",
             //search
             search: {
+                width: "90%",
                 height: "29px",
-                fontSize: "14px"
+                fontSize: "14px",
+                lineHeight: "29px",
+                padding: "0 5%"
             }
         }
     },

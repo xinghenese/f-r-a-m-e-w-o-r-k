@@ -7,7 +7,9 @@ var _ = require('lodash');
 var React = require('react');
 var makeStyle = require('../../style/styles').makeStyle;
 var commonStyle = require('../../style/common');
+var defaultStyle = require('../../style/default');
 var emitter = require('../../utils/eventemitter.thenable');
+var setStyle = require('../../style/styles').setStyle;
 
 //private fields
 
@@ -35,6 +37,8 @@ var Search = React.createClass({
                 className={this.props.className}
                 placeholder={this.props.defaultValue}
                 onChange={this._doSearch}
+                onBlur={onBlur}
+                onFocus={onFocus}
                 style={makeStyle(commonStyle.input, this.props.style)}
             />
         )
@@ -51,7 +55,7 @@ function startSearch(search, event) {
     var fields = search.props.fields;
     var searchText = event && event.target && event.target.value || '';
 
-    if (!datasource || (!_.isFunction(searchFunction) && !fields)) {
+    if (!datasource || (!_.isFunction(searchFunction) && !fields) || !searchText) {
         return null;
     }
 
@@ -63,17 +67,25 @@ function startSearch(search, event) {
         }
 
         _.forEach(fields, function(field) {
-            var subResult = _.reduce(datasource, function(memo, data, key) {
+            var subResult = _.reduce(datasource, function(memo, data) {
                 if (data[field] && (data[field] + '').indexOf(searchText) > -1) {
-                    return _.set(memo, key, data);
+                    memo.push(data);
                 }
                 return memo;
-            }, {});
+            }, []);
             if (subResult && !_.isEmpty(subResult)) {
                 result[field] = subResult;
             }
         });
     }
 
-    return result && !_.isEmpty(result) ? result : null;
+    return result;
+}
+
+function onBlur(event){
+    setStyle(event.target.style, defaultStyle.search.blur);
+}
+
+function onFocus(event){
+    setStyle(event.target.style, defaultStyle.search.focus);
 }

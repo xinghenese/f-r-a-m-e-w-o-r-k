@@ -26,9 +26,13 @@ var ConversationBox = React.createClass({
         };
     },
     _filterData: function(data) {
-        if (data) {
-            this.setState({displayData: data.name});
-        }
+        console.log('data: ', data);
+        this.setState({
+            displayData: data && _.indexBy(data.name, 'id') || this.state.data
+        });
+    },
+    componentDidUpdate: function() {
+        console.log('state: ', this.state);
     },
     _updateMessages: function() {
         var messages = _getLastMessages();
@@ -62,7 +66,7 @@ var ConversationBox = React.createClass({
                             />
                     </div>
                 </div>
-                <ConversationList data={this.state.displayData}/>
+                <ConversationList data={this.state.displayData} />
 
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}>
