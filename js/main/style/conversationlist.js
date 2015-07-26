@@ -22,8 +22,11 @@ module.exports = {
             padding: "9px 23px",
             //search
             search: {
+                width: "90%",
                 height: "29px",
-                fontSize: "14px"
+                fontSize: "14px",
+                lineHeight: "29px",
+                padding: "0 5%"
             }
         }
     },
@@ -63,24 +66,36 @@ module.exports = {
                 width: itemHeight,
                 lineHeight: itemHeight,
                 height: itemHeight,
-                borderRadius: "50%",
-                float: "left",
-                background: "#4d91c7",
-                textAlign: "center",
-                marginRight: "14px",
-                overflow: "hidden"
+                marginRight: "14px"
             },
             //title
             title: {
                 lineHeight: "1.6em",
                 '@mixin': commonStyle.singleLineText
             },
-            //time
-            time: {
+            //info
+            info: {
                 float: "right",
                 color: "#d1d1d1",
                 fontSize: "12px",
                 height: itemHeight
+            },
+            //time
+            time: {
+                lineHeight: "1.8em",
+                '@mixin': commonStyle.singleLineText
+            },
+            //unread
+            unread: {
+                fontSize: "12px",
+                lineHeight: "1.8em",
+                color: '#fff',
+                background: '#6fc766',
+                borderRadius: '3px',
+                float: 'right',
+                textAlign: 'center',
+                width: '40px',
+                '@mixin': commonStyle.singleLineText
             },
             //message
             message: {

@@ -30,13 +30,16 @@ var ValidatorClassString = [
 //module initialization
 module.exports = createDownWalkableClass({
     displayName: 'Form',
-    render: function(){
+    submit: function(event) {
+        doSubmit(this)(event);
+    },
+    render: function() {
         return (
             <form
-                onSubmit={submit(this)}
+                onSubmit={doSubmit(this)}
                 className={this.props.className}
                 style={makeStyle(this.props.style)}
-            >
+                >
                 {this.props.children}
             </form>
         )
@@ -44,7 +47,7 @@ module.exports = createDownWalkableClass({
 });
 
 //private functions
-function submit(form) {
+function doSubmit(form) {
     return function(event) {
         form.walkDescendants(validate).then(function(data) {
             event.data = data;
@@ -78,6 +81,7 @@ function validate(element, result) {
     var value = element.value || control.value || control.textContent || control.innerText;
     var field = element.props.field || element.props.id;
     if (value && field) {
+        element.value && (element.value = '');
         return result.then(function(data) {
             return _.set(data, field, value);
         })
@@ -87,7 +91,7 @@ function validate(element, result) {
 }
 
 function isValidator(element) {
-    for (var i = 0, len = ValidatorClassString.length; i < len; i ++) {
+    for (var i = 0, len = ValidatorClassString.length; i < len; i++) {
         if (element.constructor.displayName === ValidatorClassString[i]) {
             return true;
         }

@@ -9,46 +9,46 @@ var ConversationListItem = require('./conversationlistitem');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
+var emitter = require('../../../utils/eventemitter');
 
 //private fields
-//var prefix = 'conversation-list-';
+var prefix = 'conversation-list-';
 var index = 0;
 
 //core module to export
 var ConversationList = React.createClass({
     getInitialState: function() {
-        return {selectedIndex: -1, data: this.props.datasource};
+        return {selectedIndex: -1};
     },
     render: function() {
-        var conversationListItem = null;
-        var inlineStyle = this.props.style || {};
+        var conversationList = null;
 
-        if (this.props.data && !_.isEmpty(this.state.data)) {
-            console.log('conversationList.data: ', this.state.data);
-
-            conversationListItem = _.map(fetchLastMessages(this.state.data), function(data, key) {
-
+        if (this.props.data && !_.isEmpty(this.props.data)) {
+            conversationList = _.map(this.props.data, function(data, key) {
+                if (!isValidConversationData(data)) {
+                    return null;
+                }
                 return (
                     <ConversationListItem
-                        key={key}
+                        key={prefix + key}
                         time={data.time}
                         senderName={data.senderName}
                         senderAvatar={data.senderAvatar}
-                        index={key}
+                        index={prefix + key}
                         onSelect={onselect(this)}
                         selected={this.state.selectedIndex == key}
-                        style={inlineStyle.item}
-                    >
+                        >
                         {data.message}
                     </ConversationListItem>
-                    );
+                );
             }, this);
         }
+
         return (
             <ul className="chat-message-list"
-                style={makeStyle(inlineStyle)}
+                style={makeStyle(style.conversationlist, this.props.style)}
                 >
-                {conversationListItem}
+                {conversationList}
             </ul>
         )
     }
@@ -62,16 +62,16 @@ module.exports = ConversationList;
 //private functions
 function onselect(list) {
     return function(event) {
-        var index = event.currentTarget.id;
+        var index = event.currentTarget.id.replace(/\D/g, '');
         list.setState({selectedIndex: index});
-        console.log('list.state: ', index);
-        console.log('data: ', _.get(list.state.data, index));
-        list.props.onSelect(_.get(list.state.data, index));
-    }
+        emitter.emit('select', {
+            id: index,
+            type: _.get(list.props.data, index).type
+        });
+    };
 }
 
-function fetchLastMessages(data) {
-    return _.mapValues(data, function(value, key) {
-        return _.isArray(value) ? _.last(value) : value;
-    });
+function isValidConversationData(data) {
+    //TODO: why data.message here can be empty.
+    return data && !_.isEmpty(data) && data.senderName;
 }

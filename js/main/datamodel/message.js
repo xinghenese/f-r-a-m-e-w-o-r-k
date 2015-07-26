@@ -6,6 +6,8 @@
 // dependencies
 var _ = require('lodash');
 var objects = require('../utils/objects');
+var Lang = require('../locales/zh-cn');
+var MessageConstants = require('../constants/messageconstants');
 
 // exports
 function Message(data) {
@@ -35,14 +37,42 @@ Message.prototype.getContent = function() {
     if (objects.hasHierarchicalProps(this._data, ["msg", "t"])) {
         return this._data["msg"]["t"];
     } else {
-        // todo
-        // generate content
-        return "非文本消息";
+        return Lang.unknownMessage;
+    }
+};
+
+Message.prototype.getBriefText = function() {
+    var type = this.getMessageType();
+    switch (type) {
+        case 0:
+            return this.getContent();
+        case 1:
+            return Lang.pictureMessage;
+        case 2:
+            return Lang.audioMessage;
+        case 3:
+            return Lang.locationMessage;
+        case 4:
+            return Lang.vibrationMessage;
+        case 5:
+            return Lang.systemMessage;
+        case 6:
+            return Lang.emotionMessage;
+        case 7:
+            return Lang.predefinedMessage;
+        case 10:
+            return Lang.contactMessage;
+        case 11:
+            return Lang.groupCardMessage;
     }
 };
 
 Message.prototype.getUuid = function() {
     return this._data["uuid"];
+};
+
+Message.prototype.getUserNickname = function() {
+    return this._data["unk"];
 };
 
 /**
@@ -56,7 +86,7 @@ Message.prototype.getConversationType = function() {
  * see http://wiki.topcmm.net/doku.php?id=wiki:liao_enum#msgtp
  */
 Message.prototype.getMessageType = function() {
-    return this._data["msgtp"];
+    return parseInt(this._data["msgtp"]);
 };
 
 Message.prototype.getVersion = function() {
@@ -69,4 +99,20 @@ Message.prototype.getMinVersion = function() {
 
 Message.prototype.getAltText = function() {
     return this._data["alt"];
+};
+
+Message.prototype.getTimestamp = function() {
+    return parseInt(this._data["tmstp"]);
+};
+
+Message.prototype.getStatus = function() {
+    if (!objects.containsValuedProp(this, "_status")) {
+        return MessageConstants.Status.UNKNOWN;
+    }
+
+    return this._status;
+};
+
+Message.prototype.setStatus = function(status) {
+    this._status = status;
 };

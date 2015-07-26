@@ -13,8 +13,10 @@ var keyExchange = require('../crypto/factory').createKeyExchange();
 var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 var authentication = require('./authentication');
+var objects = require('../../utils/objects');
 var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
+var MessageConstants = require('../../constants/messageconstants');
 var SocketRequestResponseTagMap = require('./SocketRequestResponseTagMap');
 
 //private const fields
@@ -61,7 +63,6 @@ var socketconnection = module.exports = connection.extend({
             });
         }
         return authorize().then(function(value) {
-            console.log('authorize.then: ', value);
             //avoid duplicate handshake authorization request.
             if (HANDSHAKE_TAG == packet.tag || AUTH_TAG == packet.tag) {
                 return value;
@@ -71,13 +72,10 @@ var socketconnection = module.exports = connection.extend({
             }
         });
     },
-
     ping: ping,
-
     getState: function() {
         return state;
     },
-
     isAuthorized: function() {
         return isAuthorized;
     }
@@ -97,9 +95,7 @@ state = State.INITIALIZED;
 //just listen to data reception with tag.
 function get(tag) {
     return socketconnection.on(tag, function(data) {
-        console.group('socket');
         console.log('=>', tag + ": " + JSON.stringify(data));
-        console.groupEnd();
         return data;
     });
 }
@@ -107,34 +103,29 @@ function get(tag) {
 function post(packet) {
     var tag = packet.tag;
     var data = packet.data;
-    var responseTag = packet.responseTag;
-
-    console.group('socket');
-    console.log('<=', tag + ": " + JSON.stringify(data));
 
     if (session.has(tag)) {
         return promise.create(session.fetch(tag));
     }
 
     //process and write data to session and then send via socket.
-    session.write(prepareRequestPacket(tag, data), _.assign({}, DEFAULT_CONFIG))
-        .then(function(value) {
-            return socket.send(value);
-        });
-
-    if (!responseTag) return;
-
-    return socketconnection.once(responseTag, function(data) {
-        console.log('=>', tag + ": " + JSON.stringify(data));
-        console.groupEnd();
-        return data;
+    session.write(prepareRequestPacket(tag, data), _.assign({}, DEFAULT_CONFIG)).then(function(value) {
+        return socket.send(value);
     });
+
+    if ("responseTag" in packet && "predicate" in packet) {
+        return socketconnection.conditionalOnce(packet.responseTag, packet.predicate,
+            MessageConstants.MESSAGE_CONFIRM_TIMEOUT);
+    } else if ("responseTag" in packet) {
+        return socketconnection.once(packet.responseTag);
+    } else {
+        return socketconnection.once(tag);
+    }
 }
 
 function packetFormalize(packet) {
     var tag;
     var data;
-    var responseTag;
 
     if (!packet || _.isEmpty(packet)) {
         throw new Error("empty packet to be sent via socket");
@@ -142,17 +133,17 @@ function packetFormalize(packet) {
     if (_.isPlainObject(packet)) {
         tag = "" + (packet.tag || _.keys(packet)[0]);
         data = packet.data || _.get(packet, tag);
-        responseTag = packet.responseTag || SocketRequestResponseTagMap.getReponseTag(tag);
 
         if (!tag) {
             throw new Error('invalid tag');
         }
         if (data && !_.isEmpty(data)) {
-            return {
+            var result = {
                 tag: tag.toUpperCase(),
-                data: data,
-                responseTag: responseTag
-            }
+                data: data
+            };
+            objects.copyPropsExcept(packet, result, ["tag", "data"]);
+            return result;
         }
     }
     return {
@@ -171,33 +162,35 @@ function prepareRequestPacket(tag, data) {
 }
 
 function onMessageReceived(msg) {
-    return session.read(msg, _.assign({}, DEFAULT_CONFIG))
-        .then(function(value) {
-            var tag = value.tag;
-            var data = value.data;
+    return session.read(msg, _.assign({}, DEFAULT_CONFIG)).then(function(value) {
+        var tag = value.tag;
+        var data = value.data;
 
-            //check whether the message is pushed by server or pulled from server.
-            if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
-                socketconnection.emit(tag, data);
+        //check whether the message is pushed by server or pulled from server.
+        if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
+            console.log("emitting - " + tag);
+            socketconnection.emit(tag, data);
+        } else {
+            //if the message pushed by server does not have to notify immediately,
+            //then cache it into the session for later use.
+            if (shouldNotify(tag)) {
+                console.log("notifyImmediately - " + tag);
+                notifyImmediately(tag, data);
             } else {
-                //if the message pushed by server does not have to notify immediately,
-                //then cache it into the session for later use.
-                if (shouldNotify(tag)) {
-                    notifyImmediately(tag, data);
-                } else {
-                    session.cache(tag, data);
-                }
+                console.log("cache - " + tag);
+                session.cache(tag, data);
             }
-        })
-        ;
+        }
+    });
 }
 
 function authorize() {
     if (!authorizePromise) {
         authorizePromise = handshake().then(function() {
             return post({
-                'tag': AUTH_TAG,
-                'data': UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev")
+                tag: AUTH_TAG,
+                data: UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev"),
+                responseTag: SocketRequestResponseTagMap.getResponseTag(AUTH_TAG)
             });
         }).then(function(data) {
             if (!authentication.validateSequence(_.get(data, 'msqsid'))) {
@@ -214,8 +207,8 @@ function authorize() {
 function handshake() {
     if (!handshakePromise) {
         handshakePromise = post({
-            'tag': HANDSHAKE_TAG,
-            'data': _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
+            tag: HANDSHAKE_TAG,
+            data: _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
                 , keyExchange.getPublicKey())
         }).then(function(data) {
             _.set(DEFAULT_CONFIG, 'encryptKey'
@@ -236,12 +229,12 @@ function awaitToken() {
 function ping() {
     return authorize().then(function() {
         return post({
-            'tag': PING_TAG,
-            'data': _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
-                , authentication.nextEncodedSequence())
+            tag: PING_TAG,
+            data: _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
+                , authentication.nextEncodedSequence()),
+            responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
         })
     }).then(function(data) {
-        console.log('ping: ', data);
         return data;
     });
 }
@@ -254,5 +247,5 @@ function notifyImmediately(tag, data) {
     console.log('notifyImmediately: ', JSON.stringify({
         'tag': tag,
         'data': data
-    }))
+    }));
 }

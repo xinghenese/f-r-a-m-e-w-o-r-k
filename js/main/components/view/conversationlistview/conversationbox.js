@@ -12,19 +12,33 @@ var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
 var groups = require('../../../datamodel/groups');
 var users = require('../../../datamodel/users');
+var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
+var Formats = require('../../../utils/formats');
 
 //core module to export
 var ConversationBox = React.createClass({
     getInitialState: function() {
+        var messages = _getLastMessages();
         return {
-            data: _getLastMessages()
+            data: messages,
+            displayData: messages
         };
+    },
+    _filterData: function(data) {
+        console.log('data: ', data);
+        this.setState({
+            displayData: data && _.indexBy(data.name, 'id') || this.state.data
+        });
+    },
+    componentDidUpdate: function() {
+        console.log('state: ', this.state);
     },
     _updateMessages: function() {
         var messages = _getLastMessages();
         this.setState({
-            data: messages
+            data: messages,
+            displayData: messages
         });
     },
     componentWillMount: function() {
@@ -46,11 +60,13 @@ var ConversationBox = React.createClass({
                         <Search
                             defaultValue={Lang.search}
                             datasource={this.state.data}
+                            fields={['name', 'message']}
+                            onSearch={this._filterData}
                             style={style.header.searchbar.search}
                             />
                     </div>
                 </div>
-                <ConversationList data={this.state.data}/>
+                <ConversationList data={this.state.displayData} />
 
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}>
@@ -65,7 +81,7 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = [];
+    var result = {};
     _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
@@ -84,15 +100,19 @@ function _buildGroupRenderObject(item, collector) {
     var groupName = group.name();
     var avatar = group.picture();
     var message = "";
+    var time = "";
     if (item.message) {
-        message = item.message.getContent();
+        message = item.message.getBriefText();
+        time = Formats.formatTime(item.message.getTimestamp());
     }
-    var time = (new Date()).toLocaleTimeString();
-    collector.push({
+    _.set(collector, item.groupId, {
+        name: groupName,
         senderName: groupName,
         senderAvatar: avatar,
         message: message,
-        time: time
+        time: time,
+        id: item.groupId,
+        type: 'group'
     });
 }
 
@@ -104,14 +124,18 @@ function _buildUserRenderObject(item, collector) {
     var userName = user.getNickname();
     var avatar = user.picture();
     var message = "";
+    var time = "";
     if (item.message) {
-        message = item.message.getContent();
+        message = item.message.getBriefText();
+        time = Formats.formatTime(item.message.getTimestamp());
     }
-    var time = (new Date()).toLocaleTimeString();
-    collector.push({
+    _.set(collector, item.userId, {
+        name: userName,
         senderName: userName,
         senderAvatar: avatar,
         message: message,
-        time: time
+        time: time,
+        id: item.userId,
+        type: 'private'
     });
 }

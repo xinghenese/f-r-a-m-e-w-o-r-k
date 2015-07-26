@@ -12,7 +12,7 @@ module.exports = {
     displayName: 'DescendantsWalkable',
     descendantsProps: function(child, path) {
         return {
-            ref: (this._seq || '') + 'child-' + path.join('-')
+            ref: child.ref || ((this._seq || '') + 'child-' + path.join('-'))
         }
     },
     walkDescendants: function(process, result) {

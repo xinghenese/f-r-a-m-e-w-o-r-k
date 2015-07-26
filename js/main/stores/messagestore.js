@@ -17,13 +17,11 @@ var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
 var socketconnection = require('../net/connection/socketconnection');
 var ChangeableStore = require('./changeablestore');
+var Message = require('../datamodel/message');
+var MessageConstants = require('../constants/messageconstants');
 
 // exports
 var MessageStore = ChangeableStore.extend({
-    Events: {
-        HISTORY_MESSAGES_RECEIVED: "historyMessagesReceived",
-        HISTORY_MESSAGES_MISSED: "historyMessagesMissed"
-    },
     _groupHistoryMessages: {},
     _privateHistoryMessages: {},
     addGroupHistoryMessages: function(groupId, groupHistoryMessages) {
@@ -31,6 +29,26 @@ var MessageStore = ChangeableStore.extend({
     },
     addPrivateHistoryMessages: function(userId, privateHistoryMessages) {
         this._privateHistoryMessages[userId] = privateHistoryMessages;
+    },
+    appendGroupMessage: function(groupId, message) {
+        if (groupId in this._groupHistoryMessages) {
+            this._groupHistoryMessages[groupId].appendMessage(message);
+        } else {
+            var historyMessages = new GroupHistoryMessages({rid: groupId});
+            this._groupHistoryMessages[groupId] = historyMessages;
+        }
+
+        this.emitChange();
+    },
+    appendPrivateMessage: function(userId, message) {
+        if (userId in this._privateHistoryMessages) {
+            this._privateHistoryMessages[userId].appendMessage(message);
+        } else {
+            var historyMessages = new PrivateHistoryMessages({uid: userId});
+            this._privateHistoryMessages[userId] = historyMessages;
+        }
+
+        this.emitChange();
     },
     getGroupHistoryMessages: function(groupId) {
         return this._groupHistoryMessages[groupId];
@@ -58,6 +76,19 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 });
 
 // private functions
+function _appendMessage(data) {
+    data["tmstp"] = new Date().valueOf();
+    var message = new Message(data);
+
+    if (objects.containsValuedProp(data, "msrid")) {
+        MessageStore.appendGroupMessage(parseInt(data["msrid"]), message);
+    } else {
+        MessageStore.appendPrivateMessage(parseInt(data["mstuid"]), message);
+    }
+
+    return message;
+}
+
 function _collectLastMessages() {
     var messages = [];
     _.forEach(MessageStore._groupHistoryMessages, function(value, key) {
@@ -111,9 +142,12 @@ function _handleSendTalkMessage(action) {
         msgtp: action.messageType,
         uuid: uuid
     };
+
     objects.copyValuedProp(action, "groupId", data, "msrid");
     objects.copyValuedProp(action, "toUserId", data, "mstuid");
     objects.copyValuedProp(action, "atUserId", data, "atuid");
+    var message = _appendMessage(_.cloneDeep(data));
+
     socketconnection.request({
         tag: "TM",
         data: data,
@@ -123,7 +157,8 @@ function _handleSendTalkMessage(action) {
         if (msg["uuid"] !== uuid) {
             console.log("wrong confirm, expect: " + uuid + ", actual: " + msg["uuid"]);
         } else {
-            console.log("received confirm: " + uuid);
+            message.setStatus(MessageConstants.Status.RECEIVED);
+            MessageStore.emitChange();
         }
     }).catch(function(error) {
         console.log("message sent failed: " + error);
@@ -149,6 +184,10 @@ function _handleHistoryMessagesResponse(response) {
 
 function _handleGroupHistoryMessages(messages) {
     _.forEach(messages, function(v) {
+        if (!_isValidGroup(v["rid"])) {
+            return;
+        }
+
         var groupHistoryMessages = new GroupHistoryMessages(v);
         MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
     });
@@ -158,5 +197,9 @@ function _handlePrivateHistoryMessages(messages) {
     _.forEach(messages, function(v) {
         var privateHistoryMessages = new PrivateHistoryMessages(v);
         MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
-    })
+    });
+}
+
+function _isValidGroup(groupId) {
+    return groupId && parseInt(groupId) > 0;
 }

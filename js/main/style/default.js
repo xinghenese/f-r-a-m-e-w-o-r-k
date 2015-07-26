@@ -20,6 +20,14 @@ module.exports = {
             borderBottom: "1px solid " + COLOR_LIGHT
         }
     },
+    search: {
+        blur: {
+            outline: "0 none"
+        },
+        focus: {
+            outline: "1px solid " + COLOR_LIGHT
+        }
+    },
     textarea: {
         width: "200px",
         fontSize: "12px",
@@ -52,7 +60,11 @@ module.exports = {
             color: "#4c83b5",
             margin: "0 32px 22px 0"
         }
-  }
+    },
+    avatar: {
+        float: 'left',
+        color: '#fff'
+    }
 };
 
 //module initialization

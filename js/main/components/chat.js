@@ -11,18 +11,12 @@ var State = Router.State;
 var ChatActions = require('../actions/chatactions');
 var ChatStore = require('../stores/chatstore');
 var GroupActioins = require('../actions/groupactions');
+var ConversationBox = require('./view/conversationlistview/conversationbox');
+var ChatMessageBox = require('./view/chatview/chatmessagebox');
 var MessageActions = require('../actions/messageactions');
-var MessageStore = require('../stores/messagestore');
 var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
-var Lang = require('../locales/zh-cn');
-var Page  = require('./hierarchy/Page');
-var DataHolder = require('./hierarchy/DataHolder');
-var Search = require('./tools/Search');
-var ConversationList = require('./view/conversationlistview/conversationlist');
-var ChatMessageList = require('./view/chatview/chatmessagelist');
-var ConversationAndUserStore = require('../stores/ConversationAndUserStore');
 
 // exports
 var Chat = React.createClass({
@@ -41,7 +35,6 @@ var Chat = React.createClass({
         _.forEach(messages, function(message) {
             //console.log(message);
         });
-        MessageActions.sendTalkMessage(null, "100", null, "1", 1, 0, "1.0");
     },
     componentWillMount: function() {
         // putting it here for test purpose
@@ -49,38 +42,18 @@ var Chat = React.createClass({
         ChatActions.getChatList(1);
         ChatStore.on(ChatStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ChatStore.on(ChatStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
-        MessageStore.on(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
         modifyPageStyle();
     },
     componentWillUnmount: function() {
         ChatStore.removeListener(ChatStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ChatStore.removeListener(ChatStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
-        MessageStore.removeListener(MessageStore.Events.HISTORY_MESSAGES_RECEIVED, this._handleHistoryMessagesReceived);
     },
     render: function() {
-        var data = _.get(ConversationAndUserStore, 'ConversationStore');
-        var style = {
-            conversationBox: require('../style/conversationlist'),
-            chatBox: require('../style/chatmessage')
-        };
         return (
-            <Page className="chat" store={data} namespace="chat" style={style}>
-                <DataHolder
-                    handler={Search}
-                    props={{defaultValue: Lang.search}}
-                    updateHook={'onChange'}
-                    domPath={'/div#SideList.conversation-box/div.header/div.searchbar'}
-                >
-                    <DataHolder
-                        handler={ConversationList}
-                        domPath={'/div#SideList.conversation-box/'}
-                        updateHook={'onSelect'}
-                    >
-                        <div className={'header'} domPath={'/div#mainBox.chat-box/'} />
-                        <DataHolder handler={ChatMessageList} domPath={'/div#mainBox.chat-box/'} />
-                    </DataHolder>
-                </DataHolder>
-            </Page>
+            <div>
+                <ChatMessageBox />
+                <ConversationBox />
+            </div>
         );
     }
 });
