@@ -17,12 +17,14 @@ var Search = React.createClass({
     propTypes: {
         searchFunction: React.PropTypes.func
     },
-    componentWillMount: function() {
-        onchange(this)();
+    componentDidUpdate: function(preProps) {
+        if (!_.isEqual(preProps.datasource, this.props.datasource)) {
+            this._doSearch();
+        }
     },
-    componentWillReceiveProps: function(nextProps) {
-        if (!_.isEqual(nextProps.datasource, this.props.datasource)) {
-            onchange(this)();
+    _doSearch: function(event) {
+        if (_.isFunction(this.props.onSearch)) {
+            this.props.onSearch(startSearch(this, event));
         }
     },
     render: function() {
@@ -32,7 +34,7 @@ var Search = React.createClass({
                 id={this.props.id}
                 className={this.props.className}
                 placeholder={this.props.defaultValue}
-                onChange={onchange(this)}
+                onChange={this._doSearch}
                 style={makeStyle(commonStyle.input, this.props.style)}
             />
         )
@@ -74,13 +76,4 @@ function startSearch(search, event) {
     }
 
     return result && !_.isEmpty(result) ? result : null;
-}
-
-function onchange(search) {
-    return function(event) {
-        var result = startSearch(search, event);
-        if (_.isFunction(search.props.onSearch)) {
-            search.props.onSearch(result);
-        }
-    }
 }
