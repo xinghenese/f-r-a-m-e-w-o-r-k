@@ -1,9 +1,6 @@
 {
-  "description": "The example module to show the structure of the web project.",
-  "repository": {
-    "type": "git",
-    "url": "."
-  },
+  "description": "An application for liao web client.",
+  "private": true,
   "jshintConfig": ".jshintrc",
   "scripts": {
     "test": "jest"
