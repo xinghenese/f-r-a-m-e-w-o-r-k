@@ -38,11 +38,52 @@ module.exports = {
         background: "#fafafa",
         bottom: "0",
         height: "58px",
-        width: "100%"
+        width: "100%",
+        //switcher
+        switcher: {
+            height: "100%",
+            option: {
+                display: "inline-block",
+                width: "50%",
+                height: "100%",
+                cursor: "pointer"
+            },
+            //conversation-option
+            conversation: {
+                inactive: {
+                    background: "url(/images/conversation.png) center center no-repeat"
+                },
+                active: {
+                    background: "url(/images/conversation-active.png) center center no-repeat"
+                }
+            },
+            //contacts-option
+            contacts: {
+                inactive: {
+                    background: "url(/images/contact.png) center center no-repeat"
+                },
+                active: {
+                    background: "url(/images/contact-active.png) center center no-repeat"
+                }
+            }
+        }
+    },
+    body: {
+        height: "600px",
+        overflowY: "auto"
     },
     //conversationlist
     conversationlist: {
         border: "0",
+        //caption
+        caption: {
+            height: "30px",
+            lineHeight: "30px",
+            padding: "0 14px",
+            color: "#282828",
+            background: "#fafafa",
+            fontSize: "14px"
+        },
         //item
         item: {
             height: itemHeight,
