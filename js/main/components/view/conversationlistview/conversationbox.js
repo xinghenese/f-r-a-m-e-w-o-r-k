@@ -22,13 +22,15 @@ var ConversationBox = React.createClass({
         var messages = _getLastMessages();
         return {
             data: messages,
-            displayData: messages
+            displayData: messages,
+            matchedMessages: null
         };
     },
     _filterData: function(data) {
         console.log('data: ', data);
         this.setState({
-            displayData: data && _.indexBy(data.name, 'id') || this.state.data
+            displayData: data && _.indexBy(data.name, 'id') || this.state.data,
+            matchedMessages: data && data.message
         });
     },
     componentDidUpdate: function() {
@@ -48,6 +50,23 @@ var ConversationBox = React.createClass({
         MessageStore.removeChangeListener(this._updateMessages);
     },
     render: function() {
+        var matchedMessages = null;
+        var matchedMessagesCount = null;
+
+        if (this.state.matchedMessages) {
+            matchedMessagesCount = (
+                <div
+                    className="conversation-list-matchedmessages-gap"
+                    style={style.gap}
+                >
+                    found {_.size(this.state.matchedMessages)} messages
+                </div>
+            );
+            matchedMessages = (
+                <ConversationList data={this.state.matchedMessages} />
+            )
+        }
+
         return (
             <div className="conversation-list-box" style={makeStyle(style)}>
                 <div className="conversation-list-box-header"
@@ -67,6 +86,8 @@ var ConversationBox = React.createClass({
                     </div>
                 </div>
                 <ConversationList data={this.state.displayData} />
+                {matchedMessagesCount}
+                {matchedMessages}
 
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}>
