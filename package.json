@@ -15,8 +15,9 @@
     "del": "*",
     "flux": "*",
     "gulp": "*",
-    "gulp-plumber": "^1.0.1",
+    "gulp-plumber": "*",
     "gulp-react": "*",
+    "gulp-webserver": "^0.9.1",
     "jest-cli": "^0.4.17",
     "keymirror": "*",
     "moment": "^2.10.6",
@@ -27,8 +28,7 @@
     "reactify": "*",
     "run-sequence": "*",
     "vinyl-source-stream": "*",
-    "watchify": "*",
-    "gulp-plumber": "*"
+    "watchify": "*"
   },
   "dependencies": {
     "browserify-cryptojs": "^0.3.1",

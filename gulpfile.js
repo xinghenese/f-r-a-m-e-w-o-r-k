@@ -58,4 +58,9 @@ gulp.task('watch', function () {
     return bundle();
 });
 
+gulp.task('local-serve', function () {
+    return gulp.src('.')
+        .pipe(require('gulp-webserver')());
+});
+
 gulp.task('default', ['build']);
