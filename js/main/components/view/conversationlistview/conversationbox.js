@@ -16,7 +16,7 @@ var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
 var Formats = require('../../../utils/formats');
 
-var ContactList = require('./ContactList');
+var ContactList = require('./contactlist');
 var ContactStore = require('../../../stores/contactstore');
 var Switcher = require('./conversationuserswitcher');
 

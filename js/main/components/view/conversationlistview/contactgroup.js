@@ -8,8 +8,6 @@ var React = require('react');
 var ContactItem = require('./contactitem');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
-var setStyle = require('../../../style/styles').setStyle;
-var emitter = require('../../../utils/eventemitter');
 
 //private fields
 var prefix = 'contact-group-';
