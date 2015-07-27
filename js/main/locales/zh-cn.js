@@ -6,6 +6,7 @@ module.exports = {
     "next": "下一步",
     "code": "代码",
     "country": "国家",
+    "deleteConversation": "删除会话",
     "invalidCountryCode": "不正确的区号",
     "invalidNickname": "不可用的昵称",
     "invalidPhone": "不正确的手机号码",

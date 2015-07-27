@@ -66,6 +66,12 @@ module.exports = MessageStore;
 // module initialization
 MessageStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
+        case ActionTypes.DELETE_GROUP_MESSAGES:
+            _handleDeleteGroupMessages(action.id);
+            break;
+        case ActionTypes.DELETE_PRIVATE_MESSAGES:
+            _handleDeletePrivateMessages(action.id);
+            break;
         case ActionTypes.REQUEST_HISTORY_MESSAGES:
             _handleHistoryMessagesRequest(action);
             break;
@@ -113,6 +119,20 @@ function _collectLastMessages() {
         }
     });
     return messages;
+}
+
+function _handleDeleteGroupMessages(id) {
+    if (id in MessageStore._groupHistoryMessages) {
+        delete MessageStore._groupHistoryMessages[id];
+        MessageStore.emitChange();
+    }
+}
+
+function _handleDeletePrivateMessages(id) {
+    if (id in MessageStore._privateHistoryMessages) {
+        delete MessageStore._privateHistoryMessages[id];
+        MessageStore.emitChange();
+    }
 }
 
 function _handleHistoryMessagesRequest(action) {

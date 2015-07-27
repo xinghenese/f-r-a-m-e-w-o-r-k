@@ -24,7 +24,24 @@ var ChatMessageBox = React.createClass({
         return {
             id: '',
             type: '',
+            inputEnabled: true,
             data: []
+        };
+    },
+    _deleteConversation: function(id, type) {
+        return function() {
+            var idNumber = parseInt(id);
+            switch (type) {
+                case "group":
+                    MessageActions.deleteGroupMessages(idNumber);
+                    break;
+                case "private":
+                    MessageActions.deletePrivateMessages(idNumber);
+                    break;
+                default:
+                    console.error("Unknow type of conversation to delete");
+                    break;
+            }
         };
     },
     _handleSubmit: function(event) {
@@ -36,22 +53,37 @@ var ChatMessageBox = React.createClass({
     _updateMessages: function(id, type) {
         id = id || this.state.id;
         type = type || this.state.type;
-
-        var data;
-
         if (!id || !type) {
             return;
         }
 
+        var data;
+        var enabled = true;
         if (type === 'group') {
+            var groupHistoryMessages = MessageStore.getGroupHistoryMessages(id);
+            if (!groupHistoryMessages) {
+                this.setState({id: null});
+                return;
+            }
+
             data = {
                 groupId: id,
-                messages: MessageStore.getGroupHistoryMessages(id).getMessages()
+                messages: groupHistoryMessages.getMessages()
             };
+            var group = groups.getGroup(id);
+            if (group) {
+                enabled = group.inGroup();
+            }
         } else if (type === 'private') {
+            var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(id);
+            if (!privateHistoryMessages) {
+                this.setState({id: null});
+                return;
+            }
+
             data = {
                 userId: id,
-                messages: MessageStore.getPrivateHistoryMessages(id).getMessages()
+                messages: privateHistoryMessages.getMessages()
             };
         }
 
@@ -62,7 +94,7 @@ var ChatMessageBox = React.createClass({
             _buildUserRenderObject(data, result);
         }
 
-        this.setState({data: result, id: id, type: type});
+        this.setState({data: result, id: id, type: type, inputEnabled: enabled});
     },
     componentWillMount: function() {
         MessageStore.addChangeListener(this._updateMessages);
@@ -78,7 +110,12 @@ var ChatMessageBox = React.createClass({
                 <div className="chat-message-box" style={makeStyle(style)}>
                     <div className="chat-message-box-header" style={makeStyle(style.header)}/>
                     <ChatMessageList data={this.state.data} style={style.chatmessagelist}/>
-                    <ChatMessageToolbar onSubmit={this._handleSubmit} style={style.toolbar}/>
+                    <ChatMessageToolbar
+                        onSubmit={this._handleSubmit}
+                        inputEnabled={this.state.inputEnabled}
+                        deleteHandler={this._deleteConversation(this.state.id, this.state.type)}
+                        style={style.toolbar}
+                        />
                 </div>
             );
         }

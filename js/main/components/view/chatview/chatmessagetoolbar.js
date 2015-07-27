@@ -38,6 +38,14 @@ var toolbar = module.exports = React.createClass({
     },
     render: function() {
         var style = this.props.style;
+        if (!this.props.inputEnabled) {
+            return (
+                <Button
+                    value={Lang.deleteConversation}
+                    onClick={this.props.deleteHandler}
+                    />
+            );
+        }
         return (
             <Form
                 className="chat-message-toolbar"
