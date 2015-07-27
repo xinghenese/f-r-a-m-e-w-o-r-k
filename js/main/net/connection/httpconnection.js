@@ -72,15 +72,6 @@ var httpconnection = module.exports = connection.extend({
             url = root + (packet.url || packet.path || packet);
             data = packet.data;
 
-            //Unnecessary to define a privilege method for httpconnection to alter the
-            //configs and cache it, which would be used as a base configs for the next
-            //time to alter configs relative to, 'cause it would incur a problem that
-            //we can't clearly remember the temporal configs after last alter nor figure
-            //out how to alter the configs this time as logic becomes rather complex.
-            //In one word, the configuration method doesn't work well as espected. So
-            //ditch it and use the copy of the temporally altered configs relative to
-            //DEFAULT_CONFIG as an argument to pass into <i><httpconnectoin#request/i>.
-            //Just be simple.
             options = _.assign({}, DEFAULT_CONFIG, _.omit(options, omitConfig));
 
             if (data && !_.isEmpty(data)) {
@@ -90,7 +81,7 @@ var httpconnection = module.exports = connection.extend({
                 }
                 return post(url, data, options);
             }
-            return get(url, options);
+            return post(url, {}, _.assign({'needEncrypt': false}, options));
         });
     },
 
