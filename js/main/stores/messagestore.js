@@ -89,6 +89,11 @@ function _appendMessage(data) {
     return message;
 }
 
+function _appendMyMessage(data) {
+    data["msuid"] = myself.uid;
+    return _appendMessage(data);
+}
+
 function _collectLastMessages() {
     var messages = [];
     _.forEach(MessageStore._groupHistoryMessages, function(value, key) {
@@ -146,8 +151,8 @@ function _handleSendTalkMessage(action) {
     objects.copyValuedProp(action, "groupId", data, "msrid");
     objects.copyValuedProp(action, "toUserId", data, "mstuid");
     objects.copyValuedProp(action, "atUserId", data, "atuid");
-    var message = _appendMessage(_.cloneDeep(data));
 
+    var message = _appendMyMessage(_.cloneDeep(data));
     socketconnection.request({
         tag: "TM",
         data: data,

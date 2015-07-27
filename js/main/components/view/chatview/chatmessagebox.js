@@ -13,6 +13,7 @@ var makeStyle = require('../../../style/styles').makeStyle;
 var MessageStore = require('../../../stores/messagestore');
 var emitter = require('../../../utils/eventemitter');
 var groups = require('../../../datamodel/groups');
+var myself = require('../../../datamodel/myself');
 var users = require('../../../datamodel/users');
 var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
@@ -116,12 +117,14 @@ function _buildGroupRenderObject(item, collector) {
     var time = "";
 
     _.forEach(item.messages, function(message) {
-        if (message) {
-            messageContent = message.getContent();
-            time = Formats.formatTime(message.getTimestamp());
+        if (!message) {
+            return;
         }
+
+        messageContent = message.getContent();
+        time = Formats.formatTime(message.getTimestamp());
         collector.push({
-            senderName: message.getUserNickname() || 'myself',
+            senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
             time: time,
@@ -140,10 +143,12 @@ function _buildUserRenderObject(item, collector) {
     var time = "";
 
     _.forEach(item.messages, function(message) {
-        if (message) {
-            messageContent = message.getContent();
-            time = Formats.formatTime(message.getTimestamp());
+        if (!message) {
+            return;
         }
+
+        messageContent = message.getContent();
+        time = Formats.formatTime(message.getTimestamp());
         collector.push({
             senderName: message.getUserNickname() || 'myself',
             senderAvatar: avatar,
@@ -152,4 +157,22 @@ function _buildUserRenderObject(item, collector) {
             type: 'group'
         });
     });
+}
+
+function _getSenderNickname(message) {
+    if (message.getUserNickname()) {
+        return message.getUserNickname();
+    }
+
+    var userId = message.getUserId();
+    if (userId === myself.uid) {
+        return myself.nickname;
+    }
+
+    var user = users.getUser(userId);
+    if (user) {
+        return user.getNickname();
+    }
+
+    return "";
 }
