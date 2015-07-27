@@ -9,6 +9,18 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 
 // exports
 module.exports = {
+    deleteGroupMessages: function(id) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.DELETE_GROUP_MESSAGES,
+            id: id
+        });
+    },
+    deletePrivateMessages: function(id) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.DELETE_PRIVATE_MESSAGES,
+            id: id
+        });
+    },
     requestHistoryMessages: function() {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_HISTORY_MESSAGES

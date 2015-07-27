@@ -23,7 +23,7 @@ Group.prototype.listedInConversations = function() {
 };
 
 Group.prototype.inGroup = function() {
-    return parseInt(this._data["ij"]) === 1;
+    return objects.getBool(this._data["ij"]);
 };
 
 Group.prototype.name = function() {

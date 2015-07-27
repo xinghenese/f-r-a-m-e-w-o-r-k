@@ -12,7 +12,9 @@ var itemHeight = "48px";
 //core module to export
 module.exports = {
     width: "300px",
+    height: "706px",
     borderRight: "1px #eee solid",
+    position: "relative",
     //header
     header: {
         background: "#fafafa",
@@ -32,13 +34,56 @@ module.exports = {
     },
     //footer
     footer: {
+        position: "absolute",
         background: "#fafafa",
-        height: "58px"
+        bottom: "0",
+        height: "58px",
+        width: "100%",
+        //switcher
+        switcher: {
+            height: "100%",
+            option: {
+                display: "inline-block",
+                width: "50%",
+                height: "100%",
+                cursor: "pointer"
+            },
+            //conversation-option
+            conversation: {
+                inactive: {
+                    background: "url(/images/conversation.png) center center no-repeat"
+                },
+                active: {
+                    background: "url(/images/conversation-active.png) center center no-repeat"
+                }
+            },
+            //contacts-option
+            contacts: {
+                inactive: {
+                    background: "url(/images/contact.png) center center no-repeat"
+                },
+                active: {
+                    background: "url(/images/contact-active.png) center center no-repeat"
+                }
+            }
+        }
+    },
+    body: {
+        height: "600px",
+        overflowY: "auto"
     },
     //conversationlist
     conversationlist: {
-        height: "600px",
         border: "0",
+        //caption
+        caption: {
+            height: "30px",
+            lineHeight: "30px",
+            padding: "0 14px",
+            color: "#282828",
+            background: "#fafafa",
+            fontSize: "14px"
+        },
         //item
         item: {
             height: itemHeight,
@@ -105,6 +150,14 @@ module.exports = {
                 '@mixin': commonStyle.singleLineText
             }
         }
+    },
+    gap: {
+        height: "40px",
+        lineHeight: "40px",
+        background: "#ebeef1",
+        fontSize: "14px",
+        color: "#a2aec1",
+        textAlign: "center"
     }
 };
 

@@ -16,23 +16,36 @@ var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
 var Formats = require('../../../utils/formats');
 
+var ContactList = require('./contactlist');
+var ContactStore = require('../../../stores/contactstore');
+var Switcher = require('./conversationuserswitcher');
+
+//private fields
+var listType = {
+    conversation: 'conversation',
+    contacts: 'contacts'
+};
+
 //core module to export
 var ConversationBox = React.createClass({
     getInitialState: function() {
         var messages = _getLastMessages();
         return {
             data: messages,
-            displayData: messages
+            displayData: messages,
+            matchedMessages: null,
+            type: listType.conversation
         };
+    },
+    _switchList: function(type) {
+        this.setState({type: listType[type] || listType.conversation});
     },
     _filterData: function(data) {
         console.log('data: ', data);
         this.setState({
-            displayData: data && _.indexBy(data.name, 'id') || this.state.data
+            displayData: data && _.indexBy(data.name, 'id') || this.state.data,
+            matchedMessages: data && data.message
         });
-    },
-    componentDidUpdate: function() {
-        console.log('state: ', this.state);
     },
     _updateMessages: function() {
         var messages = _getLastMessages();
@@ -48,6 +61,30 @@ var ConversationBox = React.createClass({
         MessageStore.removeChangeListener(this._updateMessages);
     },
     render: function() {
+        var matchedMessages = null;
+        var matchedMessagesCount = null;
+        var list = null;
+
+        if (this.state.matchedMessages) {
+            matchedMessagesCount = (
+                <div
+                    className="conversation-list-matchedmessages-gap"
+                    style={style.gap}
+                >
+                    found {_.size(this.state.matchedMessages)} messages
+                </div>
+            );
+            matchedMessages = (
+                <ConversationList data={this.state.matchedMessages} />
+            )
+        }
+
+        if (this.state.type === listType.contacts) {
+            list = (<ContactList data={ContactStore} />);
+        } else if (this.state.type === listType.conversation) {
+            list = (<ConversationList data={this.state.displayData} />);
+        }
+
         return (
             <div className="conversation-list-box" style={makeStyle(style)}>
                 <div className="conversation-list-box-header"
@@ -66,10 +103,20 @@ var ConversationBox = React.createClass({
                             />
                     </div>
                 </div>
-                <ConversationList data={this.state.displayData} />
+
+                <div
+                    className="conversation-list-container"
+                    style={style.body}
+                >
+                    {list}
+                    {matchedMessagesCount}
+                    {matchedMessages}
+                </div>
 
                 <div className="conversation-list-box-footer"
-                     style={makeStyle(style.footer)}>
+                     style={makeStyle(style.footer)}
+                >
+                    <Switcher options={listType} onSwitch={this._switchList}/>
                 </div>
             </div>
         )

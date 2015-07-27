@@ -1,5 +1,5 @@
 /**
- * Created by Administrator on 2015/7/6.
+ * Created by Administrator on 2015/7/27.
  */
 
 //dependencies
@@ -14,7 +14,7 @@ var setStyle = require('../../../style/styles').setStyle;
 
 
 //core module to export
-var ConversationListItem = React.createClass({
+var ContactItem = React.createClass({
     render: function() {
         var currentStyle = style.conversationlist.item.default;
 
@@ -23,46 +23,39 @@ var ConversationListItem = React.createClass({
         }
 
         return (
-            <li className="conversation-list-item"
+            <li className="contact-list-item"
                 id={this.props.index}
                 style={makeStyle(style.conversationlist.item, currentStyle)}
                 onClick={this.props.onSelect}
                 onMouseEnter={onhoverin(this)}
                 onMouseLeave={onhoverout(this)}>
                 <Avatar
-                    className="conversation-list-item-avatar"
+                    className="contact-list-item-avatar"
                     style={style.conversationlist.item.avatar}
-                    name={this.props.senderName}
-                    src={this.props.senderAvatar}
+                    name={this.props.contactName}
+                    src={this.props.contactAvatar}
                     index={this.props.index}
                 />
-                <div
-                    className="conversation-list-item-info"
-                    style={makeStyle(style.conversationlist.item.info)}
-                >
-                    <div className="conversation-list-item-time" style={makeStyle(style.conversationlist.item.time)}>{this.props.time}</div>
-                    <div className="conversation-list-item-unread-count" style={makeStyle(style.conversationlist.item.unread)}>{this.props.unreadCount || 0}</div>
-                </div>
-                <div className="conversation-list-item-body">
+                <div className="contact-list-item-body">
                     <div
-                        className="conversation-list-item-nickname"
+                        className="contact-list-item-nickname"
                         style={makeStyle(style.conversationlist.item.title)}
                     >
-                        {this.props.senderName}
+                        {this.props.contactName}
                     </div>
                     <p
-                        className="conversation-list-item-content"
+                        className="contact-list-item-last-appearance"
                         style={makeStyle(style.conversationlist.item.message)}
                     >
-                        {this.props.children}
+                        {this.props.message}
                     </p>
                 </div>
             </li>
-        )
+            )
     }
 });
 
-module.exports = ConversationListItem;
+module.exports = ContactItem;
 
 //module initialization
 

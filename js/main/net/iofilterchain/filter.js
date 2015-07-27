@@ -18,10 +18,10 @@ module.exports = origin.extend({
    * @returns {Object|String}
    */
   'read': function(value, options){
-    if(!value){
-      throw new Error('empty data when reading');
-    }
     if(this.enableRead && options){
+      if(!value){
+        throw new Error('empty data when reading');
+      }
       return this.processReadable(value, options);
     }
     return value;
@@ -33,10 +33,10 @@ module.exports = origin.extend({
    * @returns {Object|String}
    */
   'write': function(value, options){
-    if(!value){
-      throw new Error('empty data when writing');
-    }
     if(this.enableWrite && options){
+      if(!value){
+        throw new Error('empty data when writing');
+      }
       return this.processWritable(value, options);
     }
     return value;

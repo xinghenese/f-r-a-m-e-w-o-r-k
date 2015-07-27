@@ -5,6 +5,8 @@ var keyMirror = require('keymirror');
 var ActionTypes = keyMirror({
     CHECK_PHONE_STATUS: null,
     CHECK_VERIFICATION_CODE: null,
+    DELETE_GROUP_MESSAGES: null,
+    DELETE_PRIVATE_MESSAGES: null,
     GET_CHAT_LIST: null,
     LOGIN: null,
     LOGOUT: null,
