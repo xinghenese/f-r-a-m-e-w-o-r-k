@@ -70,30 +70,4 @@ gulp.task('watch', function() {
     })).pipe(source('main.js')).pipe(gulp.dest('./dist/'));
 });
 
-gulp.task('demo', function() {
-    var bundler = browserify({
-        entries: ['./demo.js'],
-        basedir: './js/',
-        transform: [reactify],
-        debug: true,
-        cache: {},
-        packageCache: {},
-        fullPaths: true
-    });
-    var watcher = watchify(bundler);
-    return watcher.on('error', function(err){
-        console.log('err while watching');
-        console.log(err);
-    }).on('update', function() {
-        var updateStart = Date.now();
-        watcher.bundle().pipe(source('demo.js')).pipe(gulp.dest('./dist/'));
-        console.log(moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated!', (Date.now() - updateStart) + 'ms');
-    }).bundle().pipe(plumber({
-        handleError: function (err) {
-            console.log(err);
-            this.emit('end');
-        }
-    })).pipe(source('demo.js')).pipe(gulp.dest('./dist/'));
-});
-
 gulp.task('default', ['build']);
