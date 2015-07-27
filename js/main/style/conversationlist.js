@@ -12,7 +12,9 @@ var itemHeight = "48px";
 //core module to export
 module.exports = {
     width: "300px",
+    height: "706px",
     borderRight: "1px #eee solid",
+    position: "relative",
     //header
     header: {
         background: "#fafafa",
@@ -32,12 +34,14 @@ module.exports = {
     },
     //footer
     footer: {
+        position: "absolute",
         background: "#fafafa",
-        height: "58px"
+        bottom: "0",
+        height: "58px",
+        width: "100%"
     },
     //conversationlist
     conversationlist: {
-        height: "600px",
         border: "0",
         //item
         item: {
@@ -105,6 +109,14 @@ module.exports = {
                 '@mixin': commonStyle.singleLineText
             }
         }
+    },
+    gap: {
+        height: "40px",
+        lineHeight: "40px",
+        background: "#ebeef1",
+        fontSize: "14px",
+        color: "#a2aec1",
+        textAlign: "center"
     }
 };
 
