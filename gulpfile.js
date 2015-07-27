@@ -1,73 +1,61 @@
 'use strict';
 
 var gulp = require('gulp');
-var gReact = require('gulp-react');
-var reactify = require('reactify');
-var watchify = require('watchify');
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
-var del = require('del');
-var runSequence = require('run-sequence');
-var moment = require('moment');
-var plumber = require('gulp-plumber');
 
-var browserifyConfig = {
+var browserifyOptions = {
     entries: ['./main.js'],
     basedir: './js/',
-    transform: [reactify],
-    debug: false,
+    transform: ['reactify'],
+    debug: process.env['NODE_ENV'] === 'development',
     cache: {},
     packageCache: {},
     fullPaths: true
 };
 
-gulp.task('clean', function(cb) {
-    del(['lib', 'dist'], cb);
+gulp.task('clean', function (callback) {
+    var del = require('del');
+    del(['dist'], callback);
 });
 
-gulp.task('lib', function() {
-    return gulp.src('js/**/*.js')
-               .pipe(gReact({harmony: true}))
-               .pipe(gulp.dest('lib'));
+gulp.task('build', ['clean'], function () {
+    var source = require('vinyl-source-stream');
+    var bundler = require('browserify')(browserifyOptions);
+    return bundler.bundle()
+        .pipe(source('main.js'))
+        .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('browserify', function() {
-    return browserify(browserifyConfig)
-            .bundle()
+gulp.task('publish', ['build']);
+
+gulp.task('watch', function () {
+    var moment = require('moment');
+    var source = require('vinyl-source-stream');
+    var plumber = require('gulp-plumber');
+    var bundler = require('browserify')(browserifyOptions);
+
+    function bundle() {
+        return bundler.bundle()
+            .pipe(plumber(function (err) {
+                console.error(err);
+                this.emit('end');
+            }))
             .pipe(source('main.js'))
-            .pipe(gulp.dest('./dist'));
-});
+            .pipe(gulp.dest('./dist/'));
+    }
 
-gulp.task('build', ['clean', 'browserify']);
+    bundler = require('watchify')(bundler)
+        .on('error', function (err) {
+            console.error('err while watching');
+            console.error(err);
+        })
+        .on('update', function () {
+            var label = moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated';
+            console.time(label);
+            bundle();
+            console.timeEnd(label);
+        });
 
-gulp.task('publish', function(cb) {
-    runSequence('clean', 'build', cb);
-});
-
-gulp.task('watch', function() {
-    var bundler = browserify({
-        entries: ['./main.js'],
-        basedir: './js/',
-        transform: [reactify],
-        debug: true,
-        cache: {},
-        packageCache: {},
-        fullPaths: true
-    });
-    var watcher = watchify(bundler);
-    return watcher.on('error', function(err){
-        console.log('err while watching');
-        console.log(err);
-    }).on('update', function() {
-        var updateStart = Date.now();
-        watcher.bundle().pipe(source('main.js')).pipe(gulp.dest('./dist/'));
-        console.log(moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated!', (Date.now() - updateStart) + 'ms');
-    }).bundle().pipe(plumber({
-        handleError: function (err) {
-            console.log(err);
-            this.emit('end');
-        }
-    })).pipe(source('main.js')).pipe(gulp.dest('./dist/'));
+    return bundle();
 });
 
 gulp.task('default', ['build']);
