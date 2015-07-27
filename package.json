@@ -17,9 +17,9 @@
     "gulp": "*",
     "gulp-plumber": "^1.0.1",
     "gulp-react": "*",
-    "jest-cli": "^0.4.3",
+    "jest-cli": "^0.4.17",
     "keymirror": "*",
-    "moment": "^2.10.3",
+    "moment": "^2.10.6",
     "object-assign": "*",
     "react": "*",
     "react-router": "^0.13.3",
@@ -34,7 +34,7 @@
     "browserify-cryptojs": "^0.3.1",
     "gzip-js": "^0.3.2",
     "jsbn": "0.0.0",
-    "lodash": "^3.9.3",
+    "lodash": "^3.10.0",
     "q": "^1.4.1"
   }
 }
