@@ -12,28 +12,34 @@ var setStyle = require('../../../style/styles').setStyle;
 var emitter = require('../../../utils/eventemitter');
 
 //private fields
-var options = {
-    conversation: 'conversation-option',
-    contacts: 'contacts-option'
-};
+var suffix = '-option';
 
 //core module to export
 var ConversationUserSwitcher = React.createClass({
     propTypes: {
-
+        options: React.PropTypes.oneOfType([
+            React.PropTypes.array,
+            React.PropTypes.object
+        ])
     },
     getInitialState: function() {
-        return {selectedIndex: options.conversation};
+        var options = this.props.options;
+        options = _.isArray(options) ? options : _.values(options);
+        return {selectedIndex: options[0]};
     },
     _switch: function(event) {
-        var switchedName = event.target.className;
+        var switchedName = event.target.className.replace(suffix, '');
         this.setState({selectedIndex: switchedName});
         if (_.isFunction(this.props.onSwitch)) {
-            this.props.onSwitch(switchedName.replace('-option', ''));
+            this.props.onSwitch(switchedName);
         }
     },
     render: function() {
-        var items = _.map(options, function(value, key) {
+        if (!this.props.options || _.isEmpty(this.props.options)) {
+            return null;
+        }
+
+        var items = _.map(this.props.options, function(value, key) {
             var currentStyle = style.footer.switcher[key].inactive;
 
             if (value === this.state.selectedIndex) {
@@ -43,7 +49,7 @@ var ConversationUserSwitcher = React.createClass({
             return (
                 <li
                     key={key}
-                    className={value}
+                    className={value + suffix}
                     onClick={this._switch}
                     style={makeStyle(style.footer.switcher.option, currentStyle)}
                 />
@@ -67,13 +73,3 @@ module.exports = ConversationUserSwitcher;
 
 
 //private functions
-function onselect(list) {
-    return function(event) {
-        var index = event.currentTarget.id.replace(/\D/g, '');
-        list.setState({selectedIndex: index});
-        emitter.emit('switch', {
-            id: index,
-            type: _.get(list.props.data, index).type
-        });
-    };
-}

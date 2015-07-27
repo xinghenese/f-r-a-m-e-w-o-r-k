@@ -17,7 +17,7 @@ var stores = require('../utils/stores');
 var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
 var Submit = require('./form/control/Submit');
-var Form = require('./form/form');
+var Form = require('./form/Form');
 var CustomValidator = require('./form/validator/CustomValidator');
 var RequiredValidator = require('./form/validator/RequiredFieldValidator');
 

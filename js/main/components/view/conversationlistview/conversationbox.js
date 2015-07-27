@@ -116,7 +116,7 @@ var ConversationBox = React.createClass({
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}
                 >
-                    <Switcher onSwitch={this._switchList}/>
+                    <Switcher options={listType} onSwitch={this._switchList}/>
                 </div>
             </div>
         )
