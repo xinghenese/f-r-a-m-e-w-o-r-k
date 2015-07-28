@@ -65,14 +65,15 @@ gulp.task('watch', ['clean'], function () {
 
 // region tests
 gulp.task('tests', function (done) {
+    var path = require('path');
     var jest = require('jest-cli');
     // see http://facebook.github.io/jest/docs/api.html#config-options
     var options = {};
-    jest.runCLI(options, __dirname, done);
+    jest.runCLI(options, path.join(__dirname, 'js'), done);
 });
 
 gulp.task('tests:tdd', function () {
-    gulp.watch(['./**/*.js'], ['test']);
+    gulp.watch('./js/**/*.js', ['tests']);
 });
 // endregion
 
