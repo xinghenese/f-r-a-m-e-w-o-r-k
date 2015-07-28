@@ -6,10 +6,13 @@
 var _ = require('lodash');
 var React = require('react');
 var ConversationListItem = require('./conversationlistitem');
+var ConversationActions = require('../../../actions/conversationactions');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
 var emitter = require('../../../utils/eventemitter');
+var groups = require('../../../datamodel/groups');
+var protocols = require('../../../utils/protocols');
 
 //private fields
 var prefix = 'conversation-list-';
@@ -63,10 +66,21 @@ module.exports = ConversationList;
 function onselect(list) {
     return function(event) {
         var index = event.currentTarget.id.replace(/\D/g, '');
+        var type = _.get(list.props.data, index).type;
         list.setState({selectedIndex: index});
+        if (type === "group") {
+            var group = groups.getGroup(index);
+            if (group) {
+                if (group.inGroup()) {
+                    ConversationActions.joinConversation(protocols.toConversationType(type), index, null);
+                }
+            }
+        } else {
+            ConversationActions.joinConversation(protocols.toConversationType(type), null, index);
+        }
         emitter.emit('select', {
             id: index,
-            type: _.get(list.props.data, index).type
+            type: type
         });
     };
 }
