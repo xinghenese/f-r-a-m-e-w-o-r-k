@@ -21,13 +21,21 @@ var ContactList = React.createClass({
         return {selectedIndex: -1};
     },
     render: function() {
-        if (!this.props.data || _.isEmpty(this.props.data)) {
+        var datas = this.props.data;
+
+        if (!datas || _.isEmpty(datas)) {
             return null;
         }
 
-        console.log('ContactList#data: ', this.props.data);
+        datas = _.groupBy(datas, function(data) {
+            if (data.type === 'user') {
+                return data.name[0];
+            }
+            return data.type;
+        });
+        console.log('ContactList#data: ', datas);
 
-        var conversationList = _.map(this.props.data, function(data, key) {
+        var conversationList = _.map(datas, function(data, key) {
             return (
                 <ContactGroup
                     key={prefix + key}

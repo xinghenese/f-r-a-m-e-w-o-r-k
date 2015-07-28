@@ -3,6 +3,7 @@
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var HttpConnection = require('../net/connection/httpconnection');
+var SocketConnection = require('../net/connection/socketconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
@@ -78,6 +79,9 @@ AccountStore.dispatchToken = AppDispatcher.register(function(action) {
             break;
         case ActionTypes.REQUEST_VERIFICATION_CODE:
             _handleVerificationCodeRequest(action);
+            break;
+        case ActionTypes.SWITCH_STATUS:
+            _handleSwitchStatusRequest(action);
             break;
     }
 });
@@ -207,8 +211,17 @@ function _handleRegisterRequest(action) {
                 AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
         }
-    }, function(error) {
+    }, function() {
         AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
+    });
+}
+
+function _handleSwitchStatusRequest(action) {
+    SocketConnection.request({
+        tag: "SS",
+        data: {
+            tp: action.statusType
+        }
     });
 }
 
