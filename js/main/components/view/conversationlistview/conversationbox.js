@@ -80,7 +80,7 @@ var ConversationBox = React.createClass({
         }
 
         if (this.state.type === listType.contacts) {
-            list = (<ContactList data={ContactStore} />);
+            list = (<ContactList data={ContactStore.getContacts()} />);
         } else if (this.state.type === listType.conversation) {
             list = (<ConversationList data={this.state.displayData} />);
         }
