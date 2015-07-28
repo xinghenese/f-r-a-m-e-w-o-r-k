@@ -8,6 +8,7 @@ var _ = require('lodash');
 var React = require('react');
 var Router = require('react-router');
 var State = Router.State;
+var AccountActions = require('../actions/accountactions');
 var ConversationActions = require('../actions/conversationactions');
 var ConversationStore = require('../stores/conversationstore');
 var GroupActioins = require('../actions/groupactions');
@@ -40,6 +41,7 @@ var Chat = React.createClass({
         // putting it here for test purpose
         // 1 for groups, 2 for contacts
         ConversationActions.getChatList(1);
+        AccountActions.switchStatus(1);
         ConversationStore.on(ConversationStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ConversationStore.on(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
         modifyPageStyle();

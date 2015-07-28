@@ -17,7 +17,8 @@ var ActionTypes = keyMirror({
     REQUEST_HISTORY_MESSAGES: null,
     REQUEST_VERIFICATION_CODE: null,
     REQUEST_VOICE_VERIFICATION_CODE: null,
-    SEND_TALK_MESSAGE: null
+    SEND_TALK_MESSAGE: null,
+    SWITCH_STATUS: null
 });
 
 module.exports = ActionTypes;

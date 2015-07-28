@@ -46,5 +46,11 @@ module.exports = {
             requestType: requestType || 1, // register/login, by default
             codeType: codeType || 1 // text code, by default
         });
+    },
+    switchStatus: function(type) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.SWITCH_STATUS,
+            statusType: type
+        });
     }
 };
