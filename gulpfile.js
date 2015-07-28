@@ -77,7 +77,7 @@ gulp.task('tests:tdd', function () {
 });
 // endregion
 
-gulp.task('local-serve', ['clean'], function () {
+gulp.task('local-serve', ['watch'], function () {
     return gulp.src('.')
         .pipe(require('gulp-webserver')());
 });
