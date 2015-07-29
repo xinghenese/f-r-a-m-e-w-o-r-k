@@ -15,11 +15,15 @@ var prefix = 'contact-group-';
 //core module to export
 var ContactGroup = React.createClass({
     render: function() {
-        if (!this.props.data || _.isEmpty(this.props.data)) {
+        var datas = this.props.data;
+
+        if (!datas || _.isEmpty(datas)) {
             return null;
         }
 
-        var group = _.map(this.props.data, function(data, key) {
+        datas = _.indexBy(datas, 'id');
+
+        var group = _.map(datas, function(data, key) {
             return (
                 <ContactItem
                     key={prefix + key}
