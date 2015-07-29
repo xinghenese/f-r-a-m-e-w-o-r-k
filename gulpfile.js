@@ -2,6 +2,7 @@
 
 var gulp = require('gulp');
 var isDev = process.env.NODE_ENV === 'development';
+var isProduct = process.env.NODE_ENV === 'production';
 
 gulp.task('publish', ['build']);
 
@@ -15,10 +16,10 @@ var browserifyOptions = {
     entries: ['./main.js'],
     basedir: './js/',
     transform: [require('reactify')],
-    debug: isDev,
+    debug: !isProduct,
     cache: {},
     packageCache: {},
-    fullPaths: isDev
+    fullPaths: !isProduct
 };
 
 function bundlePayload(bundler) {
