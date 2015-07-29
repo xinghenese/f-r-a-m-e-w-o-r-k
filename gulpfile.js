@@ -1,11 +1,12 @@
 'use strict';
 
 var gulp = require('gulp');
+var reactify = require('reactify');
 
 var browserifyOptions = {
     entries: ['./main.js'],
     basedir: './js/',
-    transform: ['reactify'],
+    transform: [reactify],
     debug: process.env['NODE_ENV'] === 'development',
     cache: {},
     packageCache: {},
@@ -19,7 +20,15 @@ gulp.task('clean', function (callback) {
 
 gulp.task('build', ['clean'], function () {
     var source = require('vinyl-source-stream');
+    var glob = require('glob');
     var bundler = require('browserify')(browserifyOptions);
+    var pattern = './js/main/stores/*.js';
+
+    bundler.require(
+        glob(pattern, {sync: true}),
+        {basedir: './'}
+    );
+
     return bundler.bundle()
         .pipe(source('main.js'))
         .pipe(gulp.dest('./dist'));
@@ -32,6 +41,13 @@ gulp.task('watch', function () {
     var source = require('vinyl-source-stream');
     var plumber = require('gulp-plumber');
     var bundler = require('browserify')(browserifyOptions);
+    var glob = require('glob');
+    var pattern = './js/main/stores/*.js';
+
+    bundler.require(
+        glob(pattern, {sync: true}),
+        {basedir: './'}
+    );
 
     function bundle() {
         return bundler.bundle()

@@ -5,10 +5,11 @@
     "test": "jest"
   },
   "devDependencies": {
-    "browserify": "~11.0.0",
+    "browserify": "^11.0.0",
     "browserify-cryptojs": "~0.3.1",
     "del": "~1.2.0",
     "flux": "~2.0.3",
+    "glob": "^5.0.14",
     "gulp": "~3.9.0",
     "gulp-plumber": "~1.0.1",
     "gulp-webserver": "~0.9.1",
@@ -21,7 +22,7 @@
     "q": "~1.4.1",
     "react": "~0.13.3",
     "react-router": "~0.13.3",
-    "reactify": "~1.1.1",
+    "reactify": "^1.1.1",
     "vinyl-source-stream": "~1.1.0",
     "watchify": "~3.3.0"
   }
