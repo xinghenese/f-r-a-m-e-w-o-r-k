@@ -11,7 +11,6 @@ var State = Router.State;
 var AccountActions = require('../actions/accountactions');
 var ConversationActions = require('../actions/conversationactions');
 var ConversationStore = require('../stores/conversationstore');
-var GroupActioins = require('../actions/groupactions');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var ChatMessageBox = require('./view/chatview/chatmessagebox');
 var MessageActions = require('../actions/messageactions');
@@ -22,9 +21,6 @@ var setStyle = require('../style/styles').setStyle;
 // exports
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
-        // todo
-        // for test
-        GroupActioins.requestGroupMembers(708);
         MessageActions.requestHistoryMessages();
     },
     _handleUsersLoaded: function() {
@@ -38,9 +34,9 @@ var Chat = React.createClass({
         });
     },
     componentWillMount: function() {
-        // putting it here for test purpose
         // 1 for groups, 2 for contacts
         ConversationActions.getChatList(1);
+        ConversationActions.getChatList(2);
         AccountActions.switchStatus(1);
         ConversationStore.on(ConversationStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ConversationStore.on(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
