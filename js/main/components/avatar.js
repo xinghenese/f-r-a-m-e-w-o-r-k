@@ -62,5 +62,5 @@ function getColor(id) {
 }
 
 function generateRandomColor() {
-    return '#' + (~~(Math.random() * 0x1000000)).toString(16);
+    return '#' + _.padLeft((~~(Math.random() * 0x1000000)).toString(16), 6, '0');
 }
