@@ -1,6 +1,7 @@
 /**
  * Created by Administrator on 2015/7/23.
  */
+'use strict';
 
 //dependencies
 var _ = require('lodash');

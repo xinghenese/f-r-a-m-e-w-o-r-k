@@ -18,8 +18,13 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 
+var UserInfoBox = require('./view/infoview/userinfobox');
+
 // exports
 var Chat = React.createClass({
+    getInitialState: function() {
+        return {showSettings: false};
+    },
     _handleGroupsLoaded: function() {
         MessageActions.requestHistoryMessages();
     },
@@ -32,6 +37,12 @@ var Chat = React.createClass({
         _.forEach(messages, function(message) {
             //console.log(message);
         });
+    },
+    _showSettings: function() {
+        console.info('chat#_showSettings');
+        var newState = !this.state.showSettings;
+        console.log('showSettings: ', newState);
+        this.setState({showSettings: newState});
     },
     componentWillMount: function() {
         // 1 for groups, 2 for contacts
@@ -47,10 +58,20 @@ var Chat = React.createClass({
         ConversationStore.removeListener(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
     },
     render: function() {
+        var rightSideBox = null;
+
+        console.log('chat#render showSettings: ', this.state.showSettings);
+
+        if (this.state.showSettings) {
+            rightSideBox = <UserInfoBox />;
+        } else {
+            rightSideBox = <ChatMessageBox />;
+        }
+
         return (
             <div>
-                <ChatMessageBox />
-                <ConversationBox />
+                {rightSideBox}
+                <ConversationBox showSettings={this._showSettings} />
             </div>
         );
     }

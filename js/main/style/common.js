@@ -62,6 +62,11 @@ module.exports = {
         textAlign: 'center',
         overflow: 'hidden',
         cursor: 'pointer'
+    },
+    settings: {
+        textAlign: 'center',
+        overflow: 'hidden',
+        cursor: 'pointer'
     }
 };
 
