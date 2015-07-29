@@ -64,6 +64,32 @@ module.exports = {
     avatar: {
         float: 'left',
         color: '#fff'
+    },
+    switchButton: {
+        width: "36px",
+        height: "20px",
+        borderRadius: "10px",
+        cursor: "pointer",
+        bullet: {
+            width: "20px",
+            height: "20px",
+            borderRadius: "50%",
+            background: "#fff",
+            on: {
+                float: 'right'
+            },
+            off: {
+                float: 'left'
+            }
+        },
+        on: {
+            background: "#4bd763",
+            border: "1px solid #4bd763"
+        },
+        off: {
+            background: "#d7d7d7",
+            border: "1px solid #d7d7d7"
+        }
     }
 };
 

@@ -61,7 +61,7 @@ module.exports = {
         borderRadius: '50%',
         textAlign: 'center',
         overflow: 'hidden',
-        pointer: 'cursor'
+        cursor: 'pointer'
     }
 };
 
