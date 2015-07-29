@@ -11,7 +11,6 @@ var State = Router.State;
 var AccountActions = require('../actions/accountactions');
 var ConversationActions = require('../actions/conversationactions');
 var ConversationStore = require('../stores/conversationstore');
-var GroupActioins = require('../actions/groupactions');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var ChatMessageBox = require('./view/chatview/chatmessagebox');
 var MessageActions = require('../actions/messageactions');
@@ -19,12 +18,14 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 
+var UserInfoBox = require('./view/infoview/userinfobox');
+
 // exports
 var Chat = React.createClass({
+    getInitialState: function() {
+        return {showSettings: false};
+    },
     _handleGroupsLoaded: function() {
-        // todo
-        // for test
-        GroupActioins.requestGroupMembers(708);
         MessageActions.requestHistoryMessages();
     },
     _handleUsersLoaded: function() {
@@ -37,10 +38,16 @@ var Chat = React.createClass({
             //console.log(message);
         });
     },
+    _showSettings: function() {
+        console.info('chat#_showSettings');
+        var newState = !this.state.showSettings;
+        console.log('showSettings: ', newState);
+        this.setState({showSettings: newState});
+    },
     componentWillMount: function() {
-        // putting it here for test purpose
         // 1 for groups, 2 for contacts
         ConversationActions.getChatList(1);
+        ConversationActions.getChatList(2);
         AccountActions.switchStatus(1);
         ConversationStore.on(ConversationStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
         ConversationStore.on(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
@@ -51,10 +58,20 @@ var Chat = React.createClass({
         ConversationStore.removeListener(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
     },
     render: function() {
+        var rightSideBox = null;
+
+        console.log('chat#render showSettings: ', this.state.showSettings);
+
+        if (this.state.showSettings) {
+            rightSideBox = <UserInfoBox />;
+        } else {
+            rightSideBox = <ChatMessageBox />;
+        }
+
         return (
             <div>
-                <ChatMessageBox />
-                <ConversationBox />
+                {rightSideBox}
+                <ConversationBox showSettings={this._showSettings} />
             </div>
         );
     }

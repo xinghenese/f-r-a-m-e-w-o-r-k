@@ -140,7 +140,7 @@ function addConversationListSelectedHandler(box) {
 }
 
 function removeConversationListSelectedHandler(box) {
-    emitter.removeListener('select');
+    emitter.removeAllListeners('select');
 }
 
 function _buildGroupRenderObject(item, collector) {

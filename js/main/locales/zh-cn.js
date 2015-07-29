@@ -31,6 +31,14 @@ module.exports = {
     "search": "搜索",
 
     "chatBoxTips": "请选择会话",
+    "group": "群组",
+    "contact": "联系人",
+
+    //userInfoBox
+    "mobile": "手机",
+    "audioEnable": "声音",
+    "notificationEnable": "桌面通知",
+    "logout": "注销",
 
     // text alternatives of non-text messages
     "unknownMessage": "[未知消息]",
