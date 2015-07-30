@@ -2,16 +2,16 @@
 
 jest.autoMockOff();
 
-describe('AppDispatcher', function() {
+describe('AppDispatcher', function () {
     var AppDispatcher;
     var ActionTypes;
 
-    beforeEach(function() {
+    beforeEach(function () {
         AppDispatcher = require('../../dispatchers/AppDispatcher');
         ActionTypes = require('../../constants/actiontypes');
     });
 
-    it('sends actions to subscribers', function() {
+    it('sends actions to subscribers', function () {
         var listener = jest.genMockFunction();
         AppDispatcher.register(listener);
 

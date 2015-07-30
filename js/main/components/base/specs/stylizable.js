@@ -11,7 +11,7 @@ var makeStyle = require('../../../style/styles').makeStyle;
 
 //core module to export
 module.exports = {
-    descendantsProps: function(child, level, parent) {
+    descendantsProps: function (child, level, parent) {
         console.log('stylizable#className: ', child.props.className);
 
         var style = child.props.style;

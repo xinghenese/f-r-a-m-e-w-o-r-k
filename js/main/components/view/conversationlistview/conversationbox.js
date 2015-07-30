@@ -29,7 +29,7 @@ var listType = {
 
 //core module to export
 var ConversationBox = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         var messages = _getLastMessages();
         return {
             data: messages,
@@ -38,30 +38,30 @@ var ConversationBox = React.createClass({
             type: listType.conversation
         };
     },
-    _switchList: function(type) {
+    _switchList: function (type) {
         this.setState({type: listType[type] || listType.conversation});
     },
-    _filterData: function(data) {
+    _filterData: function (data) {
         console.log('data: ', data);
         this.setState({
             displayData: data && _.indexBy(data.name, 'id') || this.state.data,
             matchedMessages: data && data.message
         });
     },
-    _updateMessages: function() {
+    _updateMessages: function () {
         var messages = _getLastMessages();
         this.setState({
             data: messages,
             displayData: messages
         });
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
     },
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         MessageStore.removeChangeListener(this._updateMessages);
     },
-    render: function() {
+    render: function () {
         var matchedMessages = null;
         var matchedMessagesCount = null;
         var list = null;
@@ -71,19 +71,19 @@ var ConversationBox = React.createClass({
                 <div
                     className="conversation-list-matchedmessages-gap"
                     style={style.gap}
-                >
+                    >
                     found {_.size(this.state.matchedMessages)} messages
                 </div>
             );
             matchedMessages = (
-                <ConversationList data={this.state.matchedMessages} />
+                <ConversationList data={this.state.matchedMessages}/>
             )
         }
 
         if (this.state.type === listType.contacts) {
-            list = (<ContactList data={ContactStore.getContacts()} />);
+            list = (<ContactList data={ContactStore.getContacts()}/>);
         } else if (this.state.type === listType.conversation) {
-            list = (<ConversationList data={this.state.displayData} />);
+            list = (<ConversationList data={this.state.displayData}/>);
         }
 
         return (
@@ -101,19 +101,19 @@ var ConversationBox = React.createClass({
                             fields={['name', 'message']}
                             onSearch={this._filterData}
                             style={style.header.searchbar.search}
-                        />
+                            />
                         <Settings
                             className="conversation-list-settings"
                             onSettings={this.props.showSettings}
                             style={style.header.searchbar.settings}
-                        />
+                            />
                     </div>
                 </div>
 
                 <div
                     className="conversation-list-container"
                     style={style.body}
-                >
+                    >
                     {list}
                     {matchedMessagesCount}
                     {matchedMessages}
@@ -121,7 +121,7 @@ var ConversationBox = React.createClass({
 
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}
-                >
+                    >
                     <Switcher options={listType} onSwitch={this._switchList}/>
                 </div>
             </div>
@@ -135,7 +135,7 @@ module.exports = ConversationBox;
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
     var result = {};
-    _.forEach(lastMessages, function(item) {
+    _.forEach(lastMessages, function (item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
         } else {

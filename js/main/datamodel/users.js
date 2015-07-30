@@ -11,26 +11,26 @@ var User = require('./user');
 var users = {
     _cursor: "",
     _users: [],
-    addUser: function(user) {
+    addUser: function (user) {
         this._users.push(user);
     },
-    getCursor: function(cursor) {
+    getCursor: function (cursor) {
         return this._cursor;
     },
-    getUser: function(userId) {
-        _.find(this._users, function(user) {
+    getUser: function (userId) {
+        _.find(this._users, function (user) {
             return user.getUserId() === userId;
         });
     },
-    removeUser: function(userId) {
-        _.remove(this._users, function(user) {
+    removeUser: function (userId) {
+        _.remove(this._users, function (user) {
             return user.getUserId() === userId;
         });
     },
-    setCursor: function(cursor) {
+    setCursor: function (cursor) {
         this._cursor = cursor;
     },
-    setUsers: function(arr) {
+    setUsers: function (arr) {
         this._users = arr;
     }
 };

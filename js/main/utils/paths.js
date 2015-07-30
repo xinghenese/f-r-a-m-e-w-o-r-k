@@ -10,14 +10,14 @@
 
 //core module to export
 module.exports = {
-    isValidPath: function(path) {
+    isValidPath: function (path) {
         path = normalizePath(path);
         if (!isValidPath(path)) {
             return false;
         }
         return path;
     },
-    parsePath: function(path) {
+    parsePath: function (path) {
         path = normalizePath(path);
         if (!isValidPath(path)) {
             throw new Error('invalid path to be parsed: ', path);
@@ -46,7 +46,7 @@ function parsePath(path) {
     var levels = 0;
 
     if (execResult[2]) {
-        levels = - execResult[1].length / execResult[2].length;
+        levels = -execResult[1].length / execResult[2].length;
     }
 
     if (subPathString) {
@@ -60,7 +60,7 @@ function parsePath(path) {
 }
 
 function normalizePath(path) {
-    return (path + '').replace(/(^|\/)(\/*)(\.|\.{3,})?(?=\/)/g, function(match, p1, p2, p3) {
+    return (path + '').replace(/(^|\/)(\/*)(\.|\.{3,})?(?=\/)/g, function (match, p1, p2, p3) {
         if (p1) return ''; //case NOT_AT_THE_BEGINNING_OF_THE_LINE
         if (p2) return ''; //case AT_THE_BEGINNING_OF_THE_LINE && STARTS_WITH_SLASH
         if (p3) return '.'; //case AT_THE_BEGINNING_OF_THE_LINE && NOT_STARTS_WITH_SLASH && NON_EMPTY_MATCHED

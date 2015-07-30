@@ -11,28 +11,28 @@ var Group = require('./group');
 var groups = {
     _cursor: "",
     _groups: [],
-    addGroup: function(group) {
+    addGroup: function (group) {
         this._groups.push(group);
     },
-    getCursor: function() {
+    getCursor: function () {
         return this._cursor;
     },
-    getGroup: function(groupId) {
+    getGroup: function (groupId) {
         var groupIdInt = parseInt(groupId);
-        var group = _.find(this._groups, function(group) {
+        var group = _.find(this._groups, function (group) {
             return group.getGroupId() === groupIdInt;
         });
         return group;
     },
-    removeGroup: function(groupId) {
-        _.remove(this._groups, function(group) {
+    removeGroup: function (groupId) {
+        _.remove(this._groups, function (group) {
             return group.getGroupId() === groupId;
         });
     },
-    setCursor: function(cursor) {
+    setCursor: function (cursor) {
         this._cursor = cursor;
     },
-    setGroups: function(arr) {
+    setGroups: function (arr) {
         this._groups = arr;
     }
 };

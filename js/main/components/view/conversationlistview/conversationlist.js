@@ -20,14 +20,14 @@ var index = 0;
 
 //core module to export
 var ConversationList = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {selectedIndex: -1};
     },
-    render: function() {
+    render: function () {
         var conversationList = null;
 
         if (this.props.data && !_.isEmpty(this.props.data)) {
-            conversationList = _.map(this.props.data, function(data, key) {
+            conversationList = _.map(this.props.data, function (data, key) {
                 if (!isValidConversationData(data)) {
                     return null;
                 }
@@ -64,7 +64,7 @@ module.exports = ConversationList;
 
 //private functions
 function onselect(list) {
-    return function(event) {
+    return function (event) {
         var index = event.currentTarget.id.replace(/\D/g, '');
         var type = _.get(list.props.data, index).type;
         list.setState({selectedIndex: index});

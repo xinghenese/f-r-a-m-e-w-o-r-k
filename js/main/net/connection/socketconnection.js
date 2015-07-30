@@ -54,15 +54,15 @@ var socketconnection = module.exports = connection.extend({
      * @param packet {Object|String}
      * @returns {Q.Promise}
      */
-    request: function(packet) {
+    request: function (packet) {
         packet = packetFormalize(packet);
 
         if (!(packet.data || HANDSHAKE_TAG == packet.tag)) {
-            return authorize().repeat(function() {
+            return authorize().repeat(function () {
                 return get(packet.tag);
             });
         }
-        return authorize().then(function(value) {
+        return authorize().then(function (value) {
             //avoid duplicate handshake authorization request.
             if (HANDSHAKE_TAG == packet.tag || AUTH_TAG == packet.tag) {
                 return value;
@@ -73,19 +73,19 @@ var socketconnection = module.exports = connection.extend({
         });
     },
     ping: ping,
-    getState: function() {
+    getState: function () {
         return state;
     },
-    isAuthorized: function() {
+    isAuthorized: function () {
         return isAuthorized;
     }
 });
 
 //initialize
-socketconnection.on('ready', function() {
+socketconnection.on('ready', function () {
     state = State.CONNECTING;
 });
-socketconnection.on('connect', function() {
+socketconnection.on('connect', function () {
     state = State.CONNECTED;
     socketconnection.on('message', onMessageReceived);
 });
@@ -94,7 +94,7 @@ state = State.INITIALIZED;
 //private functions
 //just listen to data reception with tag.
 function get(tag) {
-    return socketconnection.on(tag, function(data) {
+    return socketconnection.on(tag, function (data) {
         console.log('=>', tag + ": " + JSON.stringify(data));
         return data;
     });
@@ -109,7 +109,7 @@ function post(packet) {
     }
 
     //process and write data to session and then send via socket.
-    session.write(prepareRequestPacket(tag, data), _.assign({}, DEFAULT_CONFIG)).then(function(value) {
+    session.write(prepareRequestPacket(tag, data), _.assign({}, DEFAULT_CONFIG)).then(function (value) {
         return socket.send(value);
     });
 
@@ -162,7 +162,7 @@ function prepareRequestPacket(tag, data) {
 }
 
 function onMessageReceived(msg) {
-    return session.read(msg, _.assign({}, DEFAULT_CONFIG)).then(function(value) {
+    return session.read(msg, _.assign({}, DEFAULT_CONFIG)).then(function (value) {
         var tag = value.tag;
         var data = value.data;
 
@@ -186,13 +186,13 @@ function onMessageReceived(msg) {
 
 function authorize() {
     if (!authorizePromise) {
-        authorizePromise = handshake().then(function() {
+        authorizePromise = handshake().then(function () {
             return post({
                 tag: AUTH_TAG,
                 data: UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev"),
                 responseTag: SocketRequestResponseTagMap.getResponseTag(AUTH_TAG)
             });
-        }).then(function(data) {
+        }).then(function (data) {
             if (!authentication.validateSequence(_.get(data, 'msqsid'))) {
                 throw new Error("sequence invalid with ", _.get(data, 'msqsid'));
             }
@@ -210,7 +210,7 @@ function handshake() {
             tag: HANDSHAKE_TAG,
             data: _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
                 , keyExchange.getPublicKey())
-        }).then(function(data) {
+        }).then(function (data) {
             _.set(DEFAULT_CONFIG, 'encryptKey'
                 , keyExchange.getEncryptKey(_.get(data, PUBLIC_KEY_FIELD)));
             return data;
@@ -227,14 +227,14 @@ function awaitToken() {
 }
 
 function ping() {
-    return authorize().then(function() {
+    return authorize().then(function () {
         return post({
             tag: PING_TAG,
             data: _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
                 , authentication.nextEncodedSequence()),
             responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
         })
-    }).then(function(data) {
+    }).then(function (data) {
         return data;
     });
 }

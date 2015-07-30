@@ -10,8 +10,8 @@
 
 //core module to export
 module.exports = {
-  HTTP: 'http',
-  SOCKET: 'socket'
+    HTTP: 'http',
+    SOCKET: 'socket'
 };
 
 //module initialization

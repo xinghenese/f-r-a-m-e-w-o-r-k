@@ -23,7 +23,7 @@ module.exports = {
     },
     textarea: {
         wrapper: {
-          overflow: "hidden"
+            overflow: "hidden"
         },
         overflowX: "hidden",
         overflowY: "scroll",

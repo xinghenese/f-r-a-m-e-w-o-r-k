@@ -31,7 +31,7 @@ var requested = false;
 
 //export
 var PhoneForm = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             countryName: "中国",
             countryCode: "+86",
@@ -40,34 +40,34 @@ var PhoneForm = React.createClass({
             verificationState: null
         };
     },
-    _focusPhoneInput: function() {
+    _focusPhoneInput: function () {
         document.getElementById("phone-input").focus();
     },
-    _handleCountryNameChange: function(event) {
+    _handleCountryNameChange: function (event) {
         var name = event.target.value;
         var code = this._getCountryCode(name);
         this.setState({countryName: name, countryCode: code});
     },
-    _handleCountryCodeChange: function(event) {
+    _handleCountryCodeChange: function (event) {
         var code = event.target.value;
         var name = this._getCountryName(code);
         this.setState({countryName: name, countryCode: code});
     },
-    _handleKeyDown: function(event) {
+    _handleKeyDown: function (event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
         }
     },
-    _handleCountryReadyToSelect: function() {
+    _handleCountryReadyToSelect: function () {
         this.props.onCountryReadyToSelect();
     },
-    _handlePhoneNumberChange: function(event) {
+    _handlePhoneNumberChange: function (event) {
         this.setState({
             phoneNumber: event.target.value,
             promptInvalidPhone: false
         });
     },
-    _handleSubmit: function() {
+    _handleSubmit: function () {
         if (requested) {
             return;
         } else {
@@ -79,13 +79,13 @@ var PhoneForm = React.createClass({
             this.state.phoneNumber
         );
     },
-    _handleVerificationCodeSent: function() {
+    _handleVerificationCodeSent: function () {
         this.props.onVerificationCodeSent();
     },
-    _handleVerificationCodeNotSent: function(error) {
+    _handleVerificationCodeNotSent: function (error) {
         console.log(error);
     },
-    _getCountryName: function(code) {
+    _getCountryName: function (code) {
         for (var i = 0; i < Countries.length; i++) {
             var country = Countries[i];
             if (country.code == code) {
@@ -94,7 +94,7 @@ var PhoneForm = React.createClass({
         }
         return Lang.unknown;
     },
-    _getCountryCode: function() {
+    _getCountryCode: function () {
         for (var i = 0; i < Countries.length; i++) {
             var country = Countries[i];
             if (this.state.countryName == country.name) {
@@ -103,20 +103,20 @@ var PhoneForm = React.createClass({
         }
         return "";
     },
-    componentDidMount: function() {
+    componentDidMount: function () {
         this._focusPhoneInput();
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         //observe AccountStore
         var self = this;
-        stores.observe(AccountStore, function() {
+        stores.observe(AccountStore, function () {
             return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
-        }).then(function() {
+        }).then(function () {
             self._handleVerificationCodeSent();
         });
-        stores.observe(AccountStore, function() {
+        stores.observe(AccountStore, function () {
             return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.FAILED;
-        }).then(function() {
+        }).then(function () {
             self._handleVerificationCodeNotSent();
         });
 
@@ -129,7 +129,7 @@ var PhoneForm = React.createClass({
             });
         }
     },
-    render: function() {
+    render: function () {
         if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {
             this._handleVerificationCodeSent();
         }
@@ -141,6 +141,7 @@ var PhoneForm = React.createClass({
             <div style={makeStyle(login)}>
                 <Form className="login-form" style={makeStyle(loginForm)} onSubmit={this._handleSubmit}>
                     <p style={makeStyle(loginForm.title)}>{Lang.loginTitle}</p>
+
                     <p style={makeStyle(loginForm.p)}>{Lang.loginSubTitle}</p>
                     <Wrapper className="login-form-country-name" style={makeStyle(loginForm.countryName)}>
                         <RequiredValidator
@@ -149,7 +150,7 @@ var PhoneForm = React.createClass({
                             errorMessage={Lang.country}
                             successMessage={Lang.country}
                             controlsToValidate="country-input"
-                        />
+                            />
                         <InputBox
                             id="country-input"
                             style={makeStyle(loginForm.input, loginForm.input.country)}
@@ -157,7 +158,7 @@ var PhoneForm = React.createClass({
                             onClick={this._handleCountryReadyToSelect}
                             defaultValue={this.state.countryName}
                             initialValue={this.state.countryName}
-                        />
+                            />
                     </Wrapper>
                     <Wrapper>
                         <Wrapper className="login-form-country-code" style={makeStyle(loginForm.countryCode)}>
@@ -167,14 +168,14 @@ var PhoneForm = React.createClass({
                                 errorMessage={Lang.code}
                                 successMessage={Lang.code}
                                 controlsToValidate="code-input"
-                            />
+                                />
                             <InputBox
                                 id="code-input"
                                 style={makeStyle(loginForm.input)}
                                 onChange={this._handleCountryCodeChange}
                                 defaultValue={this.state.countryCode}
                                 initialValue={this.state.countryCode}
-                            />
+                                />
                         </Wrapper>
                         <Wrapper className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
                             <CustomValidator
@@ -187,7 +188,7 @@ var PhoneForm = React.createClass({
                                 validationAtClient={function(code, phone) {
                                     return code != "+86" || phoneRegex.test(phone);
                                 }}
-                            />
+                                />
                             <InputBox
                                 id="phone-input"
                                 style={loginForm.input}
@@ -201,7 +202,7 @@ var PhoneForm = React.createClass({
                         <Submit
                             value={Lang.next}
                             style={loginForm.button}
-                        />
+                            />
                     </Wrapper>
                 </Form>
             </div>

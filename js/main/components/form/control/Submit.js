@@ -13,15 +13,15 @@ var makeStyle = require('../../../style/styles').makeStyle;
 
 //core module to export
 var Submit = React.createClass({
-  render: function() {
-    return (
-      <input
-        type="submit"
-        value={this.props.name || this.props.value}
-        style={makeStyle(style.button, theme.button, this.props.style)}
-      />
-    );
-  }
+    render: function () {
+        return (
+            <input
+                type="submit"
+                value={this.props.name || this.props.value}
+                style={makeStyle(style.button, theme.button, this.props.style)}
+                />
+        );
+    }
 });
 
 module.exports = Submit;

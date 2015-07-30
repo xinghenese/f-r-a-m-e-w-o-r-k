@@ -23,15 +23,15 @@ function on(event, callback) {
     }
     var self = this;
 
-    return repeat.create(function(resolve, reject) {
-        eventEmitter.on.call(self, event, function(msg) {
+    return repeat.create(function (resolve, reject) {
+        eventEmitter.on.call(self, event, function (msg) {
             if (!msg) {
                 reject('empty message received');
                 return;
             }
             resolve(msg);
         })
-    }).then(function(msg) {
+    }).then(function (msg) {
         return _.isFunction(callback) ? callback(msg) : msg;
     })
 }
@@ -39,19 +39,19 @@ function on(event, callback) {
 function once(event, callback) {
     var self = this;
 
-    return promise.create(function(resolve, reject) {
+    return promise.create(function (resolve, reject) {
         //eventEmitter.once would eventually invoke this.on. here we set
         //a flag in order to invoke original eventEmitter.on instead of
         //the overridden this.on.
         self._onceTag = true;
-        eventEmitter.once.call(self, event, function(msg) {
+        eventEmitter.once.call(self, event, function (msg) {
             if (!msg) {
                 reject('empty message received');
                 return;
             }
             resolve(msg);
         });
-    }).then(function(msg) {
+    }).then(function (msg) {
         return _.isFunction(callback) ? callback(msg) : msg;
     });
 }
@@ -59,10 +59,10 @@ function once(event, callback) {
 function conditionalOnce(event, predicate, timeout, callback) {
     var self = this;
 
-    return promise.create(function(resolve, reject) {
+    return promise.create(function (resolve, reject) {
         self._onceTag = true;
         var timer = _.delay(reject, timeout, "timeout");
-        var callback = function(msg) {
+        var callback = function (msg) {
             if (predicate(msg)) {
                 clearTimeout(timer);
                 eventEmitter.removeListener.call(self, event, callback);
@@ -70,7 +70,7 @@ function conditionalOnce(event, predicate, timeout, callback) {
             }
         };
         eventEmitter.on.call(self, event, callback);
-    }).then(function(msg) {
+    }).then(function (msg) {
         return _.isFunction(callback) ? callback(msg) : msg;
     });
 }

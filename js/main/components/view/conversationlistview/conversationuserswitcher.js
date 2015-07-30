@@ -19,24 +19,24 @@ var ConversationUserSwitcher = React.createClass({
             React.PropTypes.object
         ])
     },
-    getInitialState: function() {
+    getInitialState: function () {
         var options = this.props.options;
         options = _.isArray(options) ? options : _.values(options);
         return {selectedIndex: options[0]};
     },
-    _switch: function(event) {
+    _switch: function (event) {
         var switchedName = event.target.className.replace(suffix, '');
         this.setState({selectedIndex: switchedName});
         if (_.isFunction(this.props.onSwitch)) {
             this.props.onSwitch(switchedName);
         }
     },
-    render: function() {
+    render: function () {
         if (!this.props.options || _.isEmpty(this.props.options)) {
             return null;
         }
 
-        var items = _.map(this.props.options, function(value, key) {
+        var items = _.map(this.props.options, function (value, key) {
             var currentStyle = style.footer.switcher[key].inactive;
 
             if (value === this.state.selectedIndex) {
@@ -49,7 +49,7 @@ var ConversationUserSwitcher = React.createClass({
                     className={value + suffix}
                     onClick={this._switch}
                     style={makeStyle(style.footer.switcher.option, currentStyle)}
-                />
+                    />
             )
         }, this);
 
@@ -57,7 +57,7 @@ var ConversationUserSwitcher = React.createClass({
             <ul
                 className="conversations-contacts-switcher"
                 style={makeStyle(style.footer.switcher, this.props.style)}
-            >
+                >
                 {items}
             </ul>
         )

@@ -9,7 +9,7 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 
 // exports
 module.exports = {
-    getConversationAndContactList: function() {
+    getConversationAndContactList: function () {
         AppDispatcher.dispatch({
             type: ActionTypes.GET_CHAT_LIST
         });

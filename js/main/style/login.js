@@ -54,11 +54,9 @@ module.exports = {
                 float: "right",
                 width: "200px"
             },
-            submit: {
-
-            },
+            submit: {},
             title: {
-                fontSize:"20px",
+                fontSize: "20px",
                 color: "#1d1d1d",
                 margin: "0px"
             },
@@ -107,7 +105,7 @@ module.exports = {
         },
         codeForm: {
             textAlign: "center",
-                reset: {
+            reset: {
                 color: "#6cace1",
                 lineHeight: "2.5"
             },

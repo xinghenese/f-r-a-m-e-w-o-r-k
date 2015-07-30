@@ -19,17 +19,17 @@ var Search = React.createClass({
     propTypes: {
         searchFunction: React.PropTypes.func
     },
-    componentDidUpdate: function(preProps) {
+    componentDidUpdate: function (preProps) {
         if (!_.isEqual(preProps.datasource, this.props.datasource)) {
             this._doSearch();
         }
     },
-    _doSearch: function(event) {
+    _doSearch: function (event) {
         if (_.isFunction(this.props.onSearch)) {
             this.props.onSearch(startSearch(this, event));
         }
     },
-    render: function() {
+    render: function () {
         return (
             <input
                 type="text"
@@ -40,7 +40,7 @@ var Search = React.createClass({
                 onBlur={onBlur}
                 onFocus={onFocus}
                 style={makeStyle(commonStyle.input, this.props.style)}
-            />
+                />
         )
     }
 });
@@ -66,8 +66,8 @@ function startSearch(search, event) {
             fields = [fields];
         }
 
-        _.forEach(fields, function(field) {
-            var subResult = _.reduce(datasource, function(memo, data) {
+        _.forEach(fields, function (field) {
+            var subResult = _.reduce(datasource, function (memo, data) {
                 if (data[field] && (data[field] + '').indexOf(searchText) > -1) {
                     memo.push(data);
                 }
@@ -82,10 +82,10 @@ function startSearch(search, event) {
     return result;
 }
 
-function onBlur(event){
+function onBlur(event) {
     setStyle(event.target.style, defaultStyle.search.blur);
 }
 
-function onFocus(event){
+function onFocus(event) {
     setStyle(event.target.style, defaultStyle.search.focus);
 }

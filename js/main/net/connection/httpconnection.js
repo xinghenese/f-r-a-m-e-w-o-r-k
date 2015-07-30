@@ -43,8 +43,8 @@ var loginPromise = null;
 
 //core module to export
 var httpconnection = module.exports = connection.extend({
-    'login': function(data) {
-        return this.request(data).then(function(value) {
+    'login': function (data) {
+        return this.request(data).then(function (value) {
             var token = _.get(value, TOKEN_FIELD);
             userconfig.setToken(token);
             isLoggedIn = true;
@@ -58,8 +58,8 @@ var httpconnection = module.exports = connection.extend({
      * @param options{Object}
      * @returns {Q.Promise}
      */
-    'request': function(packet, options) {
-        return authorize().then(function(value) {
+    'request': function (packet, options) {
+        return authorize().then(function (value) {
             var root;
             var url;
             var data;
@@ -85,23 +85,23 @@ var httpconnection = module.exports = connection.extend({
         });
     },
 
-    'getState': function() {
+    'getState': function () {
         return state;
     },
 
-    'isAuthorized': function() {
+    'isAuthorized': function () {
         return isAuthorized;
     }
 });
 
 //initialize
-httpconnection.on('ready', function() {
+httpconnection.on('ready', function () {
     state = State.CONNECTING;
 });
-httpconnection.on('connect', function() {
+httpconnection.on('connect', function () {
     state = State.CONNECTED;
 });
-httpconnection.on('close', function() {
+httpconnection.on('close', function () {
     state = State.INITIALIZED;
 });
 state = State.INITIALIZED;
@@ -109,11 +109,11 @@ state = State.INITIALIZED;
 //private functions
 function post(url, data, options) {
     console.group('http post -', url);
-    return session.write(data, options).then(function(value) {
+    return session.write(data, options).then(function (value) {
         return http.post(url, value);
-    }).then(function(value) {
+    }).then(function (value) {
         return session.read(value, options);
-    }).then(function(data) {
+    }).then(function (data) {
         console.groupEnd();
         return data;
     });
@@ -121,9 +121,9 @@ function post(url, data, options) {
 
 function get(url, options) {
     console.group('http get -', url);
-    return http.get(url).then(function(value) {
+    return http.get(url).then(function (value) {
         return session.read(value, options);
-    }).then(function(data) {
+    }).then(function (data) {
         console.groupEnd();
         return data;
     });
@@ -138,7 +138,7 @@ function authorize() {
         var options = _.assign({}, DEFAULT_CONFIG, {'needDecompress': false});
 
         authorizePromise = post(DEFAULT_ROOT + "auth/c", packet, options)
-            .then(function(value) {
+            .then(function (value) {
                 var encryptKey = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
                 _.set(DEFAULT_CONFIG, 'encryptKey', encryptKey);
                 userconfig.setUuid(_.get(value, UUID_FILED));

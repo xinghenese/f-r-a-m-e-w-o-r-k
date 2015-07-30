@@ -20,7 +20,7 @@ var MessageActions = require('../../../actions/messageactions');
 
 //core module to export
 var ChatMessageBox = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             id: '',
             type: '',
@@ -28,8 +28,8 @@ var ChatMessageBox = React.createClass({
             data: []
         };
     },
-    _deleteConversation: function(id, type) {
-        return function() {
+    _deleteConversation: function (id, type) {
+        return function () {
             var idNumber = parseInt(id);
             switch (type) {
                 case "group":
@@ -44,13 +44,13 @@ var ChatMessageBox = React.createClass({
             }
         };
     },
-    _handleSubmit: function(event) {
+    _handleSubmit: function (event) {
         var data = _.values(event.data)[0];
         if (this.state.id && data) {
             MessageActions.sendTalkMessage(this.state.id, null, null, (_.values(event.data)[0]).toString(), 1, 0, "1.0");
         }
     },
-    _updateMessages: function(id, type) {
+    _updateMessages: function (id, type) {
         id = id || this.state.id;
         type = type || this.state.type;
         if (!id || !type) {
@@ -96,15 +96,15 @@ var ChatMessageBox = React.createClass({
 
         this.setState({data: result, id: id, type: type, inputEnabled: enabled});
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
     },
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
     },
-    render: function() {
+    render: function () {
         if (this.state.id) {
             return (
                 <div className="chat-message-box" style={makeStyle(style)}>
@@ -134,7 +134,7 @@ module.exports = ChatMessageBox;
 
 //private functions
 function addConversationListSelectedHandler(box) {
-    emitter.on('select', function(info) {
+    emitter.on('select', function (info) {
         box._updateMessages(info.id, info.type);
     });
 }
@@ -153,7 +153,7 @@ function _buildGroupRenderObject(item, collector) {
     var messageContent = "";
     var time = "";
 
-    _.forEach(item.messages, function(message) {
+    _.forEach(item.messages, function (message) {
         if (!message) {
             return;
         }
@@ -179,7 +179,7 @@ function _buildUserRenderObject(item, collector) {
     var messageContent = "";
     var time = "";
 
-    _.forEach(item.messages, function(message) {
+    _.forEach(item.messages, function (message) {
         if (!message) {
             return;
         }

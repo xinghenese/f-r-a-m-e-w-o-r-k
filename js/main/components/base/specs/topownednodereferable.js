@@ -11,14 +11,14 @@ var React = require('react');
 //core module to export
 module.exports = {
     displayName: 'TopOwnedNodeReferable',
-    getTopOwnedNode: function() {
+    getTopOwnedNode: function () {
         if (!this.isMounted()) {
             throw new Error('the component ' + this.displayName + ' is not mounted yet.'
                 + ' No owned nodes can be accessed.');
         }
         return this.refs[this.getSeq() || 'top-owned-node'];
     },
-    topOwnedNodeProps: function() {
+    topOwnedNodeProps: function () {
         return {ref: this.getSeq() || 'top-owned-node'};
     }
 };

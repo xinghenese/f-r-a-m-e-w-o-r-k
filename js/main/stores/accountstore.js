@@ -46,19 +46,19 @@ var AccountStore = ChangeableStore.extend({
     _error: null,
     _verificationCodeState: VerificationCodeState.NOT_SENT,
     _loginState: LoginState.DEFAULT,
-    getCode: function() {
+    getCode: function () {
         return _requestAccount.code;
     },
-    getLoginState: function() {
+    getLoginState: function () {
         return this._loginState;
     },
-    getPhone: function() {
+    getPhone: function () {
         return _requestAccount.phone;
     },
-    getRequestType: function() {
+    getRequestType: function () {
         return _requestAccount.requestType;
     },
-    getVerificationCodeState: function() {
+    getVerificationCodeState: function () {
         return this._verificationCodeState;
     }
 });
@@ -69,7 +69,7 @@ module.exports = AccountStore;
 AccountStore.VerificationCodeState = VerificationCodeState;
 AccountStore.LoginState = LoginState;
 
-AccountStore.dispatchToken = AppDispatcher.register(function(action) {
+AccountStore.dispatchToken = AppDispatcher.register(function (action) {
     switch (action.type) {
         case ActionTypes.LOGIN:
             _handleLoginRequest(action);
@@ -103,12 +103,12 @@ function _handleLoginRequest(action) {
     HttpConnection.login({
         url: "usr/lg",
         data: data
-    }).then(function(response) {
+    }).then(function (response) {
         _handleLoginSuccess(response);
         _afterLogin();
         AccountStore._loginState = LoginState.SUCCESS;
         AccountStore.emitChange();
-    }, function() {
+    }, function () {
         AccountStore._loginState = LoginState.FAILED;
         AccountStore.emitChange();
     });
@@ -155,7 +155,7 @@ function _handleLoginSuccess(response) {
 function _handleLogoutRequest(action) {
     HttpConnection.request({
         url: "usr/lo"
-    }).then(function(response) {
+    }).then(function (response) {
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.LOGOUT_SUCCESS);
@@ -164,7 +164,7 @@ function _handleLogoutRequest(action) {
                 AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
                 break;
         }
-    }, function(error) {
+    }, function (error) {
         AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
     });
 }
@@ -184,7 +184,7 @@ function _handleRegisterRequest(action) {
     HttpConnection.request({
         url: "usr/reg",
         data: data
-    }).then(function(response) {
+    }).then(function (response) {
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.REGISTER_SUCCESS, _stripStatusCodeInResponse(response));
@@ -211,7 +211,7 @@ function _handleRegisterRequest(action) {
                 AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
         }
-    }, function() {
+    }, function () {
         AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
     });
 }
@@ -238,10 +238,10 @@ function _handleVerificationCodeRequest(action) {
     HttpConnection.request({
         url: "sms/sc",
         data: data
-    }).then(function() {
+    }).then(function () {
         AccountStore._verificationCodeState = VerificationCodeState.SENT;
         AccountStore.emitChange();
-    }, function(error) {
+    }, function (error) {
         switch (error) {
             case 1: // failed
             case 5: // invalid arguments

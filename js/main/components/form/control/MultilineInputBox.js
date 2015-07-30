@@ -21,36 +21,36 @@ var index = 0;
 
 //core module to export
 var MultilineInputBox = React.createClass({
-    _generateChildren: function() {
-        return React.Children.map(this.props.children, function(child, key) {
+    _generateChildren: function () {
+        return React.Children.map(this.props.children, function (child, key) {
             return React.cloneElement(child, {
                 id: 'key-' + key
             });
         });
     },
-    _handleSubmit: function(event) {
+    _handleSubmit: function (event) {
         this.props.onSubmit(event);
     },
-    _onInputBlur: function(event) {
+    _onInputBlur: function (event) {
         event.target.placeholder = this.props.defaultValue;
     },
-    _onInputFocus: function(event) {
+    _onInputFocus: function (event) {
         event.target.placeholder = "";
     },
-    _onKeyDown: function(event) {
+    _onKeyDown: function (event) {
         if (event.keyCode == KeyCodes.ENTER && !event.ctrlKey) {
             event.preventDefault();
             event.stopPropagation();
             this._handleSubmit(event);
         }
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         this._seq = prefix + (index++);
     },
-    render: function() {
+    render: function () {
         var props = this.props;
         var style = props.style || {};
-        var visibleWidth = _.find([props.width, style.width, theme.width], function(width) {
+        var visibleWidth = _.find([props.width, style.width, theme.width], function (width) {
             return LENGTH_REG.test(width);
         });
         var actualWidth = visibleWidth && (+visibleWidth.replace('px', '')) + SCROLLBAR_WIDTH + 'px';
@@ -85,7 +85,7 @@ module.exports = MultilineInputBox;
 
 //private functions
 function onChange(box) {
-    return function(event) {
+    return function (event) {
         var target = event.currentTarget;
 
         //notify the renderer to recalculate the scrollHeight prop.

@@ -26,7 +26,7 @@ var boxType = {
 };
 
 var RightSideBox = React.createClass({
-    render: function() {
+    render: function () {
         if (this.props.boxType === boxType.settings) {
             return <UserInfoBox />;
         }
@@ -39,35 +39,35 @@ var RightSideBox = React.createClass({
 
 // exports
 var Chat = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {rightBoxType: boxType.messsagebox};
     },
-    _handleGroupsLoaded: function() {
+    _handleGroupsLoaded: function () {
         MessageActions.requestHistoryMessages();
     },
-    _showSettings: function() {
-        this.setState(function(previousState) {
+    _showSettings: function () {
+        this.setState(function (previousState) {
             if (previousState.rightBoxType === boxType.messsagebox) {
                 return {rightBoxType: boxType.settings}
             }
             return {rightBoxType: boxType.messsagebox};
         });
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         // 1 for groups, 2 for contacts
         ConversationAndContactActions.getConversationAndContactList();
         AccountActions.switchStatus(1);
         ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
         modifyPageStyle();
     },
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
     },
-    render: function() {
+    render: function () {
         return (
             <div>
-                <RightSideBox boxType={this.state.rightBoxType} />
-                <ConversationBox showSettings={this._showSettings} />
+                <RightSideBox boxType={this.state.rightBoxType}/>
+                <ConversationBox showSettings={this._showSettings}/>
             </div>
         );
     }

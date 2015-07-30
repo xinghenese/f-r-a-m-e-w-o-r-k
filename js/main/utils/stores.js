@@ -10,8 +10,8 @@ var Promise = require('./promise');
 function observeStore(store, predicate) {
     var performCheck;
 
-    return Promise.create(function(resolve) {
-        performCheck = function() {
+    return Promise.create(function (resolve) {
+        performCheck = function () {
             if (predicate.call(null, store)) {
                 resolve();
             }
@@ -19,7 +19,7 @@ function observeStore(store, predicate) {
 
         store.addChangeListener(performCheck);
         performCheck();
-    }).finally(function() {
+    }).finally(function () {
         store.removeChangeListener(performCheck);
     });
 }

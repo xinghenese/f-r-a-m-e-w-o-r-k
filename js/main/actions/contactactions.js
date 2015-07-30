@@ -9,7 +9,7 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 
 // exports
 module.exports = {
-    getUserInfo: function(userId) {
+    getUserInfo: function (userId) {
         AppDispatcher.dispatch({
             type: ActionTypes.GET_USER_INFO,
             id: userId

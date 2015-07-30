@@ -15,7 +15,7 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //core module to export
 var ConversationListItem = React.createClass({
-    render: function() {
+    render: function () {
         var currentStyle = style.conversationlist.item.default;
 
         if (this.props.selected) {
@@ -35,25 +35,28 @@ var ConversationListItem = React.createClass({
                     name={this.props.senderName}
                     src={this.props.senderAvatar}
                     index={this.props.index}
-                />
+                    />
+
                 <div
                     className="conversation-list-item-info"
                     style={makeStyle(style.conversationlist.item.info)}
-                >
-                    <div className="conversation-list-item-time" style={makeStyle(style.conversationlist.item.time)}>{this.props.time}</div>
-                    <div className="conversation-list-item-unread-count" style={makeStyle(style.conversationlist.item.unread)}>{this.props.unreadCount || 0}</div>
+                    >
+                    <div className="conversation-list-item-time"
+                         style={makeStyle(style.conversationlist.item.time)}>{this.props.time}</div>
+                    <div className="conversation-list-item-unread-count"
+                         style={makeStyle(style.conversationlist.item.unread)}>{this.props.unreadCount || 0}</div>
                 </div>
                 <div className="conversation-list-item-body">
                     <div
                         className="conversation-list-item-nickname"
                         style={makeStyle(style.conversationlist.item.title)}
-                    >
+                        >
                         {this.props.senderName}
                     </div>
                     <p
                         className="conversation-list-item-content"
                         style={makeStyle(style.conversationlist.item.message)}
-                    >
+                        >
                         {this.props.children}
                     </p>
                 </div>
@@ -69,7 +72,7 @@ module.exports = ConversationListItem;
 
 //private functions
 function onhoverin(item) {
-    return function(event) {
+    return function (event) {
         if (!item.props.selected) {
             setStyle(event.currentTarget.style, style.conversationlist.item.hover);
         }
@@ -77,7 +80,7 @@ function onhoverin(item) {
 }
 
 function onhoverout(item) {
-    return function(event) {
+    return function (event) {
         if (!item.props.selected) {
             setStyle(event.currentTarget.style, style.conversationlist.item.default);
         }

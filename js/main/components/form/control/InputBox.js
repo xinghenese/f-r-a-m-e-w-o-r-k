@@ -14,22 +14,22 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //core module to export
 var InputBox = React.createClass({
-  render: function(){
-    return (
-      <input
-        id={this.props.id}
-        style={makeStyle(style.input, theme.input, this.props.style)}
-        className={this.props.className}
-        autoComplete="off" type="tel"
-        onChange={this.props.onChange}
-        onBlur={onInputBlur}
-        onFocus={onInputFocus}
-        onClick={this.props.onClick}
-        placeholder={this.props.defaultValue}
-        value={this.props.initialValue}
-      />
-    )
-  }
+    render: function () {
+        return (
+            <input
+                id={this.props.id}
+                style={makeStyle(style.input, theme.input, this.props.style)}
+                className={this.props.className}
+                autoComplete="off" type="tel"
+                onChange={this.props.onChange}
+                onBlur={onInputBlur}
+                onFocus={onInputFocus}
+                onClick={this.props.onClick}
+                placeholder={this.props.defaultValue}
+                value={this.props.initialValue}
+                />
+        )
+    }
 });
 
 module.exports = InputBox;
@@ -38,10 +38,10 @@ module.exports = InputBox;
 
 
 //private functions
-function onInputBlur(event){
-  setStyle(event.target.style, theme.input.blur);
+function onInputBlur(event) {
+    setStyle(event.target.style, theme.input.blur);
 }
 
-function onInputFocus(event){
-  setStyle(event.target.style, theme.input.focus);
+function onInputFocus(event) {
+    setStyle(event.target.style, theme.input.focus);
 }

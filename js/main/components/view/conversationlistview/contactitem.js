@@ -15,7 +15,7 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //core module to export
 var ContactItem = React.createClass({
-    render: function() {
+    render: function () {
         var currentStyle = style.conversationlist.item.default;
 
         if (this.props.selected) {
@@ -35,23 +35,24 @@ var ContactItem = React.createClass({
                     name={this.props.contactName}
                     src={this.props.contactAvatar}
                     index={this.props.index}
-                />
+                    />
+
                 <div className="contact-list-item-body">
                     <div
                         className="contact-list-item-nickname"
                         style={makeStyle(style.conversationlist.item.title)}
-                    >
+                        >
                         {this.props.contactName}
                     </div>
                     <p
                         className="contact-list-item-last-appearance"
                         style={makeStyle(style.conversationlist.item.message)}
-                    >
+                        >
                         {this.props.message}
                     </p>
                 </div>
             </li>
-            )
+        )
     }
 });
 
@@ -62,7 +63,7 @@ module.exports = ContactItem;
 
 //private functions
 function onhoverin(item) {
-    return function(event) {
+    return function (event) {
         if (!item.props.selected) {
             setStyle(event.currentTarget.style, style.conversationlist.item.hover);
         }
@@ -70,7 +71,7 @@ function onhoverin(item) {
 }
 
 function onhoverout(item) {
-    return function(event) {
+    return function (event) {
         if (!item.props.selected) {
             setStyle(event.currentTarget.style, style.conversationlist.item.default);
         }

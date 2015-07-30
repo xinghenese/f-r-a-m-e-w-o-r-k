@@ -11,14 +11,14 @@ var sessioncache = {};
 
 //core module to export
 module.exports = session.extend({
-  'cache': function(tag, data){
-    _.set(sessioncache, tag, data);
-    return this;
-  },
-  'fetch': function(tag){
-    return _.get(sessioncache, tag);
-  },
-  'has': function(tag){
-    return _.has(sessioncache, tag);
-  }
+    'cache': function (tag, data) {
+        _.set(sessioncache, tag, data);
+        return this;
+    },
+    'fetch': function (tag) {
+        return _.get(sessioncache, tag);
+    },
+    'has': function (tag) {
+        return _.has(sessioncache, tag);
+    }
 });

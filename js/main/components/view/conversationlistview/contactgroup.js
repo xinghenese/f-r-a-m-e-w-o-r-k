@@ -14,7 +14,7 @@ var prefix = 'contact-group-';
 
 //core module to export
 var ContactGroup = React.createClass({
-    render: function() {
+    render: function () {
         var data = this.props.data;
 
         if (!data || _.isEmpty(data)) {
@@ -23,7 +23,7 @@ var ContactGroup = React.createClass({
 
         data = _.indexBy(data, 'id');
 
-        var groups = _.map(data, function(data, key) {
+        var groups = _.map(data, function (data, key) {
             return (
                 <ContactItem
                     key={prefix + key}
@@ -66,7 +66,7 @@ module.exports = ContactGroup;
 
 //private functions
 function onselect(group) {
-    return function(event) {
+    return function (event) {
 
     }
 }

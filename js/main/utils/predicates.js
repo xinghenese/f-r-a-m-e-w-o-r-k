@@ -5,8 +5,8 @@
 
 // exports
 module.exports = {
-    uuidPredicate: function(uuid) {
-        return function(data) {
+    uuidPredicate: function (uuid) {
+        return function (data) {
             return data["uuid"] === uuid;
         };
     }

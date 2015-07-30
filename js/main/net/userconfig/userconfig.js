@@ -35,50 +35,50 @@ var socket2http = {
 
 //core module to export
 module.exports = {
-    get: function(key) {
+    get: function (key) {
         return _.get(profile, _getKey(key));
     },
-    set: function(key, value) {
+    set: function (key, value) {
         _.set(profile, _getKey(key), value);
         return this;
     },
-    subset: function() {
+    subset: function () {
         var keys = _.flattenDeep(arguments);
         if (_.isEmpty(keys)) {
             return _.assign({}, profile)
         }
         return _.pick(profile, _.map(keys, _getKey));
     },
-    socksubset: function() {
-        return _.mapKeys(this.subset(arguments), function(value, key) {
+    socksubset: function () {
+        return _.mapKeys(this.subset(arguments), function (value, key) {
             return _.get(http2socket, key) || key;
         })
     },
-    getToken: function() {
+    getToken: function () {
         return this.get('tk');
     },
-    setToken: function(token) {
+    setToken: function (token) {
         return this.set('tk', token);
     },
-    getVersion: function() {
+    getVersion: function () {
         return this.get('ver');
     },
-    setVersion: function(version) {
+    setVersion: function (version) {
         return this.set('ver', version);
     },
-    getUid: function() {
+    getUid: function () {
         return this.get('uid');
     },
-    setUid: function(uid) {
+    setUid: function (uid) {
         return this.set('uid', uid);
     },
-    getUuid: function() {
+    getUuid: function () {
         return this.get('uuid');
     },
-    setUuid: function(uuid) {
+    setUuid: function (uuid) {
         return this.set('uuid', uuid);
     },
-    configs: function() {
+    configs: function () {
         return _configs;
     }
 };

@@ -4,7 +4,7 @@
 'use strict';
 
 //dependencies
-var _  = require('lodash');
+var _ = require('lodash');
 var React = require('react');
 var Search = require('./tools/Search');
 var loginStyle = require('../style/login');
@@ -14,7 +14,7 @@ var countries = require('../constants/countries');
 
 //private fields
 var CountryList = React.createClass({
-    _onSelect: function(event) {
+    _onSelect: function (event) {
         var target = event.target;
 
         if (target.nodeName.toLowerCase() === 'span') {
@@ -26,7 +26,7 @@ var CountryList = React.createClass({
             countryCode: target.getAttribute('data-code')
         });
     },
-    render: function() {
+    render: function () {
         var data = this.props.data;
         var style = this.props.style || {};
 
@@ -34,7 +34,7 @@ var CountryList = React.createClass({
             return null;
         }
 
-        var children = _.map(data, function(countryInfo, index) {
+        var children = _.map(data, function (countryInfo, index) {
 
             var name = countryInfo.name;
             var code = countryInfo.code;
@@ -47,17 +47,17 @@ var CountryList = React.createClass({
                     data-name={name}
                     data-code={code}
                     style={makeStyle(itemStyle)}
-                >
+                    >
                     <span
                         className="country-name"
                         style={itemStyle.name || itemStyle.countryName}
-                    >
+                        >
                         {name}
                     </span>
                     <span
                         className="country-code"
                         style={itemStyle.code || itemStyle.countryCode}
-                    >
+                        >
                         {code}
                     </span>
                 </li>
@@ -74,20 +74,20 @@ var CountryList = React.createClass({
 
 //core module to export
 var CountryForm = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {displayData: countries};
     },
-    _onSelect: function(countryInfo) {
+    _onSelect: function (countryInfo) {
         this.props.onCountryCodeSelected(countryInfo);
     },
-    _onSearch: function(data) {
+    _onSearch: function (data) {
         this.setState({displayData: data ? data.name : countries});
     },
-    render: function() {
+    render: function () {
         var style = loginStyle.country;
 
         return (
-            <div style={makeStyle(style)} >
+            <div style={makeStyle(style)}>
                 <p style={style.title}>{Lang.countryFormTitle}</p>
                 <Search
                     datasource={countries}
@@ -95,13 +95,14 @@ var CountryForm = React.createClass({
                     defaultValue={Lang.countrySearchTips}
                     onSearch={this._onSearch}
                     style={style.search}
-                />
+                    />
+
                 <div className="country-list-wrapper" style={makeStyle(style.wrapper)}>
                     <CountryList
                         data={this.state.displayData}
                         onSelect={this._onSelect}
                         style={style.wrapper.countrylist}
-                    />
+                        />
                 </div>
             </div>
         )

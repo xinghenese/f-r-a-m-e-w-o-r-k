@@ -16,22 +16,22 @@ var RouteHandler = Router.RouteHandler;
 
 // private fields
 var app = {
-    _handleVerificationCodeSent: function() {
+    _handleVerificationCodeSent: function () {
         router.transitionTo("code");
     },
-    _handleCountryReadyToSelect: function() {
+    _handleCountryReadyToSelect: function () {
         router.transitionTo("country");
     },
-    _handleCountryCodeSelected: function(countryInfo) {
+    _handleCountryCodeSelected: function (countryInfo) {
         router.transitionTo("/", {}, {
             countryName: countryInfo.countryName,
             countryCode: countryInfo.countryCode
         });
     },
-    _handleLoginSuccess: function() {
+    _handleLoginSuccess: function () {
         router.transitionTo("chat", {t: "boy"}, {age: 8});
     },
-    _onProfileLoaded: function() {
+    _onProfileLoaded: function () {
         console.log("profile loaded, after login success!");
     }
 };
@@ -47,19 +47,19 @@ var WrappedCodeForm = _wrapComponent(CodeForm, {
 });
 var routes = (
     <Route name="app" path="/">
-        <Route name="phone" handle={WrappedPhoneForm} />
-        <Route name="country" handler={WrappedCountryForm} />
-        <Route name="code" handler={WrappedCodeForm} />
-        <Route name="chat" path="/chat/:t" handler={Chat} />
-        <DefaultRoute handler={WrappedPhoneForm} />
+        <Route name="phone" handle={WrappedPhoneForm}/>
+        <Route name="country" handler={WrappedCountryForm}/>
+        <Route name="code" handler={WrappedCodeForm}/>
+        <Route name="chat" path="/chat/:t" handler={Chat}/>
+        <DefaultRoute handler={WrappedPhoneForm}/>
     </Route>
 );
 var router = Router.create(routes);
 
 // export
 module.exports = {
-    start: function(element) {
-        router.run(function(Handler, state) {
+    start: function (element) {
+        router.run(function (Handler, state) {
             React.render(<Handler params={state.routes.params}/>, element);
         });
     }
@@ -69,7 +69,7 @@ module.exports = {
 function _wrapComponent(Component, props) {
     return React.createClass({
         displayName: "WrapComponent",
-        render: function() {
+        render: function () {
             //pass the params, query and other props to the core component from
             //the outside wrapComponent
             return React.createElement(Component, _.assign(props, this.props));

@@ -7,9 +7,9 @@ var origin = require('../base/origin.js');
 
 //core module to export
 module.exports = origin.extend({
-  'root': '',
-  'url': '',
-  'tag': '',
-  'data': {},
-  'result': ''
+    'root': '',
+    'url': '',
+    'tag': '',
+    'data': {},
+    'result': ''
 });

@@ -20,7 +20,7 @@ var GroupStore = assign({}, EventEmitter.prototype, {
 });
 
 // module initialization
-GroupStore.dispatchToken = AppDispatcher.register(function(action) {
+GroupStore.dispatchToken = AppDispatcher.register(function (action) {
     switch (action.type) {
         case ActionTypes.REQUEST_GROUP_MEMBERS:
             _handleGroupMembersRequest(action);
@@ -36,10 +36,10 @@ function _handleGroupMembersRequest(action) {
     HttpConnection.request({
         url: "rmm/ml",
         data: data
-    }).then(function(response) {
+    }).then(function (response) {
         _handleGroupMembersResponse(action.groupId, response);
         GroupStore.emit(GroupStore.Events.REQUEST_GROUP_MEMBERS_SUCCESS);
-    }, function(error) {
+    }, function (error) {
         GroupStore.emit(GroupStore.Events.REQUEST_GROUP_MEMBERS_FAILURE, error);
     });
 }

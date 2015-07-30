@@ -7,16 +7,16 @@ var _ = require('lodash');
 
 var SmartSlot = {
     _listeners: [],
-    componentWillMount: function() {
-        _(_listeners).forEach(function(n) {
+    componentWillMount: function () {
+        _(_listeners).forEach(function (n) {
             var host = n.host;
             var event = n.event;
             var listener = n.listener;
             host.on(event, listener);
         });
     },
-    componentWillUnmount: function() {
-        _(_listeners).forEach(function(n) {
+    componentWillUnmount: function () {
+        _(_listeners).forEach(function (n) {
             var host = n.host;
             var event = n.event;
             var listener = n.listener;
@@ -24,7 +24,7 @@ var SmartSlot = {
         });
         _listeners = [];
     },
-    registerListener: function(host, event, listener) {
+    registerListener: function (host, event, listener) {
         _listeners.push({
             host: host,
             event: event,

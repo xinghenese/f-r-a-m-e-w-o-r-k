@@ -19,9 +19,9 @@ var createReconstructableClass = createGenerator({
 
 //core module to export
 module.exports = createReconstructableClass({
-    render: function() {
+    render: function () {
         var emitter = eventEmitter.create();
-        var children = React.Children.map(this.props.children, function(child) {
+        var children = React.Children.map(this.props.children, function (child) {
             return React.cloneElement(child, {emitter: emitter});
         }, this);
         return <div {...this.props}>{children}</div>;

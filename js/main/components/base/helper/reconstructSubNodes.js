@@ -36,8 +36,8 @@ function traverseAndReconstructReactTree(element) {
 
     var children;
 
-    if (!_.isEmpty(element.children) ) {
-        children = _.map(element.children, function(child) {
+    if (!_.isEmpty(element.children)) {
+        children = _.map(element.children, function (child) {
             return traverseAndReconstructReactTree(child);
         });
     }
@@ -61,7 +61,7 @@ function traverseAndRecreateDomTreeObject(element, parent, root) {
         cacheElementInDomTreeObject(element, parent, root);
     }
 
-    React.Children.forEach(element.props.children, function(child) {
+    React.Children.forEach(element.props.children, function (child) {
         console.log('traverse-foreach#element: ', element);
         var props = _({})
                 .assign(element.props, child.props, {
@@ -90,12 +90,12 @@ function cacheElementInDomTreeObject(element, parent, root) {
     );
     var dir = (path.relativeDirectory === paths.CWD
         && element.props.dir || []
-        ).concat(path.subPath);
+    ).concat(path.subPath);
     var depth = dir.length - path.upwardLevels;
     var elementName = helper.getNodeName(element);
 
     console.group(elementName, ': '
-            + _.isString(element.props.handler)
+        + _.isString(element.props.handler)
             ? element.props.handler
             : helper.getNodeName(element.props.handler)
     );
@@ -107,20 +107,20 @@ function cacheElementInDomTreeObject(element, parent, root) {
     } else {
         _(dir)
             .dropRight(path.upwardLevels)
-            .reduce(function(cwd, node) {
+            .reduce(function (cwd, node) {
                 //reach the end of dir array.
                 if (!node) {
                     var pos2 = findChildByType(cwd.children, element);
 
                     if (pos2 < 0) {
                         pos2 = cwd.children.push({
-                            entity: element,
-                            children: [],
-                            props: {
-                                className: element.props.className
+                                entity: element,
+                                children: [],
+                                props: {
+                                    className: element.props.className
                                     || getHandlerName(element.props.handler).toLowerCase()
-                            }
-                        }) - 1;
+                                }
+                            }) - 1;
                     }
                     return cwd.children[pos2];
                 }
@@ -128,9 +128,9 @@ function cacheElementInDomTreeObject(element, parent, root) {
                 var pos = findChildByType(cwd.children, node);
                 if (pos < 0) {
                     pos = cwd.children.push({
-                        entity: node,
-                        children: []
-                    }) - 1;
+                            entity: node,
+                            children: []
+                        }) - 1;
                 }
                 return cwd.children[pos];
 
@@ -142,7 +142,7 @@ function cacheElementInDomTreeObject(element, parent, root) {
 }
 
 function findChildByType(children, type) {
-    for (var i = 0, len = children.length; i < len; i ++) {
+    for (var i = 0, len = children.length; i < len; i++) {
         if (children[i] && children[i].entity === type) {
             return i;
         }

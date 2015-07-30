@@ -52,7 +52,7 @@ module.exports = origin.extend({
      *        return doSomethingWith(value);
      *    }
      */
-    fetch: function() {
+    fetch: function () {
         return this._promise || promise.create(this.value);
     },
     /**
@@ -62,7 +62,7 @@ module.exports = origin.extend({
      *    var value = data.fetch();
      *    doSomethingWith(value);
      */
-    fetchSync: function() {
+    fetchSync: function () {
         return this.value;
     },
     /**
@@ -71,7 +71,7 @@ module.exports = origin.extend({
      * @param process {Function|undefined}
      * @returns {exports}
      */
-    update: function(value, process) {
+    update: function (value, process) {
         var previous = this.value;
         var current = previous;
 
@@ -120,7 +120,7 @@ module.exports = origin.extend({
      * @param event
      *    the name of the update or initialization event.
      */
-    init: function(value, monitor, emitter, event) {
+    init: function (value, monitor, emitter, event) {
         monitor = configMonitor(monitor);
         event = event || DEFAULT_EVENT;
         emitter = eventemitter.isPrototypeOf(emitter) ? emitter : eventemitter.create();
@@ -155,9 +155,9 @@ module.exports = origin.extend({
 
 
 //private functions
-function configMonitor(monitor){
-    return _.mapValues(DEFAULT_MONITOR_CONFIG, function(value, key){
-        if(_.has(monitor, key)){
+function configMonitor(monitor) {
+    return _.mapValues(DEFAULT_MONITOR_CONFIG, function (value, key) {
+        if (_.has(monitor, key)) {
             return !!_.get(monitor, key);
         }
         return value;

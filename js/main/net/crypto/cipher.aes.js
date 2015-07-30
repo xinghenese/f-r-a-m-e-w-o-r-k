@@ -13,10 +13,10 @@ var aes = CryptoJS.AES;
 
 //core module to export
 module.exports = cipher.create({
-  'encrypt': function(text, key){
-    return aes.encrypt(text, key, {mode:CryptoJS.mode.ECB,padding:CryptoJS.pad.Pkcs7});
-  },
-  'decrypt': function(text, key){
-    return aes.decrypt(text, key, {mode:CryptoJS.mode.ECB,padding:CryptoJS.pad.Pkcs7});
-  }
+    'encrypt': function (text, key) {
+        return aes.encrypt(text, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
+    },
+    'decrypt': function (text, key) {
+        return aes.decrypt(text, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
+    }
 });

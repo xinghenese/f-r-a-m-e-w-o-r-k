@@ -12,9 +12,9 @@ var container = null;
 
 //core module to export
 module.exports = {
-  showMessagBox: function() {
-    return React.render(<MessagBox/>, getContainer());
-  }
+    showMessagBox: function () {
+        return React.render(<MessagBox/>, getContainer());
+    }
 };
 
 //module initialization
@@ -22,10 +22,10 @@ module.exports = {
 
 //private functions
 function getContainer() {
-  if (!container) {
-    container = document.createElement('div');
-    container.id = containerId;
-    document.getElementById('body').appendChild(container);
-  }
-  return container;
+    if (!container) {
+        container = document.createElement('div');
+        container.id = containerId;
+        document.getElementById('body').appendChild(container);
+    }
+    return container;
 }

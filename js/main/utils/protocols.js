@@ -9,7 +9,7 @@ var objects = require('./objects');
 
 // exports
 module.exports = {
-    toConversationType: function(type) {
+    toConversationType: function (type) {
         if (type === "group") {
             return 0;
         }

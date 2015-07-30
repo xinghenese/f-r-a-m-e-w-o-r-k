@@ -13,9 +13,9 @@ var defaultStyle = require('../../style/default');
 
 //core module to export
 var Mask = React.createClass({
-  render: function() {
-    return <div className="mask" style={makeStyle(commonStyle.mask, defaultStyle.mask, this.props.style)}></div>
-  }
+    render: function () {
+        return <div className="mask" style={makeStyle(commonStyle.mask, defaultStyle.mask, this.props.style)}></div>
+    }
 });
 
 module.exports = Mask;

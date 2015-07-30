@@ -15,28 +15,28 @@ var objects = require('../../../utils/objects');
 
 //core module to export
 var toolbar = module.exports = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             time: '',
             message: ''
         }
     },
-    _handleInputChange: function(event) {
+    _handleInputChange: function (event) {
         this.setState({
             time: new Date(),
             message: event.target.value
         })
     },
-    _handleTextAreaSubmit: function(event) {
+    _handleTextAreaSubmit: function (event) {
         this.refs.form.submit(event);
     },
-    _handleSubmit: function(event) {
+    _handleSubmit: function (event) {
         if (objects.containsValuedProp(event.data, "chat-message-input") &&
             _.trim(event.data["chat-message-input"]).length > 0) {
             this.props.onSubmit(event);
         }
     },
-    render: function() {
+    render: function () {
         var style = this.props.style;
         if (!this.props.inputEnabled) {
             return (

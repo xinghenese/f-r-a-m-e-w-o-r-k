@@ -12,11 +12,11 @@ var index = 0;
 
 //core module to export
 var ChatMessageList = React.createClass({
-    render: function() {
+    render: function () {
         var chatMessageNodes = null;
 
         if (this.props.data && !_.isEmpty(this.props.data)) {
-            chatMessageNodes = _.map(this.props.data, function(data, key) {
+            chatMessageNodes = _.map(this.props.data, function (data, key) {
                 if (isValidMessageData(data)) {
                     return (
                         <ChatMessage
@@ -25,7 +25,7 @@ var ChatMessageList = React.createClass({
                             senderName={data.senderName}
                             senderAvatar={data.senderAvatar}
                             style={this.props.style.chatmessage}
-                        >
+                            >
                             {data.message}
                         </ChatMessage>
                     );

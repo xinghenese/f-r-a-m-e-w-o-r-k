@@ -10,15 +10,15 @@ var eventemitter = require('../../utils/eventemitter.thenable');
 
 //core module to export
 module.exports = eventemitter.extend({
-  'request': function(packet){
-    return promise.create(packet);
-  },
+    'request': function (packet) {
+        return promise.create(packet);
+    },
 
-  'getState': function(){
-    return State.INITIALIZING;
-  },
+    'getState': function () {
+        return State.INITIALIZING;
+    },
 
-  'isAuthorized': function(){
-    return false;
-  }
+    'isAuthorized': function () {
+        return false;
+    }
 });

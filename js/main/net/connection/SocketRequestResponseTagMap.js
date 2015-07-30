@@ -15,7 +15,7 @@ var tagMap = {
 
 //core module to export
 module.exports = {
-    getResponseTag: function(tag) {
+    getResponseTag: function (tag) {
         return _.get(tagMap, tag);
     }
 };

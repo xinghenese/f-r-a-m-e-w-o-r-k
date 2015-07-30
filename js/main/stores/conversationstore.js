@@ -34,7 +34,7 @@ var ConversationStore = ChangeableStore.extend({
         type: null,
         id: -1
     },
-    whichConversation: function() {
+    whichConversation: function () {
         return this._conversation;
     }
 });
@@ -43,7 +43,7 @@ var ConversationStore = ChangeableStore.extend({
 module.exports = ConversationStore;
 
 // module initialization
-ConversationStore.dispatchToken = AppDispatcher.register(function(action) {
+ConversationStore.dispatchToken = AppDispatcher.register(function (action) {
     switch (action.type) {
         case ActionTypes.GET_CHAT_LIST:
             _handleGetChatListRequest(action);
@@ -62,12 +62,12 @@ function _handleGetChatListRequest(action) {
     HttpConnection.request({
         url: "cht/gcl",
         data: {}
-    }).then(function(response) {
+    }).then(function (response) {
         _processConversationListResponse(response);
         ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_SUCCESS);
         _processContactListResponse(response);
         ConversationStore.emit(ConversationStore.Events.USERS_LOAD_SUCCESS);
-    }, function(error) {
+    }, function (error) {
         ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_FAILURE, error);
         ConversationStore.emit(ConversationStore.Events.USERS_LOAD_FAILURE, error);
     });
@@ -88,7 +88,7 @@ function _handleJoinConversationRequest(action) {
         tag: "ER",
         data: data,
         responseTag: "ER",
-        predicate: function(msg) {
+        predicate: function (msg) {
             if (conversationType !== parseInt(msg.rmtp)) {
                 return false;
             } else if (!!roomId && roomId !== msg.msrid) {
@@ -98,7 +98,7 @@ function _handleJoinConversationRequest(action) {
             }
             return true;
         }
-    }).then(function(msg) {
+    }).then(function (msg) {
         var result = parseInt(msg.r);
         if (result === 0) {
             // joined conversation successfully
@@ -125,7 +125,7 @@ function _handleQuitConversationRequest(action) {
         tag: "QR",
         data: data,
         responseTag: "QR",
-        predicate: function(msg) {
+        predicate: function (msg) {
             if (conversationType !== msg.rmtp) {
                 return false;
             } else if (!!roomId && roomId !== msg.msrid) {
@@ -135,7 +135,7 @@ function _handleQuitConversationRequest(action) {
             }
             return true;
         }
-    }).then(function(msg) {
+    }).then(function (msg) {
         var result = parseInt(msg.r);
         var id = conversationType === 0 ? roomId : userId;
         if (result === 0) {
@@ -153,14 +153,14 @@ function _handleQuitConversationRequest(action) {
 
 function _processConversationListResponse(response) {
     groups.setCursor(response.rl.cs);
-    _.forEach(response.rl.l, function(n) {
+    _.forEach(response.rl.l, function (n) {
         groups.addGroup(new Group(n));
     });
 }
 
 function _processContactListResponse(response) {
     users.setCursor(response.ul.cs);
-    _.forEach(response.ul.l, function(n) {
+    _.forEach(response.ul.l, function (n) {
         users.addUser(new User(n));
     });
 }

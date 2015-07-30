@@ -30,10 +30,10 @@ var ValidatorClassString = [
 //module initialization
 module.exports = createDownWalkableClass({
     displayName: 'Form',
-    submit: function(event) {
+    submit: function (event) {
         doSubmit(this)(event);
     },
-    render: function() {
+    render: function () {
         return (
             <form
                 onSubmit={doSubmit(this)}
@@ -48,8 +48,8 @@ module.exports = createDownWalkableClass({
 
 //private functions
 function doSubmit(form) {
-    return function(event) {
-        form.walkDescendants(validate).then(function(data) {
+    return function (event) {
+        form.walkDescendants(validate).then(function (data) {
             event.data = data;
             form.props.onSubmit(event);
             React.findDOMNode(form).reset();
@@ -65,10 +65,10 @@ function validate(element, result) {
     result = result || promise.create({});
 
     if (isValidator(element)) {
-        return result.then(function(data) {
+        return result.then(function (data) {
             var values = element.validate();
             if (promise.isPrototypeOf(values)) {
-                return values.then(function(newData) {
+                return values.then(function (newData) {
                     return _.assign(data, newData);
                 })
             }
@@ -82,7 +82,7 @@ function validate(element, result) {
     var field = element.props.field || element.props.id;
     if (value && field) {
         element.value && (element.value = '');
-        return result.then(function(data) {
+        return result.then(function (data) {
             return _.set(data, field, value);
         })
     }

@@ -17,23 +17,23 @@ var prefix = 'contact-list-';
 
 //core module to export
 var ContactList = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {selectedIndex: -1};
     },
-    render: function() {
+    render: function () {
         var data = this.props.data;
         if (!data || _.isEmpty(data)) {
             return null;
         }
 
-        data = _.groupBy(data, function(data) {
+        data = _.groupBy(data, function (data) {
             if (data.type === 'user') {
                 return data.name[0];
             }
             return data.type;
         });
 
-        var conversationList = _.map(data, function(data, key) {
+        var conversationList = _.map(data, function (data, key) {
             return (
                 <ContactGroup
                     key={prefix + key}
