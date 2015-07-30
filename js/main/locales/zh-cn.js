@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+    //login-phone form
     "loginTitle": "网页版登录",
     "loginSubTitle": "请选择你所在的国家并输入手机号码",
     "next": "下一步",
@@ -18,6 +19,12 @@ module.exports = {
     "unknown": "未知",
     "userNotExist": "该用户不存在！",
     "wrongPassword": "密码错误！",
+
+    //login-country form
+    "countryFormTitle": "选择国家或地区",
+    "countrySearchTips": "输入国家名称",
+
+    //login-code form
     "loginReset": "更改手机号码",
     "enterCode": "请输入验证码",
     "sendCodeNotice": "验证码已通过短信发送<br/>请在下面输入验证码",

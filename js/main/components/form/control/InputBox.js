@@ -24,6 +24,7 @@ var InputBox = React.createClass({
         onChange={this.props.onChange}
         onBlur={onInputBlur}
         onFocus={onInputFocus}
+        onClick={this.props.onClick}
         placeholder={this.props.defaultValue}
         value={this.props.initialValue}
       />
