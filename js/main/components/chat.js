@@ -17,12 +17,42 @@ var MessageActions = require('../actions/messageactions');
 var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
+var UserInfoBox = require('./view/infoview/userinfobox');
+
+//private fields
+var boxType = {
+    settings: 'Settings',
+    messsagebox: 'MessageBox'
+};
+
+var RightSideBox = React.createClass({
+    render: function() {
+        if (this.props.boxType === boxType.settings) {
+            return <UserInfoBox />;
+        }
+        if (this.props.boxType === boxType.messsagebox) {
+            return <ChatMessageBox />;
+        }
+        return null;
+    }
+});
 
 // exports
 var Chat = React.createClass({
+    getInitialState: function() {
+        return {rightBoxType: boxType.messsagebox};
+    },
     _handleGroupsLoaded: function() {
         console.log("requesting history messages");
         MessageActions.requestHistoryMessages();
+    },
+    _showSettings: function() {
+        this.setState(function(previousState) {
+            if (previousState.rightBoxType === boxType.messsagebox) {
+                return {rightBoxType: boxType.settings}
+            }
+            return {rightBoxType: boxType.messsagebox};
+        });
     },
     componentWillMount: function() {
         // 1 for groups, 2 for contacts
@@ -37,8 +67,8 @@ var Chat = React.createClass({
     render: function() {
         return (
             <div>
-                <ChatMessageBox />
-                <ConversationBox />
+                <RightSideBox boxType={this.state.rightBoxType} />
+                <ConversationBox showSettings={this._showSettings} />
             </div>
         );
     }
