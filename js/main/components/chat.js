@@ -43,7 +43,6 @@ var Chat = React.createClass({
         return {rightBoxType: boxType.messsagebox};
     },
     _handleGroupsLoaded: function() {
-        console.log("requesting history messages");
         MessageActions.requestHistoryMessages();
     },
     _showSettings: function() {

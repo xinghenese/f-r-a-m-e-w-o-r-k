@@ -64,6 +64,8 @@ Message.prototype.getBriefText = function() {
             return Lang.contactMessage;
         case 11:
             return Lang.groupCardMessage;
+        default:
+            return Lang.unknownMessage;
     }
 };
 

@@ -33,10 +33,7 @@ GroupHistoryMessages.prototype.getGroupId = function() {
 };
 
 GroupHistoryMessages.prototype.getUnreadMessageCount = function() {
-    if (!"urc" in this._data) {
-        return 0;
-    }
-    return parseInt(this._data["urc"]);
+    return parseInt(this._data["urc"] || 0);
 };
 
 GroupHistoryMessages.prototype.noMoreMessages = function() {
