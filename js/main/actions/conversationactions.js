@@ -38,11 +38,5 @@ module.exports = {
             roomId: roomId,
             userId: userId
         });
-    },
-    getChatList: function(listType) {
-        AppDispatcher.dispatch({
-            type: ActionTypes.GET_CHAT_LIST,
-            listType: listType
-        });
     }
 };

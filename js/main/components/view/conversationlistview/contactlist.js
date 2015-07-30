@@ -21,21 +21,19 @@ var ContactList = React.createClass({
         return {selectedIndex: -1};
     },
     render: function() {
-        var datas = this.props.data;
-
-        if (!datas || _.isEmpty(datas)) {
+        var data = this.props.data;
+        if (!data || _.isEmpty(data)) {
             return null;
         }
 
-        datas = _.groupBy(datas, function(data) {
+        data = _.groupBy(data, function(data) {
             if (data.type === 'user') {
                 return data.name[0];
             }
             return data.type;
         });
-        console.log('ContactList#data: ', datas);
 
-        var conversationList = _.map(datas, function(data, key) {
+        var conversationList = _.map(data, function(data, key) {
             return (
                 <ContactGroup
                     key={prefix + key}
@@ -43,14 +41,14 @@ var ContactList = React.createClass({
                     data={data}
                     groupName={Lang[key] || key}
                     selectedIndex={this.state.selectedIndex}
-                />
-                );
+                    />
+            );
         }, this);
 
         return (
             <ul className="contact-list"
                 style={makeStyle(style.conversationlist, this.props.style)}
-            >
+                >
                 {conversationList}
             </ul>
         )
@@ -58,8 +56,3 @@ var ContactList = React.createClass({
 });
 
 module.exports = ContactList;
-
-//module initialization
-
-
-//private functions

@@ -61,29 +61,15 @@ ConversationStore.dispatchToken = AppDispatcher.register(function(action) {
 function _handleGetChatListRequest(action) {
     HttpConnection.request({
         url: "cht/gcl",
-        data: {
-            tp: action.listType
-        }
+        data: {}
     }).then(function(response) {
-        switch (action.listType) {
-            case GROUP_LIST_REQUEST:
-                _processGroupListResponse(response);
-                ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_SUCCESS);
-                break;
-            case USER_LIST_REQUEST:
-                _processContactListResponse(response);
-                ConversationStore.emit(ConversationStore.Events.USERS_LOAD_SUCCESS);
-                break;
-        }
+        _processConversationListResponse(response);
+        ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_SUCCESS);
+        _processContactListResponse(response);
+        ConversationStore.emit(ConversationStore.Events.USERS_LOAD_SUCCESS);
     }, function(error) {
-        switch (action.listType) {
-            case GROUP_LIST_REQUEST:
-                ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_FAILURE, error);
-                break;
-            case USER_LIST_REQUEST:
-                ConversationStore.emit(ConversationStore.Events.USERS_LOAD_FAILURE, error);
-                break;
-        }
+        ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_FAILURE, error);
+        ConversationStore.emit(ConversationStore.Events.USERS_LOAD_FAILURE, error);
     });
 }
 
@@ -127,7 +113,6 @@ function _handleJoinConversationRequest(action) {
 }
 
 function _handleQuitConversationRequest(action) {
-    console.log("quit conversation");
     var roomId = action.roomId;
     var userId = action.userId;
     var conversationType = action.conversationType;
@@ -166,7 +151,7 @@ function _handleQuitConversationRequest(action) {
     });
 }
 
-function _processGroupListResponse(response) {
+function _processConversationListResponse(response) {
     groups.setCursor(response.rl.cs);
     _.forEach(response.rl.l, function(n) {
         groups.addGroup(new Group(n));

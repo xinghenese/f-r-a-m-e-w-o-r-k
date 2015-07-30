@@ -8,6 +8,7 @@ var ActionTypes = keyMirror({
     DELETE_GROUP_MESSAGES: null,
     DELETE_PRIVATE_MESSAGES: null,
     GET_CHAT_LIST: null,
+    GET_USER_INFO: null,
     JOIN_CONVERSATION: null,
     LOGIN: null,
     LOGOUT: null,

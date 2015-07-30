@@ -15,15 +15,15 @@ var prefix = 'contact-group-';
 //core module to export
 var ContactGroup = React.createClass({
     render: function() {
-        var datas = this.props.data;
+        var data = this.props.data;
 
-        if (!datas || _.isEmpty(datas)) {
+        if (!data || _.isEmpty(data)) {
             return null;
         }
 
-        datas = _.indexBy(datas, 'id');
+        data = _.indexBy(data, 'id');
 
-        var group = _.map(datas, function(data, key) {
+        var groups = _.map(data, function(data, key) {
             return (
                 <ContactItem
                     key={prefix + key}
@@ -37,7 +37,7 @@ var ContactGroup = React.createClass({
                     }
                     onSelect={onselect(this)}
                     selected={this.props.selectedIndex == key}
-                />
+                    />
             );
         }, this);
 
@@ -46,13 +46,13 @@ var ContactGroup = React.createClass({
                 <div
                     className="contact-group-caption"
                     style={style.conversationlist.caption}
-                >
+                    >
                     {this.props.groupName}
                 </div>
                 <ul className="contact-group-body"
                     style={makeStyle(style.conversationlist, this.props.style)}
-                >
-                    {group}
+                    >
+                    {groups}
                 </ul>
             </div>
         )

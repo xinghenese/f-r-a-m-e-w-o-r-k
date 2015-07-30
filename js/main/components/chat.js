@@ -9,8 +9,8 @@ var React = require('react');
 var Router = require('react-router');
 var State = Router.State;
 var AccountActions = require('../actions/accountactions');
-var ConversationActions = require('../actions/conversationactions');
-var ConversationStore = require('../stores/conversationstore');
+var ConversationAndContactActions = require('../actions/conversationandcontactactions');
+var ConversationAndContactStore = require('../stores/conversationandcontactstore');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var ChatMessageBox = require('./view/chatview/chatmessagebox');
 var MessageActions = require('../actions/messageactions');
@@ -21,30 +21,18 @@ var setStyle = require('../style/styles').setStyle;
 // exports
 var Chat = React.createClass({
     _handleGroupsLoaded: function() {
+        console.log("requesting history messages");
         MessageActions.requestHistoryMessages();
-    },
-    _handleUsersLoaded: function() {
-        // todo
-    },
-    _handleHistoryMessagesReceived: function() {
-        var groupHistoryMessages = MessageStore.getGroupHistoryMessages(426);
-        var messages = groupHistoryMessages.getMessages();
-        _.forEach(messages, function(message) {
-            //console.log(message);
-        });
     },
     componentWillMount: function() {
         // 1 for groups, 2 for contacts
-        ConversationActions.getChatList(1);
-        ConversationActions.getChatList(2);
+        ConversationAndContactActions.getConversationAndContactList();
         AccountActions.switchStatus(1);
-        ConversationStore.on(ConversationStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
-        ConversationStore.on(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
+        ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
         modifyPageStyle();
     },
     componentWillUnmount: function() {
-        ConversationStore.removeListener(ConversationStore.Events.GROUPS_LOAD_SUCCESS, this._handleGroupsLoaded);
-        ConversationStore.removeListener(ConversationStore.Events.USERS_LOAD_SUCCESS, this._handleUsersLoaded);
+        ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
     },
     render: function() {
         return (
