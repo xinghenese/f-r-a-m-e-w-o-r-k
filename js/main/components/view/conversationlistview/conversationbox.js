@@ -19,6 +19,7 @@ var Formats = require('../../../utils/formats');
 var ContactList = require('./contactlist');
 var ContactStore = require('../../../stores/contactstore');
 var Switcher = require('./conversationuserswitcher');
+var Settings = require('../../tools/Settings');
 
 //private fields
 var listType = {
@@ -100,7 +101,12 @@ var ConversationBox = React.createClass({
                             fields={['name', 'message']}
                             onSearch={this._filterData}
                             style={style.header.searchbar.search}
-                            />
+                        />
+                        <Settings
+                            className="conversation-list-settings"
+                            onSettings={this.props.showSettings}
+                            style={style.header.searchbar.settings}
+                        />
                     </div>
                 </div>
 
