@@ -16,10 +16,15 @@ var countries = require('../constants/countries');
 var CountryList = React.createClass({
     _onSelect: function(event) {
         var target = event.target;
+
+        if (target.nodeName.toLowerCase() === 'span') {
+            target = target.parentNode;
+        }
+
         this.props.onSelect({
             countryName: target.getAttribute('data-name'),
             countryCode: target.getAttribute('data-code')
-        })
+        });
     },
     render: function() {
         var data = this.props.data;
