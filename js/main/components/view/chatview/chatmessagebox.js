@@ -87,6 +87,10 @@ var ChatMessageBox = React.createClass({
             };
         }
 
+        if (!data) {
+            return;
+        }
+
         var result = [];
         if ("groupId" in data) {
             _buildGroupRenderObject(data, result);
@@ -171,6 +175,7 @@ function _buildGroupRenderObject(item, collector) {
 }
 
 function _buildUserRenderObject(item, collector) {
+    var user = users.getUser(item.userId);
     if (!user) {
         return;
     }

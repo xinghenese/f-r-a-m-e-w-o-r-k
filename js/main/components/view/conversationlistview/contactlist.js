@@ -20,6 +20,13 @@ var ContactList = React.createClass({
     getInitialState: function () {
         return {selectedIndex: -1};
     },
+    _onSelect: function (data) {
+        this.setState({selectedIndex: data.index});
+        emitter.emit('select', {
+            id: data.id,
+            type: data.type
+        })
+    },
     render: function () {
         var data = this.props.data;
         if (!data || _.isEmpty(data)) {
@@ -34,14 +41,17 @@ var ContactList = React.createClass({
             });
 
         var contactList = _.map(data, function (data, key) {
+            var groupType = key !== 'group' ? 'user' : key;
             return (
                 <ContactGroup
                     key={prefix + key}
                     index={prefix + key}
                     data={data}
                     groupName={Lang[key] || key}
+                    groupType={groupType}
                     selectedIndex={this.state.selectedIndex}
-                    />
+                    onSelect={this._onSelect}
+                />
             );
         }, this);
 

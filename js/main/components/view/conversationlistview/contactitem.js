@@ -28,7 +28,10 @@ var ContactItem = React.createClass({
                 style={makeStyle(style.conversationlist.item, currentStyle)}
                 onClick={this.props.onSelect}
                 onMouseEnter={onhoverin(this)}
-                onMouseLeave={onhoverout(this)}>
+                onMouseLeave={onhoverout(this)}
+                data-contact-type={this.props.contactType}
+                data-contact-id={this.props.contactId}
+            >
                 <Avatar
                     className="contact-list-item-avatar"
                     style={style.conversationlist.item.avatar}
