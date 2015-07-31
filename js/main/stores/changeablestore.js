@@ -17,6 +17,9 @@ var ChangeableStore = EventEmitter.extend({
     emitChange: function () {
         this.emit(CHANGE_EVENT);
     },
+    removeAllChangeListener: function () {
+        this.removeAllListeners(CHANGE_EVENT);
+    },
     removeChangeListener: function (callback) {
         this.removeListener(CHANGE_EVENT, callback);
     }

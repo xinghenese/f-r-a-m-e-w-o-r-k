@@ -17,6 +17,7 @@ function observeStore(store, predicate) {
             }
         };
 
+        store.removeAllChangeListener();
         store.addChangeListener(performCheck);
         performCheck();
     }).finally(function () {

@@ -36,6 +36,9 @@ promise.then = function (fulfilled, rejected, progressed) {
     }
     return promise.create(then.call(this, fulfilled, rejected, progressed));
 };
+promise.finally = function (callbakc) {
+    return promise.create(then.call(this, callback, callbakc));
+};
 promise.repeat = function (resolver) {
     var repeat = require('./repeat');
 
