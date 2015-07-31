@@ -14,6 +14,15 @@ var prefix = 'contact-group-';
 
 //core module to export
 var ContactGroup = React.createClass({
+    _onSelect: function (event) {
+        var target = event.currentTarget;
+
+        this.props.onSelect({
+            id: target.getAttribute('data-contact-id'),
+            type: target.getAttribute('data-contact-type'),
+            index: target.id
+        });
+    },
     render: function () {
         var data = this.props.data;
 
@@ -27,16 +36,18 @@ var ContactGroup = React.createClass({
             return (
                 <ContactItem
                     key={prefix + key}
+                    index={prefix + key}
                     lastAppearance={data.lastAppearance}
                     contactName={data.name}
                     contactAvatar={data.avatar}
-                    index={prefix + key}
+                    contactId={key}
+                    contactType={this.props.groupType}
                     message={
                         data.count && (data.count + ' people')
                         || (data.online && 'online' || (data.lastActiveTime + 'h ago'))
                     }
-                    onSelect={onselect(this)}
-                    selected={this.props.selectedIndex == key}
+                    onSelect={this._onSelect}
+                    selected={this.props.selectedIndex == prefix + key}
                     />
             );
         }, this);

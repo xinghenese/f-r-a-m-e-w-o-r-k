@@ -20,6 +20,13 @@ var ContactList = React.createClass({
     getInitialState: function () {
         return {selectedIndex: -1};
     },
+    _onSelect: function (data) {
+        this.setState({selectedIndex: data.index});
+        emitter.emit('select', {
+            id: data.id,
+            type: data.type
+        })
+    },
     render: function () {
         var data = this.props.data;
         if (!data || _.isEmpty(data)) {
@@ -34,15 +41,17 @@ var ContactList = React.createClass({
         });
 
         var contactList = _.map(data, function (item, key) {
+            var groupType = key !== 'group' ? 'user' : key;
             return (
                 <ContactGroup
                     key={prefix + key}
                     index={prefix + key}
                     data={item}
                     groupName={Lang[key] || key}
-                    selected={this.state.selectedIndex === key}
-                    onSelect={onSelect(this)}
-                    />
+                    groupType={groupType}
+                    selectedIndex={this.state.selectedIndex}
+                    onSelect={this._onSelect}
+                />
             );
         }, this);
 
@@ -68,27 +77,3 @@ var ContactList = React.createClass({
 });
 
 module.exports = ContactList;
-
-// private functions
-function onSelect(list) {
-    return function(event) {
-        console.log(event);
-        var index = event.currentTarget.id.replace(/\D/g, '');
-        var type = _.get(list.props.data, index).type;
-        list.setState({selectedIndex: index});
-        if (type === "group") {
-            var group = groups.getGroup(index);
-            if (group) {
-                if (group.inGroup()) {
-                    ConversationActions.joinConversation(protocols.toConversationType(type), index, null);
-                }
-            }
-        } else {
-            ConversationActions.joinConversation(protocols.toConversationType(type), null, index);
-        }
-        emitter.emit('select', {
-            id: index,
-            type: type
-        });
-    };
-}
