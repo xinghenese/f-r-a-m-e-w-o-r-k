@@ -103,24 +103,26 @@ var PhoneForm = React.createClass({
         }
         return "";
     },
+    _verificationCodeSendSuccessPredicate: function () {
+        return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
+    },
+    _verificationCodeSendFailedPredicate: function () {
+        return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
+    },
     componentDidMount: function () {
         this._focusPhoneInput();
     },
     componentWillMount: function () {
-        //observe AccountStore
+        // observe AccountStore
         var self = this;
-        stores.observe(AccountStore, function () {
-            return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
-        }).then(function () {
+        stores.observe(AccountStore, this._verificationCodeSendSuccessPredicate).then(function () {
             self._handleVerificationCodeSent();
         });
-        stores.observe(AccountStore, function () {
-            return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.FAILED;
-        }).then(function () {
+        stores.observe(AccountStore, this._verificationCodeSendFailedPredicate).then(function () {
             self._handleVerificationCodeNotSent();
         });
 
-        //update state if necessary
+        // update state if necessary
         var query = this.props.query;
         if (query && !_.isEmpty(query)) {
             this.setState({
@@ -128,6 +130,10 @@ var PhoneForm = React.createClass({
                 countryCode: query.countryCode
             });
         }
+    },
+    componentWillUnmount: function () {
+        stores.unobserve(AccountStore, this._verificationCodeSendSuccessPredicate);
+        stores.unobserve(AccountStore, this._verificationCodeSendFailedPredicate);
     },
     render: function () {
         if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {

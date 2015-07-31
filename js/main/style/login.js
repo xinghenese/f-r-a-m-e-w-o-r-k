@@ -158,11 +158,10 @@ module.exports = {
             background: "#f2f2f2",
             //countrylist
             countrylist: {
-                padding: "0 20px 0 30px",
                 listStyle: "none",
                 countryItem: {
                     borderBottom: "1px #e6e6e6 solid",
-                    paddingTop: "14px",
+                    padding: "14px 20px 0 30px",
                     lineHeight: "26px",
                     cursor: "pointer",
                     //countryName
