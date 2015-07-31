@@ -27,13 +27,13 @@ var ContactList = React.createClass({
         }
 
         data = _.groupBy(data, function (data) {
-            if (data.type === 'user') {
-                return data.name[0];
-            }
-            return data.type;
-        });
+                if (data.type === 'user') {
+                    return data.name[0];
+                }
+                return data.type;
+            });
 
-        var conversationList = _.map(data, function (data, key) {
+        var contactList = _.map(data, function (data, key) {
             return (
                 <ContactGroup
                     key={prefix + key}
@@ -45,11 +45,22 @@ var ContactList = React.createClass({
             );
         }, this);
 
+        contactList = _.sortBy(contactList, function(contactGroup) {
+            var groupName = contactGroup.props.index.replace(prefix, '');
+            if (groupName === 'group') {
+                return 0;
+            }
+            if (groupName === 'contact') {
+                return 1;
+            }
+            return String(groupName).charCodeAt(0);
+        });
+
         return (
             <ul className="contact-list"
                 style={makeStyle(style.conversationlist, this.props.style)}
                 >
-                {conversationList}
+                {contactList}
             </ul>
         )
     }
