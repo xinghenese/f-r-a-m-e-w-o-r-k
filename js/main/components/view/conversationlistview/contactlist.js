@@ -26,21 +26,22 @@ var ContactList = React.createClass({
             return null;
         }
 
-        data = _.groupBy(data, function (data) {
-            if (data.type === 'user') {
-                return data.name[0];
+        data = _.groupBy(data, function (item) {
+            if (item.type === 'user') {
+                return item.name[0];
             }
-            return data.type;
+            return item.type;
         });
 
-        var conversationList = _.map(data, function (data, key) {
+        var contactList = _.map(data, function (item, key) {
             return (
                 <ContactGroup
                     key={prefix + key}
                     index={prefix + key}
-                    data={data}
+                    data={item}
                     groupName={Lang[key] || key}
-                    selectedIndex={this.state.selectedIndex}
+                    selected={this.state.selectedIndex === key}
+                    onSelect={onSelect(this)}
                     />
             );
         }, this);
@@ -49,10 +50,34 @@ var ContactList = React.createClass({
             <ul className="contact-list"
                 style={makeStyle(style.conversationlist, this.props.style)}
                 >
-                {conversationList}
+                {contactList}
             </ul>
-        )
+        );
     }
 });
 
 module.exports = ContactList;
+
+// private functions
+function onSelect(list) {
+    return function(event) {
+        console.log(event);
+        var index = event.currentTarget.id.replace(/\D/g, '');
+        var type = _.get(list.props.data, index).type;
+        list.setState({selectedIndex: index});
+        if (type === "group") {
+            var group = groups.getGroup(index);
+            if (group) {
+                if (group.inGroup()) {
+                    ConversationActions.joinConversation(protocols.toConversationType(type), index, null);
+                }
+            }
+        } else {
+            ConversationActions.joinConversation(protocols.toConversationType(type), null, index);
+        }
+        emitter.emit('select', {
+            id: index,
+            type: type
+        });
+    };
+}

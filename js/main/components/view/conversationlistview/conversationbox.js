@@ -197,6 +197,6 @@ function _buildUserRenderObject(item, collector) {
         message: message,
         time: time,
         id: item.userId,
-        type: 'private'
+        type: 'user'
     });
 }
