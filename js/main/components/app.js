@@ -56,7 +56,7 @@ var routes = (
 );
 var router = Router.create(routes);
 
-// export
+// exports
 module.exports = {
     start: function (element) {
         router.run(function (Handler, state) {
