@@ -15,7 +15,28 @@ var groups = require('../datamodel/groups');
 var users = require('../datamodel/users');
 
 // exports
-var ConversationAndContactStore = ChangeableStore.extend({});
+var ConversationAndContactStore = ChangeableStore.extend({
+    getGroupsAndContacts: function() {
+        var groupArr = _.map(groups.getGroups(), function(item) {
+            return {
+                type: "group",
+                name: item.name(),
+                id: item.getGroupId(),
+                count: item.countOfMembers()
+            };
+        });
+        var userArr = _.map(users.getUsers(), function(item) {
+            return {
+                type: "user",
+                name: item.getNickname(),
+                id: item.getUserId(),
+                online: false, // todo
+                lastActiveTime: 0
+            }
+        });
+        return _.union(groupArr, userArr);
+    }
+});
 
 module.exports = ConversationAndContactStore;
 

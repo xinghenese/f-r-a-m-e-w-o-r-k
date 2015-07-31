@@ -24,6 +24,9 @@ var groups = {
         });
         return group;
     },
+    getGroups: function() {
+        return _.clone(this._groups);
+    },
     removeGroup: function (groupId) {
         _.remove(this._groups, function (group) {
             return group.getGroupId() === groupId;

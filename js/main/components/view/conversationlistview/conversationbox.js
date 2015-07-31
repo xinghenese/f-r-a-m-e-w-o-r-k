@@ -17,7 +17,7 @@ var MessageStore = require('../../../stores/messagestore');
 var Formats = require('../../../utils/formats');
 
 var ContactList = require('./contactlist');
-var ContactStore = require('../../../stores/contactstore');
+var ConversationAndContactStore = require('../../../stores/conversationandcontactstore');
 var Switcher = require('./conversationuserswitcher');
 var Settings = require('../../tools/Settings');
 
@@ -35,7 +35,8 @@ var ConversationBox = React.createClass({
             data: messages,
             displayData: messages,
             matchedMessages: null,
-            type: listType.conversation
+            type: listType.conversation,
+            groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         };
     },
     _switchList: function (type) {
@@ -48,6 +49,11 @@ var ConversationBox = React.createClass({
             matchedMessages: data && data.message
         });
     },
+    _onGroupsAndContactsChanged: function() {
+        this.setState({
+            groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
+        });
+    },
     _updateMessages: function () {
         var messages = _getLastMessages();
         this.setState({
@@ -56,9 +62,11 @@ var ConversationBox = React.createClass({
         });
     },
     componentWillMount: function () {
+        ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
     },
     componentWillUnmount: function () {
+        ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
     },
     render: function () {
@@ -81,7 +89,7 @@ var ConversationBox = React.createClass({
         }
 
         if (this.state.type === listType.contacts) {
-            list = (<ContactList data={ContactStore.getContacts()}/>);
+            list = (<ContactList data={this.state.groupsAndContacts}/>);
         } else if (this.state.type === listType.conversation) {
             list = (<ConversationList data={this.state.displayData}/>);
         }
