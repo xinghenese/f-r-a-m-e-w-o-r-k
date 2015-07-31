@@ -46,6 +46,17 @@ var ContactList = React.createClass({
             );
         }, this);
 
+        contactList = _.sortBy(contactList, function(contactGroup) {
+            var groupName = contactGroup.props.index.replace(prefix, '');
+            if (groupName === 'group') {
+                return 0;
+            }
+            if (groupName === 'contact') {
+                return 1;
+            }
+            return String(groupName).charCodeAt(0);
+        });
+
         return (
             <ul className="contact-list"
                 style={makeStyle(style.conversationlist, this.props.style)}
