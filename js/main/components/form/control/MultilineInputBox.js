@@ -5,7 +5,9 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var EventTypes = require('../../../constants/eventtypes');
 var commonStyle = require('../../../style/common');
+var emitter = require('../../../utils/eventemitter');
 var theme = require('../../../style/default');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -28,14 +30,14 @@ var MultilineInputBox = React.createClass({
             });
         });
     },
+    _focusInput: function() {
+        var self = this;
+        _.defer(function() {
+            React.findDOMNode(self.refs[self._seq]).focus();
+        });
+    },
     _handleSubmit: function (event) {
         this.props.onSubmit(event);
-    },
-    _onInputBlur: function (event) {
-        event.target.placeholder = this.props.defaultValue;
-    },
-    _onInputFocus: function (event) {
-        event.target.placeholder = "";
     },
     _onKeyDown: function (event) {
         if (event.keyCode == KeyCodes.ENTER && !event.ctrlKey) {
@@ -46,6 +48,12 @@ var MultilineInputBox = React.createClass({
     },
     componentWillMount: function () {
         this._seq = prefix + (index++);
+    },
+    componentDidMount: function() {
+        emitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
+    },
+    componentWillUnmount: function() {
+        emitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
     },
     render: function () {
         var props = this.props;
@@ -69,8 +77,6 @@ var MultilineInputBox = React.createClass({
                     rows={props.initialRows || 1}
                     onChange={onChange(this)}
                     onKeyDown={this._onKeyDown}
-                    onFocus={this._onInputFocus}
-                    onBlur={this._onInputBlur}
                     ref={this._seq}
                     style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
                     >

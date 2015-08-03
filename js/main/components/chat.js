@@ -60,11 +60,13 @@ var Chat = React.createClass({
             return {rightBoxType: boxType.messsagebox};
         });
     },
+    componentDidMount: function() {
+        ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
+    },
     componentWillMount: function () {
         // 1 for groups, 2 for contacts
         ConversationAndContactActions.getConversationAndContactList();
         AccountActions.switchStatus(1);
-        ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
         modifyPageStyle();
     },
     componentWillUnmount: function () {

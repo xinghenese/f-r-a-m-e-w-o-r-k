@@ -15,6 +15,7 @@ var emitter = require('../../../utils/eventemitter');
 var groups = require('../../../datamodel/groups');
 var myself = require('../../../datamodel/myself');
 var users = require('../../../datamodel/users');
+var EventTypes = require('../../../constants/eventtypes');
 var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
 
@@ -99,6 +100,9 @@ var ChatMessageBox = React.createClass({
         }
 
         this.setState({data: result, id: id, type: type, inputEnabled: enabled});
+        _.defer(function() {
+            emitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
+        });
     },
     componentWillMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
