@@ -15,6 +15,22 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //core module to export
 var ContactItem = React.createClass({
+    _hoverIn: function () {
+        if (!this.props.selected) {
+            setStyle(
+                React.findDOMNode(this).style,
+                style.conversationlist.item.hover
+            );
+        }
+    },
+    _hoverOut: function () {
+        if (!this.props.selected) {
+            setStyle(
+                React.findDOMNode(this).style,
+                style.conversationlist.item.default
+            );
+        }
+    },
     render: function () {
         var currentStyle = style.conversationlist.item.default;
 
@@ -24,20 +40,22 @@ var ContactItem = React.createClass({
 
         return (
             <li className="contact-list-item"
-                id={this.props.index}
-                style={makeStyle(style.conversationlist.item, currentStyle)}
-                onClick={this.props.onSelect}
-                onMouseEnter={onhoverin(this)}
-                onMouseLeave={onhoverout(this)}
+                /* data-* attributes */
                 data-contact-type={this.props.contactType}
                 data-contact-id={this.props.contactId}
+                /* event handler */
+                onClick={this.props.onSelect}
+                onMouseEnter={this._hoverIn}
+                onMouseLeave={this._hoverOut}
+                /* style */
+                style={makeStyle(style.conversationlist.item, currentStyle)}
             >
                 <Avatar
                     className="contact-list-item-avatar"
-                    style={style.conversationlist.item.avatar}
                     name={this.props.contactName}
                     src={this.props.contactAvatar}
-                    index={this.props.index}
+                    index={this.props.contactId}
+                    style={style.conversationlist.item.avatar}
                     />
 
                 <div className="contact-list-item-body">
@@ -60,23 +78,3 @@ var ContactItem = React.createClass({
 });
 
 module.exports = ContactItem;
-
-//module initialization
-
-
-//private functions
-function onhoverin(item) {
-    return function (event) {
-        if (!item.props.selected) {
-            setStyle(event.currentTarget.style, style.conversationlist.item.hover);
-        }
-    };
-}
-
-function onhoverout(item) {
-    return function (event) {
-        if (!item.props.selected) {
-            setStyle(event.currentTarget.style, style.conversationlist.item.default);
-        }
-    };
-}

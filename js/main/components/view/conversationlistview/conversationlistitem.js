@@ -15,6 +15,22 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //core module to export
 var ConversationListItem = React.createClass({
+    _hoverIn: function (event) {
+        if (!this.props.selected) {
+            setStyle(
+                React.findDOMNode(this).style,
+                style.conversationlist.item.hover
+            );
+        }
+    },
+    _hoverOut: function () {
+        if (!this.props.selected) {
+            setStyle(
+                React.findDOMNode(this).style,
+                style.conversationlist.item.default
+            );
+        }
+    },
     render: function () {
         var currentStyle = style.conversationlist.item.default;
 
@@ -23,28 +39,44 @@ var ConversationListItem = React.createClass({
         }
 
         return (
-            <li className="conversation-list-item"
-                id={this.props.index}
-                style={makeStyle(style.conversationlist.item, currentStyle)}
+            <li
+                className="conversation-list-item"
+                /* data-* attributes */
+                data-conversation-index={this.props.conversationIndex}
+                data-conversation-type={this.props.conversationType}
+                /* event handler */
                 onClick={this.props.onSelect}
-                onMouseEnter={onhoverin(this)}
-                onMouseLeave={onhoverout(this)}>
+                onMouseEnter={this._hoverIn}
+                onMouseLeave={this._hoverOut}
+                /* style */
+                style={makeStyle(style.conversationlist.item, currentStyle)}
+                >
                 <Avatar
                     className="conversation-list-item-avatar"
-                    style={style.conversationlist.item.avatar}
+                    /* props */
                     name={this.props.senderName}
                     src={this.props.senderAvatar}
-                    index={this.props.index}
-                    />
+                    index={this.props.conversationIndex}
+                    /* style */
+                    style={style.conversationlist.item.avatar}
+                />
 
                 <div
                     className="conversation-list-item-info"
                     style={makeStyle(style.conversationlist.item.info)}
                     >
-                    <div className="conversation-list-item-time"
-                         style={makeStyle(style.conversationlist.item.time)}>{this.props.time}</div>
-                    <div className="conversation-list-item-unread-count"
-                         style={makeStyle(style.conversationlist.item.unread)}>{this.props.unreadCount || 0}</div>
+                    <div
+                        className="conversation-list-item-time"
+                        style={makeStyle(style.conversationlist.item.time)}
+                        >
+                        {this.props.time}
+                    </div>
+                    <div
+                        className="conversation-list-item-unread-count"
+                        style={makeStyle(style.conversationlist.item.unread)}
+                        >
+                        {this.props.unreadCount || 0}
+                    </div>
                 </div>
                 <div className="conversation-list-item-body">
                     <div
@@ -66,23 +98,3 @@ var ConversationListItem = React.createClass({
 });
 
 module.exports = ConversationListItem;
-
-//module initialization
-
-
-//private functions
-function onhoverin(item) {
-    return function (event) {
-        if (!item.props.selected) {
-            setStyle(event.currentTarget.style, style.conversationlist.item.hover);
-        }
-    };
-}
-
-function onhoverout(item) {
-    return function (event) {
-        if (!item.props.selected) {
-            setStyle(event.currentTarget.style, style.conversationlist.item.default);
-        }
-    };
-}

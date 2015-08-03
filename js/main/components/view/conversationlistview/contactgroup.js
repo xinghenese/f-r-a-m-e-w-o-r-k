@@ -19,8 +19,7 @@ var ContactGroup = React.createClass({
 
         this.props.onSelect({
             id: target.getAttribute('data-contact-id'),
-            type: target.getAttribute('data-contact-type'),
-            index: target.id
+            type: target.getAttribute('data-contact-type')
         });
     },
     render: function () {
@@ -29,25 +28,27 @@ var ContactGroup = React.createClass({
         if (!data || _.isEmpty(data)) {
             return null;
         }
-
         data = _.indexBy(data, 'id');
 
         var groups = _.map(data, function (data, key) {
             return (
                 <ContactItem
+                    /* key */
                     key={prefix + key}
-                    index={prefix + key}
+                    /* props */
                     lastAppearance={data.lastAppearance}
                     contactName={data.name}
                     contactAvatar={data.avatar}
-                    contactId={key}
-                    contactType={this.props.groupType}
                     message={
                         data.count && (data.count + ' people')
                         || (data.online && 'online' || (data.lastActiveTime + 'h ago'))
                     }
+                    selected={this.props.selectedIndex == key}
+                    /* data-*attributes */
+                    contactId={key}
+                    contactType={this.props.groupType}
+                    /* event handler */
                     onSelect={this._onSelect}
-                    selected={this.props.selectedIndex == prefix + key}
                     />
             );
         }, this);
@@ -71,13 +72,3 @@ var ContactGroup = React.createClass({
 });
 
 module.exports = ContactGroup;
-
-//module initialization
-
-
-//private functions
-function onselect(group) {
-    return function (event) {
-
-    }
-}

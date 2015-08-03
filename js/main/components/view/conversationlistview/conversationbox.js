@@ -91,7 +91,12 @@ var ConversationBox = React.createClass({
         if (this.state.type === listType.contacts) {
             list = (<ContactList data={this.state.groupsAndContacts}/>);
         } else if (this.state.type === listType.conversation) {
-            list = (<ConversationList data={this.state.displayData}/>);
+            list = (
+                <ConversationList
+                    data={this.state.displayData}
+                    onSelect={this.props.onSelectConversation}
+                />
+            );
         }
 
         return (

@@ -23,6 +23,37 @@ var ConversationList = React.createClass({
     getInitialState: function () {
         return {selectedIndex: -1};
     },
+    _onSelect: function (event) {
+        var target = event.currentTarget;
+        var index = target.getAttribute('data-conversation-index');
+        var type = target.getAttribute('data-conversation-type');
+
+        this.setState({selectedIndex: index});
+
+        if (type === "group") {
+            var group = groups.getGroup(index);
+            if (group && group.inGroup()) {
+                ConversationActions.joinConversation(
+                    protocols.toConversationType(type),
+                    index,
+                    null
+                );
+            }
+        } else {
+            ConversationActions.joinConversation(
+                protocols.toConversationType(type),
+                null,
+                index
+            );
+        }
+
+        this.props.onSelect({id: index, type: type});
+
+        //emitter.emit('select', {
+        //    id: index,
+        //    type: type
+        //});
+    },
     render: function () {
         var conversationList = null;
 
@@ -33,14 +64,19 @@ var ConversationList = React.createClass({
                 }
                 return (
                     <ConversationListItem
+                        /* key */
                         key={prefix + key}
+                        /* props */
                         time={data.time}
                         senderName={data.senderName}
                         senderAvatar={data.senderAvatar}
-                        index={prefix + key}
-                        onSelect={onselect(this)}
                         selected={this.state.selectedIndex == key}
-                        >
+                        /* data-* attributes */
+                        conversationIndex={key}
+                        conversationType={data.type}
+                        /* event handler */
+                        onSelect={this._onSelect}
+                    >
                         {data.message}
                     </ConversationListItem>
                 );
@@ -63,29 +99,7 @@ module.exports = ConversationList;
 
 
 //private functions
-function onselect(list) {
-    return function (event) {
-        var index = event.currentTarget.id.replace(/\D/g, '');
-        var type = _.get(list.props.data, index).type;
-        list.setState({selectedIndex: index});
-        if (type === "group") {
-            var group = groups.getGroup(index);
-            if (group) {
-                if (group.inGroup()) {
-                    ConversationActions.joinConversation(protocols.toConversationType(type), index, null);
-                }
-            }
-        } else {
-            ConversationActions.joinConversation(protocols.toConversationType(type), null, index);
-        }
-        emitter.emit('select', {
-            id: index,
-            type: type
-        });
-    };
-}
-
 function isValidConversationData(data) {
     //TODO: why data.message here can be empty.
-    return data && !_.isEmpty(data) && data.senderName;
+    return data && !_.isEmpty(data);// && data.senderName;
 }

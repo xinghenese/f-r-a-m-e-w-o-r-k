@@ -18,6 +18,7 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 var UserInfoBox = require('./view/infoview/userinfobox');
+var emitter = require('../utils/eventemitter');
 
 //private fields
 var boxType = {
@@ -40,10 +41,16 @@ var RightSideBox = React.createClass({
 // exports
 var Chat = React.createClass({
     getInitialState: function () {
-        return {rightBoxType: boxType.messsagebox};
+        return {
+            rightBoxType: boxType.messsagebox
+        };
     },
     _handleGroupsLoaded: function () {
         MessageActions.requestHistoryMessages();
+    },
+    _onSelectConversation: function (data) {
+        this.setState({rightBoxType: boxType.messsagebox});
+        emitter.emit('select', data);
     },
     _showSettings: function () {
         this.setState(function (previousState) {
@@ -67,7 +74,10 @@ var Chat = React.createClass({
         return (
             <div>
                 <RightSideBox boxType={this.state.rightBoxType}/>
-                <ConversationBox showSettings={this._showSettings}/>
+                <ConversationBox
+                    showSettings={this._showSettings}
+                    onSelectConversation={this._onSelectConversation}
+                />
             </div>
         );
     }
