@@ -7,6 +7,7 @@ var _ = require('lodash');
 var React = require('react');
 var ConversationListItem = require('./conversationlistitem');
 var ConversationActions = require('../../../actions/conversationactions');
+var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -20,10 +21,10 @@ var index = 0;
 
 //core module to export
 var ConversationList = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {selectedIndex: -1};
     },
-    _onSelect: function (event) {
+    _onSelect: function(event) {
         var target = event.currentTarget;
         var index = target.getAttribute('data-conversation-index');
         var type = target.getAttribute('data-conversation-type');
@@ -48,17 +49,27 @@ var ConversationList = React.createClass({
         }
 
         this.props.onSelect({id: index, type: type});
-
-        //emitter.emit('select', {
-        //    id: index,
-        //    type: type
-        //});
+        console.log("index: " + index + ", type: " + type);
     },
-    render: function () {
+    _selectPreviousConversation: function() {
+        console.log("selecting previous conversation");
+    },
+    _selectNextConversation: function() {
+        console.log("selecting next conversation");
+    },
+    componentDidMount: function() {
+        emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
+        emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+    },
+    componentWillUnmount: function() {
+        emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
+        emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+    },
+    render: function() {
         var conversationList = null;
 
         if (this.props.data && !_.isEmpty(this.props.data)) {
-            conversationList = _.map(this.props.data, function (data, key) {
+            conversationList = _.map(this.props.data, function(data, key) {
                 if (!isValidConversationData(data)) {
                     return null;
                 }
@@ -76,7 +87,7 @@ var ConversationList = React.createClass({
                         conversationType={data.type}
                         /* event handler */
                         onSelect={this._onSelect}
-                    >
+                        >
                         {data.message}
                     </ConversationListItem>
                 );

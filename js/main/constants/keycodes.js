@@ -4,7 +4,9 @@
 'use strict';
 
 var KeyCodes = {
-    ENTER: 13
+    DOWN: 40,
+    ENTER: 13,
+    UP: 38
 };
 
 module.exports = KeyCodes;

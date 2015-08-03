@@ -44,6 +44,8 @@ var MultilineInputBox = React.createClass({
             event.preventDefault();
             event.stopPropagation();
             this._handleSubmit(event);
+        } else if (this.props.onKeyDown) {
+            this.props.onKeyDown(event);
         }
     },
     componentWillMount: function () {
