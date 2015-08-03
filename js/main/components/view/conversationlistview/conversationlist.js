@@ -18,14 +18,27 @@ var protocols = require('../../../utils/protocols');
 //private fields
 var prefix = 'conversation-list-';
 var index = 0;
+var SELECT_REF_FIELD = 'selected';
 
 //core module to export
 var ConversationList = React.createClass({
     getInitialState: function() {
         return {selectedIndex: -1};
     },
-    _onSelect: function(event) {
-        var target = event.currentTarget;
+    _onSelect: function (event, offset) {
+        var target = event && event.currentTarget || React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+
+        offset = Number(offset) || 0;
+        if (offset > 0) {
+            target = target && target.nextSibling;
+        } else if (offset < 0) {
+            target = target && target.previousSibling;
+        }
+
+        if (!target) {
+            return;
+        }
+
         var index = target.getAttribute('data-conversation-index');
         var type = target.getAttribute('data-conversation-type');
 
@@ -49,13 +62,12 @@ var ConversationList = React.createClass({
         }
 
         this.props.onSelect({id: index, type: type});
-        console.log("index: " + index + ", type: " + type);
     },
     _selectPreviousConversation: function() {
-        console.log("selecting previous conversation");
+        this._onSelect(null, -1);
     },
     _selectNextConversation: function() {
-        console.log("selecting next conversation");
+        this._onSelect(null, 1);
     },
     componentDidMount: function() {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
@@ -73,7 +85,7 @@ var ConversationList = React.createClass({
                 if (!isValidConversationData(data)) {
                     return null;
                 }
-                return (
+                var item = (
                     <ConversationListItem
                         /* key */
                         key={prefix + key}
@@ -91,6 +103,12 @@ var ConversationList = React.createClass({
                         {data.message}
                     </ConversationListItem>
                 );
+
+                if (this.state.selectedIndex == key) {
+                    item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
+                }
+                return item;
+
             }, this);
         }
 
