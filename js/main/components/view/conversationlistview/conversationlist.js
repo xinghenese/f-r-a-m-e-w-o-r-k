@@ -89,7 +89,7 @@ var ConversationList = React.createClass({
                 >
                 {conversationList}
             </ul>
-        )
+        );
     }
 });
 
