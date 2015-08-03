@@ -17,6 +17,7 @@ var protocols = require('../../../utils/protocols');
 //private fields
 var prefix = 'conversation-list-';
 var index = 0;
+var SELECT_REF_FIELD = 'selected';
 
 //core module to export
 var ConversationList = React.createClass({
@@ -62,7 +63,7 @@ var ConversationList = React.createClass({
                 if (!isValidConversationData(data)) {
                     return null;
                 }
-                return (
+                var item = (
                     <ConversationListItem
                         /* key */
                         key={prefix + key}
@@ -80,6 +81,12 @@ var ConversationList = React.createClass({
                         {data.message}
                     </ConversationListItem>
                 );
+
+                if (this.state.selectedIndex == key) {
+                    item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
+                }
+                return item;
+
             }, this);
         }
 
