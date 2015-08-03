@@ -42,7 +42,7 @@ function bundlePayload(bundler) {
 
 gulp.task('build', ['clean'], bundlePayload(require('browserify')(browserifyOptions)));
 
-gulp.task('watch', ['clean'], function() {
+gulp.task('watch', function() {
     var moment = require('moment');
     var source = require('vinyl-source-stream');
     var watchify = require('watchify');
@@ -79,7 +79,9 @@ gulp.task('tests:tdd', function() {
 
 gulp.task('local-serve', ['watch'], function() {
     return gulp.src('.')
-        .pipe(require('gulp-webserver')());
+        .pipe(require('gulp-webserver')({
+            livereload: true
+        }));
 });
 
 gulp.task('default', ['build']);
