@@ -24,8 +24,21 @@ var ConversationList = React.createClass({
     getInitialState: function () {
         return {selectedIndex: -1};
     },
-    _onSelect: function (event) {
-        var target = event.currentTarget;
+    _onSelect: function (event, offset) {
+        var target = event.currentTarget
+            || React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+
+        if (!target) {
+            return;
+        }
+
+        offset = Number(offset) || 0;
+        if (offset > 0) {
+            target = target.nextSibling || target;
+        } else if (offset < 0) {
+            target = target.previousSibling || target;
+        }
+        
         var index = target.getAttribute('data-conversation-index');
         var type = target.getAttribute('data-conversation-type');
 
