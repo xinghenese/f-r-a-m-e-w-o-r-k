@@ -152,7 +152,7 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = {};
+    var result = []
     _.forEach(lastMessages, function (item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);

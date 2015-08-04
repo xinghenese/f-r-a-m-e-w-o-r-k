@@ -83,23 +83,22 @@ var ConversationList = React.createClass({
         if (!data || _.isEmpty(data)) {
             return null;
         }
-        data = _.indexBy(data, 'id');
 
-        var conversationList = _.map(data, function (data, key) {
+        var conversationList = _.map(data, function (data) {
             if (!isValidConversationData(data)) {
                 return null;
             }
             var item = (
                 <ConversationListItem
                     /* key */
-                    key={prefix + key}
+                    key={prefix + data.id}
                     /* props */
                     time={data.time}
                     senderName={data.senderName}
                     senderAvatar={data.senderAvatar}
-                    selected={this.state.selectedIndex == key}
+                    selected={this.state.selectedIndex == data.id}
                     /* data-* attributes */
-                    conversationIndex={key}
+                    conversationIndex={data.id}
                     conversationType={data.type}
                     /* event handler */
                     onSelect={this._onSelect}
@@ -109,7 +108,7 @@ var ConversationList = React.createClass({
                 </ConversationListItem>
             );
 
-            if (this.state.selectedIndex == key) {
+            if (this.state.selectedIndex == data.id) {
                 item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
             }
             return item;
