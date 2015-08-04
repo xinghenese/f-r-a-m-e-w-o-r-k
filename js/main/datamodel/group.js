@@ -4,6 +4,9 @@
 'use strict';
 
 // dependencies
+var _ = require('lodash');
+var Lang = require('../locales/zh-cn');
+var User = require('../datamodel/user');
 var objects = require('../utils/objects');
 
 // private fields
@@ -27,7 +30,7 @@ Group.prototype.inGroup = function () {
 };
 
 Group.prototype.name = function () {
-    return this._data["rn"];
+    return this._data["rn"] || this._generateNameFromMembers();
 };
 
 Group.prototype.countOfMembers = function () {
@@ -43,7 +46,9 @@ Group.prototype.tooManyMessages = function () {
 };
 
 Group.prototype.members = function () {
-    return this._data["jml"];
+    return _.map(this._data["jml"], function(item) {
+        return new User(item);
+    });
 };
 
 Group.prototype.setMembers = function (arr) {
@@ -60,6 +65,23 @@ Group.prototype.setMembersCursor = function (cursor) {
 
 Group.prototype.getMembersCursor = function () {
     return this._data[MEMBERS_CURSOR_FIELD];
+};
+
+Group.prototype._generateNameFromMembers = function() {
+    var name = "";
+    var members = this.members();
+    var first = true;
+    if (members) {
+        _.forEach(members, function(member) {
+            if (first) {
+                first = false;
+            } else {
+                name = name.concat(Lang.nicknameSeparator);
+            }
+            name = name.concat(member.getNickname());
+        });
+    }
+    return name;
 };
 
 module.exports = Group;

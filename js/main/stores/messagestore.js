@@ -24,13 +24,13 @@ var MessageConstants = require('../constants/messageconstants');
 var MessageStore = ChangeableStore.extend({
     _groupHistoryMessages: {},
     _privateHistoryMessages: {},
-    addGroupHistoryMessages: function (groupId, groupHistoryMessages) {
+    addGroupHistoryMessages: function(groupId, groupHistoryMessages) {
         this._groupHistoryMessages[groupId] = groupHistoryMessages;
     },
-    addPrivateHistoryMessages: function (userId, privateHistoryMessages) {
+    addPrivateHistoryMessages: function(userId, privateHistoryMessages) {
         this._privateHistoryMessages[userId] = privateHistoryMessages;
     },
-    appendGroupMessage: function (groupId, message) {
+    appendGroupMessage: function(groupId, message) {
         if (groupId in this._groupHistoryMessages) {
             this._groupHistoryMessages[groupId].appendMessage(message);
         } else {
@@ -40,7 +40,7 @@ var MessageStore = ChangeableStore.extend({
 
         this.emitChange();
     },
-    appendPrivateMessage: function (userId, message) {
+    appendPrivateMessage: function(userId, message) {
         if (userId in this._privateHistoryMessages) {
             this._privateHistoryMessages[userId].appendMessage(message);
         } else {
@@ -50,13 +50,13 @@ var MessageStore = ChangeableStore.extend({
 
         this.emitChange();
     },
-    getGroupHistoryMessages: function (groupId) {
+    getGroupHistoryMessages: function(groupId) {
         return this._groupHistoryMessages[groupId];
     },
-    getLastMessages: function () {
+    getLastMessages: function() {
         return _collectLastMessages();
     },
-    getPrivateHistoryMessages: function (userId) {
+    getPrivateHistoryMessages: function(userId) {
         return this._privateHistoryMessages[userId];
     }
 });
@@ -64,7 +64,7 @@ var MessageStore = ChangeableStore.extend({
 module.exports = MessageStore;
 
 // module initialization
-MessageStore.dispatchToken = AppDispatcher.register(function (action) {
+MessageStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.DELETE_GROUP_MESSAGES:
             _handleDeleteGroupMessages(action.id);
@@ -102,7 +102,7 @@ function _appendMyMessage(data) {
 
 function _collectLastMessages() {
     var messages = [];
-    _.forEach(MessageStore._groupHistoryMessages, function (value, key) {
+    _.forEach(MessageStore._groupHistoryMessages, function(value, key) {
         if (!_.isEmpty(value)) {
             messages.push({
                 groupId: key,
@@ -110,7 +110,7 @@ function _collectLastMessages() {
             });
         }
     });
-    _.forEach(MessageStore._privateHistoryMessages, function (value, key) {
+    _.forEach(MessageStore._privateHistoryMessages, function(value, key) {
         if (!_.isEmpty(value)) {
             messages.push({
                 userId: key,
@@ -118,7 +118,12 @@ function _collectLastMessages() {
             });
         }
     });
-    return messages;
+    return _.sortBy(messages, function(item) {
+        if (!item.message) {
+            return 0;
+        }
+        return -item.message.getTimestamp();
+    });
 }
 
 function _handleDeleteGroupMessages(id) {
@@ -149,10 +154,10 @@ function _handleHistoryMessagesRequest(action) {
                 dmc: {}
             }
         }
-    }).then(function (response) {
+    }).then(function(response) {
         _handleHistoryMessagesResponse(response);
         MessageStore.emitChange();
-    }, function (error) {
+    }, function(error) {
         MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_MISSED, error);
     });
 }
@@ -178,14 +183,14 @@ function _handleSendTalkMessage(action) {
         data: data,
         responseTag: "SCF",
         predicate: predicates.uuidPredicate(uuid)
-    }).then(function (msg) {
+    }).then(function(msg) {
         if (msg["uuid"] !== uuid) {
             console.log("wrong confirm, expect: " + uuid + ", actual: " + msg["uuid"]);
         } else {
             message.setStatus(MessageConstants.Status.RECEIVED);
             MessageStore.emitChange();
         }
-    }).catch(function (error) {
+    }).catch(function(error) {
         console.log("message sent failed: " + error);
     });
 }
@@ -208,7 +213,7 @@ function _handleHistoryMessagesResponse(response) {
 }
 
 function _handleGroupHistoryMessages(messages) {
-    _.forEach(messages, function (v) {
+    _.forEach(messages, function(v) {
         if (!_isValidGroup(v["rid"])) {
             return;
         }
@@ -219,7 +224,7 @@ function _handleGroupHistoryMessages(messages) {
 }
 
 function _handlePrivateHistoryMessages(messages) {
-    _.forEach(messages, function (v) {
+    _.forEach(messages, function(v) {
         var privateHistoryMessages = new PrivateHistoryMessages(v);
         MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
     });

@@ -43,7 +43,6 @@ var ConversationBox = React.createClass({
         this.setState({type: listType[type] || listType.conversation});
     },
     _filterData: function (data) {
-        console.log('data: ', data);
         this.setState({
             displayData: data && _.indexBy(data.name, 'id') || this.state.data,
             matchedMessages: data && data.message
@@ -164,6 +163,7 @@ function _buildGroupRenderObject(item, collector) {
         return;
     }
     var groupName = group.name();
+    console.log("group: " + groupName + ", id: " + item.groupId);
     var avatar = group.picture();
     var message = "";
     var time = "";
@@ -188,6 +188,7 @@ function _buildUserRenderObject(item, collector) {
         return;
     }
     var userName = user.getNickname();
+    console.log("user: " + userName);
     var avatar = user.picture();
     var message = "";
     var time = "";
