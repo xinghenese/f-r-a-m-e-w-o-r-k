@@ -83,7 +83,6 @@ var ConversationList = React.createClass({
         if (!data || _.isEmpty(data)) {
             return null;
         }
-        data = _.indexBy(data, 'id');
 
         var conversationList = _.map(data, function (data, key) {
             if (!isValidConversationData(data)) {

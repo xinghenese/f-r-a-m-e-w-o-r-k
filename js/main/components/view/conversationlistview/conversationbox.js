@@ -29,7 +29,7 @@ var listType = {
 
 //core module to export
 var ConversationBox = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         var messages = _getLastMessages();
         return {
             data: messages,
@@ -39,10 +39,10 @@ var ConversationBox = React.createClass({
             groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         };
     },
-    _switchList: function (type) {
+    _switchList: function(type) {
         this.setState({type: listType[type] || listType.conversation});
     },
-    _filterData: function (data) {
+    _filterData: function(data) {
         this.setState({
             displayData: data && _.indexBy(data.name, 'id') || this.state.data,
             matchedMessages: data && data.message
@@ -53,22 +53,22 @@ var ConversationBox = React.createClass({
             groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         });
     },
-    _updateMessages: function () {
+    _updateMessages: function() {
         var messages = _getLastMessages();
         this.setState({
             data: messages,
             displayData: messages
         });
     },
-    componentWillMount: function () {
+    componentWillMount: function() {
         ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
     },
-    render: function () {
+    render: function() {
         var matchedMessages = null;
         var matchedMessagesCount = null;
         var list = null;
@@ -92,14 +92,14 @@ var ConversationBox = React.createClass({
                 <ContactList
                     data={this.state.groupsAndContacts}
                     onSelect={this.props.onSelectConversation}
-                />
+                    />
             );
         } else if (this.state.type === listType.conversation) {
             list = (
                 <ConversationList
                     data={this.state.displayData}
                     onSelect={this.props.onSelectConversation}
-                />
+                    />
             );
         }
 
@@ -151,8 +151,8 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = {};
-    _.forEach(lastMessages, function (item) {
+    var result = [];
+    _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
         } else {
@@ -168,7 +168,6 @@ function _buildGroupRenderObject(item, collector) {
         return;
     }
     var groupName = group.name();
-    console.log("group: " + groupName + ", id: " + item.groupId);
     var avatar = group.picture();
     var message = "";
     var time = "";
@@ -193,7 +192,6 @@ function _buildUserRenderObject(item, collector) {
         return;
     }
     var userName = user.getNickname();
-    console.log("user: " + userName);
     var avatar = user.picture();
     var message = "";
     var time = "";
