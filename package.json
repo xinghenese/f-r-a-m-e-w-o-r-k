@@ -8,6 +8,7 @@
         "browserify": "~11.0.0",
         "browserify-cryptojs": "~0.3.1",
         "del": "~1.2.0",
+        "electron-prebuilt": "^0.30.2",
         "flux": "~2.0.3",
         "glob": "^5.0.14",
         "gulp": "~3.9.0",

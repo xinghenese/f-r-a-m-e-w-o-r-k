@@ -48,7 +48,15 @@ var ChatMessageBox = React.createClass({
     _handleSubmit: function (event) {
         var data = _.values(event.data)[0];
         if (this.state.id && data) {
-            MessageActions.sendTalkMessage(this.state.id, null, null, (_.values(event.data)[0]).toString(), 1, 0, "1.0");
+            MessageActions.sendTalkMessage(
+                this.state.id,
+                null,
+                null,
+                (_.values(event.data)[0]).toString(),
+                _getConversationType(this.state.type),
+                0,
+                "1.0"
+            );
         }
     },
     _updateMessages: function (id, type) {
@@ -203,6 +211,10 @@ function _buildUserRenderObject(item, collector) {
             type: 'group'
         });
     });
+}
+
+function _getConversationType(strType) {
+    return strType === "group" ? 0 : 1;
 }
 
 function _getSenderNickname(message) {
