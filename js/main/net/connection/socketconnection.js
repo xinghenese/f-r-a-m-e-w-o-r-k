@@ -57,10 +57,8 @@ var socketconnection = module.exports = connection.extend({
     request: function (packet) {
         packet = packetFormalize(packet);
 
-        if (!(packet.data || HANDSHAKE_TAG == packet.tag)) {
-            return authorize().repeat(function () {
-                return get(packet.tag);
-            });
+        if (!packet.data && HANDSHAKE_TAG !== packet.tag) {
+            return authorize().repeat(get(packet.tag));
         }
         return authorize().then(function (value) {
             //avoid duplicate handshake authorization request.
@@ -84,20 +82,17 @@ var socketconnection = module.exports = connection.extend({
 //initialize
 socketconnection.on('ready', function () {
     state = State.CONNECTING;
-});
+}).done();
 socketconnection.on('connect', function () {
     state = State.CONNECTED;
-    socketconnection.on('message', onMessageReceived);
-});
+    socketconnection.on('message', onMessageReceived).done();
+}).done();
 state = State.INITIALIZED;
 
 //private functions
 //just listen to data reception with tag.
 function get(tag) {
-    return socketconnection.on(tag, function (data) {
-        console.log('=>', tag + ": " + JSON.stringify(data));
-        return data;
-    });
+    return socketconnection.on(tag);
 }
 
 function post(packet) {
@@ -131,7 +126,7 @@ function packetFormalize(packet) {
         throw new Error("empty packet to be sent via socket");
     }
     if (_.isPlainObject(packet)) {
-        tag = "" + (packet.tag || _.keys(packet)[0]);
+        tag = String(packet.tag || _.keys(packet)[0]);
         data = packet.data || _.get(packet, tag);
 
         if (!tag) {
@@ -147,7 +142,7 @@ function packetFormalize(packet) {
         }
     }
     return {
-        tag: "" + packet.toUpperCase(),
+        tag: String(tag || packet).toUpperCase(),
         data: null
     }
 }
@@ -215,12 +210,6 @@ function handshake() {
     }
 
     return handshakePromise;
-}
-
-function awaitToken() {
-    if (!tokenPromise) {
-        tokenPromise = ';'
-    }
 }
 
 function ping() {
