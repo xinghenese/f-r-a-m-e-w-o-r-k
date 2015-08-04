@@ -22,11 +22,12 @@ var SELECT_REF_FIELD = 'selected';
 
 //core module to export
 var ConversationList = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {selectedIndex: -1};
     },
     _onSelect: function (event, offset) {
-        var target = event && event.currentTarget || React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+        var lastSelectedItem = React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+        var target = event && event.currentTarget || lastSelectedItem;
 
         offset = Number(offset) || 0;
         if (offset > 0) {
@@ -35,7 +36,7 @@ var ConversationList = React.createClass({
             target = target && target.previousSibling;
         }
 
-        if (!target) {
+        if (!target || target === lastSelectedItem) {
             return;
         }
 
@@ -63,54 +64,57 @@ var ConversationList = React.createClass({
 
         this.props.onSelect({id: index, type: type});
     },
-    _selectPreviousConversation: function() {
+    _selectPreviousConversation: function () {
         this._onSelect(null, -1);
     },
-    _selectNextConversation: function() {
+    _selectNextConversation: function () {
         this._onSelect(null, 1);
     },
-    componentDidMount: function() {
+    componentDidMount: function () {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    render: function() {
-        var conversationList = null;
-
-        if (this.props.data && !_.isEmpty(this.props.data)) {
-            conversationList = _.map(this.props.data, function(data, key) {
-                if (!isValidConversationData(data)) {
-                    return null;
-                }
-                var item = (
-                    <ConversationListItem
-                        /* key */
-                        key={prefix + key}
-                        /* props */
-                        time={data.time}
-                        senderName={data.senderName}
-                        senderAvatar={data.senderAvatar}
-                        selected={this.state.selectedIndex == key}
-                        /* data-* attributes */
-                        conversationIndex={key}
-                        conversationType={data.type}
-                        /* event handler */
-                        onSelect={this._onSelect}
-                        >
-                        {data.message}
-                    </ConversationListItem>
-                );
-
-                if (this.state.selectedIndex == key) {
-                    item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
-                }
-                return item;
-
-            }, this);
+    render: function () {
+        var data = this.props.data;
+        if (!data || _.isEmpty(data)) {
+            return null;
         }
+        data = _.indexBy(data, 'id');
+
+        var conversationList = _.map(data, function (data, key) {
+            if (!isValidConversationData(data)) {
+                return null;
+            }
+            var item = (
+                <ConversationListItem
+                    /* key */
+                    key={prefix + key}
+                    /* props */
+                    time={data.time}
+                    senderName={data.senderName}
+                    senderAvatar={data.senderAvatar}
+                    selected={this.state.selectedIndex == key}
+                    /* data-* attributes */
+                    conversationIndex={key}
+                    conversationType={data.type}
+                    /* event handler */
+                    onSelect={this._onSelect}
+                    onKeyPress={this._onKeyPress}
+                    >
+                    {data.message}
+                </ConversationListItem>
+            );
+
+            if (this.state.selectedIndex == key) {
+                item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
+            }
+            return item;
+
+        }, this);
 
         return (
             <ul className="chat-message-list"
