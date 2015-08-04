@@ -13,6 +13,7 @@ module.exports = {
     "invalidPhone": "不正确的手机号码",
     "invalidVerificationCode": "不正确的验证码",
     "loginFailed": "登录失败，请重试！",
+    "nicknameSeparator": "、",
     "phone": "手机号码",
     "registerFailed": "注册失败，请重试！",
     "requestVerificationCodeFailed": "发送验证码失败，请重试！",

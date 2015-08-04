@@ -6,6 +6,7 @@
 var _ = require('lodash');
 var React = require('react');
 var ContactGroup = require('./contactgroup');
+var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -17,30 +18,44 @@ var prefix = 'contact-list-';
 
 //core module to export
 var ContactList = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {selectedIndex: -1};
     },
-    _onSelect: function (data) {
+    _onSelect: function(data) {
         this.setState({selectedIndex: data.id});
         emitter.emit('select', {
             id: data.id,
             type: data.type
-        })
+        });
     },
-    render: function () {
+    _selectPreviousContact: function() {
+        console.log("selecting previous contact");
+    },
+    _selectNextContact: function() {
+        console.log("selecting previous contact");
+    },
+    componentDidMount: function() {
+        emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
+        emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
+    },
+    componentWillUnmount: function() {
+        emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
+        emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
+    },
+    render: function() {
         var data = this.props.data;
         if (!data || _.isEmpty(data)) {
             return null;
         }
 
-        data = _.groupBy(data, function (data) {
-                if (data.type === 'user') {
-                    return data.name[0];
-                }
-                return data.type;
-            });
+        data = _.groupBy(data, function(data) {
+            if (data.type === 'user') {
+                return data.name[0];
+            }
+            return data.type;
+        });
 
-        var contactList = _.map(data, function (data, key) {
+        var contactList = _.map(data, function(data, key) {
             var groupType = key !== 'group' ? 'user' : key;
             return (
                 <ContactGroup
@@ -55,7 +70,7 @@ var ContactList = React.createClass({
                     groupType={groupType}
                     /* event handler */
                     onSelect={this._onSelect}
-                />
+                    />
             );
         }, this);
 
