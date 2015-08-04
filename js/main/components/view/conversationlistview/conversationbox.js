@@ -89,7 +89,12 @@ var ConversationBox = React.createClass({
         }
 
         if (this.state.type === listType.contacts) {
-            list = (<ContactList data={this.state.groupsAndContacts}/>);
+            list = (
+                <ContactList
+                    data={this.state.groupsAndContacts}
+                    onSelect={this.props.onSelectConversation}
+                />
+            );
         } else if (this.state.type === listType.conversation) {
             list = (
                 <ConversationList
@@ -171,7 +176,7 @@ function _buildGroupRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = Formats.formatTime(item.message.getTimestamp());
     }
-    _.set(collector, item.groupId, {
+    collector.push({
         name: groupName,
         senderName: groupName,
         senderAvatar: avatar,
@@ -195,7 +200,7 @@ function _buildUserRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = Formats.formatTime(item.message.getTimestamp());
     }
-    _.set(collector, item.userId, {
+    collector.push({
         name: userName,
         senderName: userName,
         senderAvatar: avatar,
