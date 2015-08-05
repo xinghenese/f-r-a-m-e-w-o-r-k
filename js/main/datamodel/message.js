@@ -103,6 +103,10 @@ Message.prototype.getAltText = function () {
     return this._data["alt"];
 };
 
+Message.prototype.getCursor = function() {
+    return this._data["mscs"];
+}
+
 Message.prototype.getTimestamp = function () {
     return parseInt(this._data["tmstp"]);
 };

@@ -21,9 +21,21 @@ module.exports = {
             id: id
         });
     },
+    requestGroupHistoryMessages: function(groupId) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.REQUEST_GROUP_HISTORY_MESSAGES,
+            groupId: groupId
+        });
+    },
     requestHistoryMessages: function () {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_HISTORY_MESSAGES
+        });
+    },
+    requestPrivateHistoryMessages: function(userId) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.REQUEST_PRIVATE_HISTORY_MESSAGES,
+            userId: userId
         });
     },
     sendTalkMessage: function (groupId, toUserId, atUserId, content, conversationType, messageType, version) {

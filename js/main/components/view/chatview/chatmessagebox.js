@@ -75,9 +75,13 @@ var ChatMessageBox = React.createClass({
                 return;
             }
 
+            var groupMessages = groupHistoryMessages.getMessages();
+            if (groupMessages.length <= 1) {
+                MessageActions.requestGroupHistoryMessages(id);
+            }
             data = {
                 groupId: id,
-                messages: groupHistoryMessages.getMessages()
+                messages: groupMessages
             };
             var group = groups.getGroup(id);
             if (group) {
@@ -90,9 +94,13 @@ var ChatMessageBox = React.createClass({
                 return;
             }
 
+            var privateMessages = privateHistoryMessages.getMessages();
+            if (privateMessages.length <= 1) {
+                MessageActions.requestPrivateHistoryMessages(id);
+            }
             data = {
                 userId: id,
-                messages: privateHistoryMessages.getMessages()
+                messages: privateMessages
             };
         }
 
