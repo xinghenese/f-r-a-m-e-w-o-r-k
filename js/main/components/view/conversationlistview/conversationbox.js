@@ -43,7 +43,6 @@ var ConversationBox = React.createClass({
         this.setState({type: listType[type] || listType.conversation});
     },
     _filterData: function (data) {
-        console.log('data: ', data);
         this.setState({
             displayData: data && _.indexBy(data.name, 'id') || this.state.data,
             matchedMessages: data && data.message

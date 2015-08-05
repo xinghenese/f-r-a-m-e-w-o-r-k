@@ -18,19 +18,19 @@ module.exports = Message;
 
 // module initialization
 Message.prototype.getGroupId = function () {
-    return this._data["msrid"];
+    return parseInt(this._data["msrid"] || -1);
 };
 
 Message.prototype.getUserId = function () {
-    return this._data["msuid"];
+    return parseInt(this._data["msuid"] || -1);
 };
 
 Message.prototype.getTargetUserIds = function () {
-    return this._data["mstuid"];
+    return parseInt(this._data["mstuid"] || -1);
 };
 
 Message.prototype.getAtUserId = function () {
-    return this._data["atuid"];
+    return parseInt(this._data["atuid"] || -1);
 };
 
 Message.prototype.getContent = function () {

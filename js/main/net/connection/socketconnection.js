@@ -171,7 +171,6 @@ function prepareRequestPacket(tag, data) {
 
 function onMessageReceived(msg) {
     return session.read(msg, _.assign({}, DEFAULT_CONFIG)).then(function(value) {
-        console.log("received: ", value);
         var tag = value.tag;
         var data = value.data;
 
