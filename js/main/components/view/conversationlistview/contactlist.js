@@ -23,7 +23,7 @@ var ContactList = React.createClass({
     },
     _onSelect: function(data) {
         this.setState({selectedIndex: data.id});
-        emitter.emit('select', {
+        this.props.onSelect({
             id: data.id,
             type: data.type
         });
