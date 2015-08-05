@@ -10,7 +10,7 @@ var filter = require('./filter');
 var factory = require('./factory');
 
 //private fields
-var _tasks = _.map(['wrapper', 'cipher', 'zipper', 'json', 'token', 'iohandler'], function(item) {
+var _tasks = _.map(['wrapper', 'cipher', 'zipper', 'json', 'token', 'iohandler'], function (item) {
     return factory.createFilter(item);
 });
 
@@ -22,9 +22,9 @@ module.exports = origin.extend({
      * @param options {Object}
      * @returns {Q.Promise}
      */
-    'filterWrite': function(msg, options) {
-        return _.reduceRight(this.tasks, function(promise, task, index) {
-            return promise.then(function(value) {
+    'filterWrite': function (msg, options) {
+        return _.reduceRight(this.tasks, function (promise, task, index) {
+            return promise.then(function (value) {
                 return task.write(value, options);
             })
         }, promise.create(msg));
@@ -35,9 +35,9 @@ module.exports = origin.extend({
      * @param options {Object}
      * @returns {Q.Promise}
      */
-    'filterRead': function(msg, options) {
-        return _.reduce(this.tasks, function(promise, task, index) {
-            return promise.then(function(value) {
+    'filterRead': function (msg, options) {
+        return _.reduce(this.tasks, function (promise, task, index) {
+            return promise.then(function (value) {
                 return task.read(value, options);
             })
         }, promise.create(msg));

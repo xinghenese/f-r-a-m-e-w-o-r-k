@@ -16,7 +16,7 @@ module.exports = {
      * @param roomId the id of the group
      * @param userId the id of the target user
      */
-    joinConversation: function(conversationType, roomId, userId) {
+    joinConversation: function (conversationType, roomId, userId) {
         AppDispatcher.dispatch({
             type: ActionTypes.JOIN_CONVERSATION,
             conversationType: conversationType,
@@ -31,18 +31,12 @@ module.exports = {
      * @param roomId the id of the group
      * @param userId the id of the target user
      */
-    quitConversation: function(conversationType, roomId, userId) {
+    quitConversation: function (conversationType, roomId, userId) {
         AppDispatcher.dispatch({
             type: ActionTypes.QUIT_CONVERSATION,
             conversationType: conversationType,
             roomId: roomId,
             userId: userId
-        });
-    },
-    getChatList: function(listType) {
-        AppDispatcher.dispatch({
-            type: ActionTypes.GET_CHAT_LIST,
-            listType: listType
         });
     }
 };

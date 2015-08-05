@@ -9,7 +9,7 @@ var userconfig = require('../userconfig/userconfig');
 
 // exports
 module.exports = filter.create({
-    processWritable: function(value, options) {
+    processWritable: function (value, options) {
         if (options.needToken && userconfig.getToken()) {
             value['tk'] = userconfig.getToken();
         }

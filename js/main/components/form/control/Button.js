@@ -13,19 +13,19 @@ var makeStyle = require('../../../style/styles').makeStyle;
 
 //core module to export
 var Button = React.createClass({
-  propTypes: {
-    onClick: React.PropTypes.func
-  },
-  render: function() {
-    return (
-      <input
-        type="button"
-        value={this.props.name || this.props.value}
-        style={makeStyle(style.button, theme.button, this.props.style)}
-        onClick={this.props.onClick}
-      />
-    );
-  }
+    propTypes: {
+        onClick: React.PropTypes.func
+    },
+    render: function () {
+        return (
+            <input
+                type="button"
+                value={this.props.name || this.props.value}
+                style={makeStyle(style.button, theme.button, this.props.style)}
+                onClick={this.props.onClick}
+                />
+        );
+    }
 });
 
 module.exports = Button;

@@ -6,24 +6,24 @@
 var _ = require('lodash');
 
 module.exports = {
-    containsValuedProp: function(obj, prop) {
+    containsValuedProp: function (obj, prop) {
         return obj[prop] ? true : false;
     },
-    copyPropsExcept: function(src, dst, exceptKeys) {
+    copyPropsExcept: function (src, dst, exceptKeys) {
         var interestedKeys = _.difference(_.keys(src), exceptKeys);
-        _.forEach(interestedKeys, function(key) {
+        _.forEach(interestedKeys, function (key) {
             dst[key] = src[key];
         });
     },
-    copyValuedProp: function(src, srcAttr, dst, dstAttr) {
+    copyValuedProp: function (src, srcAttr, dst, dstAttr) {
         if (this.containsValuedProp(src, srcAttr)) {
             dst[dstAttr] = src[srcAttr];
         }
     },
-    getBool: function(obj) {
+    getBool: function (obj) {
         return obj !== 0 && obj !== "0";
     },
-    isIntValue: function(obj, intValue) {
+    isIntValue: function (obj, intValue) {
         if (obj === intValue) {
             return true;
         } else if (typeof obj === "string") {
@@ -31,7 +31,7 @@ module.exports = {
         }
         return false;
     },
-    hasHierarchicalProps: function(obj, hierarchicalProps) {
+    hasHierarchicalProps: function (obj, hierarchicalProps) {
         var first = _.first(hierarchicalProps);
         var rest = _.rest(hierarchicalProps);
         if (!this.hasProperty(obj, first)) {
@@ -42,10 +42,11 @@ module.exports = {
             return this.hasHierarchicalProps(obj[first], rest);
         }
     },
-    hasProperty: function(obj, prop) {
+    hasProperty: function (obj, prop) {
         return _.isPlainObject(obj) && prop in obj;
     },
-    mergeObjects: function(obj1, obj2) {
+    mergeObjects: function (obj1, obj2) {
+        // FIXME: replace with _.create(obj1, obj2)
         var result = {};
         for (var attr in obj1) {
             result[attr] = obj1[attr];
@@ -55,17 +56,17 @@ module.exports = {
         }
         return result;
     },
-    preventDefault: function(event) {
+    preventDefault: function (event) {
         event.preventDefault();
         event.stopPropagation();
         return "preventDefault" in event || "stopPropagation" in event;
     },
-    setTruePropIf: function(target, prop, condition) {
+    setTruePropIf: function (target, prop, condition) {
         if (condition) {
             target[prop] = true;
         }
     },
-    setTruePropIfNotZero: function(target, prop, dependent) {
+    setTruePropIfNotZero: function (target, prop, dependent) {
         if (dependent !== 0 && dependent !== "0") {
             target[prop] = true;
         }

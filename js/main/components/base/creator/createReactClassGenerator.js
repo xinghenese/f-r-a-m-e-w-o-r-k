@@ -13,16 +13,16 @@ var modifiable = require('./../specs/modifiable');
 //private fields
 
 //core module to export
-module.exports = function(configs) {
-    return function(spec) {
+module.exports = function (configs) {
+    return function (spec) {
         if (configs && configs.mixins && configs.mixins.push) {
             spec = _.assign({}, configs, {
-              //have a copy of mixins to make configs immutable.
-              mixins: _(configs.mixins)
-                  .slice(0)
-                  .push(spec)
-                  .unshift(identifiable, modifiable, topOwnedNodeReferable)
-                  .value()
+                //have a copy of mixins to make configs immutable.
+                mixins: _(configs.mixins)
+                    .slice(0)
+                    .push(spec)
+                    .unshift(identifiable, modifiable, topOwnedNodeReferable)
+                    .value()
             });
         }
         return React.createClass(mixinSpecs(spec));

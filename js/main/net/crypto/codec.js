@@ -11,17 +11,17 @@ var origin = require('./../base/origin');
 //core module to export
 module.exports = origin.extend({
 
-  encodeHex: function(hexText){
-    return hexText;
-  },
-  decodeToHex: function(encodedText){
-    return encodedText;
-  },
-  encode: function(utf8Text){
-    return utf8Text;
-  },
-  decode: function(encodedText){
-    return encodedText;
-  }
+    encodeHex: function (hexText) {
+        return hexText;
+    },
+    decodeToHex: function (encodedText) {
+        return encodedText;
+    },
+    encode: function (utf8Text) {
+        return utf8Text;
+    },
+    decode: function (encodedText) {
+        return encodedText;
+    }
 
 });

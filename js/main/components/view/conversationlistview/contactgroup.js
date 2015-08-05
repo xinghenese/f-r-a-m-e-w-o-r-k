@@ -11,34 +11,69 @@ var makeStyle = require('../../../style/styles').makeStyle;
 
 //private fields
 var prefix = 'contact-group-';
+var SELECT_REF_FIELD = 'selected';
 
 //core module to export
 var ContactGroup = React.createClass({
-    render: function() {
-        var datas = this.props.data;
+    getDefaultProps: function () {
+        return {selectedIndex: -1};
+    },
+    _onSelect: function (event, offset) {
+        var lastSelectedItem = React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+        var target = event && event.currentTarget || lastSelectedItem;
 
-        if (!datas || _.isEmpty(datas)) {
-            return null;
+        offset = Number(offset) || 0;
+        if (offset > 0) {
+            target = target && target.nextSibling;
+        } else if (offset < 0) {
+            target = target && target.previousSibling;
         }
 
-        datas = _.indexBy(datas, 'id');
+        if (!target || target === lastSelectedItem) {
+            return;
+        }
 
-        var group = _.map(datas, function(data, key) {
-            return (
+        this.props.onSelect({
+            itemId: target.getAttribute('data-contact-id'),
+            groupId: this.props.index,
+            type: target.getAttribute('data-contact-type')
+        });
+    },
+    render: function () {
+        var data = this.props.data;
+
+        if (!data || _.isEmpty(data)) {
+            return null;
+        }
+        data = _.indexBy(data, 'id');
+
+        var groups = _.map(data, function (data, key) {
+            var item = (
                 <ContactItem
+                    /* key */
                     key={prefix + key}
+                    /* props */
                     lastAppearance={data.lastAppearance}
                     contactName={data.name}
                     contactAvatar={data.avatar}
-                    index={prefix + key}
                     message={
                         data.count && (data.count + ' people')
                         || (data.online && 'online' || (data.lastActiveTime + 'h ago'))
                     }
-                    onSelect={onselect(this)}
                     selected={this.props.selectedIndex == key}
+                    /* data-*attributes */
+                    contactId={key}
+                    contactType={this.props.groupType}
+                    /* event handler */
+                    onSelect={this._onSelect}
                 />
             );
+
+            if (this.props.selectedIndex == key) {
+                item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
+            }
+            return item;
+
         }, this);
 
         return (
@@ -46,13 +81,13 @@ var ContactGroup = React.createClass({
                 <div
                     className="contact-group-caption"
                     style={style.conversationlist.caption}
-                >
+                    >
                     {this.props.groupName}
                 </div>
                 <ul className="contact-group-body"
                     style={makeStyle(style.conversationlist, this.props.style)}
-                >
-                    {group}
+                    >
+                    {groups}
                 </ul>
             </div>
         )
@@ -60,13 +95,3 @@ var ContactGroup = React.createClass({
 });
 
 module.exports = ContactGroup;
-
-//module initialization
-
-
-//private functions
-function onselect(group) {
-    return function(event) {
-
-    }
-}

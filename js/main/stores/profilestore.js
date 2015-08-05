@@ -9,18 +9,18 @@ var assign = require('object-assign');
 var PROFILE_LOADED = 'profileLoaded';
 
 var ProfileStore = assign({}, EventEmitter.prototype, {
-    emitProfileLoaded: function() {
+    emitProfileLoaded: function () {
         this.emit(PROFILE_LOADED);
     },
-    addProfileLoadedListener: function(callback) {
+    addProfileLoadedListener: function (callback) {
         this.on(PROFILE_LOADED, callback);
     },
-    removeProfileLoadedListener: function(callback) {
+    removeProfileLoadedListener: function (callback) {
         this.removeListener(PROFILE_LOADED, callback);
     }
 });
 
-ProfileStore.dispatchToken = AppDispatcher.register(function(action) {
+ProfileStore.dispatchToken = AppDispatcher.register(function (action) {
     console.log("here");
     switch (action.actionType) {
         case ActionTypes.LOGIN:

@@ -50,17 +50,15 @@ var isAuthorized = false;
 //core module to export
 var socketconnection = module.exports = connection.extend({
     /**
-     *
+     * post the packet to server and then wait for the response.
      * @param packet {Object|String}
      * @returns {Q.Promise}
      */
     request: function(packet) {
         packet = packetFormalize(packet);
 
-        if (!(packet.data || HANDSHAKE_TAG == packet.tag)) {
-            return authorize().repeat(function() {
-                return get(packet.tag);
-            });
+        if (!packet.data && HANDSHAKE_TAG !== packet.tag) {
+            return authorize().repeat(get(packet.tag));
         }
         return authorize().then(function(value) {
             //avoid duplicate handshake authorization request.
@@ -71,6 +69,17 @@ var socketconnection = module.exports = connection.extend({
                 return post(packet);
             }
         });
+    },
+    /**
+     * monitor the incoming packet data with specified tag pushed by server
+     * @param tag {String}
+     * @returns {Q.Promise}
+     */
+    monitor: function (tag) {
+        if (!tag) {
+            throw new Error('invalid tag');
+        }
+        return get(String(tag));
     },
     ping: ping,
     getState: function() {
@@ -84,20 +93,17 @@ var socketconnection = module.exports = connection.extend({
 //initialize
 socketconnection.on('ready', function() {
     state = State.CONNECTING;
-});
-socketconnection.on('connect', function() {
+}).done();
+socketconnection.on('connect', function () {
     state = State.CONNECTED;
-    socketconnection.on('message', onMessageReceived);
-});
+    socketconnection.on('message', onMessageReceived).done();
+}).done();
 state = State.INITIALIZED;
 
 //private functions
 //just listen to data reception with tag.
 function get(tag) {
-    return socketconnection.on(tag, function(data) {
-        console.log('=>', tag + ": " + JSON.stringify(data));
-        return data;
-    });
+    return socketconnection.on(tag);
 }
 
 function post(packet) {
@@ -131,23 +137,25 @@ function packetFormalize(packet) {
         throw new Error("empty packet to be sent via socket");
     }
     if (_.isPlainObject(packet)) {
-        tag = "" + (packet.tag || _.keys(packet)[0]);
+        tag = String(packet.tag || _.keys(packet)[0]);
         data = packet.data || _.get(packet, tag);
 
         if (!tag) {
             throw new Error('invalid tag');
         }
+
+        var result = {
+            tag: tag.toUpperCase()
+        };
         if (data && !_.isEmpty(data)) {
-            var result = {
-                tag: tag.toUpperCase(),
-                data: data
-            };
-            objects.copyPropsExcept(packet, result, ["tag", "data"]);
-            return result;
+            result["data"] = data;
         }
+        objects.copyPropsExcept(packet, result, ["tag", "data"]);
+        return result;
     }
+
     return {
-        tag: "" + packet.toUpperCase(),
+        tag: String(tag || packet).toUpperCase(),
         data: null
     }
 }
@@ -168,16 +176,13 @@ function onMessageReceived(msg) {
 
         //check whether the message is pushed by server or pulled from server.
         if (tag && !_.isEmpty(socketconnection.listeners(tag))) {
-            console.log("emitting - " + tag);
             socketconnection.emit(tag, data);
         } else {
             //if the message pushed by server does not have to notify immediately,
             //then cache it into the session for later use.
             if (shouldNotify(tag)) {
-                console.log("notifyImmediately - " + tag);
                 notifyImmediately(tag, data);
             } else {
-                console.log("cache - " + tag);
                 session.cache(tag, data);
             }
         }
@@ -218,12 +223,6 @@ function handshake() {
     }
 
     return handshakePromise;
-}
-
-function awaitToken() {
-    if (!tokenPromise) {
-        tokenPromise = ';'
-    }
 }
 
 function ping() {

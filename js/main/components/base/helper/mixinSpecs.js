@@ -33,13 +33,13 @@ module.exports = mixinSpecs;
 //private functions
 function mixinSpecs(configs, policy, priority) {
     return cleanSpecs(
-            composite.create(configs, policy || defaultConflictPolicy)
-            || configs
+        composite.create(configs, policy || defaultConflictPolicy)
+        || configs
     );
 }
 
 function cleanSpecs(spec) {
-    return _.reduce(spec, function(memo, value, key) {
+    return _.reduce(spec, function (memo, value, key) {
         if (isSet(value)) {
             return _.set(memo, key, value);
         }

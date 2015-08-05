@@ -13,13 +13,15 @@ var React = require('react');
 module.exports = {
     getNodeName: getNodeName,
     travserSubNodes: traverseSubNodes,
-    removeSubNodes: function(element, removeFunc, thisArg) {
-        return traverseSubNodes(element, void 0, function(){return true;}, removeFunc, thisArg);
+    removeSubNodes: function (element, removeFunc, thisArg) {
+        return traverseSubNodes(element, void 0, function () {
+            return true;
+        }, removeFunc, thisArg);
     },
-    processSubNodes: function(element, processFunc, filterFunc, thisArg) {
+    processSubNodes: function (element, processFunc, filterFunc, thisArg) {
         return traverseSubNodes(element, processFunc, filterFunc, void 0, thisArg);
     },
-    processAllSubNodes: function(element, processFunc, thisArg) {
+    processAllSubNodes: function (element, processFunc, thisArg) {
         return traverseSubNodes(element, processFunc, void 0, void 0, thisArg);
     }
 };
@@ -59,8 +61,8 @@ function traverse(element, process, filter, remove, thisArg, level) {
         return element.props.children;
     }
 
-    var children = React.Children.map(element.props.children, function(child, key) {
-       if (_.isFunction(remove) && remove.call(thisArg, child, element)) {
+    var children = React.Children.map(element.props.children, function (child, key) {
+        if (_.isFunction(remove) && remove.call(thisArg, child, element)) {
             return void 0;
         }
 

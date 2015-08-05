@@ -8,12 +8,12 @@ var filter = require('./filter');
 
 //core module to export
 module.exports = filter.create({
-  'notifyConfig': function(cfg){
-    if(!_.isUndefined(cfg.needEncode)){
-      this.enableWrite = !!cfg.needEncode;
+    'notifyConfig': function (cfg) {
+        if (!_.isUndefined(cfg.needEncode)) {
+            this.enableWrite = !!cfg.needEncode;
+        }
+        if (!_.isUndefined(cfg.needDecode)) {
+            this.enableRead = !!cfg.needDecode;
+        }
     }
-    if(!_.isUndefined(cfg.needDecode)){
-      this.enableRead = !!cfg.needDecode;
-    }
-  }
 });

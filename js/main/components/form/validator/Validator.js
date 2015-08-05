@@ -36,16 +36,16 @@ var Validator = React.createClass({
         validationAtServer: React.PropTypes.func,
         validationAtClient: React.PropTypes.func
     },
-    getInitialState: function() {
+    getInitialState: function () {
         return {validateState: ValidateState.DEFAULT, errorType: -1};
     },
-    validate: function() {
+    validate: function () {
         var self = this;
         var fieldValues = {};
         var controls = this.props.controlsToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
-        var values = _.map(controls, function(control) {
+        var values = _.map(controls, function (control) {
             control = document.getElementById(control);
             var field = control.getAttribute('field') || control.id;
             var value = control.value;
@@ -63,7 +63,7 @@ var Validator = React.createClass({
 
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
-            ? !! this.props.validationAtClient.apply(this, values)
+            ? !!this.props.validationAtClient.apply(this, values)
             : true;
 
         if (!isValidAtClient) {
@@ -76,9 +76,9 @@ var Validator = React.createClass({
             : true;
 
         if (promise.isPrototypeOf(isValidAtServer)) {
-            return isValidAtServer.then(function() {
+            return isValidAtServer.then(function () {
                 return handleSuccess(self, fieldValues);
-            }, function(err) {
+            }, function (err) {
                 return handleError(self, err);
             });
         }
@@ -89,7 +89,7 @@ var Validator = React.createClass({
 
         return handleSuccess(this, fieldValues);
     },
-    render: function() {
+    render: function () {
         if (!this.props.controlsToValidate) {
             console.error('no controlsToValidate props found in Validator');
             return null;
@@ -155,9 +155,9 @@ function handleSuccess(validator, data) {
 function restoreDefaultStyleAfterChange(validator) {
     var controls = validator.props.controlsToValidate;
     controls = _.isArray(controls) ? controls : [controls];
-    _.forEach(controls, function(c) {
+    _.forEach(controls, function (c) {
         var element = document.getElementById(c);
-        var onInput = function() {
+        var onInput = function () {
             element.removeEventListener("input", onInput);
             validator.setState({validateState: ValidateState.DEFAULT});
         };

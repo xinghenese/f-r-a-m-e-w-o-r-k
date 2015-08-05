@@ -10,13 +10,13 @@ var helper = require('../helper/helper');
 //core module to export
 module.exports = {
     displayName: 'DescendantsWalkable',
-    descendantsProps: function(child, path) {
+    descendantsProps: function (child, path) {
         return {
             ref: child.ref || ((this._seq || '') + 'child-' + path.join('-'))
         }
     },
-    walkDescendants: function(process, result) {
-        return _.reduce(this.refs, function(memo, element) {
+    walkDescendants: function (process, result) {
+        return _.reduce(this.refs, function (memo, element) {
             return process.call(this, element, memo);
         }, result, this);
     }

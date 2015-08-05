@@ -11,10 +11,10 @@ var createValidatableClass = require('../../base/creator/createValidatableClass'
 //core module to export
 module.exports = createValidatableClass({
     displayName: 'RegularExpressionValidator',
-    getDefaultProps: function() {
+    getDefaultProps: function () {
         return {validationAtClient: validation(this)};
     },
-    render: function(){
+    render: function () {
         if (!_.isArray(this.props.regExp) && !_.isRegExp(this.props.regExp)) {
             console.error('no regExp props found in RegularExpressionValidator');
             return null;
@@ -30,10 +30,10 @@ function validation(validator) {
     var regExp = _.toArray(validator.props.regExp);
     var regExpCount = _.size(regExp);
 
-    return function() {
+    return function () {
         return _(arguments)
             .toArray()
-            .every(function(arg, index) {
+            .every(function (arg, index) {
                 var reg = regExp[index % regExpCount];
                 console.log('reg: ', reg);
                 return _.isRegExp(reg)

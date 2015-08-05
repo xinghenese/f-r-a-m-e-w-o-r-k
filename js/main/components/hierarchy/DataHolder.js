@@ -15,7 +15,7 @@ var createReferableClass = require('../base/creator/createReferableClass');
 //core module to export
 module.exports = createReferableClass({
     displayName: 'DataHolder',
-    _updateStateAndNotify: function(data) {
+    _updateStateAndNotify: function (data) {
         var emitter = this.props.emitter;
         var event = this.props.updateEvent;
 
@@ -23,20 +23,20 @@ module.exports = createReferableClass({
             emitter.emit(event, data);
         }
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         var self = this;
         var emitter = this.props.emitter;
         var event = this.props.superUpdateEvent;
 
         if (event && eventEmitter.isPrototypeOf(emitter)) {
-            emitter.on(event, function(data) {
+            emitter.on(event, function (data) {
                 console.log('event: ', event);
                 console.log('data: ', data);
                 self.getTopOwnedNode().setState({data: data});
             });
         }
     },
-    render: function() {
+    render: function () {
         if (!this.props.handler) {
             return null;
         }
@@ -44,19 +44,19 @@ module.exports = createReferableClass({
 
         var className = this.props.className || getTagName(this.props.handler).toLowerCase();
         var props = _(this.props)
-            .omit(['domPath', 'handler'])
+                .omit(['domPath', 'handler'])
 //            .pick(['emitter', 'updateEvent', 'superUpdateEvent', 'id', 'style', 'rawStyle'])
-            .assign(this.props.props, {
-                className: className,
-                datasource: this.props.data || this.props.store
-            })
-            .value()
-        ;
+                .assign(this.props.props, {
+                    className: className,
+                    datasource: this.props.data || this.props.store
+                })
+                .value()
+            ;
 
         var hooks = this.props.updateHook;
         hooks = hooks && (_.isArray(hooks) ? hooks : [hooks]);
         if (hooks && !_.isEmpty(hooks)) {
-            _.forEach(hooks, function(hook) {
+            _.forEach(hooks, function (hook) {
                 _.set(props, hook, this._updateStateAndNotify);
             }, this);
         }

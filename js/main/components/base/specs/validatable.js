@@ -11,9 +11,9 @@ var defaultStyle = require('../../../style/default');
 
 //private fields
 var ValidateState = {
-  DEFAULT: 0,
-  FAILED: 1,
-  SUCCESS: 2
+    DEFAULT: 0,
+    FAILED: 1,
+    SUCCESS: 2
 };
 
 //core module to export
@@ -26,15 +26,15 @@ module.exports = {
         validationAtServer: React.PropTypes.func,
         validationAtClient: React.PropTypes.func
     },
-    getInitialState: function() {
+    getInitialState: function () {
         return {validateState: ValidateState.DEFAULT, errorType: -1};
     },
-    validate: function() {
+    validate: function () {
         var fieldValues = {};
         var controls = this.props.controlsToValidate;
         controls = _.isArray(controls) ? controls : [controls];
 
-        var values = _.map(controls, function(control) {
+        var values = _.map(controls, function (control) {
             control = document.getElementById(control);
             var field = control.getAttribute('field') || control.id;
             var value = control.value;
@@ -52,7 +52,7 @@ module.exports = {
 
         //first validate at client end
         var isValidAtClient = _.isFunction(this.props.validationAtClient)
-            ? !! this.props.validationAtClient.apply(this, values)
+            ? !!this.props.validationAtClient.apply(this, values)
             : true;
 
         if (!isValidAtClient) {
@@ -65,9 +65,9 @@ module.exports = {
             : true;
 
         if (promise.isPrototypeOf(isValidAtServer)) {
-            return isValidAtServer.then(function() {
+            return isValidAtServer.then(function () {
                 return handleSuccess(self, fieldValues);
-            }, function(err) {
+            }, function (err) {
                 return handleError(self, err);
             });
         }
@@ -78,7 +78,7 @@ module.exports = {
 
         return handleSuccess(this, fieldValues);
     },
-    render: function() {
+    render: function () {
         if (!this.props.controlsToValidate) {
             console.error('no controlsToValidate props found in Validator');
             return null;
@@ -110,7 +110,7 @@ module.exports = {
             <label
                 style={makeStyle(this.props.style, style)}
                 className={this.props.className}
-            >
+                >
                 {message}
             </label>
         )
@@ -122,36 +122,36 @@ module.exports = {
 
 //private functions
 function doFocus(validator) {
-  if (validator.props.controlToFocus) {
-    document.getElementById(validator.props.controlToFocus).focus();
-  } else {
-    var controls = validator.props.controlsToValidate;
-    var control = _.isArray(controls) ? _.last(controls) : controls;
-    document.getElementById(control).focus();
-  }
+    if (validator.props.controlToFocus) {
+        document.getElementById(validator.props.controlToFocus).focus();
+    } else {
+        var controls = validator.props.controlsToValidate;
+        var control = _.isArray(controls) ? _.last(controls) : controls;
+        document.getElementById(control).focus();
+    }
 }
 
 function handleError(validator, error) {
-  validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
-  restoreDefaultStyleAfterChange(validator);
-  doFocus(validator);
-  throw new Error('invalid value');
+    validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
+    restoreDefaultStyleAfterChange(validator);
+    doFocus(validator);
+    throw new Error('invalid value');
 }
 
 function handleSuccess(validator, data) {
-  validator.setState({validateState: ValidateState.SUCCESS});
-  return data;
+    validator.setState({validateState: ValidateState.SUCCESS});
+    return data;
 }
 
 function restoreDefaultStyleAfterChange(validator) {
-  var controls = validator.props.controlsToValidate;
-  controls = _.isArray(controls) ? controls : [controls];
-  _.forEach(controls, function(c) {
-    var element = document.getElementById(c);
-    var onInput = function() {
-      element.removeEventListener("input", onInput);
-      validator.setState({validateState: ValidateState.DEFAULT});
-    };
-    element.addEventListener("input", onInput);
-  });
+    var controls = validator.props.controlsToValidate;
+    controls = _.isArray(controls) ? controls : [controls];
+    _.forEach(controls, function (c) {
+        var element = document.getElementById(c);
+        var onInput = function () {
+            element.removeEventListener("input", onInput);
+            validator.setState({validateState: ValidateState.DEFAULT});
+        };
+        element.addEventListener("input", onInput);
+    });
 }

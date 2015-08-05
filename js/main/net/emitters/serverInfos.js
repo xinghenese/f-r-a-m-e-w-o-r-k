@@ -7,7 +7,7 @@ var eventemitter = require('../../utils/eventemitter.thenable');
 
 var timestamp = +(new Date());
 var events = {
-  'serverInfos': "serverInfos_" + timestamp
+    'serverInfos': "serverInfos_" + timestamp
 };
 
 var emitter = module.exports = eventemitter.create();

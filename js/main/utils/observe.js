@@ -10,8 +10,8 @@ var Promise = require('./promise');
 function observeStore(store, predicate) {
     var performCheck;
 
-    return Promise.create(function(resolve) {
-        performCheck = function() {
+    return Promise.create(function (resolve) {
+        performCheck = function () {
             if (predicate.call(null, store)) {
                 console.log("predicate true");
                 resolve();
@@ -20,7 +20,7 @@ function observeStore(store, predicate) {
 
         store.addChangeListener(performCheck);
         performCheck();
-    }).finally(function() {
+    }).finally(function () {
         store.removeChangeListener(performCheck);
     });
 }
@@ -28,27 +28,27 @@ function observeStore(store, predicate) {
 var store = {
     _callback: null,
     _done: false,
-    addChangeListener: function(callback) {
+    addChangeListener: function (callback) {
         this._callback = callback;
     },
-    emitChange: function() {
+    emitChange: function () {
         this._callback();
     },
-    isDone: function() {
+    isDone: function () {
         return this._done;
     },
-    removeChangeListener: function(callback) {
+    removeChangeListener: function (callback) {
         this._callback = null;
     },
-    setDone: function() {
+    setDone: function () {
         this._done = true;
         this.emitChange();
     }
 };
 
-observeStore(store, function() {
+observeStore(store, function () {
     return store.isDone();
-}).then(function() {
+}).then(function () {
     console.log("done");
 });
 

@@ -13,7 +13,7 @@ var MessageConstants = {
         NEW_TO_OLD: 1,
         OLD_TO_NEW: 2
     },
-    parseMessageDirection: function(direction) {
+    parseMessageDirection: function (direction) {
         if (objects.isIntValue(direction, this.Direction.NEW_TO_OLD)) {
             return this.Direction.NEW_TO_OLD;
         }

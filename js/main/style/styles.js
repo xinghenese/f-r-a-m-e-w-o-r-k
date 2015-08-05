@@ -17,7 +17,7 @@ module.exports = {
 
 //private functions
 function makeStyle() {
-    return _.reduce(_.toArray(arguments), function(result, arg) {
+    return _.reduce(_.toArray(arguments), function (result, arg) {
         return _.assign(result, mixinStyle(arg));
     }, {});
 }
@@ -28,7 +28,7 @@ function mixinStyle(style) {
     if (_.isEmpty(style)) {
         return style;
     }
-    return _.reduce(style, function(memo, value, key) {
+    return _.reduce(style, function (memo, value, key) {
         if (!_.isObject(value) && !_.isFunction(value)) {
             return _.set(memo, key, value + "");
         } else if (_.isObject(value) && key === MIXIN_FIELD) {
@@ -51,7 +51,7 @@ function coverStyle(component, style) {
         || !component.props.children) {
         return;
     }
-    React.Children.forEach(component.props.children, function(child) {
+    React.Children.forEach(component.props.children, function (child) {
         var className = child.props.className;
 
     });

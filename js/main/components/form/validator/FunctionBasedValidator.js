@@ -14,7 +14,7 @@ var validatable = require('../../mixins/validatable');
 // exports
 var FunctionBasedValidator = React.createClass({
     mixins: [referable, validatable],
-    render: function() {
+    render: function () {
         return (
             <Validator
                 className={this.props.className}
@@ -34,7 +34,7 @@ module.exports = FunctionBasedValidator;
 
 // private functions
 function _validation(validator) {
-    return function() {
+    return function () {
         return validator.props.validateFunc();
     };
 }

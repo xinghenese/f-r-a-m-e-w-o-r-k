@@ -8,13 +8,13 @@ var userconfigs = require('../userconfig/userconfig');
 
 //core module to export
 module.exports = filter.create({
-    'processWritable': function(value, options) {
+    'processWritable': function (value, options) {
         if (options.needWrap) {
             return queryStringify(value);
         }
         return value;
     },
-    'processReadable': function(value, options) {
+    'processReadable': function (value, options) {
         if (options.needUnwrap) {
             return decodeURIComponent(value.replace(/[\r\n]/gm, ''));
         }

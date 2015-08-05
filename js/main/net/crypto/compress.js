@@ -10,10 +10,10 @@ var origin = require('./../base/origin');
 
 //core module to export
 module.exports = origin.extend({
-  compress: function(text, options){
-    return text;
-  },
-  decompress: function(hexText, options){
-    return hexText;
-  }
+    compress: function (text, options) {
+        return text;
+    },
+    decompress: function (hexText, options) {
+        return hexText;
+    }
 });

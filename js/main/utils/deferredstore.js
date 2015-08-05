@@ -31,21 +31,21 @@ var deferredData = require('./deferreddata');
  *    })
  */
 module.exports = origin.extend({
-    fetch: function(key) {
+    fetch: function (key) {
         return checkAndGetProp(this, key).fetch();
     },
-    fetchSync: function(key) {
+    fetchSync: function (key) {
         return checkAndGetProp(this, key).fetchSync();
     },
-    update: function(key, value, process) {
+    update: function (key, value, process) {
         checkAndGetProp(this, key).update(value, process);
         return this;
     },
-    init: function(data) {
+    init: function (data) {
         if (_.isPlainObject(data)) {
-            var emitter =  eventemitter.create();
+            var emitter = eventemitter.create();
             var _data = this._data = {};
-            _.forOwn(data, function(prop, key) {
+            _.forOwn(data, function (prop, key) {
                 prop = deferredData.isPrototypeOf(prop)
                     ? prop
                     : deferredData.create(prop.value, prop.monitor, emitter, key)
@@ -63,7 +63,7 @@ module.exports = origin.extend({
 function checkAndGetProp(store, key) {
     var prop = _.get(store._data, key);
     if (!deferredData.isPrototypeOf(prop)) {
-      throw new Error('no valid keys named ' + key + ' found in deferreddata: ', store);
+        throw new Error('no valid keys named ' + key + ' found in deferreddata: ', store);
     }
     return prop;
 }

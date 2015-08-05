@@ -16,7 +16,7 @@ var defaultColor = "#499dd9";
 
 //core module to export
 var Avatar = React.createClass({
-    render: function() {
+    render: function () {
         var name = this.props.name && this.props.name[0] || '';
         var img = name;
 
@@ -26,7 +26,7 @@ var Avatar = React.createClass({
                 src={this.props.src}
                 width="100%"
                 height="100%"
-            />;
+                />;
         }
 
         return (
@@ -39,7 +39,7 @@ var Avatar = React.createClass({
                     this.props.style,
                     {backgroundColor: getColor(this.props.index)}
                 )}
-            >
+                >
                 {img}
             </a>
         )

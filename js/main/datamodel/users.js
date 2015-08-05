@@ -18,12 +18,15 @@ var users = {
         return this._cursor;
     },
     getUser: function(userId) {
-        _.find(this._users, function(user) {
+        return _.find(this._users, function (user) {
             return user.getUserId() === userId;
         });
     },
+    getUsers: function() {
+        return _.clone(this._users);
+    },
     removeUser: function(userId) {
-        _.remove(this._users, function(user) {
+        _.remove(this._users, function (user) {
             return user.getUserId() === userId;
         });
     },

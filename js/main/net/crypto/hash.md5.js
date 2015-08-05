@@ -10,7 +10,7 @@ var hash = require('./hash');
 
 //core module to export
 module.exports = hash.create({
-  hashEncode: function(msg){
-    return CryptoJS.MD5(msg).toString();
-  }
+    hashEncode: function (msg) {
+        return CryptoJS.MD5(msg).toString();
+    }
 });

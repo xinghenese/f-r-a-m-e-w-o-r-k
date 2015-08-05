@@ -5,7 +5,7 @@
 
 // exports
 module.exports = {
-    formatTime: function(milliseconds) {
+    formatTime: function (milliseconds) {
         return new Date(milliseconds).toLocaleTimeString();
     }
 };
