@@ -50,7 +50,7 @@ var isAuthorized = false;
 //core module to export
 var socketconnection = module.exports = connection.extend({
     /**
-     *
+     * post the packet to server and then wait for the response.
      * @param packet {Object|String}
      * @returns {Q.Promise}
      */
@@ -69,6 +69,17 @@ var socketconnection = module.exports = connection.extend({
                 return post(packet);
             }
         });
+    },
+    /**
+     * monitor the incoming packet data with specified tag pushed by server
+     * @param tag {String}
+     * @returns {Q.Promise}
+     */
+    monitor: function (tag) {
+        if (!tag) {
+            throw new Error('invalid tag');
+        }
+        return authorize().repeat(get(String(tag)));
     },
     ping: ping,
     getState: function() {
