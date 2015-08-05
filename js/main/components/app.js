@@ -29,7 +29,7 @@ var app = {
         });
     },
     _handleLoginSuccess: function () {
-        router.transitionTo("chat", {t: "boy"}, {age: 8});
+        router.transitionTo("chat");
     },
     _onProfileLoaded: function () {
         console.log("profile loaded, after login success!");
@@ -50,7 +50,7 @@ var routes = (
         <Route name="phone" handle={WrappedPhoneForm}/>
         <Route name="country" handler={WrappedCountryForm}/>
         <Route name="code" handler={WrappedCodeForm}/>
-        <Route name="chat" path="/chat/:t" handler={Chat}/>
+        <Route name="chat" handler={Chat}/>
         <DefaultRoute handler={WrappedPhoneForm}/>
     </Route>
 );

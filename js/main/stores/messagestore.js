@@ -81,6 +81,10 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
     }
 });
 
+socketconnection.monitor("TM").then(function(data) {
+    _handleReceivedTalkMessage(data);
+});
+
 // private functions
 function _appendMessage(data) {
     data["tmstp"] = new Date().valueOf();
@@ -160,6 +164,18 @@ function _handleHistoryMessagesRequest(action) {
     }, function(error) {
         MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_MISSED, error);
     });
+}
+
+function _handleReceivedTalkMessage(data) {
+    var message = new Message(data);
+    if (objects.containsValuedProp(data, "msrid")) {
+        MessageStore.appendGroupMessage(message.getGroupId(), message);
+    } else if (objects.containsValuedProp(data, "msuid")) {
+        MessageStore.appendPrivateMessage(message.getUserId(), message);
+    } else {
+        console.error("Unknow type of talk message received");
+    }
+    MessageStore.emitChange();
 }
 
 function _handleSendTalkMessage(action) {

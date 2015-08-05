@@ -175,7 +175,6 @@ function startPromise(repeat, index, start) {
 
 function destroy(promises, index) {
     return function () {
-        console.log('delete');
         promises[index] = null;
         promises.splice(index, 1);
     }
