@@ -79,7 +79,7 @@ var socketconnection = module.exports = connection.extend({
         if (!tag) {
             throw new Error('invalid tag');
         }
-        return authorize().repeat(get(String(tag)));
+        return get(String(tag));
     },
     ping: ping,
     getState: function () {
