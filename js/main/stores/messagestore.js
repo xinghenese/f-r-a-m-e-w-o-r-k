@@ -81,6 +81,14 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
     }
 });
 
+/*
+socketconnection.request({
+    tag: "TM"
+}).then(function(msg) {
+    console.log("received: " + msg);
+});
+*/
+
 // private functions
 function _appendMessage(data) {
     data["tmstp"] = new Date().valueOf();
