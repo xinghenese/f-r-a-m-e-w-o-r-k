@@ -107,6 +107,7 @@ function _appendMessage(data) {
 
 function _appendMyMessage(data) {
     data["msuid"] = myself.uid;
+    data["unk"] = myself.nickname;
     return _appendMessage(data);
 }
 
@@ -272,14 +273,10 @@ function _handleSendTalkMessage(action) {
 function _handleHistoryMessagesResponse(response) {
     if (response.data.rmsg && response.data.rmsg.cvs && response.data.rmsg.cvs.length > 0) {
         _handleGroupHistoryMessages(response.data.rmsg.cvs);
-    } else {
-        console.log("no group history messages!");
     }
 
     if (response.data.pmsg && response.data.pmsg.cvs && response.data.pmsg.cvs.length > 0) {
         _handlePrivateHistoryMessages(response.data.pmsg.cvs);
-    } else {
-        console.log("no private history messages!");
     }
 
     // todo
