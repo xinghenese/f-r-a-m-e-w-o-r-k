@@ -18,12 +18,14 @@ var users = require('../../../datamodel/users');
 var EventTypes = require('../../../constants/eventtypes');
 var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
+var Button = require('../../form/control/Button');
 
 //core module to export
 var ChatMessageBox = React.createClass({
     getInitialState: function () {
         return {
             id: '',
+            name: '',
             type: '',
             inputEnabled: true,
             data: []
@@ -68,6 +70,8 @@ var ChatMessageBox = React.createClass({
 
         var data;
         var enabled = true;
+        var name;
+
         if (type === 'group') {
             var groupHistoryMessages = MessageStore.getGroupHistoryMessages(id);
             if (!groupHistoryMessages) {
@@ -86,6 +90,7 @@ var ChatMessageBox = React.createClass({
             var group = groups.getGroup(id);
             if (group) {
                 enabled = group.inGroup();
+                name = group.name();
             }
         } else if (type === 'private') {
             var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(id);
@@ -102,6 +107,10 @@ var ChatMessageBox = React.createClass({
                 userId: id,
                 messages: privateMessages
             };
+            var user = users.getUser(id);
+            if (user) {
+                name = user.name();
+            }
         }
 
         if (!data) {
@@ -115,14 +124,30 @@ var ChatMessageBox = React.createClass({
             _buildUserRenderObject(data, result);
         }
 
-        this.setState({data: result, id: id, type: type, inputEnabled: enabled});
+        this.setState({
+            data: result,
+            id: id,
+            name: name,
+            type: type,
+            inputEnabled: enabled
+        });
+
         _.defer(function() {
             emitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
         });
     },
+    _scrollToBottom: function () {
+        var messageList = React.findDOMNode(this.refs.messagelist);
+        if (messageList) {
+            messageList.scrollTop = messageList.scrollHeight;
+        }
+    },
     componentWillMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
+    },
+    componentDidUpdate: function () {
+        this._scrollToBottom();
     },
     componentWillUnmount: function () {
         MessageStore.removeChangeListener(this._updateMessages);
@@ -132,8 +157,12 @@ var ChatMessageBox = React.createClass({
         if (this.state.id) {
             return (
                 <div className="chat-message-box" style={makeStyle(style)}>
-                    <div className="chat-message-box-header" style={makeStyle(style.header)}/>
-                    <ChatMessageList data={this.state.data} style={style.chatmessagelist}/>
+                    <div className="chat-message-box-header" style={makeStyle(style.header)}>
+                        <Button value={Lang.close} style={makeStyle(style.header.button, style.header.button.close)} />
+                        <span>{this.state.name}</span>
+                        <Button value={Lang.modify} style={makeStyle(style.header.button, style.header.button.modify)} />
+                    </div>
+                    <ChatMessageList id="chat-message-list" ref="messagelist" data={this.state.data} style={style.chatmessagelist}/>
                     <ChatMessageToolbar
                         onSubmit={this._handleSubmit}
                         inputEnabled={this.state.inputEnabled}
@@ -148,7 +177,7 @@ var ChatMessageBox = React.createClass({
             <div className="chat-message-box" style={makeStyle(style)}>
                 <div className="chat-message-box-header" style={makeStyle(style.header)}/>
                 <div style={style.chattips}>{Lang.chatBoxTips}</div>
-                <div className="chat-message-box-header" style={makeStyle(style.footer)}/>
+                <div className="chat-message-box-footer" style={makeStyle(style.footer)}/>
             </div>
         );
     }
