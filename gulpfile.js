@@ -6,7 +6,7 @@ var isProduct = process.env.NODE_ENV === 'production';
 
 gulp.task('publish', ['build']);
 
-gulp.task('clean', function (done) {
+gulp.task('clean', function(done) {
     var del = require('del');
     del(['dist'], done);
 });
@@ -29,9 +29,9 @@ function bundlePayload(bundler) {
 
     bundler.add(glob('./js/main/stores/*.js', {sync: true}), {basedir: './'});
 
-    return function () {
+    return function() {
         return bundler.bundle()
-            .pipe(plumber(function (err) {
+            .pipe(plumber(function(err) {
                 console.error(err);
                 this.emit('end');
             }))
@@ -42,18 +42,18 @@ function bundlePayload(bundler) {
 
 gulp.task('build', ['clean'], bundlePayload(require('browserify')(browserifyOptions)));
 
-gulp.task('watch', ['clean'], function () {
+gulp.task('watch', ['clean'], function() {
     var moment = require('moment');
     var source = require('vinyl-source-stream');
     var watchify = require('watchify');
     var browserify = require('browserify');
     var bundler = watchify(browserify(browserifyOptions))
-        .on('error', function (err) {
+        .on('error', function(err) {
             console.error('err while watching');
             console.error(err);
             this.emit('end');
         })
-        .on('update', function () {
+        .on('update', function() {
             var label = moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated';
             console.time(label);
             bundle();
@@ -65,7 +65,7 @@ gulp.task('watch', ['clean'], function () {
 // endregion
 
 // region tests
-gulp.task('tests', function (done) {
+gulp.task('tests', function(done) {
     var path = require('path');
     var jest = require('jest-cli');
     // see http://facebook.github.io/jest/docs/api.html#config-options
@@ -73,16 +73,32 @@ gulp.task('tests', function (done) {
     jest.runCLI(options, path.join(__dirname, 'js'), done);
 });
 
-gulp.task('tests:tdd', function () {
+gulp.task('tests:tdd', function() {
     gulp.watch('./js/**/*.js', ['tests']);
 });
 // endregion
 
-gulp.task('local-serve', ['watch'], function () {
+gulp.task('local-serve', ['watch'], function() {
     return gulp.src('.')
         .pipe(require('gulp-webserver')({
             livereload: true
         }));
+});
+
+gulp.task('pack', ['build'], function() {
+    gulp.src('./images/*').pipe(gulp.dest('./pack/images')).on('end', function() {
+        gulp.src('./dist/*').pipe(gulp.dest('./pack/dist')).on('end', function() {
+            var asar = require('asar');
+            var src = 'pack';
+            var dest = 'app.asar';
+
+            asar.createPackage(src, dest, function() {
+                var del = require('del');
+                del(['pack']);
+                console.log("done.");
+            });
+        });
+    });
 });
 
 gulp.task('default', ['build']);
