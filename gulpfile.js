@@ -13,34 +13,40 @@ gulp.task('clean', function (done) {
 
 // region bundle
 var browserifyOptions = {
-    entries: ['./main.js'],
-    basedir: './js/',
-    transform: [require('reactify')],
-    debug: !isProduct,
+    entries: ['./app/demo.js'],
+    basedir: './js/main/',
+//    transform: [require('reactify')],
+    debug: isProduct,
     cache: {},
     packageCache: {},
     fullPaths: !isProduct
 };
 
 function bundlePayload(bundler) {
-    var glob = require('glob');
+//    var glob = require('glob');
     var source = require('vinyl-source-stream');
-    var plumber = require('gulp-plumber');
+//    var plumber = require('gulp-plumber');
 
-    bundler.require(glob('./js/main/stores/*.js', {sync: true}), {basedir: './'});
+//    bundler.require('./app/moduleB.js', {expose: 'moduleB'});
+
+    bundler.external('./moduleC.js');
+
+//    bundler.require('./app/moduleC.js');
+
+//    bundler.require(glob('./js/main/stores/*.js', {sync: true}), {basedir: './'});
 
     return function () {
         return bundler.bundle()
-            .pipe(plumber(function (err) {
-                console.error(err);
-                this.emit('end');
-            }))
-            .pipe(source('main.js'))
+//            .pipe(plumber(function (err) {
+//                console.error(err);
+//                this.emit('end');
+//            }))
+            .pipe(source('demo.js'))
             .pipe(gulp.dest('./dist'));
     };
 }
 
-gulp.task('build', ['clean'], bundlePayload(require('browserify')(browserifyOptions)));
+gulp.task('build',  bundlePayload(require('browserify')(browserifyOptions)));
 
 gulp.task('watch', ['clean'], function () {
     var moment = require('moment');
