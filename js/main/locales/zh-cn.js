@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    //login-phone form
+    // login-phone form
     "loginTitle": "网页版登录",
     "loginSubTitle": "请选择你所在的国家并输入手机号码",
     "next": "下一步",
@@ -21,11 +21,11 @@ module.exports = {
     "userNotExist": "该用户不存在！",
     "wrongPassword": "密码错误！",
 
-    //login-country form
+    // login-country form
     "countryFormTitle": "选择国家或地区",
     "countrySearchTips": "输入国家名称",
 
-    //login-code form
+    // login-code form
     "loginReset": "更改手机号码",
     "enterCode": "请输入验证码",
     "sendCodeNotice": "验证码已通过短信发送<br/>请在下面输入验证码",
@@ -42,11 +42,15 @@ module.exports = {
     "group": "群组",
     "contact": "联系人",
 
-    //userInfoBox
+    // user-info-box
     "mobile": "手机",
     "audioEnable": "声音",
     "notificationEnable": "桌面通知",
     "logout": "注销",
+
+    // chat-box
+    "close": "关闭",
+    "modify": "修改",
 
     // text alternatives of non-text messages
     "unknownMessage": "[未知消息]",
