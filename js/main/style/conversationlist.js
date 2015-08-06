@@ -57,19 +57,19 @@ module.exports = {
             //conversation-option
             conversation: {
                 inactive: {
-                    background: "url(/images/conversation.png) center center no-repeat"
+                    background: "url(images/conversation.png) center center no-repeat"
                 },
                 active: {
-                    background: "url(/images/conversation-active.png) center center no-repeat"
+                    background: "url(images/conversation-active.png) center center no-repeat"
                 }
             },
             //contacts-option
             contacts: {
                 inactive: {
-                    background: "url(/images/contact.png) center center no-repeat"
+                    background: "url(images/contact.png) center center no-repeat"
                 },
                 active: {
-                    background: "url(/images/contact-active.png) center center no-repeat"
+                    background: "url(images/contact-active.png) center center no-repeat"
                 }
             }
         }
