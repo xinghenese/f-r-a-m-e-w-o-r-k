@@ -1,6 +1,9 @@
 {
     "description": "An application for liao web client.",
     "private": true,
+    "name": "chaoxin",
+    "version": "0.1.0",
+    "main": "desktop.js",
     "scripts": {
         "test": "gulp tests"
     },

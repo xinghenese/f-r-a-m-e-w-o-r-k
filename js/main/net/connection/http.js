@@ -3,9 +3,9 @@
  */
 
 //dependencies
-var promise = require('../../utils/promise');
 var _ = require('lodash');
 var origin = require('../base/origin.js');
+var promise = require('../../utils/promise');
 
 //core module to export
 module.exports = origin.extend({
@@ -14,7 +14,7 @@ module.exports = origin.extend({
      * @param url
      * @returns {Q.Promise}
      */
-    'get': function (url) {
+    'get': function(url) {
         return request("GET", url, void 0);
     },
     /**
@@ -23,17 +23,17 @@ module.exports = origin.extend({
      * @param data
      * @returns {Q.Promise}
      */
-    'post': function (url, data) {
+    'post': function(url, data) {
         return request("POST", url, data);
     }
 });
 
 //private functions
 function request(method, url, data) {
-    return promise.create(function (resolve, reject, progress) {
+    return promise.create(function(resolve, reject, progress) {
         var xhr = new XMLHttpRequest();
 
-        xhr.onreadystatechange = function () {
+        xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
                     var res = xhr.responseText;
