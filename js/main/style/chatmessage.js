@@ -38,8 +38,9 @@ module.exports = {
     },
     //chatmessagelist
     chatmessagelist: {
-        height: "658px",
+        height: "600px",
         padding: "0 32px 0 38px",
+        overflowY: "auto",
         //chatmessage
         chatmessage: {
             paddingTop: "22px",
