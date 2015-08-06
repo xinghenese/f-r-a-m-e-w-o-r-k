@@ -17,14 +17,14 @@ var Settings = React.createClass({
     propTypes: {
         onSettings: React.PropTypes.func
     },
-    render: function() {
+    render: function () {
         var icon = (
             <img
                 alt={SETTINGS}
                 src={this.props.icon || iconPath}
                 width="100%"
                 height="100%"
-            />
+                />
         );
 
         return (
@@ -36,7 +36,7 @@ var Settings = React.createClass({
                     commonStyle.settings,
                     this.props.style
                 )}
-            >
+                >
                 {icon}
             </a>
         )

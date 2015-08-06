@@ -17,23 +17,23 @@ function Message(data) {
 module.exports = Message;
 
 // module initialization
-Message.prototype.getGroupId = function() {
-    return this._data["msrid"];
+Message.prototype.getGroupId = function () {
+    return parseInt(this._data["msrid"] || -1);
 };
 
-Message.prototype.getUserId = function() {
-    return this._data["msuid"];
+Message.prototype.getUserId = function () {
+    return parseInt(this._data["msuid"] || -1);
 };
 
-Message.prototype.getTargetUserIds = function() {
-    return this._data["mstuid"];
+Message.prototype.getTargetUserIds = function () {
+    return parseInt(this._data["mstuid"] || -1);
 };
 
-Message.prototype.getAtUserId = function() {
-    return this._data["atuid"];
+Message.prototype.getAtUserId = function () {
+    return parseInt(this._data["atuid"] || -1);
 };
 
-Message.prototype.getContent = function() {
+Message.prototype.getContent = function () {
     if (objects.hasHierarchicalProps(this._data, ["msg", "t"])) {
         return this._data["msg"]["t"];
     } else {
@@ -41,7 +41,7 @@ Message.prototype.getContent = function() {
     }
 };
 
-Message.prototype.getBriefText = function() {
+Message.prototype.getBriefText = function () {
     var type = this.getMessageType();
     switch (type) {
         case 0:
@@ -64,48 +64,50 @@ Message.prototype.getBriefText = function() {
             return Lang.contactMessage;
         case 11:
             return Lang.groupCardMessage;
+        default:
+            return Lang.unknownMessage;
     }
 };
 
-Message.prototype.getUuid = function() {
+Message.prototype.getUuid = function () {
     return this._data["uuid"];
 };
 
-Message.prototype.getUserNickname = function() {
+Message.prototype.getUserNickname = function () {
     return this._data["unk"];
 };
 
 /**
  * Conversation type of string, 0 for group, 1 for private.
  */
-Message.prototype.getConversationType = function() {
+Message.prototype.getConversationType = function () {
     return this._data["rmtp"];
 };
 
 /**
  * see http://wiki.topcmm.net/doku.php?id=wiki:liao_enum#msgtp
  */
-Message.prototype.getMessageType = function() {
+Message.prototype.getMessageType = function () {
     return parseInt(this._data["msgtp"]);
 };
 
-Message.prototype.getVersion = function() {
+Message.prototype.getVersion = function () {
     return this._data["ver"];
 };
 
-Message.prototype.getMinVersion = function() {
+Message.prototype.getMinVersion = function () {
     return this._data["minver"];
 };
 
-Message.prototype.getAltText = function() {
+Message.prototype.getAltText = function () {
     return this._data["alt"];
 };
 
-Message.prototype.getTimestamp = function() {
+Message.prototype.getTimestamp = function () {
     return parseInt(this._data["tmstp"]);
 };
 
-Message.prototype.getStatus = function() {
+Message.prototype.getStatus = function () {
     if (!objects.containsValuedProp(this, "_status")) {
         return MessageConstants.Status.UNKNOWN;
     }
@@ -113,6 +115,6 @@ Message.prototype.getStatus = function() {
     return this._status;
 };
 
-Message.prototype.setStatus = function(status) {
+Message.prototype.setStatus = function (status) {
     this._status = status;
 };

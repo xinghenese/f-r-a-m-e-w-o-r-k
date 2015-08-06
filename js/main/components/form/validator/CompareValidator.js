@@ -11,10 +11,10 @@ var createValidatableClass = require('../../base/creator/createValidatableClass'
 //core module to export
 module.exports = createValidatableClass({
     displayName: 'CompareValidator',
-    getDefaultProps: function() {
+    getDefaultProps: function () {
         return {validationAtClient: validation(this)};
     },
-    render: function() {
+    render: function () {
         if (!_.isUndefined(this.props.max) && !_.isUndefined(this.props.min)) {
             console.error('no max or min props found in CompareValidator');
             return null;
@@ -24,7 +24,7 @@ module.exports = createValidatableClass({
 
 //private functions
 function validation(validator) {
-    return function(value) {
+    return function (value) {
         return value >= validator.props.min && value <= validator.props.max;
     };
 }

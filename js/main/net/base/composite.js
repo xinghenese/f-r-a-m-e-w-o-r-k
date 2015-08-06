@@ -25,16 +25,16 @@ module.exports = {
      * @param defaultPolicy {Object}
      * @returns {null}
      */
-    create: function(configs, defaultPolicy) {
+    create: function (configs, defaultPolicy) {
         if (!isValidConfigs(configs)) {
             return null;
         }
-        var keys = _.reduce(configs.mixins, function(memo, mixin) {
+        var keys = _.reduce(configs.mixins, function (memo, mixin) {
             return _(mixin).keys().union(memo).value();
         }, []);
 
-        return _.reduce(keys, function(result, key) {
-            var args = _.reduce(configs.mixins, function(memo, mixin) {
+        return _.reduce(keys, function (result, key) {
+            var args = _.reduce(configs.mixins, function (memo, mixin) {
                 if (_.has(mixin, key)) {
                     _.set(result, key, _.get(mixin, key));
                 }
@@ -81,9 +81,9 @@ module.exports = {
 function chain() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduce(methods, function(memo, method) {
+        return _.reduce(methods, function (memo, method) {
             if (_.isFunction(method)) {
 //                return method.apply(this, _.unshift(args, memo));
                 return method.call(this, memo);
@@ -96,9 +96,9 @@ function chain() {
 function chainRight() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduceRight(methods, function(memo, method) {
+        return _.reduceRight(methods, function (memo, method) {
             if (_.isFunction(method)) {
 //                return method.apply(this, _.unshift(args, memo));
                 return method.call(this, memo);
@@ -111,9 +111,9 @@ function chainRight() {
 function sequence() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduce(methods, function(memo, method) {
+        return _.reduce(methods, function (memo, method) {
             if (_.isFunction(method)) {
                 method.apply(this, args);
             }
@@ -124,9 +124,9 @@ function sequence() {
 function sequenceRight() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduceRight(methods, function(memo, method) {
+        return _.reduceRight(methods, function (memo, method) {
             if (_.isFunction(method)) {
                 method.apply(this, args);
             }
@@ -137,9 +137,9 @@ function sequenceRight() {
 function merge() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduce(methods, function(memo, method) {
+        return _.reduce(methods, function (memo, method) {
             method = _.isFunction(method) ? method.apply(this, args) : method;
             return _.assign(memo, _.toPlainObject(method));
         }, {}, this);
@@ -149,9 +149,9 @@ function merge() {
 function mergeRight() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduceRight(methods, function(memo, method) {
+        return _.reduceRight(methods, function (memo, method) {
             method = _.isFunction(method) ? method.apply(this, args) : method;
             return _.assign(memo, _.toPlainObject(method));
         }, {}, this);
@@ -161,9 +161,9 @@ function mergeRight() {
 function queue() {
     var methods = _(arguments).rest().value();
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduce(methods, function(memo, method) {
+        return _.reduce(methods, function (memo, method) {
             method = _.isFunction(method) ? method.apply(this, args) : method;
             return _(memo).push(method).value();
         }, [], this);
@@ -173,9 +173,9 @@ function queue() {
 function queueRight() {
     var methods = _.toArray(arguments);
 
-    return function() {
+    return function () {
         var args = _.toArray(arguments);
-        return _.reduceRight(methods, function(memo, method) {
+        return _.reduceRight(methods, function (memo, method) {
             method = _.isFunction(method) ? method.apply(this, args) : method;
             return _(memo).push(method).value();
         }, [], this);

@@ -17,7 +17,7 @@ var MessageStore = require('../../../stores/messagestore');
 var Formats = require('../../../utils/formats');
 
 var ContactList = require('./contactlist');
-var ContactStore = require('../../../stores/contactstore');
+var ConversationAndContactStore = require('../../../stores/conversationandcontactstore');
 var Switcher = require('./conversationuserswitcher');
 var Settings = require('../../tools/Settings');
 
@@ -29,64 +29,78 @@ var listType = {
 
 //core module to export
 var ConversationBox = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         var messages = _getLastMessages();
         return {
             data: messages,
             displayData: messages,
             matchedMessages: null,
-            type: listType.conversation
+            type: listType.conversation,
+            groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         };
     },
-    _switchList: function(type) {
+    _switchList: function (type) {
         this.setState({type: listType[type] || listType.conversation});
     },
-    _filterData: function(data) {
-        console.log('data: ', data);
+    _filterData: function (data) {
         this.setState({
             displayData: data && _.indexBy(data.name, 'id') || this.state.data,
             matchedMessages: data && data.message
         });
     },
-    _updateMessages: function() {
+    _onGroupsAndContactsChanged: function() {
+        this.setState({
+            groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
+        });
+    },
+    _updateMessages: function () {
         var messages = _getLastMessages();
         this.setState({
             data: messages,
             displayData: messages
         });
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
+        ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
     },
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
+        ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
     },
-    render: function() {
+    render: function () {
         var matchedMessages = null;
         var matchedMessagesCount = null;
         var list = null;
-
-        console.log('ConversationBox.props.showSettings: ');
-        console.log(this.props.showSettings);
 
         if (this.state.matchedMessages) {
             matchedMessagesCount = (
                 <div
                     className="conversation-list-matchedmessages-gap"
                     style={style.gap}
-                >
+                    >
                     found {_.size(this.state.matchedMessages)} messages
                 </div>
             );
             matchedMessages = (
-                <ConversationList data={this.state.matchedMessages} />
+                <ConversationList data={this.state.matchedMessages}/>
             )
         }
 
         if (this.state.type === listType.contacts) {
-            list = (<ContactList data={ContactStore.getContacts()} />);
+            list = (
+                <ContactList
+                    data={this.state.groupsAndContacts}
+                    onSelect={this.props.onSelectConversation}
+                />
+            );
         } else if (this.state.type === listType.conversation) {
-            list = (<ConversationList data={this.state.displayData} />);
+            list = (
+                <ConversationList
+                    data={this.state.displayData}
+                    onSelect={this.props.onSelectConversation}
+                />
+            );
         }
 
         return (
@@ -104,19 +118,19 @@ var ConversationBox = React.createClass({
                             fields={['name', 'message']}
                             onSearch={this._filterData}
                             style={style.header.searchbar.search}
-                        />
+                            />
                         <Settings
                             className="conversation-list-settings"
                             onSettings={this.props.showSettings}
                             style={style.header.searchbar.settings}
-                        />
+                            />
                     </div>
                 </div>
 
                 <div
                     className="conversation-list-container"
                     style={style.body}
-                >
+                    >
                     {list}
                     {matchedMessagesCount}
                     {matchedMessages}
@@ -124,7 +138,7 @@ var ConversationBox = React.createClass({
 
                 <div className="conversation-list-box-footer"
                      style={makeStyle(style.footer)}
-                >
+                    >
                     <Switcher options={listType} onSwitch={this._switchList}/>
                 </div>
             </div>
@@ -137,8 +151,8 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = {};
-    _.forEach(lastMessages, function(item) {
+    var result = []
+    _.forEach(lastMessages, function (item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
         } else {
@@ -161,7 +175,7 @@ function _buildGroupRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = Formats.formatTime(item.message.getTimestamp());
     }
-    _.set(collector, item.groupId, {
+    collector.push({
         name: groupName,
         senderName: groupName,
         senderAvatar: avatar,
@@ -185,13 +199,13 @@ function _buildUserRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = Formats.formatTime(item.message.getTimestamp());
     }
-    _.set(collector, item.userId, {
+    collector.push({
         name: userName,
         senderName: userName,
         senderAvatar: avatar,
         message: message,
         time: time,
         id: item.userId,
-        type: 'private'
+        type: 'user'
     });
 }

@@ -3,12 +3,12 @@
  */
 
 module.exports = {
-  'INITIALIZING': 0,
-  'INITIALIZED': 1,
-  'CONNECTING': 2,
-  'CONNECTED': 3,
+    'INITIALIZING': 0,
+    'INITIALIZED': 1,
+    'CONNECTING': 2,
+    'CONNECTED': 3,
 //    'AUTHORIZING': 4,
 //    'AUTHORIZED': 5,
-  'CLOSING': 6,
-  'CLOSED': 7
+    'CLOSING': 6,
+    'CLOSED': 7
 }

@@ -17,7 +17,7 @@ var token = require('./filter.token');
 
 //core module to export
 module.exports = {
-    createFilter: function(tag) {
+    createFilter: function (tag) {
         switch (tag) {
             case 'json':
                 return json;

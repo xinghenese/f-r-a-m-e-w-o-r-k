@@ -28,15 +28,15 @@ function modifyOwnedTopNode(spec) {
 
     var modifyFunc = spec.modifyOwnedTopNode;
 
-    _.set(spec, 'render', function(element) {
+    _.set(spec, 'render', function (element) {
         if (!React.isValidElement(element)) {
             return null;
         }
 
         return React.cloneElement(
-           element,
-           modifyFunc.call(this, element),
-           element.props.children
+            element,
+            modifyFunc.call(this, element),
+            element.props.children
         );
     });
     delete spec.modifyOwnedTopNode;
@@ -51,7 +51,7 @@ function modifyOwnedNodes(spec) {
 
     var modifyFunc = spec.modifyOwnedNodes;
 
-    _.set(spec, 'render', function(element) {
+    _.set(spec, 'render', function (element) {
         if (!React.isValidElement(element)) {
             return null;
         }
@@ -59,7 +59,7 @@ function modifyOwnedNodes(spec) {
         var ownees = traverse.processSubNodes(
             element,
             modifyFunc,
-            function(child, element) {
+            function (child, element) {
                 if (!child.ref) return true;
             },
             this
@@ -83,7 +83,7 @@ function modifyDescendants(spec) {
 
     var modifyFunc = spec.modifyDescendants;
 
-    _.set(spec, 'render', function(element) {
+    _.set(spec, 'render', function (element) {
         if (!React.isValidElement(element)) {
             return null;
         }

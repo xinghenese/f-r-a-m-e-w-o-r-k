@@ -72,7 +72,7 @@ module.exports = {
                 fontSize: "12px",
                 padding: "0 0 20px 10px"
             }
-      }
+        }
     },
     //toolbar
     toolbar: {
@@ -99,7 +99,7 @@ module.exports = {
             width: "530px"
         },
         //inputFocus
-        inputFocus:{
+        inputFocus: {
             borderBottom: "2px #499dd9 solid"
         },
         //emoji
@@ -114,7 +114,7 @@ module.exports = {
             background: "#499dd9",
             cursor: "pointer"
             //test
-            ,display:"none"
+            , display: "none"
         },
         //send
         send: {

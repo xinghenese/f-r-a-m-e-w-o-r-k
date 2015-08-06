@@ -8,54 +8,69 @@ var eventEmitter = require('./eventemitter');
 var promise = require('./promise');
 var repeat = require('./repeat');
 
-console.log('Emitter: ', eventEmitter);
-
 //core module to export
 module.exports = eventEmitter.extend({
-  'on': on,
-  'once': once
-}, ['on', 'once']);
+    on: on,
+    once: once,
+    conditionalOnce: conditionalOnce
+}, ['on', 'once', 'conditionalOnce']);
 
-function on(event, callback){
-  if(this._onceTag){
-    eventEmitter.on.call(this, event, callback);
-    this._onceTag = false;
-    return this;
-  }
-  var self = this;
+function on(event, callback) {
+    if (this._onceTag) {
+        eventEmitter.on.call(this, event, callback);
+        this._onceTag = false;
+        return this;
+    }
+    var self = this;
 
-  return repeat.create(function(resolve, reject){
-    eventEmitter.on.call(self, event, function(msg){
-      if(!msg){
-        reject('empty message received');
-        return;
-      }
-      resolve(msg);
+    return repeat.create(function (resolve, reject) {
+        eventEmitter.on.call(self, event, function (msg) {
+            if (!msg) {
+                reject('empty message received');
+                return;
+            }
+            resolve(msg);
+        })
+    }).then(function (msg) {
+        return _.isFunction(callback) ? callback(msg) : msg;
     })
-  }).then(function(msg){
-    return _.isFunction(callback) ? callback(msg) : msg;
-  })
 }
 
-function once(event, callback){
-  var self = this;
+function once(event, callback) {
+    var self = this;
 
-  return promise.create(function(resolve, reject){
-    //eventEmitter.once would eventually invoke this.on. here we set
-    //a flag in order to invoke original eventEmitter.on instead of
-    //the overridden this.on.
-    self._onceTag = true;
-    eventEmitter.once.call(self, event, function(msg){
-      console.log('once.event.Type: ', event);
-      console.log('once.event.Data: ', msg);
-      if(!msg){
-        reject('empty message received');
-        return;
-      }
-      resolve(msg);
-    })
-  }).then(function(msg){
-    console.log('then.msg: ', msg);
-    return _.isFunction(callback) ? callback(msg) : msg;
-  })
+    return promise.create(function (resolve, reject) {
+        //eventEmitter.once would eventually invoke this.on. here we set
+        //a flag in order to invoke original eventEmitter.on instead of
+        //the overridden this.on.
+        self._onceTag = true;
+        eventEmitter.once.call(self, event, function (msg) {
+            if (!msg) {
+                reject('empty message received');
+                return;
+            }
+            resolve(msg);
+        });
+    }).then(function (msg) {
+        return _.isFunction(callback) ? callback(msg) : msg;
+    });
+}
+
+function conditionalOnce(event, predicate, timeout, callback) {
+    var self = this;
+
+    return promise.create(function (resolve, reject) {
+        self._onceTag = true;
+        var timer = _.delay(reject, timeout, "timeout");
+        var callback = function (msg) {
+            if (predicate(msg)) {
+                clearTimeout(timer);
+                eventEmitter.removeListener.call(self, event, callback);
+                resolve(msg);
+            }
+        };
+        eventEmitter.on.call(self, event, callback);
+    }).then(function (msg) {
+        return _.isFunction(callback) ? callback(msg) : msg;
+    });
 }

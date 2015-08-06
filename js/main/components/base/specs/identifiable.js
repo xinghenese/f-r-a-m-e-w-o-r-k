@@ -12,14 +12,14 @@ var indexMap = {};
 //core module to export
 module.exports = {
     displayName: 'Identifiable',
-    componentWillMount: function() {
+    componentWillMount: function () {
         var className = this.constructor.displayName;
         var index = _.get(indexMap, className) || 0;
 
         _.set(indexMap, className, index + 1);
         this._seq = this._seq || hyphenFormalize(className) + '-' + index + '-';
     },
-    getSeq: function() {
+    getSeq: function () {
         return createSeqIfNotExists(this);
     }
 };
@@ -40,7 +40,7 @@ function createSeqIfNotExists(component) {
 }
 
 function hyphenFormalize(str) {
-    return ('' + str).replace(/[A-Z]/g, function(match, offset) {
+    return ('' + str).replace(/[A-Z]/g, function (match, offset) {
         return (offset ? '-' : '') + match.toLowerCase();
     })
 }

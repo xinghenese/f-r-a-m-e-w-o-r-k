@@ -5,7 +5,9 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var EventTypes = require('../../../constants/eventtypes');
 var commonStyle = require('../../../style/common');
+var emitter = require('../../../utils/eventemitter');
 var theme = require('../../../style/default');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -21,36 +23,44 @@ var index = 0;
 
 //core module to export
 var MultilineInputBox = React.createClass({
-    _generateChildren: function() {
-        return React.Children.map(this.props.children, function(child, key) {
+    _generateChildren: function () {
+        return React.Children.map(this.props.children, function (child, key) {
             return React.cloneElement(child, {
                 id: 'key-' + key
             });
         });
     },
-    _handleSubmit: function(event) {
+    _focusInput: function() {
+        var self = this;
+        _.defer(function() {
+            React.findDOMNode(self.refs[self._seq]).focus();
+        });
+    },
+    _handleSubmit: function (event) {
         this.props.onSubmit(event);
     },
-    _onInputBlur: function(event) {
-        event.target.placeholder = this.props.defaultValue;
-    },
-    _onInputFocus: function(event) {
-        event.target.placeholder = "";
-    },
-    _onKeyDown: function(event) {
+    _onKeyDown: function (event) {
         if (event.keyCode == KeyCodes.ENTER && !event.ctrlKey) {
             event.preventDefault();
             event.stopPropagation();
             this._handleSubmit(event);
+        } else if (this.props.onKeyDown) {
+            this.props.onKeyDown(event);
         }
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         this._seq = prefix + (index++);
     },
-    render: function() {
+    componentDidMount: function() {
+        emitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
+    },
+    componentWillUnmount: function() {
+        emitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
+    },
+    render: function () {
         var props = this.props;
         var style = props.style || {};
-        var visibleWidth = _.find([props.width, style.width, theme.width], function(width) {
+        var visibleWidth = _.find([props.width, style.width, theme.width], function (width) {
             return LENGTH_REG.test(width);
         });
         var actualWidth = visibleWidth && (+visibleWidth.replace('px', '')) + SCROLLBAR_WIDTH + 'px';
@@ -69,8 +79,6 @@ var MultilineInputBox = React.createClass({
                     rows={props.initialRows || 1}
                     onChange={onChange(this)}
                     onKeyDown={this._onKeyDown}
-                    onFocus={this._onInputFocus}
-                    onBlur={this._onInputBlur}
                     ref={this._seq}
                     style={makeStyle(commonStyle.textarea, theme.textarea, style, textAreaWidthStyle)}
                     >
@@ -85,7 +93,7 @@ module.exports = MultilineInputBox;
 
 //private functions
 function onChange(box) {
-    return function(event) {
+    return function (event) {
         var target = event.currentTarget;
 
         //notify the renderer to recalculate the scrollHeight prop.

@@ -8,35 +8,49 @@ var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var Form = require('./../../form/Form');
 var Button = require('./../../form/control/Button');
+var EventTypes = require('../../../constants/eventtypes');
+var KeyCodes = require('../../../constants/keycodes');
 var TextArea = require('./../../form/control/MultilineInputBox');
 var Submit = require('./../../form/control/Submit');
 var Lang = require('../../../locales/zh-cn');
+var emitter = require('../../../utils/eventemitter');
 var objects = require('../../../utils/objects');
 
 //core module to export
 var toolbar = module.exports = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             time: '',
             message: ''
         }
     },
-    _handleInputChange: function(event) {
+    _handleInputChange: function (event) {
         this.setState({
             time: new Date(),
             message: event.target.value
         })
     },
-    _handleTextAreaSubmit: function(event) {
+    _handleInputKeyDown: function(event) {
+        if (!event || !event.target || !_.isEmpty(event.target.value)) {
+            return;
+        }
+
+        if (event.keyCode === KeyCodes.UP) {
+            emitter.emit(EventTypes.SELECT_PREVIOUS_CONVERSATION);
+        } else if (event.keyCode === KeyCodes.DOWN) {
+            emitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
+        }
+    },
+    _handleTextAreaSubmit: function (event) {
         this.refs.form.submit(event);
     },
-    _handleSubmit: function(event) {
+    _handleSubmit: function (event) {
         if (objects.containsValuedProp(event.data, "chat-message-input") &&
             _.trim(event.data["chat-message-input"]).length > 0) {
             this.props.onSubmit(event);
         }
     },
-    render: function() {
+    render: function () {
         var style = this.props.style;
         if (!this.props.inputEnabled) {
             return (
@@ -75,6 +89,7 @@ var toolbar = module.exports = React.createClass({
                     className="chat-message-toolbar-input"
                     defaultValue={Lang.chatMessageInputTips}
                     style={style.input}
+                    onKeyDown={this._handleInputKeyDown}
                     onSubmit={this._handleTextAreaSubmit}
                     >
                     <div className="dev"/>

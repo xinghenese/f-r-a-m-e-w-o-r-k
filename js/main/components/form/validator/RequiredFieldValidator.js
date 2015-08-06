@@ -12,7 +12,7 @@ var createValidatableClass = require('../../base/creator/createValidatableClass'
 //core module to export
 module.exports = createValidatableClass({
     displayName: 'RequiredFieldValidator',
-    getDefaultProps: function() {
+    getDefaultProps: function () {
         return {validationAtClient: validation};
     }
 });
@@ -25,7 +25,7 @@ function validation() {
 //    console.log('validating');
     return _(arguments)
         .toArray()
-        .every(function(arg) {
+        .every(function (arg) {
             return arg !== void 0 && arg !== '';
         });
 }

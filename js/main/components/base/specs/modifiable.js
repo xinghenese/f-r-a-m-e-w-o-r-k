@@ -12,7 +12,7 @@ var helper = require('../helper/helper');
 
 //core module to export
 module.exports = {
-    render: function(element) {
+    render: function (element) {
         if (!React.isValidElement(element)) {
             return null;
         }

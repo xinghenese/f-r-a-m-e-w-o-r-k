@@ -2,8 +2,8 @@
 
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var HttpConnection = require('../net/connection/httpconnection');
-var SocketConnection = require('../net/connection/socketconnection');
+//var HttpConnection = require('../net/connection/httpconnection');
+//var SocketConnection = require('../net/connection/socketconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
@@ -12,6 +12,7 @@ var ChangeableStore = require('./changeablestore');
 var keyMirror = require('keymirror');
 var myself = require('../datamodel/myself');
 var userconfig = require('../net/userconfig/userconfig');
+var UUIDGenerator = require('../utils/uuidgenerator');
 
 //private fields
 var _requestAccount = {
@@ -46,20 +47,35 @@ var AccountStore = ChangeableStore.extend({
     _error: null,
     _verificationCodeState: VerificationCodeState.NOT_SENT,
     _loginState: LoginState.DEFAULT,
-    getCode: function() {
+    getCode: function () {
         return _requestAccount.code;
     },
-    getLoginState: function() {
+    getLoginState: function () {
         return this._loginState;
     },
-    getPhone: function() {
+    getPhone: function () {
         return _requestAccount.phone;
     },
-    getRequestType: function() {
+    getRequestType: function () {
         return _requestAccount.requestType;
     },
-    getVerificationCodeState: function() {
+    getVerificationCodeState: function () {
         return this._verificationCodeState;
+    },
+    getUid: function () {
+        return myself.uid;
+    },
+    getVersion: function () {
+        return myself.version;
+    },
+    getUUID: function () {
+        if (!myself.uuid) {
+            myself.uuid = UUIDGenerator.generate();
+        }
+        return myself.uuid;
+    },
+    getToken: function () {
+        return myself.token;
     }
 });
 
@@ -69,7 +85,7 @@ module.exports = AccountStore;
 AccountStore.VerificationCodeState = VerificationCodeState;
 AccountStore.LoginState = LoginState;
 
-AccountStore.dispatchToken = AppDispatcher.register(function(action) {
+AccountStore.dispatchToken = AppDispatcher.register(function (action) {
     switch (action.type) {
         case ActionTypes.LOGIN:
             _handleLoginRequest(action);
@@ -88,11 +104,13 @@ AccountStore.dispatchToken = AppDispatcher.register(function(action) {
 
 // private functions
 function _handleLoginRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     var data = {
         mid: action.phone,
         os: UserAgent.getOS(),
         di: UserAgent.getDeviceInfo(),
-        dv: Config.device
+        dv: myself.device
     };
     // code is optional, default to 86
     if (objects.containsValuedProp(action, "code")) {
@@ -103,12 +121,12 @@ function _handleLoginRequest(action) {
     HttpConnection.login({
         url: "usr/lg",
         data: data
-    }).then(function(response) {
+    }).then(function (response) {
         _handleLoginSuccess(response);
         _afterLogin();
         AccountStore._loginState = LoginState.SUCCESS;
         AccountStore.emitChange();
-    }, function() {
+    }, function () {
         AccountStore._loginState = LoginState.FAILED;
         AccountStore.emitChange();
     });
@@ -123,6 +141,9 @@ function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "uid", myself, "uid");
     objects.copyValuedProp(response, "unk", myself, "nickname");
     objects.copyValuedProp(response, "pt", myself, "avatar");
+    objects.copyValuedProp(response, "tk", myself, "token");
+    objects.copyValuedProp(response, "mid", myself, "mobileId");
+    objects.copyValuedProp(response, "cc", myself, "countryCode");
     objects.setTruePropIfNotZero(myself, "hasPassword", response.hp);
     objects.setTruePropIfNotZero(myself, "autoPlayDynamicEmotion", response.eape);
     objects.setTruePropIfNotZero(myself, "autoPlayPrivateDynamicEmotion", response.epape);
@@ -153,9 +174,11 @@ function _handleLoginSuccess(response) {
 }
 
 function _handleLogoutRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     HttpConnection.request({
         url: "usr/lo"
-    }).then(function(response) {
+    }).then(function (response) {
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.LOGOUT_SUCCESS);
@@ -164,12 +187,14 @@ function _handleLogoutRequest(action) {
                 AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
                 break;
         }
-    }, function(error) {
+    }, function (error) {
         AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
     });
 }
 
 function _handleRegisterRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
         mid: action.phone,
@@ -184,7 +209,7 @@ function _handleRegisterRequest(action) {
     HttpConnection.request({
         url: "usr/reg",
         data: data
-    }).then(function(response) {
+    }).then(function (response) {
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.REGISTER_SUCCESS, _stripStatusCodeInResponse(response));
@@ -211,12 +236,14 @@ function _handleRegisterRequest(action) {
                 AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
         }
-    }, function() {
+    }, function () {
         AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
     });
 }
 
 function _handleSwitchStatusRequest(action) {
+    var SocketConnection = require('../net/connection/socketconnection');
+
     SocketConnection.request({
         tag: "SS",
         data: {
@@ -226,6 +253,8 @@ function _handleSwitchStatusRequest(action) {
 }
 
 function _handleVerificationCodeRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     _updateAccount(action);
 
     var code = _removeLeadingPlusSignOfCode(action.code);
@@ -238,10 +267,10 @@ function _handleVerificationCodeRequest(action) {
     HttpConnection.request({
         url: "sms/sc",
         data: data
-    }).then(function() {
+    }).then(function () {
         AccountStore._verificationCodeState = VerificationCodeState.SENT;
         AccountStore.emitChange();
-    }, function(error) {
+    }, function (error) {
         switch (error) {
             case 1: // failed
             case 5: // invalid arguments

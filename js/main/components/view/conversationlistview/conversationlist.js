@@ -7,6 +7,7 @@ var _ = require('lodash');
 var React = require('react');
 var ConversationListItem = require('./conversationlistitem');
 var ConversationActions = require('../../../actions/conversationactions');
+var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -17,35 +18,102 @@ var protocols = require('../../../utils/protocols');
 //private fields
 var prefix = 'conversation-list-';
 var index = 0;
+var SELECT_REF_FIELD = 'selected';
 
 //core module to export
 var ConversationList = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {selectedIndex: -1};
     },
-    render: function() {
-        var conversationList = null;
+    _onSelect: function (event, offset) {
+        var lastSelectedItem = React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+        var target = event && event.currentTarget || lastSelectedItem;
 
-        if (this.props.data && !_.isEmpty(this.props.data)) {
-            conversationList = _.map(this.props.data, function(data, key) {
-                if (!isValidConversationData(data)) {
-                    return null;
-                }
-                return (
-                    <ConversationListItem
-                        key={prefix + key}
-                        time={data.time}
-                        senderName={data.senderName}
-                        senderAvatar={data.senderAvatar}
-                        index={prefix + key}
-                        onSelect={onselect(this)}
-                        selected={this.state.selectedIndex == key}
-                        >
-                        {data.message}
-                    </ConversationListItem>
-                );
-            }, this);
+        offset = Number(offset) || 0;
+        if (offset > 0) {
+            target = target && target.nextSibling;
+        } else if (offset < 0) {
+            target = target && target.previousSibling;
         }
+
+        if (!target || target === lastSelectedItem) {
+            return;
+        }
+
+        var index = target.getAttribute('data-conversation-index');
+        var type = target.getAttribute('data-conversation-type');
+
+        this.setState({selectedIndex: index});
+
+        if (type === "group") {
+            var group = groups.getGroup(index);
+            if (group && group.inGroup()) {
+                ConversationActions.joinConversation(
+                    protocols.toConversationType(type),
+                    index,
+                    null
+                );
+            }
+        } else {
+            ConversationActions.joinConversation(
+                protocols.toConversationType(type),
+                null,
+                index
+            );
+        }
+
+        this.props.onSelect({id: index, type: type});
+    },
+    _selectPreviousConversation: function () {
+        this._onSelect(null, -1);
+    },
+    _selectNextConversation: function () {
+        this._onSelect(null, 1);
+    },
+    componentDidMount: function () {
+        emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
+        emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+    },
+    componentWillUnmount: function () {
+        emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
+        emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+    },
+    render: function () {
+        var data = this.props.data;
+        if (!data || _.isEmpty(data)) {
+            return null;
+        }
+
+        var conversationList = _.map(data, function (data) {
+            if (!isValidConversationData(data)) {
+                return null;
+            }
+            var item = (
+                <ConversationListItem
+                    /* key */
+                    key={prefix + data.id}
+                    /* props */
+                    time={data.time}
+                    senderName={data.senderName}
+                    senderAvatar={data.senderAvatar}
+                    selected={this.state.selectedIndex == data.id}
+                    /* data-* attributes */
+                    conversationIndex={data.id}
+                    conversationType={data.type}
+                    /* event handler */
+                    onSelect={this._onSelect}
+                    onKeyPress={this._onKeyPress}
+                    >
+                    {data.message}
+                </ConversationListItem>
+            );
+
+            if (this.state.selectedIndex == data.id) {
+                item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
+            }
+            return item;
+
+        }, this);
 
         return (
             <ul className="chat-message-list"
@@ -53,7 +121,7 @@ var ConversationList = React.createClass({
                 >
                 {conversationList}
             </ul>
-        )
+        );
     }
 });
 
@@ -63,29 +131,7 @@ module.exports = ConversationList;
 
 
 //private functions
-function onselect(list) {
-    return function(event) {
-        var index = event.currentTarget.id.replace(/\D/g, '');
-        var type = _.get(list.props.data, index).type;
-        list.setState({selectedIndex: index});
-        if (type === "group") {
-            var group = groups.getGroup(index);
-            if (group) {
-                if (group.inGroup()) {
-                    ConversationActions.joinConversation(protocols.toConversationType(type), index, null);
-                }
-            }
-        } else {
-            ConversationActions.joinConversation(protocols.toConversationType(type), null, index);
-        }
-        emitter.emit('select', {
-            id: index,
-            type: type
-        });
-    };
-}
-
 function isValidConversationData(data) {
     //TODO: why data.message here can be empty.
-    return data && !_.isEmpty(data) && data.senderName;
+    return data && !_.isEmpty(data);// && data.senderName;
 }

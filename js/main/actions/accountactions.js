@@ -4,7 +4,7 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 var ActionTypes = require('../constants/actiontypes');
 
 module.exports = {
-    checkVerificationCode: function(code, phone, verificationType, verificationCode) {
+    checkVerificationCode: function (code, phone, verificationType, verificationCode) {
         AppDispatcher.dispatch({
             type: ActionTypes.CHECK_VERIFICATION_CODE,
             code: code,
@@ -13,7 +13,7 @@ module.exports = {
             verificationCode: verificationCode
         });
     },
-    login: function(code, phone, verificationCode) {
+    login: function (code, phone, verificationCode) {
         AppDispatcher.dispatch({
             type: ActionTypes.LOGIN,
             code: code,
@@ -21,12 +21,12 @@ module.exports = {
             verificationCode: verificationCode
         });
     },
-    logout: function() {
+    logout: function () {
         AppDispatcher.dispatch({
             type: ActionTypes.LOGOUT
         });
     },
-    register: function(code, phone, nickname, device, deviceInfo, os, avatar, verificationCode) {
+    register: function (code, phone, nickname, device, deviceInfo, os, avatar, verificationCode) {
         AppDispatcher.dispatch({
             type: ActionTypes.REGISTER,
             code: code,
@@ -38,7 +38,7 @@ module.exports = {
             verificationCode: verificationCode
         });
     },
-    requestVerificationCode: function(code, phone, requestType, codeType) {
+    requestVerificationCode: function (code, phone, requestType, codeType) {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_VERIFICATION_CODE,
             code: code,
@@ -47,7 +47,7 @@ module.exports = {
             codeType: codeType || 1 // text code, by default
         });
     },
-    switchStatus: function(type) {
+    switchStatus: function (type) {
         AppDispatcher.dispatch({
             type: ActionTypes.SWITCH_STATUS,
             statusType: type

@@ -33,9 +33,9 @@ module.exports = {
         fontSize: "12px",
         lineHeight: "20px",
         wrapper: {
-          padding: "5px 0 5px 5px",
-          outline: "1px #ececec solid",
-          background: "#fff"
+            padding: "5px 0 5px 5px",
+            outline: "1px #ececec solid",
+            background: "#fff"
         }
     },
     button: {

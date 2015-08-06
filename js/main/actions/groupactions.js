@@ -9,7 +9,7 @@ var AppDispatcher = require('../dispatchers/appdispatcher');
 
 // exports
 module.exports = {
-    requestGroupMembers: function(groupId) {
+    requestGroupMembers: function (groupId) {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_GROUP_MEMBERS,
             groupId: groupId

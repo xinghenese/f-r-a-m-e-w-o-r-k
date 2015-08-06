@@ -27,6 +27,7 @@ function bundlePayload(bundler) {
     var source = require('vinyl-source-stream');
 //    var plumber = require('gulp-plumber');
 
+
 //    bundler.require('./app/moduleB.js', {expose: 'moduleB'});
 
     bundler.external('./moduleC.js');
@@ -34,6 +35,7 @@ function bundlePayload(bundler) {
 //    bundler.require('./app/moduleC.js');
 
 //    bundler.require(glob('./js/main/stores/*.js', {sync: true}), {basedir: './'});
+
 
     return function () {
         return bundler.bundle()
@@ -57,6 +59,7 @@ gulp.task('watch', ['clean'], function () {
         .on('error', function (err) {
             console.error('err while watching');
             console.error(err);
+            this.emit('end');
         })
         .on('update', function () {
             var label = moment().format('YYYY-MM-DD hh:mm:ss') + ' - Updated';
@@ -83,9 +86,11 @@ gulp.task('tests:tdd', function () {
 });
 // endregion
 
-gulp.task('local-serve', ['clean'], function () {
+gulp.task('local-serve', ['watch'], function () {
     return gulp.src('.')
-        .pipe(require('gulp-webserver')());
+        .pipe(require('gulp-webserver')({
+            livereload: true
+        }));
 });
 
 gulp.task('default', ['build']);

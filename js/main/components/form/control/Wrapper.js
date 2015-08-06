@@ -12,10 +12,10 @@ var createDownWalkableClass = require('../../base/creator/createDownWalkableClas
 //core module to export
 module.exports = React.createClass({
     displayName: 'ControlWrapper',
-    render: function() {
-      return (
-        <div style={makeStyle(this.props.style)}>{this.props.children}</div>
-      )
+    render: function () {
+        return (
+            <div style={makeStyle(this.props.style)}>{this.props.children}</div>
+        )
     }
 });
 
@@ -24,8 +24,8 @@ module.exports = React.createClass({
 
 //private functions
 function getCSSClassPath(className) {
-  if (!className) {
-    return className;
-  }
-  return className.replace('-', '.');
+    if (!className) {
+        return className;
+    }
+    return className.replace('-', '.');
 }

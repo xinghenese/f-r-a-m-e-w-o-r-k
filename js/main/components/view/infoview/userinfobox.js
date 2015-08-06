@@ -20,14 +20,14 @@ var UserInfoBox = React.createClass({
     propTypes: {
         onLogout: React.PropTypes.func
     },
-    getDefaultProps: function() {
+    getDefaultProps: function () {
         return {user: {}};
 
     },
-    render: function() {
+    render: function () {
         return (
             <div className="user-info-box" style={makeStyle(style)}>
-                <div className="user-info-box-header" style={makeStyle(style.header)} />
+                <div className="user-info-box-header" style={makeStyle(style.header)}/>
                 <div className="user-info-box-body" style={makeStyle(style.body)}>
                     <div className="user-info-avatar" style={makeStyle(style.body.avatarRow)}>
                         <Avatar
@@ -35,7 +35,7 @@ var UserInfoBox = React.createClass({
                             index={this.props.user.id || 3234}
                             src={this.props.user.avatar}
                             style={makeStyle(style.body.avatarRow.avatar)}
-                        />
+                            />
                         <span>{this.props.user.name || 'hello'}</span>
                     </div>
                     <div className="user-info-content">
@@ -47,21 +47,21 @@ var UserInfoBox = React.createClass({
                         </div>
                         <div className="user-info-audio-enable" style={makeStyle(style.body.contentRow)}>
                             <span>{Lang.audioEnable}</span>
-                            <SwitchButton style={makeStyle(style.body.contentRow.infoSwitch)} />
+                            <SwitchButton style={makeStyle(style.body.contentRow.infoSwitch)}/>
                         </div>
                         <div className="user-info-notification-enable" style={makeStyle(style.body.contentRow)}>
                             <span>{Lang.notificationEnable}</span>
-                            <SwitchButton style={makeStyle(style.body.contentRow.infoSwitch)} />
+                            <SwitchButton style={makeStyle(style.body.contentRow.infoSwitch)}/>
                         </div>
                         <Button
                             className="user-info-log-out-button"
                             value={Lang.logout}
                             style={style.body.logoutButton}
                             onClick={this.props.onLogout}
-                        />
+                            />
                     </div>
                 </div>
-                <div className="user-info-box-footer" style={makeStyle(style.footer)} />
+                <div className="user-info-box-footer" style={makeStyle(style.footer)}/>
             </div>
         )
     }
