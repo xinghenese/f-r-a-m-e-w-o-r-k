@@ -57,8 +57,11 @@ var toolbar = module.exports = React.createClass({
     _showModificationToolbar: function (event) {
         this.setState({modifyEnable: !!(event && event.modifyEnable)});
     },
-    componentWillMount: function () {
+    componentDidMount: function () {
         emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+    },
+    componentWillUnmount: function () {
+        emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
     },
     render: function () {
         var style = this.props.style;

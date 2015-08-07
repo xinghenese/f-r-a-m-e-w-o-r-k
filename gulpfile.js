@@ -1,6 +1,8 @@
 'use strict';
 
 var gulp = require('gulp');
+var electron = require('gulp-electron');
+var packageJson = require('./package.json');
 var isDev = process.env.NODE_ENV === 'development';
 var isProduct = process.env.NODE_ENV === 'production';
 
@@ -99,6 +101,31 @@ gulp.task('pack', ['build'], function() {
             });
         });
     });
+});
+
+gulp.task('electron', function() {
+    gulp.src('./images/*').pipe(gulp.dest('./pack/images')).on('end', function() {
+        gulp.src('./dist/*').pipe(gulp.dest('./pack/dist')).on('end', function() {
+            gulp.src("./pack").pipe(electron({
+                src: './pack',
+                packageJson: packageJson,
+                release: './release',
+                cache: './cache',
+                version: '0.1',
+                packaging: true,
+                platforms: ['darwin-x64'],
+                platformResources: {
+                    darwin: {
+                        CFBundleDisplayName: packageJson.name,
+                        CFBundleIdentifier: packageJson.name,
+                        CFBundleName: packageJson.name,
+                        CFBundleVersion: packageJson.version
+                    }
+                }
+            })).pipe(gulp.dest(""));
+        });
+    });
+
 });
 
 gulp.task('default', ['build']);

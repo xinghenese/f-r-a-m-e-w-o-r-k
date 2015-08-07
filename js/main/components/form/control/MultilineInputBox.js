@@ -30,12 +30,6 @@ var MultilineInputBox = React.createClass({
             });
         });
     },
-    _focusInput: function() {
-        var self = this;
-        _.defer(function() {
-            React.findDOMNode(self.refs[self._seq]).focus();
-        });
-    },
     _handleSubmit: function (event) {
         this.props.onSubmit(event);
     },
@@ -51,11 +45,11 @@ var MultilineInputBox = React.createClass({
     componentWillMount: function () {
         this._seq = prefix + (index++);
     },
-    componentDidMount: function() {
-        emitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
-    },
-    componentWillUnmount: function() {
-        emitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
+    focus: function() {
+        var self = this;
+        _.defer(function() {
+            React.findDOMNode(self.refs[self._seq]).focus();
+        });
     },
     render: function () {
         var props = this.props;

@@ -148,7 +148,7 @@ var ChatMessageBox = React.createClass({
     _modifyCurrentChat: function () {
         emitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: true});
     },
-    componentWillMount: function () {
+    componentDidMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
     },

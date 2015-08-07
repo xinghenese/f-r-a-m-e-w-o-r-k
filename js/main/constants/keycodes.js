@@ -6,6 +6,7 @@
 var KeyCodes = {
     DOWN: 40,
     ENTER: 13,
+    ESCAPE: 27,
     UP: 38
 };
 

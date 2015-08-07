@@ -28,7 +28,10 @@ app.on('ready', function() {
     mainWindow = new BrowserWindow({
         "width": 1000,
         "height": 725,
-        "overlay-scrollbars": false
+        "min-width": 1000,
+        "min-height": 725,
+        "max-width": 1000,
+        "max-height": 725
     });
 
     // and load the index.html of the app.
