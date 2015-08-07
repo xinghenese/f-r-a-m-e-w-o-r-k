@@ -5,31 +5,41 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var KeyCodes = require('../../constants/keycodes');
 var makeStyle = require('../../style/styles').makeStyle;
 var commonStyle = require('../../style/common');
 var defaultStyle = require('../../style/default');
 var emitter = require('../../utils/eventemitter.thenable');
 var setStyle = require('../../style/styles').setStyle;
 
-//private fields
-
-
 //core module to export
 var Search = React.createClass({
     propTypes: {
         searchFunction: React.PropTypes.func
     },
-    componentDidUpdate: function (preProps) {
+    componentDidUpdate: function(preProps) {
         if (!_.isEqual(preProps.datasource, this.props.datasource)) {
             this._doSearch();
         }
     },
-    _doSearch: function (event) {
+    _doSearch: function(event) {
         if (_.isFunction(this.props.onSearch)) {
             this.props.onSearch(startSearch(this, event));
         }
     },
-    render: function () {
+    _onKeyDown: function(event) {
+        if (_.isFunction(this.props.onKeyDown)) {
+            this.props.onKeyDown(event);
+        }
+    },
+    clear: function() {
+        React.findDOMNode(this.refs.searchInput).value = "";
+        this._doSearch();
+    },
+    focus: function() {
+        React.findDOMNode(this.refs.searchInput).focus();
+    },
+    render: function() {
         return (
             <input
                 type="text"
@@ -39,7 +49,9 @@ var Search = React.createClass({
                 onChange={this._doSearch}
                 onBlur={onBlur}
                 onFocus={onFocus}
+                onKeyDown={this._onKeyDown}
                 style={makeStyle(commonStyle.input, this.props.style)}
+                ref="searchInput"
                 />
         )
     }
@@ -66,8 +78,8 @@ function startSearch(search, event) {
             fields = [fields];
         }
 
-        _.forEach(fields, function (field) {
-            var subResult = _.reduce(datasource, function (memo, data) {
+        _.forEach(fields, function(field) {
+            var subResult = _.reduce(datasource, function(memo, data) {
                 if (data[field] && (data[field] + '').indexOf(searchText) > -1) {
                     memo.push(data);
                 }

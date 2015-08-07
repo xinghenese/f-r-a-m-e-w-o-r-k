@@ -142,7 +142,7 @@ var ChatMessageBox = React.createClass({
             messageList.scrollTop = messageList.scrollHeight;
         }
     },
-    componentWillMount: function () {
+    componentDidMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
     },

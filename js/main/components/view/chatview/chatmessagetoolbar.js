@@ -24,6 +24,9 @@ var toolbar = module.exports = React.createClass({
             message: ''
         }
     },
+    _focusInput: function() {
+        this.refs.form.refs.textArea.focus();
+    },
     _handleInputChange: function (event) {
         this.setState({
             time: new Date(),
@@ -39,6 +42,8 @@ var toolbar = module.exports = React.createClass({
             emitter.emit(EventTypes.SELECT_PREVIOUS_CONVERSATION);
         } else if (event.keyCode === KeyCodes.DOWN) {
             emitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
+        } else if (event.keyCode === KeyCodes.ESCAPE) {
+            emitter.emit(EventTypes.ESCAPE_MESSAGE_INPUT);
         }
     },
     _handleTextAreaSubmit: function (event) {
@@ -49,6 +54,12 @@ var toolbar = module.exports = React.createClass({
             _.trim(event.data["chat-message-input"]).length > 0) {
             this.props.onSubmit(event);
         }
+    },
+    componentDidMount: function() {
+        emitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
+    },
+    componentWillUnmount: function() {
+        emitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusInput);
     },
     render: function () {
         var style = this.props.style;
@@ -91,6 +102,7 @@ var toolbar = module.exports = React.createClass({
                     style={style.input}
                     onKeyDown={this._handleInputKeyDown}
                     onSubmit={this._handleTextAreaSubmit}
+                    ref="textArea"
                     >
                     <div className="dev"/>
                 </TextArea>
