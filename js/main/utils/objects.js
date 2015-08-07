@@ -46,6 +46,7 @@ module.exports = {
         return _.isPlainObject(obj) && prop in obj;
     },
     mergeObjects: function (obj1, obj2) {
+        // FIXME: replace with _.create(obj1, obj2)
         var result = {};
         for (var attr in obj1) {
             result[attr] = obj1[attr];

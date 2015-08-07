@@ -2,8 +2,8 @@
 
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var HttpConnection = require('../net/connection/httpconnection');
-var SocketConnection = require('../net/connection/socketconnection');
+//var HttpConnection = require('../net/connection/httpconnection');
+//var SocketConnection = require('../net/connection/socketconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
@@ -12,6 +12,7 @@ var ChangeableStore = require('./changeablestore');
 var keyMirror = require('keymirror');
 var myself = require('../datamodel/myself');
 var userconfig = require('../net/userconfig/userconfig');
+var UUIDGenerator = require('../utils/uuidgenerator');
 
 //private fields
 var _requestAccount = {
@@ -60,6 +61,21 @@ var AccountStore = ChangeableStore.extend({
     },
     getVerificationCodeState: function () {
         return this._verificationCodeState;
+    },
+    getUid: function () {
+        return myself.uid;
+    },
+    getVersion: function () {
+        return myself.version;
+    },
+    getUUID: function () {
+        if (!myself.uuid) {
+            myself.uuid = UUIDGenerator.generate();
+        }
+        return myself.uuid;
+    },
+    getToken: function () {
+        return myself.token;
     }
 });
 
@@ -88,11 +104,13 @@ AccountStore.dispatchToken = AppDispatcher.register(function (action) {
 
 // private functions
 function _handleLoginRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     var data = {
         mid: action.phone,
         os: UserAgent.getOS(),
         di: UserAgent.getDeviceInfo(),
-        dv: Config.device
+        dv: myself.device
     };
     // code is optional, default to 86
     if (objects.containsValuedProp(action, "code")) {
@@ -123,6 +141,9 @@ function _handleLoginSuccess(response) {
     objects.copyValuedProp(response, "uid", myself, "uid");
     objects.copyValuedProp(response, "unk", myself, "nickname");
     objects.copyValuedProp(response, "pt", myself, "avatar");
+    objects.copyValuedProp(response, "tk", myself, "token");
+    objects.copyValuedProp(response, "mid", myself, "mobileId");
+    objects.copyValuedProp(response, "cc", myself, "countryCode");
     objects.setTruePropIfNotZero(myself, "hasPassword", response.hp);
     objects.setTruePropIfNotZero(myself, "autoPlayDynamicEmotion", response.eape);
     objects.setTruePropIfNotZero(myself, "autoPlayPrivateDynamicEmotion", response.epape);
@@ -153,6 +174,8 @@ function _handleLoginSuccess(response) {
 }
 
 function _handleLogoutRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     HttpConnection.request({
         url: "usr/lo"
     }).then(function (response) {
@@ -170,6 +193,8 @@ function _handleLogoutRequest(action) {
 }
 
 function _handleRegisterRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     var code = _removeLeadingPlusSignOfCode(action.code);
     var data = {
         mid: action.phone,
@@ -217,6 +242,8 @@ function _handleRegisterRequest(action) {
 }
 
 function _handleSwitchStatusRequest(action) {
+    var SocketConnection = require('../net/connection/socketconnection');
+
     SocketConnection.request({
         tag: "SS",
         data: {
@@ -226,6 +253,8 @@ function _handleSwitchStatusRequest(action) {
 }
 
 function _handleVerificationCodeRequest(action) {
+    var HttpConnection = require('../net/connection/httpconnection');
+
     _updateAccount(action);
 
     var code = _removeLeadingPlusSignOfCode(action.code);
