@@ -116,7 +116,6 @@ var ConversationBox = React.createClass({
             list = (
                 <ConversationList
                     data={this.state.displayData}
-                    onSelect={this.props.onSelectConversation}
                     />
             );
         }

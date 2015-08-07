@@ -15,22 +15,6 @@ var setStyle = require('../../../style/styles').setStyle;
 
 //core module to export
 var ConversationListItem = React.createClass({
-    _hoverIn: function (event) {
-        if (!this.props.selected) {
-            setStyle(
-                React.findDOMNode(this).style,
-                style.conversationlist.item.hover
-            );
-        }
-    },
-    _hoverOut: function () {
-        if (!this.props.selected) {
-            setStyle(
-                React.findDOMNode(this).style,
-                style.conversationlist.item.default
-            );
-        }
-    },
     render: function () {
         var currentStyle = style.conversationlist.item.default;
 
@@ -38,25 +22,20 @@ var ConversationListItem = React.createClass({
             currentStyle = style.conversationlist.item.active;
         }
 
+        var liProps = _.omit(this.props, ['style', 'className', 'senderName', 'senderAvatar', 'time', 'unreadCount', 'senderName']);
+
         return (
             <li
-                className="conversation-list-item"
-                /* data-* attributes */
-                data-conversation-index={this.props.conversationIndex}
-                data-conversation-type={this.props.conversationType}
-                /* event handler */
-                onClick={this.props.onSelect}
-                onMouseEnter={this._hoverIn}
-                onMouseLeave={this._hoverOut}
-                /* style */
+                className={this.props.className + '-item'}
                 style={makeStyle(style.conversationlist.item, currentStyle)}
+                {...liProps}
                 >
                 <Avatar
                     className="conversation-list-item-avatar"
                     /* props */
                     name={this.props.senderName}
                     src={this.props.senderAvatar}
-                    index={this.props.conversationIndex}
+                    index={this.props['data-item-id']}
                     /* style */
                     style={style.conversationlist.item.avatar}
                 />

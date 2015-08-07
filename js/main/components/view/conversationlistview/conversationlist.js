@@ -15,60 +15,33 @@ var emitter = require('../../../utils/eventemitter');
 var groups = require('../../../datamodel/groups');
 var protocols = require('../../../utils/protocols');
 
+var createGenerator = require('../../base/creator/createReactClassGenerator');
+var listableMixin = require('../../base/specs/list/listable');
+var selectableMixin = require('../../base/specs/list/selectable');
+
 //private fields
-var prefix = 'conversation-list-';
-var index = 0;
-var SELECT_REF_FIELD = 'selected';
+var createListClass = createGenerator({
+    mixins: [selectableMixin, listableMixin]
+});
+
 
 //core module to export
-var ConversationList = React.createClass({
-    getInitialState: function () {
-        return {selectedIndex: -1};
-    },
-    _onSelect: function (event, offset) {
-        var lastSelectedItem = React.findDOMNode(this.refs[SELECT_REF_FIELD]);
-        var target = event && event.currentTarget || lastSelectedItem;
-
-        offset = Number(offset) || 0;
-        if (offset > 0) {
-            target = target && target.nextSibling;
-        } else if (offset < 0) {
-            target = target && target.previousSibling;
+module.exports = createListClass({
+    displayName: 'ConversationList',
+    getDefaultProps: function () {
+        return {
+            onHoverIn: defaultOnHoverIn,
+            onHoverOut: defaultOnHoverOut,
+            onSelect: defaultOnSelect,
+            className: "chat-message-list",
+            style: makeStyle(style.conversationlist)
         }
-
-        if (!target || target === lastSelectedItem) {
-            return;
-        }
-
-        var index = target.getAttribute('data-conversation-index');
-        var type = target.getAttribute('data-conversation-type');
-
-        this.setState({selectedIndex: index});
-
-        if (type === "group") {
-            var group = groups.getGroup(index);
-            if (group && group.inGroup()) {
-                ConversationActions.joinConversation(
-                    protocols.toConversationType(type),
-                    index,
-                    null
-                );
-            }
-        } else {
-            ConversationActions.joinConversation(
-                protocols.toConversationType(type),
-                null,
-                index
-            );
-        }
-
-        this.props.onSelect({id: index, type: type});
     },
     _selectPreviousConversation: function () {
-        this._onSelect(null, -1);
+        this._onSiblingSelect(-1);
     },
     _selectNextConversation: function () {
-        this._onSelect(null, 1);
+        this._onSiblingSelect(1);
     },
     componentDidMount: function () {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
@@ -78,54 +51,25 @@ var ConversationList = React.createClass({
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    render: function () {
-        var data = this.props.data;
-        if (!data || _.isEmpty(data)) {
+
+    renderItem: function (data, props) {
+        if (!isValidConversationData(data)) {
             return null;
         }
 
-        var conversationList = _.map(data, function (data) {
-            if (!isValidConversationData(data)) {
-                return null;
-            }
-            var item = (
-                <ConversationListItem
-                    /* key */
-                    key={prefix + data.id}
-                    /* props */
-                    time={data.time}
-                    senderName={data.senderName}
-                    senderAvatar={data.senderAvatar}
-                    selected={this.state.selectedIndex == data.id}
-                    /* data-* attributes */
-                    conversationIndex={data.id}
-                    conversationType={data.type}
-                    /* event handler */
-                    onSelect={this._onSelect}
-                    onKeyPress={this._onKeyPress}
-                    >
-                    {data.message}
-                </ConversationListItem>
-            );
-
-            if (this.state.selectedIndex == data.id) {
-                item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
-            }
-            return item;
-
-        }, this);
+        var otherData = _.omit(data, ['id', 'type', 'message']);
 
         return (
-            <ul className="chat-message-list"
-                style={makeStyle(style.conversationlist, this.props.style)}
+            <ConversationListItem
+                data-conversation-type={data.type}
+                {...otherData}
+                {...props}
                 >
-                {conversationList}
-            </ul>
+                {data.message}
+            </ConversationListItem>
         );
     }
 });
-
-module.exports = ConversationList;
 
 //module initialization
 
@@ -134,4 +78,42 @@ module.exports = ConversationList;
 function isValidConversationData(data) {
     //TODO: why data.message here can be empty.
     return data && !_.isEmpty(data);// && data.senderName;
+}
+
+function defaultOnHoverIn (event) {
+    setStyle(
+        event.currentTarget.style,
+        style.conversationlist.item.hover
+    );
+}
+
+function defaultOnHoverOut (event) {
+    setStyle(
+        event.currentTarget.style,
+        style.conversationlist.item.default
+    );
+}
+
+function defaultOnSelect (event) {
+    var index = event.selectedId;
+    var target = event.currentTarget;
+    var type = target.getAttribute('data-conversation-type');
+
+    if (type === "group") {
+        var group = groups.getGroup(index);
+        if (group && group.inGroup()) {
+            ConversationActions.joinConversation(
+                protocols.toConversationType(type),
+                index,
+                null
+            );
+        }
+    } else {
+        ConversationActions.joinConversation(
+            protocols.toConversationType(type),
+            null,
+            index
+        );
+    }
+    emitter.emit('select', {id: index, type: type});
 }
