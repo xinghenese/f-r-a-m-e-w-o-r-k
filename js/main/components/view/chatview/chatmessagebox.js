@@ -142,6 +142,12 @@ var ChatMessageBox = React.createClass({
             messageList.scrollTop = messageList.scrollHeight;
         }
     },
+    _closeCurrentChat: function () {
+        this.setState({id: '', name: ''});
+    },
+    _modifyCurrentChat: function () {
+        emitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: true});
+    },
     componentWillMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
@@ -158,9 +164,17 @@ var ChatMessageBox = React.createClass({
             return (
                 <div className="chat-message-box" style={makeStyle(style)}>
                     <div className="chat-message-box-header" style={makeStyle(style.header)}>
-                        <Button value={Lang.close} style={makeStyle(style.header.button, style.header.button.close)} />
+                        <Button
+                            value={Lang.close}
+                            style={makeStyle(style.header.button, style.header.button.close)}
+                            onClick={this._closeCurrentChat}
+                        />
                         <span>{this.state.name}</span>
-                        <Button value={Lang.modify} style={makeStyle(style.header.button, style.header.button.modify)} />
+                        <Button
+                            value={Lang.modify}
+                            style={makeStyle(style.header.button, style.header.button.modify)}
+                            onClick={this._modifyCurrentChat}
+                        />
                     </div>
                     <ChatMessageList id="chat-message-list" ref="messagelist" data={this.state.data} style={style.chatmessagelist}/>
                     <ChatMessageToolbar

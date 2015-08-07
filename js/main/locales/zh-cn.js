@@ -33,9 +33,6 @@ module.exports = {
     "codeSuccess": "验证码匹配成功",
     "confirm": "确定",
     "cancel": "取消",
-    "send": "发送",
-    "accessory": "附",
-    "chatMessageInputTips": "Enter发送，Ctrl+Enter换行",
     "search": "搜索",
 
     "chatBoxTips": "请选择会话",
@@ -51,6 +48,14 @@ module.exports = {
     // chat-box
     "close": "关闭",
     "modify": "修改",
+
+    // chat-message-toolbar
+    "send": "发送",
+    "accessory": "附",
+    "chatMessageInputTips": "Enter发送，Ctrl+Enter换行",
+    "deleteMessage": "删除",
+    "forwardMessage": "转发",
+    "reply": "回复",
 
     // text alternatives of non-text messages
     "unknownMessage": "[未知消息]",
