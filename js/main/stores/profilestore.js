@@ -21,8 +21,7 @@ var ProfileStore = assign({}, EventEmitter.prototype, {
 });
 
 ProfileStore.dispatchToken = AppDispatcher.register(function (action) {
-    console.log("here");
-    switch (action.actionType) {
+    switch (action.type) {
         case ActionTypes.LOGIN:
             AppDispatcher.waitFor([AccountStore.dispatchToken]);
             ProfileStore.emitProfileLoaded();

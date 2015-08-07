@@ -6,8 +6,11 @@
 var _ = require('lodash');
 var React = require('react');
 var ConversationList = require('./conversationlist');
+var emitter = require('../../../utils/eventemitter');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
+var EventTypes = require('../../../constants/eventtypes');
+var KeyCodes = require('../../../constants/keycodes');
 var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
 var groups = require('../../../datamodel/groups');
@@ -29,7 +32,7 @@ var listType = {
 
 //core module to export
 var ConversationBox = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         var messages = _getLastMessages();
         return {
             data: messages,
@@ -39,36 +42,51 @@ var ConversationBox = React.createClass({
             groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         };
     },
-    _switchList: function (type) {
+    _switchList: function(type) {
         this.setState({type: listType[type] || listType.conversation});
     },
-    _filterData: function (data) {
+    _filterData: function(data) {
         this.setState({
             displayData: data && _.indexBy(data.name, 'id') || this.state.data,
             matchedMessages: data && data.message
         });
+    },
+    _focusSearchInput: function() {
+        this.refs.search.focus();
     },
     _onGroupsAndContactsChanged: function() {
         this.setState({
             groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         });
     },
-    _updateMessages: function () {
+    _onKeyDownInSearchBox: function(event) {
+        if (event.keyCode === KeyCodes.ESCAPE) {
+            var target = event.target;
+            if (_.isEmpty(target.value)) {
+                emitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
+            } else {
+                this.refs.search.clear();
+            }
+        }
+    },
+    _updateMessages: function() {
         var messages = _getLastMessages();
         this.setState({
             data: messages,
             displayData: messages
         });
     },
-    componentWillMount: function () {
+    componentDidMount: function() {
         ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
+        emitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
+        emitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
     },
-    render: function () {
+    render: function() {
         var matchedMessages = null;
         var matchedMessagesCount = null;
         var list = null;
@@ -92,14 +110,13 @@ var ConversationBox = React.createClass({
                 <ContactList
                     data={this.state.groupsAndContacts}
                     onSelect={this.props.onSelectConversation}
-                />
+                    />
             );
         } else if (this.state.type === listType.conversation) {
             list = (
                 <ConversationList
                     data={this.state.displayData}
-                    onSelect={this.props.onSelectConversation}
-                />
+                    />
             );
         }
 
@@ -117,7 +134,9 @@ var ConversationBox = React.createClass({
                             datasource={this.state.data}
                             fields={['name', 'message']}
                             onSearch={this._filterData}
+                            onKeyDown={this._onKeyDownInSearchBox}
                             style={style.header.searchbar.search}
+                            ref="search"
                             />
                         <Settings
                             className="conversation-list-settings"
@@ -151,8 +170,8 @@ module.exports = ConversationBox;
 //private functions
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
-    var result = []
-    _.forEach(lastMessages, function (item) {
+    var result = [];
+    _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
         } else {

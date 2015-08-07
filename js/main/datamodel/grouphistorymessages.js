@@ -18,7 +18,7 @@ var Message = require('./message');
 // exports
 function GroupHistoryMessages(data) {
     this._data = data;
-    this._messages = _parseMessages(this._data["tms"]);
+    this._messages = _parseMessages(this._data["tms"]).reverse();
 }
 
 module.exports = GroupHistoryMessages;
@@ -26,6 +26,10 @@ module.exports = GroupHistoryMessages;
 // module initialization
 GroupHistoryMessages.prototype.appendMessage = function (message) {
     this._messages.push(message);
+};
+
+GroupHistoryMessages.prototype.prependMessages = function(messages) {
+    this._messages = messages.concat(this._messages);
 };
 
 GroupHistoryMessages.prototype.getGroupId = function () {

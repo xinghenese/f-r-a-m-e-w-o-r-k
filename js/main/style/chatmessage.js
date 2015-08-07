@@ -9,12 +9,29 @@ module.exports = {
     height: "100%",
     top: '0',
     right: '0',
-    //header
+    // header
     header: {
         background: "#fafafa",
-        height: "48px"
+        height: "48px",
+        textAlign: "center",
+        lineHeight: "48px",
+        fontSize: "14px",
+        // button
+        button: {
+            height: "100%",
+            background: "transparent",
+            color: "#2482cc",
+            width: "50px",
+            // close button
+            close: {
+                float: "left"
+            },
+            modify: {
+                float: "right"
+            }
+        }
     },
-    //chattips
+    // chattips
     chattips: {
         position: 'absolute',
         width: '40%',
@@ -28,7 +45,7 @@ module.exports = {
         color: '#fff',
         borderRadius: '4px'
     },
-    //footer
+    // footer
     footer: {
         position: "absolute",
         bottom: "0",
@@ -36,14 +53,15 @@ module.exports = {
         width: '100%',
         background: "#fafafa"
     },
-    //chatmessagelist
+    // chatmessagelist
     chatmessagelist: {
-        height: "658px",
+        height: "600px",
         padding: "0 32px 0 38px",
-        //chatmessage
+        overflowY: "auto",
+        // chatmessage
         chatmessage: {
             paddingTop: "22px",
-            //avatar
+            // avatar
             avatar: {
                 boxSizing: "border-box",
                 float: "left",
@@ -56,16 +74,16 @@ module.exports = {
                 cursor: "pointer",
                 borderRadius: "50%"
             },
-            //messagebody
+            // messagebody
             messagebody: {
                 fontSize: "14px",
                 margin: "0 82px 0 54px",
-                //messagecontent
+                // messagecontent
                 messagecontent: {
                     color: "#313232"
                 }
             },
-            //time
+            // time
             time: {
                 float: "right",
                 color: "#939393",
@@ -74,7 +92,7 @@ module.exports = {
             }
         }
     },
-    //toolbar
+    // toolbar
     toolbar: {
         position: "absolute",
         bottom: "0",
@@ -82,7 +100,7 @@ module.exports = {
         background: "#fafafa",
         width: "100%",
         padding: "12px 0",
-        //accessory
+        // accessory
         accessory: {
             boxSizing: "border-box",
             float: "left",
@@ -94,15 +112,25 @@ module.exports = {
             cursor: "pointer",
             borderRadius: "4px"
         },
-        //input
+        // button
+        button: {
+            width: "70px",
+            height: "32px",
+            background: "#f1f1ee",
+            color: "#7c7c7b",
+            fontSize: "14px",
+            marginLeft: "18px",
+            borderRadius: "4px"
+        },
+        // input
         input: {
             width: "530px"
         },
-        //inputFocus
+        // inputFocus
         inputFocus: {
             borderBottom: "2px #499dd9 solid"
         },
-        //emoji
+        // emoji
         emoji: {
             boxSizing: "border-box",
             float: "right",
@@ -113,10 +141,10 @@ module.exports = {
             borderRadius: "50%",
             background: "#499dd9",
             cursor: "pointer"
-            //test
+            // test
             , display: "none"
         },
-        //send
+        // send
         send: {
             float: "right",
             width: "50px",

@@ -12,52 +12,56 @@ var Message = require('./message');
 // exports
 function PrivateHistoryMessages(data) {
     this._data = data;
-    this._messages = _parseMessages(this._data["tms"]);
+    this._messages = _parseMessages(this._data["tms"]).reverse();
 }
 
 module.exports = PrivateHistoryMessages;
 
 // module initialization
-PrivateHistoryMessages.prototype.appendMessage = function (message) {
+PrivateHistoryMessages.prototype.appendMessage = function(message) {
     this._messages.push(message);
 };
 
-PrivateHistoryMessages.prototype.getUserId = function () {
+PrivateHistoryMessages.prototype.prependMessages = function(messages) {
+    this._messages = messages.concat(this._messages);
+};
+
+PrivateHistoryMessages.prototype.getUserId = function() {
     return parseInt(this._data["uid"]);
 };
 
-PrivateHistoryMessages.prototype.getUnreadMessageCount = function () {
+PrivateHistoryMessages.prototype.getUnreadMessageCount = function() {
     return parseInt(this._data["urc"]);
 };
 
-PrivateHistoryMessages.prototype.noMoreMessages = function () {
+PrivateHistoryMessages.prototype.noMoreMessages = function() {
     return objects.getBool(this._data["ise"]);
 };
 
-PrivateHistoryMessages.prototype.getDirection = function () {
+PrivateHistoryMessages.prototype.getDirection = function() {
     var direction = this._data["etp"];
     return MessageConstants.parseMessageDirection(direction);
 };
 
-PrivateHistoryMessages.prototype.isDirectionChanged = function () {
+PrivateHistoryMessages.prototype.isDirectionChanged = function() {
     return "tp" in this._data;
 };
 
-PrivateHistoryMessages.prototype.getReadCursor = function () {
+PrivateHistoryMessages.prototype.getReadCursor = function() {
     return this._data["rcs"];
 };
 
-PrivateHistoryMessages.prototype.getCleanCursor = function () {
+PrivateHistoryMessages.prototype.getCleanCursor = function() {
     return this._data["ccs"];
 };
 
-PrivateHistoryMessages.prototype.getMessages = function () {
+PrivateHistoryMessages.prototype.getMessages = function() {
     return this._messages;
 };
 
 // private functions
 function _parseMessages(arr) {
-    return _.map(arr, function (v) {
+    return _.map(arr, function(v) {
         return new Message(v);
     });
 }

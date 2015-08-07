@@ -10,7 +10,7 @@ var commonStyle = require('../../style/common');
 
 //private fields
 var SETTINGS = 'Settings';
-var iconPath = '/images/settings.png';
+var iconPath = 'images/settings.png';
 
 //core module to export
 var Settings = React.createClass({

@@ -21,7 +21,8 @@ var toolbar = module.exports = React.createClass({
     getInitialState: function () {
         return {
             time: '',
-            message: ''
+            message: '',
+            modifyEnable: false
         }
     },
     _handleInputChange: function (event) {
@@ -50,8 +51,48 @@ var toolbar = module.exports = React.createClass({
             this.props.onSubmit(event);
         }
     },
+    _showInputToolbar: function () {
+        this.setState({modifyEnable: false});
+    },
+    _showModificationToolbar: function (event) {
+        this.setState({modifyEnable: !!(event && event.modifyEnable)});
+    },
+    componentDidMount: function () {
+        emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+    },
+    componentWillUnmount: function () {
+        emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+    },
     render: function () {
         var style = this.props.style;
+
+        if (this.state.modifyEnable) {
+            return (
+                <div className="chat-message-toolbar" style={makeStyle(style)}>
+                    <Button
+                        value={Lang.deleteMessage}
+                        onClick={this.props.deleteHandler}
+                        style={style.button}
+                        />
+                    <Button
+                        value={Lang.forwardMessage}
+                        onClick={this.props.deleteHandler}
+                        style={style.button}
+                        />
+                    <Button
+                        value={Lang.reply}
+                        onClick={this.props.deleteHandler}
+                        style={style.button}
+                        />
+                    <Button
+                        value={Lang.cancel}
+                        onClick={this._showInputToolbar}
+                        style={style.send}
+                        />
+                </div>
+            );
+        }
+
         if (!this.props.inputEnabled) {
             return (
                 <Button
@@ -60,6 +101,7 @@ var toolbar = module.exports = React.createClass({
                     />
             );
         }
+
         return (
             <Form
                 className="chat-message-toolbar"

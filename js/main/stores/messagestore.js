@@ -72,8 +72,14 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
         case ActionTypes.DELETE_PRIVATE_MESSAGES:
             _handleDeletePrivateMessages(action.id);
             break;
+        case ActionTypes.REQUEST_GROUP_HISTORY_MESSAGES:
+            _handleGroupHistoryMessagesRequest(action);
+            break;
         case ActionTypes.REQUEST_HISTORY_MESSAGES:
             _handleHistoryMessagesRequest(action);
+            break;
+        case ActionTypes.REQUEST_PRIVATE_HISTORY_MESSAGES:
+            _handlePrivateHistoryMessagesRequest(action);
             break;
         case ActionTypes.SEND_TALK_MESSAGE:
             _handleSendTalkMessage(action);
@@ -101,6 +107,7 @@ function _appendMessage(data) {
 
 function _appendMyMessage(data) {
     data["msuid"] = myself.uid;
+    data["unk"] = myself.nickname;
     return _appendMessage(data);
 }
 
@@ -144,6 +151,34 @@ function _handleDeletePrivateMessages(id) {
     }
 }
 
+function _handleGroupHistoryMessagesRequest(action) {
+    var groupHistoryMessages = MessageStore.getGroupHistoryMessages(action.groupId);
+    if (!groupHistoryMessages || _.isEmpty(groupHistoryMessages.getMessages())) {
+        return;
+    }
+
+    var first = _.first(groupHistoryMessages.getMessages());
+    socketconnection.request({
+        tag: "HM",
+        responseTag: "HM",
+        data: {
+            data: {
+                rmsg: {
+                    cvstp: 1, // request history message of single group
+                    cvs: [{
+                        rid: action.groupId,
+                        cs: first.getCursor(),
+                        tp: 1 // from new to old
+                    }]
+                }
+            }
+        }
+    }).then(function(response) {
+        _handleHistoryMessagesResponse(response);
+        MessageStore.emitChange();
+    });
+}
+
 function _handleHistoryMessagesRequest(action) {
     socketconnection.request({
         tag: "HM",
@@ -161,8 +196,32 @@ function _handleHistoryMessagesRequest(action) {
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
         MessageStore.emitChange();
-    }, function(error) {
-        MessageStore.emit(MessageStore.Events.HISTORY_MESSAGES_MISSED, error);
+    });
+}
+
+function _handlePrivateHistoryMessagesRequest(action) {
+    var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(action.userId);
+    if (!privateHistoryMessages || _.isEmpty(privateHistoryMessages.getMessages())) {
+        return;
+    }
+
+    var first = _.first(privateHistoryMessages.getMessages());
+    socketconnection.request({
+        tag: "HM",
+        responseTag: "HM",
+        data: {
+            pmsg: {
+                cvstp: 1, // request history messages of single user
+                cvs: [{
+                    uid: action.userId,
+                    cs: first.getCursor(),
+                    tp: 1
+                }]
+            }
+        }
+    }).then(function(response) {
+        _handleHistoryMessagesResponse(response);
+        MessageStore.emitChange();
     });
 }
 
@@ -214,14 +273,10 @@ function _handleSendTalkMessage(action) {
 function _handleHistoryMessagesResponse(response) {
     if (response.data.rmsg && response.data.rmsg.cvs && response.data.rmsg.cvs.length > 0) {
         _handleGroupHistoryMessages(response.data.rmsg.cvs);
-    } else {
-        console.log("no group history messages!");
     }
 
     if (response.data.pmsg && response.data.pmsg.cvs && response.data.pmsg.cvs.length > 0) {
         _handlePrivateHistoryMessages(response.data.pmsg.cvs);
-    } else {
-        console.log("no private history messages!");
     }
 
     // todo
@@ -234,15 +289,37 @@ function _handleGroupHistoryMessages(messages) {
             return;
         }
 
-        var groupHistoryMessages = new GroupHistoryMessages(v);
-        MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
+        var groupId = parseInt(v["rid"]);
+        var groupHistoryMessages = MessageStore.getGroupHistoryMessages(groupId);
+        if (groupHistoryMessages) {
+            var previousMessages = _.map(v["tms"], function(item) {
+                return new Message(item);
+            });
+            groupHistoryMessages.prependMessages(previousMessages.reverse());
+        } else {
+            groupHistoryMessages = new GroupHistoryMessages(v);
+            MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
+        }
     });
 }
 
 function _handlePrivateHistoryMessages(messages) {
     _.forEach(messages, function(v) {
-        var privateHistoryMessages = new PrivateHistoryMessages(v);
-        MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
+        if (!v["msuid"]) {
+            return;
+        }
+
+        var userId = parseInt(v["msuid"]);
+        var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
+        if (privateHistoryMessages) {
+            var previousMessages = _.map(v["tms"], function(item) {
+                return new Message(item);
+            });
+            privateHistoryMessages.prependMessages(previousMessages.reverse());
+        } else {
+            privateHistoryMessages = new PrivateHistoryMessages(v);
+            MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
+        }
     });
 }
 
