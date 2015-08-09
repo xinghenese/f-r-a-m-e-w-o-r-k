@@ -11,14 +11,31 @@ var makeStyle = require('../../../style/styles').makeStyle;
 
 //private fields
 var prefix = 'contact-group-';
+var SELECT_REF_FIELD = 'selected';
 
 //core module to export
 var ContactGroup = React.createClass({
-    _onSelect: function (event) {
-        var target = event.currentTarget;
+    getDefaultProps: function () {
+        return {selectedIndex: -1};
+    },
+    _onSelect: function (event, offset) {
+        var lastSelectedItem = React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+        var target = event && event.currentTarget || lastSelectedItem;
+
+        offset = Number(offset) || 0;
+        if (offset > 0) {
+            target = target && target.nextSibling;
+        } else if (offset < 0) {
+            target = target && target.previousSibling;
+        }
+
+        if (!target || target === lastSelectedItem) {
+            return;
+        }
 
         this.props.onSelect({
-            id: target.getAttribute('data-contact-id'),
+            itemId: target.getAttribute('data-contact-id'),
+            groupId: this.props.index,
             type: target.getAttribute('data-contact-type')
         });
     },
@@ -31,7 +48,7 @@ var ContactGroup = React.createClass({
         data = _.indexBy(data, 'id');
 
         var groups = _.map(data, function (data, key) {
-            return (
+            var item = (
                 <ContactItem
                     /* key */
                     key={prefix + key}
@@ -49,8 +66,14 @@ var ContactGroup = React.createClass({
                     contactType={this.props.groupType}
                     /* event handler */
                     onSelect={this._onSelect}
-                    />
+                />
             );
+
+            if (this.props.selectedIndex == key) {
+                item = React.cloneElement(item, {ref: SELECT_REF_FIELD});
+            }
+            return item;
+
         }, this);
 
         return (
