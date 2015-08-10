@@ -50,6 +50,8 @@ module.exports = {
                 return null;
             }
 
+            _.assign(itemProps.style, item.props.style);
+
             if (React.isValidElement(item) && item.type.toLowerCase() === 'li') {
                 return React.cloneElement(
                     item,

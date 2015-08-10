@@ -11,6 +11,7 @@ var setStyle = require('../../../../style/styles').setStyle;
 
 // private fields
 var SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
+var LAST_SELECT_REF_FIELD = fields.LAST_SELECT_REF_FIELD;
 var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 
 // exports
@@ -22,12 +23,12 @@ module.exports = {
         var target = event && event.currentTarget;
         var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
         var component = id && this.refs[id];
-        var selectedId = this.state.selectedId;
-        var selectedComponent = this.refs[SELECT_REF_FIELD];
+        var lastSelectedId = this.state.selectedId;
+        var lastSelectedComponent = this.refs[lastSelectedId];
 
         if (!component
-            || (selectedId && id == selectedId)
-            || (selectedComponent && component === selectedComponent)
+            || (lastSelectedId && id == lastSelectedId)
+            || (lastSelectedComponent && component === lastSelectedComponent)
         ) {
             return;
         }
@@ -36,12 +37,14 @@ module.exports = {
         if (_.isFunction(this.props.onSelect)) {
             this.props.onSelect(_.assign(event, {
                 selectedId: id,
-                currentComponent: component
+                currentComponent: component,
+                previousComponent: lastSelectedComponent
             }));
         }
     },
     _onSiblingSelect: function (offset) {
-        var currentSelectedItem = React.findDOMNode(this.refs[SELECT_REF_FIELD]);
+        var selectedComponent = this.refs[SELECT_REF_FIELD];
+        var currentSelectedItem = React.findDOMNode(selectedComponent);
         var target;
         offset = ~~(Number(offset));
 
@@ -79,10 +82,6 @@ module.exports = {
             selected: selected,
             onClick: this._onSelect
         };
-
-        if (selected) {
-            _.assign(props, {ref: SELECT_REF_FIELD});
-        }
 
         return React.cloneElement(item, props);
     }
