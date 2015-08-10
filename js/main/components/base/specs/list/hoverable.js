@@ -44,6 +44,16 @@ module.exports = {
                 currentComponent: component
             }));
         }
+    },
+    renderItem: function (item) {
+        if (!React.isValidElement(item)) {
+            return null;
+        }
+
+        return React.cloneElement(item, {
+            onMouseEnter: this._onHoverIn,
+            onMouseLeave: this._onHoverOut
+        });
     }
 };
 

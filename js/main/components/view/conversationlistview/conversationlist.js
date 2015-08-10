@@ -15,13 +15,15 @@ var emitter = require('../../../utils/eventemitter');
 var groups = require('../../../datamodel/groups');
 var protocols = require('../../../utils/protocols');
 
+var Avatar = require('../../avatar');
 var createGenerator = require('../../base/creator/createReactClassGenerator');
 var listableMixin = require('../../base/specs/list/listable');
 var selectableMixin = require('../../base/specs/list/selectable');
+var hoverableMixin = require('../../base/specs/list/hoverable');
 
 //private fields
 var createListClass = createGenerator({
-    mixins: [selectableMixin, listableMixin]
+    mixins: [selectableMixin, listableMixin, hoverableMixin]
 });
 
 
@@ -51,7 +53,7 @@ module.exports = createListClass({
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    
+
     renderItem: function (data, props, key) {
         if (!isValidConversationData(data)) {
             return null;
@@ -134,6 +136,7 @@ function defaultOnHoverOut(event) {
 
 function defaultOnSelect(event) {
     var index = event.selectedId;
+    var target = event.currentTarget;
     var component = event.currentComponent;
     var type = component.props['data-conversation-type'];
 

@@ -68,28 +68,23 @@ module.exports = {
             });
         }
     },
-    render: function (list) {
-        if (!React.isValidElement(list)) {
+    renderItem: function (item) {
+        if (!React.isValidElement(item)) {
             return null;
         }
 
-        var items = React.Children.map(list.props.children, function (child) {
-            var id = child.props[DATA_ITEM_ID_FIELD];
-            var selected = this.state.selectedId == id;
-            var props = {
-                selected: selected,
-                onClick: this._onSelect,
-                onMouseEnter: this._onHoverIn,
-                onMouseLeave: this._onHoverOut
-            };
+        var id = item.props[DATA_ITEM_ID_FIELD];
+        var selected = this.state.selectedId == id;
+        var props = {
+            selected: selected,
+            onClick: this._onSelect
+        };
 
-            if (selected) {
-                child = React.cloneElement(child, {ref: SELECT_REF_FIELD});
-            }
-            return React.cloneElement(child, props);
-        }, this);
+        if (selected) {
+            _.assign(props, {ref: SELECT_REF_FIELD});
+        }
 
-        return React.cloneElement(list, null, items);
+        return React.cloneElement(item, props);
     }
 };
 
