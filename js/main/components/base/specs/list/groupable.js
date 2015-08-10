@@ -5,8 +5,10 @@
 
 // dependencies
 var _ = require('lodash');
+var React = require('react');
 var fields = require('./fields');
 var listable = require('./listable');
+var makeStyle = require('../../../../style/styles').makeStyle;
 
 // private fields
 var SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
@@ -32,22 +34,28 @@ module.exports = {
             .set('style', makeStyle(this.props.style))
             .value();
 
-        data = _.groupBy(data, this.props.groupBy);
+        data = _.groupBy(data, this.groupBy);
 
         var groupClassName = this.props.className && this.props.className + '-group';
         var groupStyle = this.props.style && this.props.style.group || {};
+        var groupTitleClassName = groupClassName + '-title';
+        var groupTitleStyle = groupStyle && groupStyle.title || {};
 
         var list = _.map(data, function (data, key) {
             var id = data.id || key;
             var groupTitle = _.isFunction(this.renderGroupTitle)
-                && this.renderGroupTitle(data, id, this.props);
+                && this.renderGroupTitle(data, {
+                    className: groupTitleClassName,
+                    style: groupTitleStyle
+                }, id);
 
             var group = listable.render.call({
                 props: {
                     data: data,
                     className: groupClassName,
                     style: groupStyle
-                }
+                },
+                renderItem: this.renderItem
             });
 
             return [groupTitle, group];

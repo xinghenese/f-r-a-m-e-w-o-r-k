@@ -38,12 +38,12 @@ module.exports = {
                 key: itemId,
                 ref: itemId,
                 className: listClassName && listClassName + '-item',
-                style: listStyle.item
+                style: listStyle.item || {}
             })
                 .set(DATA_ITEM_ID_FIELD, itemId)
                 .value();
             var item = _.isFunction(this.renderItem)
-                && this.renderItem(data, itemId, _.clone(itemProps));
+                && this.renderItem(data, _.clone(itemProps), itemId);
 
             if (!item) {
                 return null;
@@ -62,6 +62,10 @@ module.exports = {
                 item
             );
         }, this);
+
+        console.log('list: ', list);
+
+        console.groupEnd();
 
         return (
             <ul {...listProps}>{list}</ul>
