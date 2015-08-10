@@ -51,7 +51,6 @@ module.exports = createListClass({
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    
     renderItem: function (data, props, key) {
         if (!isValidConversationData(data)) {
             return null;

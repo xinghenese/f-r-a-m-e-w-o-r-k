@@ -1,8 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
-var electron = require('gulp-electron');
-var packageJson = require('./package.json');
+var packager = require('electron-packager');
 var isDev = process.env.NODE_ENV === 'development';
 var isProduct = process.env.NODE_ENV === 'production';
 
@@ -87,45 +86,22 @@ gulp.task('local-serve', ['watch'], function() {
         }));
 });
 
-gulp.task('pack', ['build'], function() {
-    gulp.src('./images/*').pipe(gulp.dest('./pack/images')).on('end', function() {
-        gulp.src('./dist/*').pipe(gulp.dest('./pack/dist')).on('end', function() {
-            var asar = require('asar');
-            var src = 'pack';
-            var dest = 'app.asar';
-
-            asar.createPackage(src, dest, function() {
-                var del = require('del');
-                del(['pack']);
-                console.log("done.");
-            });
-        });
+gulp.task('package', ['build'], function() {
+    packager({
+        dir: ".",
+        name: "chaoxin",
+        platform: ["darwin"],
+        arch: "x64",
+        version: "0.30.3",
+        asar: true,
+		overwrite: true
+    }, function(err, appPath) {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log("done.\nthe package is located in: ", appPath);
+        }
     });
-});
-
-gulp.task('electron', function() {
-    gulp.src('./images/*').pipe(gulp.dest('./pack/images')).on('end', function() {
-        gulp.src('./dist/*').pipe(gulp.dest('./pack/dist')).on('end', function() {
-            gulp.src("./pack").pipe(electron({
-                src: './pack',
-                packageJson: packageJson,
-                release: './release',
-                cache: './cache',
-                version: '0.1',
-                packaging: true,
-                platforms: ['darwin-x64'],
-                platformResources: {
-                    darwin: {
-                        CFBundleDisplayName: packageJson.name,
-                        CFBundleIdentifier: packageJson.name,
-                        CFBundleName: packageJson.name,
-                        CFBundleVersion: packageJson.version
-                    }
-                }
-            })).pipe(gulp.dest(""));
-        });
-    });
-
 });
 
 gulp.task('default', ['build']);

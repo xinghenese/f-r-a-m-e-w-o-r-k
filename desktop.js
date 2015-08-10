@@ -6,6 +6,8 @@
 // dependencies
 var app = require('app');
 var BrowserWindow = require('browser-window');
+var EventTypes = require('./js/main/constants/eventtypes');
+var emitter = require('./js/main/utils/eventemitter');
 
 require('crash-reporter').start();
 
@@ -46,5 +48,12 @@ app.on('ready', function() {
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null;
+    });
+
+    // Handle notifications
+    var notifier = require('node-notifier');
+    emitter.on(EventTypes.SHOW_NOTIFICATION, function(notification) {
+        console.log("got notification");
+        notifier.notify(notification);
     });
 });
