@@ -18,45 +18,26 @@ module.exports = {
     getInitialState: function () {
         return {selectedId: -1};
     },
-    _onHoverIn: function (event) {
-        var target = event && event.currentTarget;
-
-        var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
-
-        if (!id || id === this.state.selectedId) {
-            return;
-        }
-
-        if (_.isFunction(this.props.onHoverIn)) {
-            this.props.onHoverIn(_.assign(event, {selectedId: id}));
-        }
-    },
-    _onHoverOut: function (event) {
-        var target = event && event.currentTarget;
-        var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
-
-        if (!id || id === this.state.selectedId) {
-            return;
-        }
-
-        if (_.isFunction(this.props.onHoverOut)) {
-            this.props.onHoverOut(_.assign(event, {selectedId: id}));
-        }
-    },
     _onSelect: function (event) {
         var target = event && event.currentTarget;
         var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
+        var component = id && this.refs[id];
+        var selectedId = this.state.selectedId;
+        var selectedComponent = this.refs[SELECT_REF_FIELD];
 
-        console.info('_onSelect: ', event);
-
-
-        if (!id || id === this.state.selectedId) {
+        if (!component
+            || (selectedId && id == selectedId)
+            || (selectedComponent && component === selectedComponent)
+        ) {
             return;
         }
         this.setState({selectedId: id});
 
         if (_.isFunction(this.props.onSelect)) {
-            this.props.onSelect(_.assign(event, {selectedId: id}));
+            this.props.onSelect(_.assign(event, {
+                selectedId: id,
+                currentComponent: component
+            }));
         }
     },
     _onSiblingSelect: function (offset) {
@@ -65,13 +46,15 @@ module.exports = {
         offset = ~~(Number(offset));
 
         if (offset > 0) {
-            target = currentSelectedItem.nextSibling;
+            target = currentSelectedItem && currentSelectedItem.nextSibling;
         } else if (offset < 0) {
-            target = currentSelectedItem.previousSibling;
+            target = currentSelectedItem && currentSelectedItem.previousSibling;
         }
 
         var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
-        if (!id) {
+        var component = id && this.refs[id];
+
+        if (!component) {
             return;
         }
 
@@ -80,7 +63,8 @@ module.exports = {
         if (_.isFunction(this.props.onSelect)) {
             this.props.onSelect({
                 currentTarget: target,
-                selectedId: id
+                selectedId: id,
+                currentComponent: component
             });
         }
     },
