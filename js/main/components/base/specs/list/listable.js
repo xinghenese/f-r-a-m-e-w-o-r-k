@@ -15,8 +15,8 @@ var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 
 // exports
 module.exports = {
-    renderItem: function () {
-        return null;
+    renderItem: function (item) {
+        return item;
     },
     render: function () {
         var data = this.props.data;
@@ -42,6 +42,7 @@ module.exports = {
             })
                 .set(DATA_ITEM_ID_FIELD, itemId)
                 .value();
+
             var item = _.isFunction(this.renderItem)
                 && this.renderItem(data, _.clone(itemProps), itemId);
 

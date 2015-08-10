@@ -21,7 +21,8 @@ var defaultConflictPolicy = {
     componentDidUpdate: policyName.SEQUENCE,
     componentWillUnmount: policyName.SEQUENCE,
     componentDidUnmount: policyName.SEQUENCE,
-    render: policyName.CHAIN_RIGHT
+    render: policyName.CHAIN_RIGHT,
+    renderItem: policyName.CHAIN_RIGHT
 };
 
 //core module to export

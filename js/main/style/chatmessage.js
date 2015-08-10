@@ -15,6 +15,7 @@ module.exports = {
         height: "48px",
         textAlign: "center",
         lineHeight: "48px",
+        fontSize: "14px",
         // button
         button: {
             height: "100%",
@@ -109,6 +110,16 @@ module.exports = {
             margin: "0 10px 0 26px",
             background: "#4d91c7",
             cursor: "pointer",
+            borderRadius: "4px"
+        },
+        // button
+        button: {
+            width: "70px",
+            height: "32px",
+            background: "#f1f1ee",
+            color: "#7c7c7b",
+            fontSize: "14px",
+            marginLeft: "18px",
             borderRadius: "4px"
         },
         // input

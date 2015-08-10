@@ -81,15 +81,6 @@ module.exports = {
     //conversationlist
     conversationlist: {
         border: "0",
-        //caption
-        caption: {
-            height: "30px",
-            lineHeight: "30px",
-            padding: "0 14px",
-            color: "#282828",
-            background: "#fafafa",
-            fontSize: "14px"
-        },
         //item
         item: {
             height: itemHeight,
