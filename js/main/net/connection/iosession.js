@@ -15,11 +15,7 @@ module.exports = origin.extend({
      * @returns {Q.Promise}
      */
     'read': function (msg, options) {
-        return chain.filterRead(msg, options)
-            .catch(function (err) {
-                console.error(err);
-            })
-            ;
+        return chain.filterRead(msg, options);
     },
     /**
      * write data processed with filter chain to the connection.
@@ -28,10 +24,6 @@ module.exports = origin.extend({
      * @returns {Q.Promise}
      */
     'write': function (msg, options) {
-        return chain.filterWrite(msg, options)
-            .catch(function (err) {
-                console.error(err);
-            })
-            ;
+        return chain.filterWrite(msg, options);
     }
 });
