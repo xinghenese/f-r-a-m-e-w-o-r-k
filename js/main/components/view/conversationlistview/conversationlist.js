@@ -137,6 +137,19 @@ function defaultOnSelect(event) {
     var target = event.currentTarget;
     var component = event.currentComponent;
     var type = component.props['data-conversation-type'];
+    var previousComponent = event.previousComponent;
+
+    if (previousComponent) {
+        setStyle(
+            React.findDOMNode(previousComponent).style,
+            style.conversationlist.item.default
+        );
+    }
+
+    setStyle(
+        event.currentTarget.style,
+        style.conversationlist.item.active
+    );
 
     if (type === "group") {
         var group = groups.getGroup(index);

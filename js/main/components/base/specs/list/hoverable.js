@@ -23,7 +23,7 @@ module.exports = {
     _onHover: function (event, hoverType) {
         hoverType = String(hoverType).toLowerCase();
         hoverType = _.includes(['hoverout', 'mouseout', 'mouseleave', 'out'], hoverType)
-            ? 'hoverOut' : 'hoverIn';
+            ? 'onHoverOut' : 'onHoverIn';
 
         var target = event && event.currentTarget;
         var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
