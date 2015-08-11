@@ -9,41 +9,41 @@ var fields = require('./fields');
 
 // private fields
 var CURRENT_SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
-var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
+var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 
 // exports
 module.exports = {
     getInitialState: function () {
-        return {selectedIds: []};
+        return {selectedKeys: []};
     },
     _onSelect: function (event) {
         var target = event && event.currentTarget;
-        var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
-        var component = id && this.refs[id];
+        var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
+        var component = key && this.refs[key];
 
         if (!component) {
             return;
         }
 
-        var ids = this.state.selectedIds;
-        var index = _.indexOf(ids, id);
+        var keys = this.state.selectedKeys;
+        var index = _.indexOf(keys, key);
 
         if (index > -1) {
-            ids.splice(index, 1);
-            this.setState({selectedIds: ids});
+            keys.splice(index, 1);
+            this.setState({selectedKeys: keys});
             if (_.isFunction(this.props.onUnselect)) {
                 this.props.onUnselect({
-                    id: id,
+                    id: key,
                     currentTarget: target,
                     currentComponent: component
                 });
             }
         } else {
-            ids.push(id);
-            this.setState({selectedIds: ids});
+            keys.push(key);
+            this.setState({selectedKeys: keys});
             if (_.isFunction(this.props.onSelect)) {
                 this.props.onSelect({
-                    id: id,
+                    id: key,
                     currentTarget: target,
                     currentComponent: component
                 });
@@ -52,8 +52,8 @@ module.exports = {
     },
     render: function (list) {
         var items = React.Children.map(list.props.children, function (child) {
-            var id = child.props[DATA_ITEM_ID_FIELD];
-            var selected = _.includes(this.state.selectedId, id);
+            var key = child.props[DATA_ITEM_KEY_FIELD];
+            var selected = _.includes(this.state.selectedKeys, key);
             var props = {
                 selected: selected,
                 onClick: this._onSelect,

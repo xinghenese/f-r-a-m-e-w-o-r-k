@@ -11,65 +11,69 @@ var setStyle = require('../../../../style/styles').setStyle;
 
 // private fields
 var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
+var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 
 // exports
 module.exports = {
     getInitialState: function () {
-        return {selectedId: -1};
+        return {selectedKey: -1};
     },
     _onSelect: function (event) {
         var target = event && event.currentTarget;
-        var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
-        var component = id && this.refs[id];
-        var lastSelectedId = this.state.selectedId;
-        var lastSelectedComponent = this.refs[lastSelectedId];
+        var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
+        var component = key && this.refs[key];
+        var lastselectedKey = this.state.selectedKey;
+        var lastSelectedComponent = this.refs[lastselectedKey];
 
         if (!component
-            || (lastSelectedId && id == lastSelectedId)
+            || (lastselectedKey && key == lastselectedKey)
             || (lastSelectedComponent && component === lastSelectedComponent)
         ) {
             return;
         }
-        this.setState({selectedId: id});
+
+        this.setState({selectedKey: key});
 
         if (_.isFunction(this.props.onSelect)) {
             this.props.onSelect(_.assign(event, {
-                selectedId: id,
+                selectedKey: key,
+                selectedId: component.props[DATA_ITEM_ID_FIELD],
                 currentComponent: component,
                 previousComponent: lastSelectedComponent
             }));
         }
     },
     _onSiblingSelect: function (offset) {
-        if (!this._itemIds || _.isEmpty(this._itemIds)) {
+        if (!this._itemKeys || _.isEmpty(this._itemKeys)) {
             return;
         }
 
-        var selectedId = this.state.selectedId;
-        var selectedComponent = this.refs[selectedId];
-        var position = _.indexOf(this._itemIds, selectedId);
+        var selectedKey = parseInt(this.state.selectedKey);
+        var selectedComponent = this.refs[selectedKey];
+        var position = _.indexOf(this._itemKeys, selectedKey);
         var targetComponent;
-        var nextSelectedId;
+        var nextselectedKey;
         offset = ~~(Number(offset));
 
         if (offset > 0) {
-            nextSelectedId = this._itemIds[position+1];
+            nextselectedKey = this._itemKeys[position + 1];
         } else if (offset < 0) {
-            nextSelectedId = this._itemIds[position-1];
+            nextselectedKey = this._itemKeys[position - 1];
         }
 
-        targetComponent = nextSelectedId && this.refs[nextSelectedId];
+        targetComponent = nextselectedKey && this.refs[nextselectedKey];
 
         if (!targetComponent) {
             return;
         }
 
-        this.setState({selectedId: nextSelectedId});
+        this.setState({selectedKey: nextselectedKey});
 
         if (_.isFunction(this.props.onSelect)) {
             this.props.onSelect({
                 currentTarget: React.findDOMNode(targetComponent),
-                selectedId: nextSelectedId,
+                selectedKey: nextselectedKey,
+                selectedId: targetComponent.props[DATA_ITEM_ID_FIELD],
                 currentComponent: targetComponent,
                 previousComponent: selectedComponent
             });
@@ -80,8 +84,8 @@ module.exports = {
             return null;
         }
 
-        var id = item.props[DATA_ITEM_ID_FIELD];
-        var selected = this.state.selectedId == id;
+        var key = item.props[DATA_ITEM_KEY_FIELD];
+        var selected = this.state.selectedKey == key;
         var props = {
             selected: selected,
             onClick: this._onSelect

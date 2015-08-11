@@ -13,14 +13,19 @@ var setStyle = require('../../../style/styles').setStyle;
 var emitter = require('../../../utils/eventemitter');
 var Lang = require('../../../locales/zh-cn');
 
+var groups = require('../../../datamodel/groups');
+var ConversationActions = require('../../../actions/conversationactions');
+var protocols = require('../../../utils/protocols');
+
 var Avatar = require('../../avatar');
 var createGenerator = require('../../base/creator/createReactClassGenerator');
 var groupableMixin = require('../../base/specs/list/groupable');
 var hoverableMixin = require('../../base/specs/list/hoverable');
+var selectableMixin = require('../../base/specs/list/selectable');
 
 //private fields
 var createGroupClass = createGenerator({
-    mixins: [groupableMixin, hoverableMixin]
+    mixins: [groupableMixin, selectableMixin, hoverableMixin]
 });
 
 //core module to export
@@ -30,16 +35,17 @@ module.exports = createGroupClass({
         return {
             onHoverIn: defaultOnHoverIn,
             onHoverOut: defaultOnHoverOut,
+            onSelect: defaultOnSelect,
             className: "contact-list",
             style: style.contactlist,
             groupBy: this.groupBy
         }
     },
     _selectPreviousContact: function() {
-        console.log("selecting previous contact");
+        this._onSiblingSelect(-1);
     },
     _selectNextContact: function() {
-        console.log("selecting previous contact");
+        this._onSiblingSelect(1);
     },
     componentDidMount: function() {
         console.log('did mount');
@@ -64,7 +70,7 @@ module.exports = createGroupClass({
         var className = props.className;
         var style = props.style;
         return (
-            <li >
+            <li data-conversation-type={data.type}>
                 <Avatar
                     className={className + '-avatar'}
                     name={data.name}
@@ -112,4 +118,41 @@ function defaultOnHoverOut(event) {
         event.currentTarget.style,
         style.contactlist.group.item.default
     );
+}
+
+function defaultOnSelect(event) {
+    var index = event.selectedId;
+    var component = event.currentComponent;
+    var type = component.props['data-conversation-type'];
+    var previousComponent = event.previousComponent;
+
+    if (previousComponent) {
+        setStyle(
+            React.findDOMNode(previousComponent).style,
+            style.contactlist.group.item.default
+        );
+    }
+
+    setStyle(
+        event.currentTarget.style,
+        style.contactlist.group.item.active
+    );
+
+    if (type === "group") {
+        var group = groups.getGroup(index);
+        if (group && group.inGroup()) {
+            ConversationActions.joinConversation(
+                protocols.toConversationType(type),
+                index,
+                null
+            );
+        }
+    } else {
+        ConversationActions.joinConversation(
+            protocols.toConversationType(type),
+            null,
+            index
+        );
+    }
+    emitter.emit('select', {id: index, type: type});
 }

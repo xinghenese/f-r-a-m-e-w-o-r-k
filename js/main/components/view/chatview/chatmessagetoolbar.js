@@ -26,7 +26,7 @@ var toolbar = module.exports = React.createClass({
         }
     },
     _focusTextArea: function() {
-        this.refs.form.refs.textArea.focus();
+        this.refs.form && this.refs.form.refs.textArea.focus();
     },
     _handleInputChange: function(event) {
         this.setState({
@@ -46,7 +46,7 @@ var toolbar = module.exports = React.createClass({
         }
     },
     _handleTextAreaSubmit: function(event) {
-        this.refs.form.submit(event);
+        this.refs.form && this.refs.form.submit(event);
     },
     _handleSubmit: function(event) {
         if (objects.containsValuedProp(event.data, "chat-message-input") &&
