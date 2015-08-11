@@ -18,14 +18,17 @@ var objects = require('../../../utils/objects');
 
 //core module to export
 var toolbar = module.exports = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {
             time: '',
             message: '',
             modifyEnable: false
         }
     },
-    _handleInputChange: function (event) {
+    _focusTextArea: function() {
+        this.refs.form.refs.textArea.focus();
+    },
+    _handleInputChange: function(event) {
         this.setState({
             time: new Date(),
             message: event.target.value
@@ -42,28 +45,30 @@ var toolbar = module.exports = React.createClass({
             emitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
         }
     },
-    _handleTextAreaSubmit: function (event) {
+    _handleTextAreaSubmit: function(event) {
         this.refs.form.submit(event);
     },
-    _handleSubmit: function (event) {
+    _handleSubmit: function(event) {
         if (objects.containsValuedProp(event.data, "chat-message-input") &&
             _.trim(event.data["chat-message-input"]).length > 0) {
             this.props.onSubmit(event);
         }
     },
-    _showInputToolbar: function () {
+    _showInputToolbar: function() {
         this.setState({modifyEnable: false});
     },
-    _showModificationToolbar: function (event) {
+    _showModificationToolbar: function(event) {
         this.setState({modifyEnable: !!(event && event.modifyEnable)});
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+        emitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+        emitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
     },
-    render: function () {
+    render: function() {
         var style = this.props.style;
 
         if (this.state.modifyEnable) {
@@ -133,6 +138,7 @@ var toolbar = module.exports = React.createClass({
                     style={style.input}
                     onKeyDown={this._handleInputKeyDown}
                     onSubmit={this._handleTextAreaSubmit}
+                    ref="textArea"
                     >
                     <div className="dev"/>
                 </TextArea>

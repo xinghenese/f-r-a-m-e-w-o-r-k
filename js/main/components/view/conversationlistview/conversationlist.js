@@ -29,7 +29,7 @@ var createListClass = createGenerator({
 //core module to export
 module.exports = createListClass({
     displayName: 'ConversationList',
-    getDefaultProps: function () {
+    getDefaultProps: function() {
         return {
             onHoverIn: defaultOnHoverIn,
             onHoverOut: defaultOnHoverOut,
@@ -38,21 +38,21 @@ module.exports = createListClass({
             style: style.conversationlist
         }
     },
-    _selectPreviousConversation: function () {
+    _selectPreviousConversation: function() {
         this._onSiblingSelect(-1);
     },
-    _selectNextConversation: function () {
+    _selectNextConversation: function() {
         this._onSiblingSelect(1);
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    renderItem: function (data, props, key) {
+    renderItem: function(data, props, key) {
         if (!isValidConversationData(data)) {
             return null;
         }
