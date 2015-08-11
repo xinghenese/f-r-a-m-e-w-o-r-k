@@ -26,12 +26,12 @@ var Countries = require('../constants/countries');
 
 //private fields
 var codeRegex = /\+86/;
-var phoneRegex = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
+var phoneRegex = /^0?(13[0-9]|15[0-9]|18[0-9]|14[0-9])[0-9]{8}$/;
 var requested = false;
 
 //export
 var PhoneForm = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {
             countryName: "中国",
             countryCode: "+86",
@@ -40,34 +40,34 @@ var PhoneForm = React.createClass({
             verificationState: null
         };
     },
-    _focusPhoneInput: function () {
+    _focusPhoneInput: function() {
         document.getElementById("phone-input").focus();
     },
-    _handleCountryNameChange: function (event) {
+    _handleCountryNameChange: function(event) {
         var name = event.target.value;
         var code = this._getCountryCode(name);
         this.setState({countryName: name, countryCode: code});
     },
-    _handleCountryCodeChange: function (event) {
+    _handleCountryCodeChange: function(event) {
         var code = event.target.value;
         var name = this._getCountryName(code);
         this.setState({countryName: name, countryCode: code});
     },
-    _handleKeyDown: function (event) {
+    _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
         }
     },
-    _handleCountryReadyToSelect: function () {
+    _handleCountryReadyToSelect: function() {
         this.props.onCountryReadyToSelect();
     },
-    _handlePhoneNumberChange: function (event) {
+    _handlePhoneNumberChange: function(event) {
         this.setState({
             phoneNumber: event.target.value,
             promptInvalidPhone: false
         });
     },
-    _handleSubmit: function () {
+    _handleSubmit: function() {
         if (requested) {
             return;
         } else {
@@ -79,13 +79,13 @@ var PhoneForm = React.createClass({
             this.state.phoneNumber
         );
     },
-    _handleVerificationCodeSent: function () {
+    _handleVerificationCodeSent: function() {
         this.props.onVerificationCodeSent();
     },
-    _handleVerificationCodeNotSent: function (error) {
+    _handleVerificationCodeNotSent: function(error) {
         console.log(error);
     },
-    _getCountryName: function (code) {
+    _getCountryName: function(code) {
         for (var i = 0; i < Countries.length; i++) {
             var country = Countries[i];
             if (country.code == code) {
@@ -94,7 +94,7 @@ var PhoneForm = React.createClass({
         }
         return Lang.unknown;
     },
-    _getCountryCode: function () {
+    _getCountryCode: function() {
         for (var i = 0; i < Countries.length; i++) {
             var country = Countries[i];
             if (this.state.countryName == country.name) {
@@ -103,22 +103,22 @@ var PhoneForm = React.createClass({
         }
         return "";
     },
-    _verificationCodeSendSuccessPredicate: function () {
+    _verificationCodeSendSuccessPredicate: function() {
         return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
     },
-    _verificationCodeSendFailedPredicate: function () {
+    _verificationCodeSendFailedPredicate: function() {
         return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         this._focusPhoneInput();
     },
-    componentWillMount: function () {
+    componentWillMount: function() {
         // observe AccountStore
         var self = this;
-        stores.observe(AccountStore, this._verificationCodeSendSuccessPredicate).then(function () {
+        stores.observe(AccountStore, this._verificationCodeSendSuccessPredicate).then(function() {
             self._handleVerificationCodeSent();
         });
-        stores.observe(AccountStore, this._verificationCodeSendFailedPredicate).then(function () {
+        stores.observe(AccountStore, this._verificationCodeSendFailedPredicate).then(function() {
             self._handleVerificationCodeNotSent();
         });
 
@@ -131,11 +131,11 @@ var PhoneForm = React.createClass({
             });
         }
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         stores.unobserve(AccountStore, this._verificationCodeSendSuccessPredicate);
         stores.unobserve(AccountStore, this._verificationCodeSendFailedPredicate);
     },
-    render: function () {
+    render: function() {
         if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {
             this._handleVerificationCodeSent();
         }

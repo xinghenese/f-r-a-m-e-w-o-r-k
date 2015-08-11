@@ -12,13 +12,19 @@ var makeStyle = require('../../../../style/styles').makeStyle;
 // private fields
 var SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
 var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
+var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 
 // exports
 module.exports = {
-    renderItem: function () {
-        return null;
+    renderItem: function (item) {
+        return item;
     },
+    _itemKeys: [],
     render: function () {
+        if (!this.shouldKeepItemKeys) {
+            this._itemKeys = [];
+        }
+
         var data = this.props.data;
 
         if (!data || _.isEmpty(data)) {
@@ -33,21 +39,36 @@ module.exports = {
         var listStyle = this.props.style || {};
 
         var list = _.map(data, function (data, key) {
-            var itemId = data.id || key;
+            var itemKey = parseInt(data.key || data.id || key, 10);
+
+            while (_.includes(this._itemKeys, itemKey)) {
+                itemKey = parseInt(itemKey, 10) + 1;
+            }
+            data.key = itemKey;
+            data.id = data.id || key;
+
             var itemProps = _({
-                key: itemId,
-                ref: itemId,
+                key: itemKey,
+                ref: itemKey,
                 className: listClassName && listClassName + '-item',
                 style: listStyle.item || {}
             })
-                .set(DATA_ITEM_ID_FIELD, itemId)
+                .set(DATA_ITEM_KEY_FIELD, itemKey)
+                .set(DATA_ITEM_ID_FIELD, data.id)
                 .value();
+
             var item = _.isFunction(this.renderItem)
-                && this.renderItem(data, _.clone(itemProps), itemId);
+                && this.renderItem(data, _.clone(itemProps), itemKey);
 
             if (!item) {
                 return null;
             }
+
+            if (!_.includes(this._itemKeys, itemKey)) {
+                this._itemKeys.push(itemKey);
+            }
+
+            _.assign(itemProps.style, item.props.style);
 
             if (React.isValidElement(item) && item.type.toLowerCase() === 'li') {
                 return React.cloneElement(
@@ -62,10 +83,6 @@ module.exports = {
                 item
             );
         }, this);
-
-        console.log('list: ', list);
-
-        console.groupEnd();
 
         return (
             <ul {...listProps}>{list}</ul>

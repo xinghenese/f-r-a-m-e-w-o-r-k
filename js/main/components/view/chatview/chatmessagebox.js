@@ -151,6 +151,7 @@ var ChatMessageBox = React.createClass({
     componentDidMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
+        emitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
     componentDidUpdate: function () {
         this._scrollToBottom();
@@ -158,6 +159,7 @@ var ChatMessageBox = React.createClass({
     componentWillUnmount: function () {
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
+        emitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
     render: function () {
         if (this.state.id) {
@@ -201,13 +203,13 @@ module.exports = ChatMessageBox;
 
 //private functions
 function addConversationListSelectedHandler(box) {
-    emitter.on('select', function (info) {
+    emitter.on(EventTypes.SELECT_CONVERSATION, function (info) {
         box._updateMessages(info.id, info.type);
     });
 }
 
 function removeConversationListSelectedHandler(box) {
-    emitter.removeAllListeners('select');
+    emitter.removeAllListeners(EventTypes.SELECT_CONVERSATION);
 }
 
 function _buildGroupRenderObject(item, collector) {

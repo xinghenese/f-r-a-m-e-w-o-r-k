@@ -8,10 +8,12 @@ var _ = require('lodash');
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
+var EventTypes = require('../constants/eventtypes');
 var GroupHistoryMessages = require('../datamodel/grouphistorymessages');
 var PrivateHistoryMessages = require('../datamodel/privatehistorymessages');
 var UuidGenerator = require('../utils/uuidgenerator');
 var assign = require('object-assign');
+var emitter = require('../utils/eventemitter');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
@@ -88,7 +90,14 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 });
 
 socketconnection.monitor("TM").then(function(data) {
+    console.log("got message");
     _handleReceivedTalkMessage(data);
+    var message = new Message(data);
+    emitter.emit(EventTypes.SHOW_NOTIFICATION, {
+        title: message.getUserNickname(),
+        message: message.getBriefText()
+    });
+    console.log("sent notification");
 });
 
 // private functions

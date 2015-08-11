@@ -13,6 +13,7 @@ var ConversationAndContactActions = require('../actions/conversationandcontactac
 var ConversationAndContactStore = require('../stores/conversationandcontactstore');
 var ConversationBox = require('./view/conversationlistview/conversationbox');
 var ChatMessageBox = require('./view/chatview/chatmessagebox');
+var EventTypes = require('../constants/eventtypes');
 var MessageActions = require('../actions/messageactions');
 var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
@@ -50,7 +51,7 @@ var Chat = React.createClass({
     },
     _onSelectConversation: function (data) {
         this.setState({rightBoxType: boxType.messsagebox});
-        emitter.emit('select', data);
+        emitter.emit(EventTypes.SELECT_CONVERSATION, data);
     },
     _showSettings: function () {
         this.setState(function (previousState) {

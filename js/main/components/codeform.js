@@ -6,32 +6,33 @@ var Lang = require('../locales/zh-cn');
 var KeyCodes = require('../constants/keycodes');
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
+var errors = require('../constants/errors');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
 var stores = require('../utils/stores');
 
 var CodeForm = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {
             smsCode: "",
             promptInvalidSMSCode: false
         };
     },
-    _focusInput: function () {
+    _focusInput: function() {
         React.findDOMNode(this.refs.smscode).focus();
     },
-    _handleLoginFailed: function (error) {
-        console.log("login failed: " + error);
-    },
-    _handleCodeChange: function (event) {
+    _handleCodeChange: function(event) {
         this.setState({smsCode: event.target.value});
     },
-    _handleKeyDown: function (event) {
+    _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
         }
     },
-    _handleSubmit: function () {
+    _handleLoginFailed: function() {
+        this.setState({promptInvalidSMSCode: true});
+    },
+    _handleSubmit: function() {
         if (!this._validateSMSCode()) {
             this.setState({promptInvalidSMSCode: true});
             this._focusInput();
@@ -43,26 +44,26 @@ var CodeForm = React.createClass({
             );
         }
     },
-    _validateSMSCode: function () {
+    _validateSMSCode: function() {
         return (/(\d){5,}/).test(this.state.smsCode);
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         this._focusInput();
     },
-    componentWillMount: function () {
+    componentWillMount: function() {
         var self = this;
-        stores.observe(AccountStore, function () {
+        stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.SUCCESS;
-        }).then(function () {
+        }).then(function() {
             self.props.onLoginSuccess();
         });
-        stores.observe(AccountStore, function () {
+        stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.FAILED;
-        }).then(function () {
-            self._handleLoginFailed();
+        }).then(function() {
+            self._handleLoginFailed(AccountStore.getLoginErrorCode());
         });
     },
-    render: function () {
+    render: function() {
         var login = style.login;
         var loginForm = login.form;
         var codeForm = login.codeForm;

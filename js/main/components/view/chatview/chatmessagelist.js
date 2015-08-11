@@ -10,8 +10,54 @@ var makeStyle = require('../../../style/styles').makeStyle;
 var prefix = "chat-message-list-";
 var index = 0;
 
+var createGenerator = require('../../base/creator/createReactClassGenerator');
+var listableMixin = require('../../base/specs/list/listable');
+var Avatar = require('../../avatar');
+
+//private fields
+var createListClass = createGenerator({
+    mixins: [listableMixin]
+});
+
 //core module to export
-var ChatMessageList = React.createClass({
+module.exports = createListClass({
+    displayName: 'ChatMessageList',
+    renderItem: function (data, props, key) {
+        if (!isValidMessageData(data)) {
+            return null;
+        }
+        var className = props.className || 'chat-message';
+        var style = props.style || {};
+
+        return (
+            <li>
+                <Avatar
+                    className={className + '-avatar'}
+                    style={makeStyle(style.avatar, inlineStyle.avatar)}
+                    name={this.props.senderName}
+                    src={this.props.senderAvatar}
+                    index={this.props.senderName}
+                    />
+
+                <div
+                    className={className + '-time'}
+                    style={makeStyle(style.time, inlineStyle.time)}
+                    >
+                    {this.props.time}
+                </div>
+                <div className={className + '-body'}
+                     style={makeStyle(commonStyle.message, style.messagebody, inlineStyle.messagebody)}
+                    >
+                    <div className={className + '-nickname'}>
+                        {this.props.senderName}
+                    </div>
+                    <p className={className + '-content'} style={makeStyle(style.messagebody.messagecontent)}>
+                        {this.props.children}
+                    </p>
+                </div>
+            </li>
+        )
+    },
     render: function () {
         var chatMessageNodes = null;
 
@@ -40,8 +86,6 @@ var ChatMessageList = React.createClass({
         )
     }
 });
-
-module.exports = ChatMessageList;
 
 //private function
 function isValidMessageData(data) {

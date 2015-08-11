@@ -21,7 +21,8 @@ var defaultConflictPolicy = {
     componentDidUpdate: policyName.SEQUENCE,
     componentWillUnmount: policyName.SEQUENCE,
     componentDidUnmount: policyName.SEQUENCE,
-    render: policyName.CHAIN_RIGHT
+    render: policyName.CHAIN_RIGHT,
+    renderItem: policyName.CHAIN_RIGHT
 };
 
 //core module to export
@@ -48,11 +49,5 @@ function cleanSpecs(spec) {
 }
 
 function isSet(value) {
-    if (!value) {
-        return false;
-    }
-    if (_.isFunction(value)) {
-        return true;
-    }
-    return !_.isEmpty(value);
+    return !!value;
 }

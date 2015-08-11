@@ -4,20 +4,12 @@
 'use strict';
 
 // dependencies
-var _ = require('lodash');
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
-var EventEmitter = require('events').EventEmitter;
-var Group = require('../datamodel/group');
-var HttpConnection = require('../net/connection/httpconnection');
 var SocketConnection = require('../net/connection/socketconnection');
 var ChangeableStore = require('./changeablestore');
-var User = require('../datamodel/user');
 var assign = require('object-assign');
-var myself = require('../datamodel/myself');
-var groups = require('../datamodel/groups');
 var objects = require('../utils/objects');
-var users = require('../datamodel/users');
 
 // private fields
 var GROUP_LIST_REQUEST = 1;
@@ -45,9 +37,6 @@ module.exports = ConversationStore;
 // module initialization
 ConversationStore.dispatchToken = AppDispatcher.register(function (action) {
     switch (action.type) {
-        case ActionTypes.GET_CHAT_LIST:
-            _handleGetChatListRequest(action);
-            break;
         case ActionTypes.JOIN_CONVERSATION:
             _handleJoinConversationRequest(action);
             break;
@@ -58,21 +47,6 @@ ConversationStore.dispatchToken = AppDispatcher.register(function (action) {
 });
 
 // private functions
-function _handleGetChatListRequest(action) {
-    HttpConnection.request({
-        url: "cht/gcl",
-        data: {}
-    }).then(function (response) {
-        _processConversationListResponse(response);
-        ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_SUCCESS);
-        _processContactListResponse(response);
-        ConversationStore.emit(ConversationStore.Events.USERS_LOAD_SUCCESS);
-    }, function (error) {
-        ConversationStore.emit(ConversationStore.Events.GROUPS_LOAD_FAILURE, error);
-        ConversationStore.emit(ConversationStore.Events.USERS_LOAD_FAILURE, error);
-    });
-}
-
 function _handleJoinConversationRequest(action) {
     _quitCurrentConversation();
 
@@ -148,20 +122,6 @@ function _handleQuitConversationRequest(action) {
                 };
             }
         }
-    });
-}
-
-function _processConversationListResponse(response) {
-    groups.setCursor(response.rl.cs);
-    _.forEach(response.rl.l, function (n) {
-        groups.addGroup(new Group(n));
-    });
-}
-
-function _processContactListResponse(response) {
-    users.setCursor(response.ul.cs);
-    _.forEach(response.ul.l, function (n) {
-        users.addUser(new User(n));
     });
 }
 

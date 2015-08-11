@@ -1,4 +1,6 @@
 dist
 lib
 node_modules
-.idea/
+.idea
+chaoxin-darwin-x64
+chaoxin-win32-x64

@@ -7,14 +7,30 @@ var _ = require('lodash');
 
 //private fields
 var policy = {
-    chain: chain,
-    chainRight: chainRight,
-    sequence: sequence,
-    sequenceRight: sequenceRight,
-    merge: merge,
-    mergeRight: mergeRight,
-    queue: queue,
-    queueRight: queueRight
+    chain: function () {
+        return chain(arguments);
+    },
+    chainRight: function () {
+        return chain(arguments, 'right');
+    },
+    sequence: function () {
+        return sequence(arguments);
+    },
+    sequenceRight: function () {
+        return sequence(arguments, 'right');
+    },
+    merge: function () {
+        return merge(arguments);
+    },
+    mergeRight: function () {
+        return merge(arguments, 'right');
+    },
+    queue: function () {
+        return queue(arguments);
+    },
+    queueRight: function () {
+        return queue(arguments, 'right');
+    }
 };
 
 //core module to export
@@ -29,11 +45,12 @@ module.exports = {
         if (!isValidConfigs(configs)) {
             return null;
         }
-        var keys = _.reduce(configs.mixins, function (memo, mixin) {
+        var mixinKeys = _.reduce(configs.mixins, function (memo, mixin) {
             return _(mixin).keys().union(memo).value();
         }, []);
 
-        return _.reduce(keys, function (result, key) {
+        return _.reduce(mixinKeys, function (result, key) {
+            // args = [key, mixin1.key, mixin2.key, ..., spec.key]
             var args = _.reduce(configs.mixins, function (memo, mixin) {
                 if (_.has(mixin, key)) {
                     _.set(result, key, _.get(mixin, key));
@@ -44,15 +61,22 @@ module.exports = {
 
             var value;
 
+            // configs.handleConflict as priority
             if (_.isFunction(configs.handleConflict)) {
                 value = configs.handleConflict.apply(null, args);
             }
 
+            // defaultPolicy for handle mixins' conflicts by default
             if (_.isUndefined(value)) {
                 var func = defaultPolicy && defaultPolicy[key];
                 if (func && _.has(policy, func)) {
                     value = _.get(policy, func).apply(null, args);
                 }
+            }
+
+            // adapt the overrides policy if no defaultPolicy provided
+            if (_.isUndefined(value)) {
+                value = overrides.apply(null, args);
             }
 
             if (!_.isUndefined(value)) {
@@ -78,108 +102,59 @@ module.exports = {
 
 
 //private functions
-function chain() {
-    var methods = _(arguments).rest().value();
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduce(methods, function (memo, method) {
-            if (_.isFunction(method)) {
-//                return method.apply(this, _.unshift(args, memo));
+function chain(methods, dir) {
+    return serialize(methods || arguments, function (memo, method, args) {
+        if (_.isFunction(method)) {
+            if (memo) {
                 return method.call(this, memo);
             }
-            return memo;
-        }, void 0, this);
-    };
+            return method.apply(this, args);
+        }
+        return memo;
+    }, dir);
 }
 
-function chainRight() {
-    var methods = _(arguments).rest().value();
+function sequence(methods, dir) {
+    return serialize(methods, function (memo, method, args) {
+        if (_.isFunction(method)) {
+            method.apply(this, args);
+        }
+    }, dir);
+}
+
+function merge(methods, dir) {
+    return serialize(methods || arguments, function (memo, method, args) {
+        method = _.isFunction(method) ? method.apply(this, args) : method;
+        return _.assign(memo, _.toPlainObject(method));
+    }, dir, {});
+}
+
+function queue(methods, dir) {
+    return serialize(methods || arguments, function (memo, method, args) {
+        method = _.isFunction(method) ? method.apply(this, args) : method;
+        return _(memo).push(method).value();
+    }, dir, []);
+}
+
+function overrides() {
+    return _.findLast(_(arguments).rest().value(), function (method) {
+        return !!method;
+    });
+}
+
+function serialize(methods, callback, dir, initValue) {
+    dir = getReduceMethodName(dir);
 
     return function () {
         var args = _.toArray(arguments);
-        return _.reduceRight(methods, function (memo, method) {
-            if (_.isFunction(method)) {
-//                return method.apply(this, _.unshift(args, memo));
-                return method.call(this, memo);
-            }
-            return memo;
-        }, void 0, this);
+        return _[dir](_(methods).rest().value(), function (memo, method) {
+            return callback.call(this, memo, method, args);
+        }, initValue, this);
     };
 }
 
-function sequence() {
-    var methods = _(arguments).rest().value();
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduce(methods, function (memo, method) {
-            if (_.isFunction(method)) {
-                method.apply(this, args);
-            }
-        }, void 0, this);
-    };
-}
-
-function sequenceRight() {
-    var methods = _(arguments).rest().value();
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduceRight(methods, function (memo, method) {
-            if (_.isFunction(method)) {
-                method.apply(this, args);
-            }
-        }, void 0, this);
-    };
-}
-
-function merge() {
-    var methods = _(arguments).rest().value();
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduce(methods, function (memo, method) {
-            method = _.isFunction(method) ? method.apply(this, args) : method;
-            return _.assign(memo, _.toPlainObject(method));
-        }, {}, this);
-    };
-}
-
-function mergeRight() {
-    var methods = _(arguments).rest().value();
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduceRight(methods, function (memo, method) {
-            method = _.isFunction(method) ? method.apply(this, args) : method;
-            return _.assign(memo, _.toPlainObject(method));
-        }, {}, this);
-    };
-}
-
-function queue() {
-    var methods = _(arguments).rest().value();
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduce(methods, function (memo, method) {
-            method = _.isFunction(method) ? method.apply(this, args) : method;
-            return _(memo).push(method).value();
-        }, [], this);
-    };
-}
-
-function queueRight() {
-    var methods = _.toArray(arguments);
-
-    return function () {
-        var args = _.toArray(arguments);
-        return _.reduceRight(methods, function (memo, method) {
-            method = _.isFunction(method) ? method.apply(this, args) : method;
-            return _(memo).push(method).value();
-        }, [], this);
-    };
+function getReduceMethodName(dir) {
+    return dir === 'right' ? 'reduceRight' : 'reduce';
 }
 
 function isValidConfigs(configs) {

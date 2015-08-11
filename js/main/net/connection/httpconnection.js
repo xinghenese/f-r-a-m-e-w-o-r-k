@@ -19,6 +19,7 @@ var PUBLIC_KEY_FIELD = "pk";
 var UUID_FILED = "uuid";
 var TOKEN_FIELD = "tk";
 var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
+//var DEFAULT_ROOT = "http://api.shanliao.com/";
 var DEFAULT_CONFIG = {
     'needEncrypt': true,
     'needDecrypt': true,

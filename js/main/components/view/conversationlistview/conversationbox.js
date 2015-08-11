@@ -46,8 +46,9 @@ var ConversationBox = React.createClass({
         this.setState({type: listType[type] || listType.conversation});
     },
     _filterData: function(data) {
+        var displayData = data && data.name || this.state.data;
         this.setState({
-            displayData: data && _.indexBy(data.name, 'id') || this.state.data,
+            displayData: displayData,
             matchedMessages: data && data.message
         });
     },
@@ -60,13 +61,15 @@ var ConversationBox = React.createClass({
         });
     },
     _onKeyDownInSearchBox: function(event) {
-        if (event.keyCode === KeyCodes.ESCAPE) {
-            var target = event.target;
-            if (_.isEmpty(target.value)) {
-                emitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
-            } else {
-                this.refs.search.clear();
-            }
+        switch (event.keyCode) {
+            case KeyCodes.ESCAPE:
+                if (!_.isEmpty(event.target.value)) {
+                    this.refs.search.clear();
+                }
+                break;
+            case KeyCodes.DOWN:
+                emitter.emit(EventTypes.SELECT_FIRST_CONVERSATION);
+                break;
         }
     },
     _updateMessages: function() {
@@ -102,14 +105,13 @@ var ConversationBox = React.createClass({
             );
             matchedMessages = (
                 <ConversationList data={this.state.matchedMessages}/>
-            )
+            );
         }
 
         if (this.state.type === listType.contacts) {
             list = (
                 <ContactList
                     data={this.state.groupsAndContacts}
-                    onSelect={this.props.onSelectConversation}
                     />
             );
         } else if (this.state.type === listType.conversation) {

@@ -25,7 +25,7 @@ module.exports = function (configs) {
                     .value()
             });
         }
-        return React.createClass(mixinSpecs(spec));
+        return React.createClass(mixinSpecs(spec, configs && configs.policy));
     }
 };
 

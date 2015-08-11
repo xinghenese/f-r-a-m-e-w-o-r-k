@@ -15,15 +15,18 @@ var emitter = require('../../../utils/eventemitter');
 var groups = require('../../../datamodel/groups');
 var protocols = require('../../../utils/protocols');
 
+var Avatar = require('../../avatar');
 var createGenerator = require('../../base/creator/createReactClassGenerator');
 var listableMixin = require('../../base/specs/list/listable');
 var selectableMixin = require('../../base/specs/list/selectable');
+var hoverableMixin = require('../../base/specs/list/hoverable');
+var fields = require('../../base/specs/list/fields');
 
 //private fields
+var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 var createListClass = createGenerator({
-    mixins: [selectableMixin, listableMixin]
+    mixins: [selectableMixin, listableMixin, hoverableMixin]
 });
-
 
 //core module to export
 module.exports = createListClass({
@@ -37,6 +40,14 @@ module.exports = createListClass({
             style: style.conversationlist
         }
     },
+    _selectFirstConversation: function() {
+        if (!this.props.data || _.isEmpty(this.props.data)) {
+            return;
+        }
+
+        var first = _.first(this.props.data);
+        emitter.emit(EventTypes.SELECT_CONVERSATION, {id: first.id, type: first.type});
+    },
     _selectPreviousConversation: function () {
         this._onSiblingSelect(-1);
     },
@@ -46,19 +57,20 @@ module.exports = createListClass({
     componentDidMount: function () {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+        emitter.on(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     componentWillUnmount: function () {
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+        emitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
-
-    renderItem: function (data, key, parentProps) {
+    renderItem: function (data, props, key) {
         if (!isValidConversationData(data)) {
             return null;
         }
 
-        var className = parentProps.className || 'conversation-list-item';
-        var style = parentProps.style || {};
+        var className = props.className || 'conversation-list-item';
+        var style = props.style || {};
 
         return (
             <li data-conversation-type={data.type}>
@@ -133,9 +145,22 @@ function defaultOnHoverOut(event) {
 }
 
 function defaultOnSelect(event) {
-    var index = event.selectedId;
     var component = event.currentComponent;
+    var index = event.selectedId || component.props[DATA_ITEM_ID_FIELD];
     var type = component.props['data-conversation-type'];
+    var previousComponent = event.previousComponent;
+
+    if (previousComponent) {
+        setStyle(
+            React.findDOMNode(previousComponent).style,
+            style.conversationlist.item.default
+        );
+    }
+
+    setStyle(
+        event.currentTarget.style,
+        style.conversationlist.item.active
+    );
 
     if (type === "group") {
         var group = groups.getGroup(index);
@@ -153,5 +178,5 @@ function defaultOnSelect(event) {
             index
         );
     }
-    emitter.emit('select', {id: index, type: type});
+    emitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
 }
