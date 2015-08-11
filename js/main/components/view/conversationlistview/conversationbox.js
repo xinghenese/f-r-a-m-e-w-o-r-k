@@ -60,13 +60,18 @@ var ConversationBox = React.createClass({
         });
     },
     _onKeyDownInSearchBox: function(event) {
-        if (event.keyCode === KeyCodes.ESCAPE) {
-            var target = event.target;
-            if (_.isEmpty(target.value)) {
-                emitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
-            } else {
-                this.refs.search.clear();
-            }
+        switch (event.keyCode) {
+            case KeyCodes.ESCAPE:
+                if (!_.isEmpty(event.target.value)) {
+                    this.refs.search.clear();
+                }
+                break;
+            case KeyCodes.UP:
+                // todo
+                break;
+            case KeyCodes.DOWN:
+                // todo
+                break;
         }
     },
     _updateMessages: function() {

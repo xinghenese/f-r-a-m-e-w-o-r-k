@@ -5,6 +5,7 @@
 
 // exports
 module.exports = {
+    CLOSE_CURRENT_CONVERSATION: "closeCurrentConversation",
     ESCAPE_MESSAGE_INPUT: "escapeMessageInput",
     ESCAPE_SEARCH_INPUT: "escapeSearchInput",
     FOCUS_MESSAGE_INPUT: "focusMessageInput",

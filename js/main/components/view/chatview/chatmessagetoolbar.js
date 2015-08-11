@@ -43,6 +43,8 @@ var toolbar = module.exports = React.createClass({
             emitter.emit(EventTypes.SELECT_PREVIOUS_CONVERSATION);
         } else if (event.keyCode === KeyCodes.DOWN) {
             emitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
+        } else if (event.keyCode === KeyCodes.ESCAPE) {
+            emitter.emit(EventTypes.ESCAPE_MESSAGE_INPUT);
         }
     },
     _handleTextAreaSubmit: function(event) {

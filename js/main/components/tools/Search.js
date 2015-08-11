@@ -65,7 +65,7 @@ function startSearch(search, event) {
     var datasource = search.props.datasource;
     var searchFunction = search.props.searchFunction;
     var fields = search.props.fields;
-    var searchText = event && event.target && event.target.value || '';
+    var searchText = (event && event.target && event.target.value || '').toLowerCase();
 
     if (!datasource || (!_.isFunction(searchFunction) && !fields) || !searchText) {
         return null;
@@ -80,7 +80,7 @@ function startSearch(search, event) {
 
         _.forEach(fields, function(field) {
             var subResult = _.reduce(datasource, function(memo, data) {
-                if (data[field] && (data[field] + '').indexOf(searchText) > -1) {
+                if (data[field] && data[field].toString().toLowerCase().indexOf(searchText) > -1) {
                     memo.push(data);
                 }
                 return memo;
