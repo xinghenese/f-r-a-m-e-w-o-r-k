@@ -28,7 +28,6 @@ var createListClass = createGenerator({
     mixins: [selectableMixin, listableMixin, hoverableMixin]
 });
 
-
 //core module to export
 module.exports = createListClass({
     displayName: 'ConversationList',
@@ -41,6 +40,14 @@ module.exports = createListClass({
             style: style.conversationlist
         }
     },
+    _selectFirstConversation: function() {
+        if (!this.props.data || _.isEmpty(this.props.data)) {
+            return;
+        }
+
+        var first = _.first(this.props.data);
+        emitter.emit(EventTypes.SELECT_CONVERSATION, {id: first.id, type: first.type});
+    },
     _selectPreviousConversation: function () {
         this._onSiblingSelect(-1);
     },
@@ -50,12 +57,13 @@ module.exports = createListClass({
     componentDidMount: function () {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+        emitter.on(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     componentWillUnmount: function () {
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+        emitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
-
     renderItem: function (data, props, key) {
         if (!isValidConversationData(data)) {
             return null;
@@ -170,5 +178,5 @@ function defaultOnSelect(event) {
             index
         );
     }
-    emitter.emit('select', {id: index, type: type});
+    emitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
 }

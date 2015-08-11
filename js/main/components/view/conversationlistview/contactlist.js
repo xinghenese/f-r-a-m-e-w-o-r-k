@@ -154,5 +154,5 @@ function defaultOnSelect(event) {
             index
         );
     }
-    emitter.emit('select', {id: index, type: type});
+    emitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
 }

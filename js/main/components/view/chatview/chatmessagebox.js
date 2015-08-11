@@ -203,13 +203,13 @@ module.exports = ChatMessageBox;
 
 //private functions
 function addConversationListSelectedHandler(box) {
-    emitter.on('select', function (info) {
+    emitter.on(EventTypes.SELECT_CONVERSATION, function (info) {
         box._updateMessages(info.id, info.type);
     });
 }
 
 function removeConversationListSelectedHandler(box) {
-    emitter.removeAllListeners('select');
+    emitter.removeAllListeners(EventTypes.SELECT_CONVERSATION);
 }
 
 function _buildGroupRenderObject(item, collector) {

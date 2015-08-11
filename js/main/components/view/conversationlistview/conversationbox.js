@@ -46,8 +46,9 @@ var ConversationBox = React.createClass({
         this.setState({type: listType[type] || listType.conversation});
     },
     _filterData: function(data) {
+        var displayData = data && data.name || this.state.data;
         this.setState({
-            displayData: data && _.indexBy(data.name, 'id') || this.state.data,
+            displayData: displayData,
             matchedMessages: data && data.message
         });
     },
@@ -66,11 +67,8 @@ var ConversationBox = React.createClass({
                     this.refs.search.clear();
                 }
                 break;
-            case KeyCodes.UP:
-                // todo
-                break;
             case KeyCodes.DOWN:
-                // todo
+                emitter.emit(EventTypes.SELECT_FIRST_CONVERSATION);
                 break;
         }
     },
@@ -107,7 +105,7 @@ var ConversationBox = React.createClass({
             );
             matchedMessages = (
                 <ConversationList data={this.state.matchedMessages}/>
-            )
+            );
         }
 
         if (this.state.type === listType.contacts) {
