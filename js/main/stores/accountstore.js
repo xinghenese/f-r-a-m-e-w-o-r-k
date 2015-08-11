@@ -46,8 +46,12 @@ var AccountStore = ChangeableStore.extend({
     _error: null,
     _verificationCodeState: VerificationCodeState.NOT_SENT,
     _loginState: LoginState.DEFAULT,
+    _loginStatusCode: 0,
     getCode: function () {
         return _requestAccount.code;
+    },
+    getLoginErrorCode: function() {
+        return this._loginStatusCode;
     },
     getLoginState: function () {
         return this._loginState;
@@ -60,6 +64,14 @@ var AccountStore = ChangeableStore.extend({
     },
     getVerificationCodeState: function () {
         return this._verificationCodeState;
+    },
+    markLoginFailure: function(code) {
+        this._loginState = LoginState.FAILED;
+        this._loginStatusCode = code;
+    },
+    markLoginSuccess: function() {
+        this._loginState = LoginState.SUCCESS;
+        this._loginStatusCode = 0;
     }
 });
 
@@ -106,10 +118,10 @@ function _handleLoginRequest(action) {
     }).then(function (response) {
         _handleLoginSuccess(response);
         _afterLogin();
-        AccountStore._loginState = LoginState.SUCCESS;
+        AccountStore.markLoginSuccess();
         AccountStore.emitChange();
-    }, function () {
-        AccountStore._loginState = LoginState.FAILED;
+    }, function (statusCode) {
+        AccountStore.markLoginFailure(statusCode);
         AccountStore.emitChange();
     });
 }

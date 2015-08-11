@@ -90,7 +90,7 @@ gulp.task('package', ['build'], function() {
     packager({
         dir: ".",
         name: "chaoxin",
-        platform: ["darwin"],
+        platform: ["darwin", "win32"],
         arch: "x64",
         version: "0.30.3",
         asar: true,
