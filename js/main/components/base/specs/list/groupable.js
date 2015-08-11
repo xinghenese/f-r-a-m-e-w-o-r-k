@@ -13,6 +13,7 @@ var makeStyle = require('../../../../style/styles').makeStyle;
 // private fields
 var SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
 var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
+var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 
 // exports
 module.exports = {
@@ -22,8 +23,12 @@ module.exports = {
     renderItem: function (item) {
         return item;
     },
-    _itemIds: [],
+    _itemKeys: [],
     render: function () {
+        if (_.isFunction(this.setState)) {
+            this._itemKeys = [];
+        }
+
         var data = this.props.data;
 
         if (!data || _.isEmpty(data) || this.props.groupBy) {
@@ -43,12 +48,19 @@ module.exports = {
         var groupTitleStyle = groupStyle && groupStyle.title || {};
 
         var list = _.map(data, function (data, key) {
-            var id = data.id || key;
+            var groupKey = data.key || data.id || key;
+
+            while (_.includes(this._itemKeys, groupKey)) {
+                groupKey = parseInt(groupKey, 10) + 1;
+            }
+            data.key = groupKey;
+            data.id = data.id || key;
+
             var groupTitle = _.isFunction(this.renderGroupTitle)
                 && this.renderGroupTitle(data, {
                     className: groupTitleClassName,
                     style: groupTitleStyle
-                }, id);
+                }, groupKey);
 
             var group = listable.render.call({
                 props: {
@@ -57,7 +69,8 @@ module.exports = {
                     style: groupStyle
                 },
                 renderItem: this.renderItem,
-                _itemIds: this._itemIds
+                _itemKeys: this._itemKeys,
+                shouldKeepItemKeys: true
             });
 
             return [groupTitle, group];

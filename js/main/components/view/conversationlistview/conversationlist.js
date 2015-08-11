@@ -20,16 +20,19 @@ var createGenerator = require('../../base/creator/createReactClassGenerator');
 var listableMixin = require('../../base/specs/list/listable');
 var selectableMixin = require('../../base/specs/list/selectable');
 var hoverableMixin = require('../../base/specs/list/hoverable');
+var fields = require('../../base/specs/list/fields');
 
 //private fields
+var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 var createListClass = createGenerator({
     mixins: [selectableMixin, listableMixin, hoverableMixin]
 });
 
+
 //core module to export
 module.exports = createListClass({
     displayName: 'ConversationList',
-    getDefaultProps: function() {
+    getDefaultProps: function () {
         return {
             onHoverIn: defaultOnHoverIn,
             onHoverOut: defaultOnHoverOut,
@@ -38,21 +41,22 @@ module.exports = createListClass({
             style: style.conversationlist
         }
     },
-    _selectPreviousConversation: function() {
+    _selectPreviousConversation: function () {
         this._onSiblingSelect(-1);
     },
-    _selectNextConversation: function() {
+    _selectNextConversation: function () {
         this._onSiblingSelect(1);
     },
-    componentDidMount: function() {
+    componentDidMount: function () {
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
     },
-    renderItem: function(data, props, key) {
+
+    renderItem: function (data, props, key) {
         if (!isValidConversationData(data)) {
             return null;
         }
@@ -133,9 +137,8 @@ function defaultOnHoverOut(event) {
 }
 
 function defaultOnSelect(event) {
-    var index = event.selectedId;
-    var target = event.currentTarget;
     var component = event.currentComponent;
+    var index = event.selectedId || component.props[DATA_ITEM_ID_FIELD];
     var type = component.props['data-conversation-type'];
     var previousComponent = event.previousComponent;
 
