@@ -18,6 +18,7 @@ module.exports = {
     renderItem: function (item) {
         return item;
     },
+    _itemIds: [],
     render: function () {
         var data = this.props.data;
 
@@ -48,6 +49,10 @@ module.exports = {
 
             if (!item) {
                 return null;
+            }
+
+            if (!_.includes(this._itemIds, itemId)) {
+                this._itemIds.push(itemId);
             }
 
             _.assign(itemProps.style, item.props.style);

@@ -16,12 +16,13 @@ var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 
 // exports
 module.exports = {
-    renderGroupTitle: function () {
-        return null;
+    renderGroupTitle: function (title) {
+        return title;
     },
-    renderItem: function () {
-        return null;
+    renderItem: function (item) {
+        return item;
     },
+    _itemIds: [],
     render: function () {
         var data = this.props.data;
 
@@ -55,7 +56,8 @@ module.exports = {
                     className: groupClassName,
                     style: groupStyle
                 },
-                renderItem: this.renderItem
+                renderItem: this.renderItem,
+                _itemIds: this._itemIds
             });
 
             return [groupTitle, group];

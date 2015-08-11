@@ -10,8 +10,6 @@ var fields = require('./fields');
 var setStyle = require('../../../../style/styles').setStyle;
 
 // private fields
-var SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
-var LAST_SELECT_REF_FIELD = fields.LAST_SELECT_REF_FIELD;
 var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 
 // exports
@@ -43,31 +41,37 @@ module.exports = {
         }
     },
     _onSiblingSelect: function (offset) {
-        var selectedComponent = this.refs[SELECT_REF_FIELD];
-        var currentSelectedItem = React.findDOMNode(selectedComponent);
-        var target;
-        offset = ~~(Number(offset));
-
-        if (offset > 0) {
-            target = currentSelectedItem && currentSelectedItem.nextSibling;
-        } else if (offset < 0) {
-            target = currentSelectedItem && currentSelectedItem.previousSibling;
-        }
-
-        var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
-        var component = id && this.refs[id];
-
-        if (!component) {
+        if (!this._itemIds || _.isEmpty(this._itemIds)) {
             return;
         }
 
-        this.setState({selectedId: id});
+        var selectedId = this.state.selectedId;
+        var selectedComponent = this.refs[selectedId];
+        var position = _.indexOf(this._itemIds, selectedId);
+        var targetComponent;
+        var nextSelectedId;
+        offset = ~~(Number(offset));
+
+        if (offset > 0) {
+            nextSelectedId = this._itemIds[position+1];
+        } else if (offset < 0) {
+            nextSelectedId = this._itemIds[position-1];
+        }
+
+        targetComponent = nextSelectedId && this.refs[nextSelectedId];
+
+        if (!targetComponent) {
+            return;
+        }
+
+        this.setState({selectedId: nextSelectedId});
 
         if (_.isFunction(this.props.onSelect)) {
             this.props.onSelect({
-                currentTarget: target,
-                selectedId: id,
-                currentComponent: component
+                currentTarget: React.findDOMNode(targetComponent),
+                selectedId: nextSelectedId,
+                currentComponent: targetComponent,
+                previousComponent: selectedComponent
             });
         }
     },

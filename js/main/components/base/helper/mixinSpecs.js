@@ -49,11 +49,5 @@ function cleanSpecs(spec) {
 }
 
 function isSet(value) {
-    if (!value) {
-        return false;
-    }
-    if (_.isFunction(value)) {
-        return true;
-    }
-    return !_.isEmpty(value);
+    return !!value;
 }

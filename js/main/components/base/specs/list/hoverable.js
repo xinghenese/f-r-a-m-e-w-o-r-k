@@ -28,7 +28,7 @@ module.exports = {
         var target = event && event.currentTarget;
         var id = target && target.getAttribute(DATA_ITEM_ID_FIELD);
         var component = id && this.refs[id];
-        var selectedId = this.state.selectedId;
+        var selectedId = this.state && this.state.selectedId;
         var selectedComponent = this.refs[SELECT_REF_FIELD];
 
         if (!component
