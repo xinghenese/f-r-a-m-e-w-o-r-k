@@ -30,7 +30,7 @@ module.exports = filter.create({
         }
 
         if (result != 0) {
-            throw new Error(result);
+            throw result;
         }
 
         notify(msg);
