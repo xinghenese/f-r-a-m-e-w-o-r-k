@@ -59,7 +59,7 @@ module.exports = {
         padding: "0 32px 0 38px",
         overflowY: "auto",
         // chatmessage
-        chatmessage: {
+        item: {
             paddingTop: "22px",
             // avatar
             avatar: {

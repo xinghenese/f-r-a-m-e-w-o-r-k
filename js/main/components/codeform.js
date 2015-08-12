@@ -69,7 +69,7 @@ var CodeForm = React.createClass({
         var codeForm = login.codeForm;
         return (
             <div style={makeStyle(login)}>
-                <div className="login-code-form" style={codeForm}>
+                <Form className="login-code-form" style={codeForm} onSubmit={this._handleSubmit}>
                     <p className="login-current-phone" style={loginForm.title}>
                         {AccountStore.getCode() + " - " + AccountStore.getPhone()}
                     </p>
@@ -81,28 +81,32 @@ var CodeForm = React.createClass({
                         >
                     </p>
 
-                    <div className="login-enter-code">
-                        <label style={makeStyle(loginForm.label)}>{Lang.enterCode}</label>
-                        <input type="text"
-                               style={makeStyle(loginForm.input, codeForm.commonText)}
-                               autoComplete="off"
-                               type="tel"
-                               ref="smscode"
-                               onKeyDown={this._handleKeyDown}
-                               onChange={this._handleCodeChange}
-                               onBlur={onInputBlur}
-                               onFocus={onInputFocus}
+                    <Wrapper className="login-enter-code">
+                        <CustomValidator
+                            style={makeStyle(loginForm.label)}
+                            defaultMessage={Lang.enterCode}
+                            controlsToValidate={["sms-code-input"]}
+                            validationAtClient={function(code) {
+                                return (/(\d){5,}/).test(code);
+                            }}
+                            validationAt={function(code) {
+
+                            }}
                             />
-                    </div>
-                    <div>
-                        <input
-                            type="submit"
+                        <InputBox
+                            id="sms-code-input"
+                            style={makeStyle(loginForm.input, codeForm.commonText)}
+                            onKeyDown={this._handleKeyDown}
+                            onChange={this._handleCodeChange}
+                            />
+                    </Wrapper>
+                    <Wrapper>
+                        <Submit
                             value={Lang.next}
                             style={makeStyle(loginForm.button, codeForm.submit)}
-                            onClick={this._handleSubmit}
                             />
-                    </div>
-                </div>
+                    </Wrapper>
+                </Form>
             </div>
         );
     }

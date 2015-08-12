@@ -5,10 +5,8 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var ChatMessage = require('./chatmessage');
 var makeStyle = require('../../../style/styles').makeStyle;
-var prefix = "chat-message-list-";
-var index = 0;
+var commonStyle = require('../../../style/common');
 
 var createGenerator = require('../../base/creator/createReactClassGenerator');
 var listableMixin = require('../../base/specs/list/listable');
@@ -33,56 +31,33 @@ module.exports = createListClass({
             <li>
                 <Avatar
                     className={className + '-avatar'}
-                    style={makeStyle(style.avatar, inlineStyle.avatar)}
-                    name={this.props.senderName}
-                    src={this.props.senderAvatar}
-                    index={this.props.senderName}
+                    style={makeStyle(style.avatar)}
+                    name={data.senderName}
+                    src={data.senderAvatar}
+                    index={key}
                     />
 
                 <div
                     className={className + '-time'}
-                    style={makeStyle(style.time, inlineStyle.time)}
+                    style={makeStyle(style.time)}
                     >
-                    {this.props.time}
+                    {data.time}
                 </div>
-                <div className={className + '-body'}
-                     style={makeStyle(commonStyle.message, style.messagebody, inlineStyle.messagebody)}
+                <div
+                    className={className + '-body'}
+                    style={makeStyle(commonStyle.message, style.messagebody)}
                     >
                     <div className={className + '-nickname'}>
-                        {this.props.senderName}
+                        {data.senderName}
                     </div>
-                    <p className={className + '-content'} style={makeStyle(style.messagebody.messagecontent)}>
-                        {this.props.children}
+                    <p
+                        className={className + '-content'}
+                        style={makeStyle(style.messagebody.messagecontent)}
+                        >
+                        {data.message}
                     </p>
                 </div>
             </li>
-        )
-    },
-    render: function () {
-        var chatMessageNodes = null;
-
-        if (this.props.data && !_.isEmpty(this.props.data)) {
-            chatMessageNodes = _.map(this.props.data, function (data, key) {
-                if (isValidMessageData(data)) {
-                    return (
-                        <ChatMessage
-                            key={prefix + key}
-                            time={data.time}
-                            senderName={data.senderName}
-                            senderAvatar={data.senderAvatar}
-                            style={this.props.style.chatmessage}
-                            >
-                            {data.message}
-                        </ChatMessage>
-                    );
-                }
-            }, this);
-        }
-
-        return (
-            <div className="chat-message-list" style={makeStyle(this.props.style)}>
-                {chatMessageNodes}
-            </div>
         )
     }
 });
