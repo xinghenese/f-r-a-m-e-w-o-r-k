@@ -17,6 +17,16 @@ var Search = React.createClass({
     propTypes: {
         searchFunction: React.PropTypes.func
     },
+    getDefaultProps: function () {
+        return {
+            caseSensitive: true
+        }
+    },
+    componentDidUpdate: function(preProps) {
+        if (!_.isEqual(preProps.datasource, this.props.datasource)) {
+            this._doSearch();
+        }
+    },
     _doSearch: function(event) {
         if (_.isFunction(this.props.onSearch)) {
             this.props.onSearch(startSearch(this, event));
@@ -33,18 +43,18 @@ var Search = React.createClass({
     },
     defaultSearchFunc: function(datasource, fields) {
         var result = {};
-        var searchText = this.getSearchText().toLowerCase();
+        var transformString = this.props.caseSensitive
+            ? function (str) { return String(str); }
+            : function (str) { return String(str).toLowerCase(); };
+        var searchText = transformString(this.getSearchText());
 
         _.forEach(fields, function(field) {
-            var subResult = _.reduce(datasource, function(memo, data) {
-                if (data[field] && data[field].toString().toLowerCase().indexOf(searchText) > -1) {
+            result[field] = _.reduce(datasource, function(memo, data) {
+                if (data[field] && transformString(data[field]).indexOf(searchText) > -1) {
                     memo.push(data);
                 }
                 return memo;
             }, []);
-            if (subResult && !_.isEmpty(subResult)) {
-                result[field] = subResult;
-            }
         });
 
         return result;
