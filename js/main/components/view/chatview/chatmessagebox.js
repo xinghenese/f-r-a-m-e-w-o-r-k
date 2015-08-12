@@ -50,6 +50,7 @@ var ChatMessageBox = React.createClass({
     _handleSubmit: function (event) {
         var data = _.values(event.data)[0];
         if (this.state.id && data) {
+            emitter.emit(EventTypes.BEFORE_SENDING_MESSAGE);
             MessageActions.sendTalkMessage(
                 this.state.id,
                 null,

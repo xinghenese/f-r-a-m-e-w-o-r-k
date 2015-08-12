@@ -30,6 +30,11 @@ var listType = {
     contacts: 'contacts'
 };
 
+var SEARCH_FIELDS = [
+    "name",
+    "message"
+];
+
 //core module to export
 var ConversationBox = React.createClass({
     getInitialState: function() {
@@ -42,8 +47,8 @@ var ConversationBox = React.createClass({
             groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
         };
     },
-    _switchList: function(type) {
-        this.setState({type: listType[type] || listType.conversation});
+    _beforeSendingMessage: function() {
+        this.refs.search.clear();
     },
     _filterData: function(data) {
         var displayData = data && data.name || this.state.data;
@@ -72,8 +77,12 @@ var ConversationBox = React.createClass({
                 break;
         }
     },
+    _switchList: function(type) {
+        this.setState({type: listType[type] || listType.conversation});
+    },
     _updateMessages: function() {
-        var messages = _getLastMessages();
+        var allMessages = _getLastMessages();
+        var messages = _search(allMessages, SEARCH_FIELDS, this.refs.search.getSearchText());
         this.setState({
             data: messages,
             displayData: messages
@@ -83,11 +92,13 @@ var ConversationBox = React.createClass({
         ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
         emitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
+        emitter.on(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
     },
     componentWillUnmount: function() {
         ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
         emitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
+        emitter.removeListener(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
     },
     render: function() {
         var matchedMessages = null;
@@ -228,5 +239,18 @@ function _buildUserRenderObject(item, collector) {
         time: time,
         id: item.userId,
         type: 'user'
+    });
+}
+
+function _search(data, fields, searchText) {
+    return _.filter(data, function(item) {
+        var len = fields.length;
+        for (var i = 0; i < len; ++i) {
+            var field = fields[i];
+            if (item[field] && item[field].toString().toLowerCase().indexOf(searchText) > -1) {
+                return true;
+            }
+        }
+        return false;
     });
 }
