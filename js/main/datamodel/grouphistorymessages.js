@@ -17,6 +17,7 @@ var Message = require('./message');
 
 // exports
 function GroupHistoryMessages(data) {
+    this._requested = false;
     this._data = data;
     this._messages = _parseMessages(this._data["tms"]).reverse();
 }
@@ -63,6 +64,14 @@ GroupHistoryMessages.prototype.getCleanCursor = function () {
 
 GroupHistoryMessages.prototype.getMessages = function () {
     return this._messages;
+};
+
+GroupHistoryMessages.prototype.isRequested = function() {
+    return this._requested;
+};
+
+GroupHistoryMessages.prototype.setRequested = function() {
+    this._requested = true;
 };
 
 // private functions

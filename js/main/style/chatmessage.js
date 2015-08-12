@@ -58,6 +58,7 @@ module.exports = {
         height: "600px",
         padding: "0 32px 0 38px",
         overflowY: "auto",
+        listStyle: "none",
         // chatmessage
         item: {
             paddingTop: "22px",

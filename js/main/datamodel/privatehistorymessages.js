@@ -11,6 +11,7 @@ var Message = require('./message');
 
 // exports
 function PrivateHistoryMessages(data) {
+    this._requested = false;
     this._data = data;
     this._messages = _parseMessages(this._data["tms"]).reverse();
 }
@@ -57,6 +58,14 @@ PrivateHistoryMessages.prototype.getCleanCursor = function() {
 
 PrivateHistoryMessages.prototype.getMessages = function() {
     return this._messages;
+};
+
+PrivateHistoryMessages.prototype.isRequested = function() {
+    return this._requested;
+};
+
+PrivateHistoryMessages.prototype.setRequested = function() {
+    this._requested = true;
 };
 
 // private functions

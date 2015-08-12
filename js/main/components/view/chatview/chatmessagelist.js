@@ -34,7 +34,7 @@ module.exports = createListClass({
                     style={makeStyle(style.avatar)}
                     name={data.senderName}
                     src={data.senderAvatar}
-                    index={key}
+                    index={data.senderId}
                     />
 
                 <div

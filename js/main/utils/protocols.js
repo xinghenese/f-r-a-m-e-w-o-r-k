@@ -5,12 +5,13 @@
 
 // dependencies
 var _ = require('lodash');
+var ConversationConstants = require('../constants/conversationconstants');
 var objects = require('./objects');
 
 // exports
 module.exports = {
     toConversationType: function (type) {
-        if (type === "group") {
+        if (type === ConversationConstants.GROUP_TYPE) {
             return 0;
         }
         return 1;

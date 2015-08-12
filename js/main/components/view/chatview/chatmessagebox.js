@@ -8,6 +8,7 @@ var React = require('react');
 var Lang = require('../../../locales/zh-cn');
 var ChatMessageList = require('./chatmessagelist');
 var ChatMessageToolbar = require('./chatmessagetoolbar');
+var ConversationConstants = require('../../../constants/conversationconstants');
 var style = require('../../../style/chatmessage');
 var makeStyle = require('../../../style/styles').makeStyle;
 var MessageStore = require('../../../stores/messagestore');
@@ -35,10 +36,10 @@ var ChatMessageBox = React.createClass({
         return function () {
             var idNumber = parseInt(id);
             switch (type) {
-                case "group":
+                case ConversationConstants.GROUP_TYPE:
                     MessageActions.deleteGroupMessages(idNumber);
                     break;
-                case "private":
+                case ConversationConstants.PRIVATE_TYPE:
                     MessageActions.deletePrivateMessages(idNumber);
                     break;
                 default:
@@ -50,9 +51,18 @@ var ChatMessageBox = React.createClass({
     _handleSubmit: function (event) {
         var data = _.values(event.data)[0];
         if (this.state.id && data) {
+            emitter.emit(EventTypes.BEFORE_SENDING_MESSAGE);
+
+            var roomId = null;
+            var toUserId = null;
+            if (this.state.type === ConversationConstants.GROUP_TYPE) {
+                roomId = this.state.id;
+            } else {
+                toUserId = this.state.id;
+            }
             MessageActions.sendTalkMessage(
-                this.state.id,
-                null,
+                roomId,
+                toUserId,
                 null,
                 (_.values(event.data)[0]).toString(),
                 _getConversationType(this.state.type),
@@ -72,56 +82,50 @@ var ChatMessageBox = React.createClass({
         var enabled = true;
         var name;
 
-        if (type === 'group') {
-            var groupHistoryMessages = MessageStore.getGroupHistoryMessages(id);
-            if (!groupHistoryMessages) {
-                this.setState({id: null});
-                return;
-            }
-
-            var groupMessages = groupHistoryMessages.getMessages();
-            if (groupMessages.length <= 1) {
-                MessageActions.requestGroupHistoryMessages(id);
-            }
-            data = {
-                groupId: id,
-                messages: groupMessages
-            };
+        if (type === ConversationConstants.GROUP_TYPE) {
             var group = groups.getGroup(id);
             if (group) {
                 enabled = group.inGroup();
                 name = group.name();
             }
-        } else if (type === 'private') {
-            var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(id);
-            if (!privateHistoryMessages) {
-                this.setState({id: null});
-                return;
-            }
 
-            var privateMessages = privateHistoryMessages.getMessages();
-            if (privateMessages.length <= 1) {
-                MessageActions.requestPrivateHistoryMessages(id);
+            var groupHistoryMessages = MessageStore.getGroupHistoryMessages(id);
+            if (groupHistoryMessages) {
+                if (!groupHistoryMessages.isRequested()) {
+                    MessageActions.requestGroupHistoryMessages(id);
+                }
+
+                data = {
+                    groupId: id,
+                    messages: groupHistoryMessages.getMessages()
+                };
             }
-            data = {
-                userId: id,
-                messages: privateMessages
-            };
+        } else {
             var user = users.getUser(id);
             if (user) {
-                name = user.name();
+                name = user.getNickname();
             }
-        }
 
-        if (!data) {
-            return;
+            var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(id);
+            if (privateHistoryMessages) {
+                if (!privateHistoryMessages.isRequested()) {
+                    MessageActions.requestPrivateHistoryMessages(id);
+                }
+
+                data = {
+                    userId: id,
+                    messages: privateHistoryMessages.getMessages()
+                };
+            }
         }
 
         var result = [];
-        if ("groupId" in data) {
-            _buildGroupRenderObject(data, result);
-        } else {
-            _buildUserRenderObject(data, result);
+        if (data) {
+            if ("groupId" in data) {
+                _buildGroupRenderObject(data, result);
+            } else {
+                _buildUserRenderObject(data, result);
+            }
         }
 
         this.setState({
@@ -230,11 +234,12 @@ function _buildGroupRenderObject(item, collector) {
         messageContent = message.getContent();
         time = Formats.formatTime(message.getTimestamp());
         collector.push({
+            senderId: message.getUserId(),
             senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
             time: time,
-            type: 'group'
+            type: ConversationConstants.GROUP_TYPE
         });
     });
 }
@@ -257,17 +262,18 @@ function _buildUserRenderObject(item, collector) {
         messageContent = message.getContent();
         time = Formats.formatTime(message.getTimestamp());
         collector.push({
+            senderId: message.getUserId(),
             senderName: message.getUserNickname() || 'myself',
             senderAvatar: avatar,
             message: messageContent,
             time: time,
-            type: 'group'
+            type: ConversationConstants.GROUP_TYPE
         });
     });
 }
 
 function _getConversationType(strType) {
-    return strType === "group" ? 0 : 1;
+    return strType === ConversationConstants.GROUP_TYPE ? 0 : 1;
 }
 
 function _getSenderNickname(message) {

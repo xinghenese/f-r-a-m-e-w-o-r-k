@@ -36,11 +36,13 @@ module.exports = {
             .set('style', makeStyle(this.props.style))
             .value();
         var listClassName = this.props.className;
-        var listStyle = this.props.style || {};
+        var listStyle = this.props.style && _.clone(this.props.style) || {};
 
         var list = _.map(data, function (data, key) {
-            var itemKey = parseInt(data.key || data.id || key, 10);
+            data = Object(data);
+            var itemKey = parseInt(data.key || data.id || key, 10) || key;
 
+            // TODO: create keys more reasonably
             while (_.includes(this._itemKeys, itemKey)) {
                 itemKey = parseInt(itemKey, 10) + 1;
             }
@@ -51,7 +53,7 @@ module.exports = {
                 key: itemKey,
                 ref: itemKey,
                 className: listClassName && listClassName + '-item',
-                style: listStyle.item || {}
+                style: listStyle.item && _.clone(listStyle.item) || {}
             })
                 .set(DATA_ITEM_KEY_FIELD, itemKey)
                 .set(DATA_ITEM_ID_FIELD, data.id)

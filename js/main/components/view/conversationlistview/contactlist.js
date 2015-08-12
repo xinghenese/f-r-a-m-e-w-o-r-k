@@ -6,6 +6,7 @@
 var _ = require('lodash');
 var React = require('react');
 var ContactGroup = require('./contactgroup');
+var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/contactlist');
 var makeStyle = require('../../../style/styles').makeStyle;
@@ -48,7 +49,6 @@ module.exports = createGroupClass({
         this._onSiblingSelect(1);
     },
     componentDidMount: function() {
-        console.log('did mount');
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
     },
@@ -56,26 +56,28 @@ module.exports = createGroupClass({
         emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
         emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
     },
-    renderGroupTitle: function (data, props, id) {
+    renderGroupTitle: function (data, props, key) {
         return (
             <div
                 className={props.className + '-caption'}
                 style={props.style.caption}
                 >
-                {Lang[id] || id}
+                {Lang[key] || key}
             </div>
         )
     },
-    renderItem: function (data, props, id) {
+    renderItem: function (data, props, key) {
         var className = props.className;
         var style = props.style;
+        var liStyle = (key == this.state.selectedKey) && style.active;
+
         return (
-            <li data-conversation-type={data.type}>
+            <li data-conversation-type={data.type} style={liStyle}>
                 <Avatar
                     className={className + '-avatar'}
                     name={data.name}
                     src={data.avatar}
-                    index={id}
+                    index={key}
                     style={style.avatar}
                     />
 
@@ -98,7 +100,7 @@ module.exports = createGroupClass({
         )
     },
     groupBy: function (data) {
-        if (data.type === 'user') {
+        if (data.type === ConversationConstants.PRIVATE_TYPE) {
             return data.name[0];
         }
         return data.type;
@@ -124,21 +126,8 @@ function defaultOnSelect(event) {
     var index = event.selectedId;
     var component = event.currentComponent;
     var type = component.props['data-conversation-type'];
-    var previousComponent = event.previousComponent;
 
-    if (previousComponent) {
-        setStyle(
-            React.findDOMNode(previousComponent).style,
-            style.contactlist.group.item.default
-        );
-    }
-
-    setStyle(
-        event.currentTarget.style,
-        style.contactlist.group.item.active
-    );
-
-    if (type === "group") {
+    if (type === ConversationConstants.GROUP_TYPE) {
         var group = groups.getGroup(index);
         if (group && group.inGroup()) {
             ConversationActions.joinConversation(

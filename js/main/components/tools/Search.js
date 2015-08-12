@@ -17,6 +17,11 @@ var Search = React.createClass({
     propTypes: {
         searchFunction: React.PropTypes.func
     },
+    getDefaultProps: function () {
+        return {
+            caseSensitive: true
+        }
+    },
     componentDidUpdate: function(preProps) {
         if (!_.isEqual(preProps.datasource, this.props.datasource)) {
             this._doSearch();
@@ -36,8 +41,29 @@ var Search = React.createClass({
         React.findDOMNode(this.refs.searchInput).value = "";
         this._doSearch();
     },
+    defaultSearchFunc: function(datasource, fields) {
+        var result = {};
+        var transformString = this.props.caseSensitive
+            ? function (str) { return String(str); }
+            : function (str) { return String(str).toLowerCase(); };
+        var searchText = transformString(this.getSearchText());
+
+        _.forEach(fields, function(field) {
+            result[field] = _.reduce(datasource, function(memo, data) {
+                if (data[field] && transformString(data[field]).indexOf(searchText) > -1) {
+                    memo.push(data);
+                }
+                return memo;
+            }, []);
+        });
+
+        return result;
+    },
     focus: function() {
         React.findDOMNode(this.refs.searchInput).focus();
+    },
+    getSearchText: function() {
+        return React.findDOMNode(this.refs.searchInput).value || "";
     },
     render: function() {
         return (
@@ -77,18 +103,7 @@ function startSearch(search, event) {
         if (!_.isArray(fields)) {
             fields = [fields];
         }
-
-        _.forEach(fields, function(field) {
-            var subResult = _.reduce(datasource, function(memo, data) {
-                if (data[field] && data[field].toString().toLowerCase().indexOf(searchText) > -1) {
-                    memo.push(data);
-                }
-                return memo;
-            }, []);
-            if (subResult && !_.isEmpty(subResult)) {
-                result[field] = subResult;
-            }
-        });
+        result = search.defaultSearchFunc(datasource, fields);
     }
 
     return result;

@@ -5,6 +5,7 @@
 
 // exports
 module.exports = {
+    BEFORE_SENDING_MESSAGE: "beforeSendMessage",
     CLOSE_CURRENT_CONVERSATION: "closeCurrentConversation",
     ESCAPE_MESSAGE_INPUT: "escapeMessageInput",
     ESCAPE_SEARCH_INPUT: "escapeSearchInput",
@@ -13,6 +14,7 @@ module.exports = {
     SELECT_FIRST_CONVERSATION: "selectFirstConversation",
     SELECT_PREVIOUS_CONVERSATION: "selectPreviousConversation",
     SELECT_NEXT_CONVERSATION: "selectNextConversation",
+    SWITCH_CONVERSATIONS_OR_CONTACTS: "switchConversationsOrContacts",
     SHOW_NOTIFICATION: "showNotification",
     MODIFY_CHAT_MESSAGES: "modifyChatMessages"
 };

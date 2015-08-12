@@ -8,6 +8,7 @@ var _ = require('lodash');
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var ChangeableStore = require('./changeablestore');
+var ConversationConstants = require('../constants/conversationconstants');
 var Group = require('../datamodel/group');
 var HttpConnection = require('../net/connection/httpconnection');
 var User = require('../datamodel/user');
@@ -19,7 +20,7 @@ var ConversationAndContactStore = ChangeableStore.extend({
     getGroupsAndContacts: function() {
         var groupArr = _.map(groups.getGroups(), function(item) {
             return {
-                type: "group",
+                type: ConversationConstants.GROUP_TYPE,
                 name: item.name(),
                 id: item.getGroupId(),
                 count: item.countOfMembers()
@@ -27,7 +28,7 @@ var ConversationAndContactStore = ChangeableStore.extend({
         });
         var userArr = _.map(users.getUsers(), function(item) {
             return {
-                type: "user",
+                type: ConversationConstants.PRIVATE_TYPE,
                 name: item.getNickname(),
                 id: item.getUserId(),
                 online: false, // todo

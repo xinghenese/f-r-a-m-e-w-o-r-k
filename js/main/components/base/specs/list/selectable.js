@@ -22,11 +22,11 @@ module.exports = {
         var target = event && event.currentTarget;
         var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
         var component = key && this.refs[key];
-        var lastselectedKey = this.state.selectedKey;
-        var lastSelectedComponent = this.refs[lastselectedKey];
+        var lastSelectedKey = this.state.selectedKey;
+        var lastSelectedComponent = this.refs[lastSelectedKey];
 
         if (!component
-            || (lastselectedKey && key == lastselectedKey)
+            || (lastSelectedKey && key == lastSelectedKey)
             || (lastSelectedComponent && component === lastSelectedComponent)
         ) {
             return;

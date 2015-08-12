@@ -12,9 +12,9 @@ var makeStyle = require('../style/styles').makeStyle;
 var Lang = require('../locales/zh-cn');
 var countries = require('../constants/countries');
 
-var createGenerator = require('../../base/creator/createReactClassGenerator');
-var listableMixin = require('../../base/specs/list/listable');
-var selectableMixin = require('../../base/specs/list/selectable');
+var createGenerator = require('./base/creator/createReactClassGenerator');
+var listableMixin = require('./base/specs/list/listable');
+var selectableMixin = require('./base/specs/list/selectable');
 
 //private fields
 var createListClass = createGenerator({
@@ -23,7 +23,7 @@ var createListClass = createGenerator({
 
 var CountryList = createListClass({
     displayName: 'CountryList',
-    renderItem: function (props, data, key) {
+    renderItem: function (data, props, key) {
         var className = props.className || 'country-list-item';
         var style = props.style || {};
 
@@ -83,6 +83,7 @@ module.exports = React.createClass({
 
                 <div className="country-list-wrapper" style={makeStyle(style.wrapper)}>
                     <CountryList
+                        className="country-list"
                         data={this.state.displayData}
                         onSelect={this._onSelect}
                         style={style.wrapper.countrylist}

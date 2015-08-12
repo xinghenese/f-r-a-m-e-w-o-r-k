@@ -7,6 +7,7 @@ var _ = require('lodash');
 var React = require('react');
 var ConversationListItem = require('./conversationlistitem');
 var ConversationActions = require('../../../actions/conversationactions');
+var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
@@ -40,7 +41,7 @@ module.exports = createListClass({
             style: style.conversationlist
         }
     },
-    _selectFirstConversation: function() {
+    _selectFirstConversation: function () {
         if (!this.props.data || _.isEmpty(this.props.data)) {
             return;
         }
@@ -71,9 +72,10 @@ module.exports = createListClass({
 
         var className = props.className || 'conversation-list-item';
         var style = props.style || {};
+        var liStyle = (key == this.state.selectedKey) && style.active;
 
         return (
-            <li data-conversation-type={data.type}>
+            <li data-conversation-type={data.type} style={liStyle}>
                 <Avatar
                     className={className + '-avatar'}
                     /* props */
@@ -148,21 +150,8 @@ function defaultOnSelect(event) {
     var component = event.currentComponent;
     var index = event.selectedId || component.props[DATA_ITEM_ID_FIELD];
     var type = component.props['data-conversation-type'];
-    var previousComponent = event.previousComponent;
 
-    if (previousComponent) {
-        setStyle(
-            React.findDOMNode(previousComponent).style,
-            style.conversationlist.item.default
-        );
-    }
-
-    setStyle(
-        event.currentTarget.style,
-        style.conversationlist.item.active
-    );
-
-    if (type === "group") {
+    if (type === ConversationConstants.GROUP_TYPE) {
         var group = groups.getGroup(index);
         if (group && group.inGroup()) {
             ConversationActions.joinConversation(
