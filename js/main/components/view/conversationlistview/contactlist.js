@@ -6,6 +6,7 @@
 var _ = require('lodash');
 var React = require('react');
 var ContactGroup = require('./contactgroup');
+var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/contactlist');
 var makeStyle = require('../../../style/styles').makeStyle;
@@ -48,7 +49,6 @@ module.exports = createGroupClass({
         this._onSiblingSelect(1);
     },
     componentDidMount: function() {
-        console.log('did mount');
         emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
         emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
     },
@@ -98,7 +98,7 @@ module.exports = createGroupClass({
         )
     },
     groupBy: function (data) {
-        if (data.type === 'user') {
+        if (data.type === ConversationConstants.PRIVATE_TYPE) {
             return data.name[0];
         }
         return data.type;
@@ -138,7 +138,7 @@ function defaultOnSelect(event) {
         style.contactlist.group.item.active
     );
 
-    if (type === "group") {
+    if (type === ConversationConstants.GROUP_TYPE) {
         var group = groups.getGroup(index);
         if (group && group.inGroup()) {
             ConversationActions.joinConversation(

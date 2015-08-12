@@ -94,7 +94,18 @@ gulp.task('package', ['build'], function() {
         arch: "x64",
         version: "0.30.3",
         asar: true,
-		overwrite: true
+		overwrite: true,
+        ignore: [
+            "node_modules/asar",
+            "node_modules/bower-resolve",
+            "node_modules/electron*",
+            "node_modules/gulp*",
+            "node_modules/jest*",
+            "node_modules/jscs",
+            "node_modules/vinyl-source-stream",
+            "node_modules/watchify",
+            "chaoxin-*"
+        ]
     }, function(err, appPath) {
         if (err) {
             console.error(err);

@@ -184,6 +184,7 @@ function _handleGroupHistoryMessagesRequest(action) {
         }
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
+        _markGroupHistoryMessagesAsRequested(action.groupId);
         MessageStore.emitChange();
     });
 }
@@ -230,6 +231,7 @@ function _handlePrivateHistoryMessagesRequest(action) {
         }
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
+        _markPrivateHistoryMessagesAsRequested(action.userId);
         MessageStore.emitChange();
     });
 }
@@ -309,16 +311,20 @@ function _handleGroupHistoryMessages(messages) {
             groupHistoryMessages = new GroupHistoryMessages(v);
             MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
         }
+
+        if (_.isEmpty(v["tms"])) {
+            groupHistoryMessages.setRequested();
+        }
     });
 }
 
 function _handlePrivateHistoryMessages(messages) {
     _.forEach(messages, function(v) {
-        if (!v["msuid"]) {
+        if (!v["uid"]) {
             return;
         }
 
-        var userId = parseInt(v["msuid"]);
+        var userId = parseInt(v["uid"]);
         var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
         if (privateHistoryMessages) {
             var previousMessages = _.map(v["tms"], function(item) {
@@ -329,9 +335,27 @@ function _handlePrivateHistoryMessages(messages) {
             privateHistoryMessages = new PrivateHistoryMessages(v);
             MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
         }
+
+        if (_.isEmpty(v["tms"])) {
+            privateHistoryMessages.setRequested();
+        }
     });
 }
 
 function _isValidGroup(groupId) {
     return groupId && parseInt(groupId) > 0;
+}
+
+function _markGroupHistoryMessagesAsRequested(groupId) {
+    var history = MessageStore.getGroupHistoryMessages(groupId);
+    if (history) {
+        history.setRequested();
+    }
+}
+
+function _markPrivateHistoryMessagesAsRequested(userId) {
+    var history = MessageStore.getPrivateHistoryMessages(userId);
+    if (history) {
+        history.setRequested();
+    }
 }

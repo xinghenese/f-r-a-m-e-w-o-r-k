@@ -35,6 +35,7 @@
         "watchify": "~3.3.0"
     },
     "dependencies": {
+        "electron-builder": "^2.0.0",
         "node-notifier": "^4.2.3"
     }
 }

@@ -7,6 +7,7 @@ var _ = require('lodash');
 var React = require('react');
 var ConversationListItem = require('./conversationlistitem');
 var ConversationActions = require('../../../actions/conversationactions');
+var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
@@ -162,7 +163,7 @@ function defaultOnSelect(event) {
         style.conversationlist.item.active
     );
 
-    if (type === "group") {
+    if (type === ConversationConstants.GROUP_TYPE) {
         var group = groups.getGroup(index);
         if (group && group.inGroup()) {
             ConversationActions.joinConversation(
