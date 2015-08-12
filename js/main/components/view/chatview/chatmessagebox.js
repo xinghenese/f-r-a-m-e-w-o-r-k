@@ -231,6 +231,7 @@ function _buildGroupRenderObject(item, collector) {
         messageContent = message.getContent();
         time = Formats.formatTime(message.getTimestamp());
         collector.push({
+            senderId: message.getUserId(),
             senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
@@ -258,6 +259,7 @@ function _buildUserRenderObject(item, collector) {
         messageContent = message.getContent();
         time = Formats.formatTime(message.getTimestamp());
         collector.push({
+            senderId: message.getUserId(),
             senderName: message.getUserNickname() || 'myself',
             senderAvatar: avatar,
             message: messageContent,

@@ -159,7 +159,7 @@ module.exports = {
             //countrylist
             countrylist: {
                 listStyle: "none",
-                countryItem: {
+                item: {
                     borderBottom: "1px #e6e6e6 solid",
                     padding: "14px 20px 0 30px",
                     lineHeight: "26px",

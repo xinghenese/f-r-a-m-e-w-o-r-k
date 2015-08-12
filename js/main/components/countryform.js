@@ -12,73 +12,57 @@ var makeStyle = require('../style/styles').makeStyle;
 var Lang = require('../locales/zh-cn');
 var countries = require('../constants/countries');
 
+var createGenerator = require('./base/creator/createReactClassGenerator');
+var listableMixin = require('./base/specs/list/listable');
+var selectableMixin = require('./base/specs/list/selectable');
+
 //private fields
-var CountryList = React.createClass({
-    _onSelect: function (event) {
-        var target = event.target;
+var createListClass = createGenerator({
+    mixins: [selectableMixin, listableMixin]
+});
 
-        if (target.nodeName.toLowerCase() === 'span') {
-            target = target.parentNode;
-        }
-
-        this.props.onSelect({
-            countryName: target.getAttribute('data-name'),
-            countryCode: target.getAttribute('data-code')
-        });
-    },
-    render: function () {
-        var data = this.props.data;
-        var style = this.props.style || {};
-
-        if (!data || _.isEmpty(data)) {
-            return null;
-        }
-
-        var children = _.map(data, function (countryInfo, index) {
-
-            var name = countryInfo.name;
-            var code = countryInfo.code;
-            var itemStyle = style.item || style.countryItem || {};
-
-            return (
-                <li
-                    key={code + index}
-                    className="country-list-item"
-                    data-name={name}
-                    data-code={code}
-                    style={makeStyle(itemStyle)}
-                    >
-                    <span
-                        className="country-name"
-                        style={itemStyle.name || itemStyle.countryName}
-                        >
-                        {name}
-                    </span>
-                    <span
-                        className="country-code"
-                        style={itemStyle.code || itemStyle.countryCode}
-                        >
-                        {code}
-                    </span>
-                </li>
-            )
-        });
+var CountryList = createListClass({
+    displayName: 'CountryList',
+    renderItem: function (data, props, key) {
+        var className = props.className || 'country-list-item';
+        var style = props.style || {};
 
         return (
-            <ul className="country-list" onClick={this._onSelect} style={makeStyle(style)}>
-                {children}
-            </ul>
-        );
+            <li
+                className={className}
+                data-name={data.name}
+                data-code={data.code}
+                style={makeStyle(style)}
+                >
+                <span
+                    className={className + '-name'}
+                    style={style.name || style.countryName}
+                    >
+                    {data.name}
+                </span>
+                <span
+                    className={className + '-code'}
+                    style={style.code || style.countryCode}
+                    >
+                    {data.code}
+                </span>
+            </li>
+        )
     }
 });
 
 //core module to export
-var CountryForm = React.createClass({
+module.exports = React.createClass({
+    displayName: 'CountryForm',
     getInitialState: function () {
         return {displayData: countries};
     },
-    _onSelect: function (countryInfo) {
-        this.props.onCountryCodeSelected(countryInfo);
+    _onSelect: function (event) {
+        var target = event.currentTarget;
+        this.props.onCountryCodeSelected({
+            countryName: target.getAttribute('data-name'),
+            countryCode: target.getAttribute('data-code')
+        });
     },
     _onSearch: function (data) {
         this.setState({displayData: data ? data.name : countries});
@@ -99,6 +83,7 @@ var CountryForm = React.createClass({
 
                 <div className="country-list-wrapper" style={makeStyle(style.wrapper)}>
                     <CountryList
+                        className="country-list"
                         data={this.state.displayData}
                         onSelect={this._onSelect}
                         style={style.wrapper.countrylist}
@@ -108,8 +93,6 @@ var CountryForm = React.createClass({
         )
     }
 });
-
-module.exports = CountryForm;
 
 //module initialization
 
