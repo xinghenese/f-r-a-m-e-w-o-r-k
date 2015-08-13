@@ -159,8 +159,6 @@ var ConversationBox = React.createClass({
         });
     },
     _updateMessages: function() {
-        //var allMessages = _getLastMessages();
-        //var messages = _search(allMessages, SEARCH_FIELDS, this.refs.search.getSearchText());
         if (this.state.type === listType.contacts) {
             return;
         }
@@ -287,18 +285,5 @@ function _buildUserRenderObject(item, collector) {
         time: time,
         id: item.userId,
         type: 'user'
-    });
-}
-
-function _search(data, fields, searchText) {
-    return _.filter(data, function(item) {
-        var len = fields.length;
-        for (var i = 0; i < len; ++i) {
-            var field = fields[i];
-            if (item[field] && item[field].toString().toLowerCase().indexOf(searchText) > -1) {
-                return true;
-            }
-        }
-        return false;
     });
 }
