@@ -27,6 +27,13 @@ var MessageConstants = {
         FAILED: 3,
         SENDING_ATTACHMENT: 4,
         SENT: 5
+    },
+    MessageTypes: {
+        SYSTEM: 5
+    },
+    SystemMessageTypes: {
+        INVITED_INTO_GROUP: 100,
+        USER_INVITED_INTO_GROUP: 101
     }
 };
 

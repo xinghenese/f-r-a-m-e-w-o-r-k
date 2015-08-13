@@ -83,9 +83,9 @@ module.exports = {
             console.error('no controlsToValidate props found in Validator');
             return null;
         }
+
         var style;
         var message;
-
         switch (this.state.validateState) {
             case ValidateState.DEFAULT:
                 message = this.props.defaultMessage;
@@ -113,7 +113,7 @@ module.exports = {
                 >
                 {message}
             </label>
-        )
+        );
     }
 };
 

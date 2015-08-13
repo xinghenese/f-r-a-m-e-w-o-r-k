@@ -45,7 +45,6 @@ var SideList = React.createClass({
         }
     },
     _switchListType: function (event) {
-        console.info('SideList#switchType');
         var prevListType = this.state.listType;
         var newListType = event.option;
         var newDisplayData;
@@ -66,7 +65,6 @@ var SideList = React.createClass({
         }
     },
     _updateSql: function (event) {
-        console.info('SideList#updateSql');
         this.setState({displayData: event.displayData, matchedMessages: event.matchedMessages});
     },
     componentDidMount: function () {
@@ -168,10 +166,8 @@ var ConversationBox = React.createClass({
         emitter.emit('switch', type);
     },
     _updateMessages: function() {
-        //var allMessages = _getLastMessages();
-        var messages = _getLastMessages();
-        console.info('messages: ', messages);
-        //var messages = _search(allMessages, SEARCH_FIELDS, this.refs.search.getSearchText());
+        var allMessages = _getLastMessages();
+        var messages = _search(allMessages, SEARCH_FIELDS, this.refs.search.getSearchText());
         this.setState({
             data: messages,
             displayData: messages
@@ -190,9 +186,6 @@ var ConversationBox = React.createClass({
         emitter.removeListener(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
     },
     render: function() {
-
-        console.info('ConversationBox#state.data: ', this.state.data);
-
         return (
             <div className="conversation-list-box" style={makeStyle(style)}>
                 <div className="conversation-list-box-header"

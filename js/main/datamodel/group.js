@@ -22,11 +22,11 @@ Group.prototype.getGroupId = function () {
 };
 
 Group.prototype.listedInConversations = function () {
-    return objects.getBool(this._data["od"]);
+    return objects.getBool(this._data["od"] || 1);
 };
 
 Group.prototype.inGroup = function () {
-    return objects.getBool(this._data["ij"]);
+    return objects.getBool(this._data["ij"] || 1);
 };
 
 Group.prototype.name = function () {
@@ -34,19 +34,19 @@ Group.prototype.name = function () {
 };
 
 Group.prototype.countOfMembers = function () {
-    return parseInt(this._data["jmt"]);
+    return parseInt(this._data["jmt"] || 0);
 };
 
 Group.prototype.picture = function () {
-    return this._data["pt"];
+    return this._data["pt"] || "";
 };
 
 Group.prototype.tooManyMessages = function () {
-    return objects.getBool(this._data["if"]);
+    return objects.getBool(this._data["if"] || 0);
 };
 
 Group.prototype.members = function () {
-    return _.map(this._data["jml"], function(item) {
+    return _.map(this._data["jml"] || [], function(item) {
         return new User(item);
     });
 };
