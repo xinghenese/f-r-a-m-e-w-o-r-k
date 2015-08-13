@@ -10,6 +10,7 @@ var errors = require('../constants/errors');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
 var stores = require('../utils/stores');
+var promise = require('../utils/promise');
 
 var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
@@ -39,26 +40,28 @@ var CodeForm = React.createClass({
         this.setState({promptInvalidSMSCode: true});
     },
     _handleSubmit: function() {
-        AccountActions.login(
-            AccountStore.getCode(),
-            AccountStore.getPhone(),
-            this.state.smsCode
-        );
+        this.props.onLoginSuccess();
     },
     componentDidMount: function() {
         this._focusInput();
     },
-    componentWillMount: function() {
-        var self = this;
+    _requestSMSCodeValidation: function(code) {
+        AccountActions.login(
+            AccountStore.getCode(),
+            AccountStore.getPhone(),
+            code
+        );
+    },
+    _awaitSMSCodeValidationResult: function(resolve, reject) {
         stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.SUCCESS;
         }).then(function() {
-            self.props.onLoginSuccess();
+            resolve(AccountStore.LoginState.SUCCESS);
         });
         stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.FAILED;
         }).then(function() {
-            self._handleLoginFailed(AccountStore.getLoginErrorCode());
+            reject(AccountStore.getLoginErrorCode());
         });
     },
     render: function() {
@@ -89,6 +92,10 @@ var CodeForm = React.createClass({
                             validationAtClient={function(code) {
                                 return (/(\d){5,}/).test(code);
                             }}
+                            validationAtServer={_.bind(function(code) {
+                                this._requestSMSCodeValidation(code);
+                                return promise.create(this._awaitSMSCodeValidationResult);
+                            }, this)}
                             />
                         <InputBox
                             id="sms-code-input"
@@ -113,10 +120,3 @@ var CodeForm = React.createClass({
 module.exports = CodeForm;
 
 //private functions
-function onInputBlur(event) {
-    event.target.style.borderBottom = style.login.form.input.borderBottom;
-}
-
-function onInputFocus(event) {
-    event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
-}

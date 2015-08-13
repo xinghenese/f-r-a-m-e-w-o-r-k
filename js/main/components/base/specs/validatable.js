@@ -61,8 +61,9 @@ module.exports = {
 
         //then validate at server end
         var isValidAtServer = _.isFunction(this.props.validationAtServer)
-            ? this.props.validationAtServer(this, values)
+            ? this.props.validationAtServer.apply(this, values)
             : true;
+        var self = this;
 
         if (promise.isPrototypeOf(isValidAtServer)) {
             return isValidAtServer.then(function () {
