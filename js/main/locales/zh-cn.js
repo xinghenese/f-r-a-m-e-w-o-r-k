@@ -48,6 +48,8 @@ module.exports = {
     // chat-box
     "close": "关闭",
     "modify": "修改",
+    "today": "今天",
+    "yesterday": "昨天",
 
     // chat-message-toolbar
     "send": "发送",
