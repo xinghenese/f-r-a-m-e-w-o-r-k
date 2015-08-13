@@ -44,35 +44,19 @@ var SideList = React.createClass({
             matchedMessages: null
         }
     },
-    _switchListType: function (event) {
-        var prevListType = this.state.listType;
-        var newListType = event.option;
-        var newDisplayData;
-
-        if (!newListType) {
-            newListType = prevListType === listType.conversation
-                ? listType.contacts : listType.conversation;
-        }
-
-        if (newListType === listType.conversation) {
-            newDisplayData = _getLastMessages();
-        } else if (newListType === listType.contacts) {
-            newDisplayData = ConversationAndContactStore.getGroupsAndContacts();
-        }
-
-        if (newListType && newDisplayData) {
-            this.setState({listType: newListType, displayData: newDisplayData});
-        }
-    },
     _updateSql: function (event) {
-        this.setState({displayData: event.displayData, matchedMessages: event.matchedMessages});
+        this.setState({
+            displayData: event.displayData,
+            matchedMessages: event.matchedMessages,
+            listType: event.type
+        });
     },
     componentDidMount: function () {
-        emitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
+        //emitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
         emitter.on('search', this._updateSql);
     },
     componentWillUnmount: function () {
-        emitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
+        //emitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
         emitter.removeListener('search', this._updateSql);
     },
     render: function () {
@@ -85,7 +69,7 @@ var SideList = React.createClass({
         if (matchedMessages && !_.isEmpty(matchedMessages)) {
             matchedMessagesCountNode = (
                 <div
-                    className="conversation-list-matchedmessages-gap"
+                    className="conversation-list-matched-messages-gap"
                     style={style.gap}
                     >
                     found {_.size(matchedMessages)} messages
@@ -121,33 +105,15 @@ var ConversationBox = React.createClass({
         var messages = _getLastMessages();
         return {
             data: messages,
-            displayData: messages,
             matchedMessages: null,
-            type: listType.conversation,
-            groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
+            type: listType.conversation
         };
     },
     _beforeSendingMessage: function() {
         this.refs.search.clear();
     },
-    _filterData: function(data) {
-        var displayData = data && data.name || this.state.data;
-        //this.setState({
-        //    displayData: displayData,
-        //    matchedMessages: data && data.message
-        //});
-        emitter.emit('search', {
-            displayData: displayData,
-            matchedMessages: data && data.message
-        });
-    },
     _focusSearchInput: function() {
         this.refs.search.focus();
-    },
-    _onGroupsAndContactsChanged: function() {
-        this.setState({
-            groupsAndContacts: ConversationAndContactStore.getGroupsAndContacts()
-        });
     },
     _onKeyDownInSearchBox: function(event) {
         switch (event.keyCode) {
@@ -161,16 +127,46 @@ var ConversationBox = React.createClass({
                 break;
         }
     },
-    _switchList: function(type) {
-        //this.setState({type: listType[type] || listType.conversation});
-        emitter.emit('switch', type);
+    _filterData: function(data) {
+        emitter.emit('search', {
+            displayData: data && data.name || this.state.data,
+            matchedMessages: data && data.message,
+            type: this.state.type
+        });
+    },
+    _switchList: function(event) {
+        var newType = listType[event.option] || listType.conversation;
+        var data;
+
+        if (newType === listType.conversation) {
+            data = _getLastMessages();
+        } else {
+            data = ConversationAndContactStore.getGroupsAndContacts();
+        }
+
+        this.setState({
+            type: newType,
+            data: data
+        });
+    },
+    _onGroupsAndContactsChanged: function() {
+        if (this.state.type === listType.conversation) {
+            return;
+        }
+
+        this.setState({
+            data: ConversationAndContactStore.getGroupsAndContacts()
+        });
     },
     _updateMessages: function() {
-        var allMessages = _getLastMessages();
-        var messages = _search(allMessages, SEARCH_FIELDS, this.refs.search.getSearchText());
+        //var allMessages = _getLastMessages();
+        //var messages = _search(allMessages, SEARCH_FIELDS, this.refs.search.getSearchText());
+        if (this.state.type === listType.contacts) {
+            return;
+        }
+
         this.setState({
-            data: messages,
-            displayData: messages
+            data: _getLastMessages()
         });
     },
     componentDidMount: function() {
@@ -178,12 +174,14 @@ var ConversationBox = React.createClass({
         MessageStore.addChangeListener(this._updateMessages);
         emitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
         emitter.on(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
+        emitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
     },
     componentWillUnmount: function() {
         ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
         emitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
         emitter.removeListener(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
+        emitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
     },
     render: function() {
         return (

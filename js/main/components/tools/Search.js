@@ -91,7 +91,8 @@ function startSearch(search, event) {
     var datasource = search.props.datasource;
     var searchFunction = search.props.searchFunction;
     var fields = search.props.fields;
-    var searchText = (event && event.target && event.target.value || '').toLowerCase();
+    var target = event && event.target || React.findDOMNode(search.refs.searchInput);
+    var searchText = String(target.value || '').toLowerCase();
 
     if (!datasource || (!_.isFunction(searchFunction) && !fields) || !searchText) {
         return null;

@@ -10,6 +10,7 @@ var errors = require('../constants/errors');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
 var stores = require('../utils/stores');
+var promise = require('../utils/promise');
 
 var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
@@ -18,48 +19,38 @@ var Form = require('./form/Form');
 var CustomValidator = require('./form/validator/CustomValidator');
 
 var CodeForm = React.createClass({
-    getInitialState: function() {
-        return {
-            smsCode: "",
-            promptInvalidSMSCode: false
-        };
-    },
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode || this.refs.form.refs.smscode).focus();
-    },
-    _handleCodeChange: function(event) {
-        this.setState({smsCode: event.target.value});
     },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
         }
     },
-    _handleLoginFailed: function() {
-        this.setState({promptInvalidSMSCode: true});
-    },
     _handleSubmit: function() {
+        this.props.onLoginSuccess();
+    },
+    _requestSMSCodeValidation: function(code) {
         AccountActions.login(
             AccountStore.getCode(),
             AccountStore.getPhone(),
-            this.state.smsCode
+            code
         );
     },
-    componentDidMount: function() {
-        this._focusInput();
-    },
-    componentWillMount: function() {
-        var self = this;
+    _awaitSMSCodeValidationResult: function(resolve, reject) {
         stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.SUCCESS;
         }).then(function() {
-            self.props.onLoginSuccess();
+            resolve(AccountStore.LoginState.SUCCESS);
         });
         stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.FAILED;
         }).then(function() {
-            self._handleLoginFailed(AccountStore.getLoginErrorCode());
+            reject(AccountStore.getLoginErrorCode());
         });
+    },
+    componentDidMount: function() {
+        this._focusInput();
     },
     render: function() {
         var login = style.login;
@@ -89,13 +80,16 @@ var CodeForm = React.createClass({
                             validationAtClient={function(code) {
                                 return (/(\d){5,}/).test(code);
                             }}
+                            validationAtServer={_.bind(function(code) {
+                                this._requestSMSCodeValidation(code);
+                                return promise.create(this._awaitSMSCodeValidationResult);
+                            }, this)}
                             />
                         <InputBox
                             id="sms-code-input"
                             ref="smscode"
                             style={makeStyle(loginForm.input, codeForm.commonText)}
                             onKeyDown={this._handleKeyDown}
-                            onChange={this._handleCodeChange}
                             />
                     </Wrapper>
                     <Wrapper>
@@ -113,10 +107,3 @@ var CodeForm = React.createClass({
 module.exports = CodeForm;
 
 //private functions
-function onInputBlur(event) {
-    event.target.style.borderBottom = style.login.form.input.borderBottom;
-}
-
-function onInputFocus(event) {
-    event.target.style.borderBottom = style.login.form.inputFocus.borderBottom;
-}
