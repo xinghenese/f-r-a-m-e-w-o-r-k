@@ -19,31 +19,16 @@ var Form = require('./form/Form');
 var CustomValidator = require('./form/validator/CustomValidator');
 
 var CodeForm = React.createClass({
-    getInitialState: function() {
-        return {
-            smsCode: "",
-            promptInvalidSMSCode: false
-        };
-    },
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode || this.refs.form.refs.smscode).focus();
-    },
-    _handleCodeChange: function(event) {
-        this.setState({smsCode: event.target.value});
     },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this._handleSubmit();
         }
     },
-    _handleLoginFailed: function() {
-        this.setState({promptInvalidSMSCode: true});
-    },
     _handleSubmit: function() {
         this.props.onLoginSuccess();
-    },
-    componentDidMount: function() {
-        this._focusInput();
     },
     _requestSMSCodeValidation: function(code) {
         AccountActions.login(
@@ -63,6 +48,9 @@ var CodeForm = React.createClass({
         }).then(function() {
             reject(AccountStore.getLoginErrorCode());
         });
+    },
+    componentDidMount: function() {
+        this._focusInput();
     },
     render: function() {
         var login = style.login;
@@ -102,7 +90,6 @@ var CodeForm = React.createClass({
                             ref="smscode"
                             style={makeStyle(loginForm.input, codeForm.commonText)}
                             onKeyDown={this._handleKeyDown}
-                            onChange={this._handleCodeChange}
                             />
                     </Wrapper>
                     <Wrapper>
