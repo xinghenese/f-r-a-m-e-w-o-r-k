@@ -5,7 +5,6 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var ConversationListItem = require('./conversationlistitem');
 var ConversationActions = require('../../../actions/conversationactions');
 var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');

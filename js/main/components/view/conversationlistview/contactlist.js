@@ -5,7 +5,6 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var ContactGroup = require('./contactgroup');
 var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/contactlist');

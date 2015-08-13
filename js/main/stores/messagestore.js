@@ -9,11 +9,14 @@ var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventEmitter = require('events').EventEmitter;
 var EventTypes = require('../constants/eventtypes');
+var Group = require('../datamodel/group');
 var GroupHistoryMessages = require('../datamodel/grouphistorymessages');
 var PrivateHistoryMessages = require('../datamodel/privatehistorymessages');
+var User = require('../datamodel/user');
 var UuidGenerator = require('../utils/uuidgenerator');
 var assign = require('object-assign');
 var emitter = require('../utils/eventemitter');
+var groups = require('../datamodel/groups');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
@@ -37,6 +40,7 @@ var MessageStore = ChangeableStore.extend({
             this._groupHistoryMessages[groupId].appendMessage(message);
         } else {
             var historyMessages = new GroupHistoryMessages({rid: groupId});
+            historyMessages.appendMessage(message);
             this._groupHistoryMessages[groupId] = historyMessages;
         }
 
@@ -47,6 +51,7 @@ var MessageStore = ChangeableStore.extend({
             this._privateHistoryMessages[userId].appendMessage(message);
         } else {
             var historyMessages = new PrivateHistoryMessages({uid: userId});
+            historyMessages.appendMessage(message);
             this._privateHistoryMessages[userId] = historyMessages;
         }
 
@@ -236,9 +241,39 @@ function _handlePrivateHistoryMessagesRequest(action) {
     });
 }
 
+function _handleReceivedGroupSystemMessage(data) {
+    if (!("msgtp" in data && parseInt(data["msgtp"]) === MessageConstants.MessageTypes.SYSTEM && "tp" in data)) {
+        return;
+    }
+
+    var type = parseInt(data["tp"]);
+    switch (type) {
+        case MessageConstants.SystemMessageTypes.INVITED_INTO_GROUP:
+            var referedMembers = data["referobj"] || [];
+            var members = _.map(referedMembers, function(member) {
+                return {
+                    uid: member["referid"],
+                    unk: member["refern"]
+                };
+            });
+            var group = new Group({
+                rid: data["msrid"],
+                jml: members
+            });
+            groups.addGroup(group);
+            break;
+        case MessageConstants.SystemMessageTypes.USER_INVITED_INTO_GROUP:
+            break;
+        default:
+            console.log("Unknown system message received: ", type);
+            break;
+    }
+}
+
 function _handleReceivedTalkMessage(data) {
     var message = new Message(data);
     if (objects.containsValuedProp(data, "msrid")) {
+        _handleReceivedGroupSystemMessage(data);
         MessageStore.appendGroupMessage(message.getGroupId(), message);
     } else if (objects.containsValuedProp(data, "msuid")) {
         MessageStore.appendPrivateMessage(message.getUserId(), message);

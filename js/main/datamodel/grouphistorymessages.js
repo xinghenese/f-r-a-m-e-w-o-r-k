@@ -25,7 +25,7 @@ function GroupHistoryMessages(data) {
 module.exports = GroupHistoryMessages;
 
 // module initialization
-GroupHistoryMessages.prototype.appendMessage = function (message) {
+GroupHistoryMessages.prototype.appendMessage = function(message) {
     this._messages.push(message);
 };
 
@@ -33,36 +33,36 @@ GroupHistoryMessages.prototype.prependMessages = function(messages) {
     this._messages = messages.concat(this._messages);
 };
 
-GroupHistoryMessages.prototype.getGroupId = function () {
+GroupHistoryMessages.prototype.getGroupId = function() {
     return parseInt(this._data["rid"]);
 };
 
-GroupHistoryMessages.prototype.getUnreadMessageCount = function () {
+GroupHistoryMessages.prototype.getUnreadMessageCount = function() {
     return parseInt(this._data["urc"] || 0);
 };
 
-GroupHistoryMessages.prototype.noMoreMessages = function () {
+GroupHistoryMessages.prototype.noMoreMessages = function() {
     return objects.getBool(this._data["ise"]);
 };
 
-GroupHistoryMessages.prototype.getDirection = function () {
+GroupHistoryMessages.prototype.getDirection = function() {
     var direction = this._data["etp"];
     return MessageConstants.parseMessageDirection(direction);
 };
 
-GroupHistoryMessages.prototype.isDirectionChanged = function () {
+GroupHistoryMessages.prototype.isDirectionChanged = function() {
     return "tp" in this._data;
 };
 
-GroupHistoryMessages.prototype.getReadCursor = function () {
+GroupHistoryMessages.prototype.getReadCursor = function() {
     return this._data["rcs"];
 };
 
-GroupHistoryMessages.prototype.getCleanCursor = function () {
+GroupHistoryMessages.prototype.getCleanCursor = function() {
     return this._data["ccs"];
 };
 
-GroupHistoryMessages.prototype.getMessages = function () {
+GroupHistoryMessages.prototype.getMessages = function() {
     return this._messages;
 };
 
@@ -76,7 +76,7 @@ GroupHistoryMessages.prototype.setRequested = function() {
 
 // private functions
 function _parseMessages(arr) {
-    return _.map(arr, function (v) {
+    return _.map(arr, function(v) {
         return new Message(v);
     });
 }

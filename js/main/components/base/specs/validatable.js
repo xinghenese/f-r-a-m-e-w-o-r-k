@@ -61,8 +61,9 @@ module.exports = {
 
         //then validate at server end
         var isValidAtServer = _.isFunction(this.props.validationAtServer)
-            ? this.props.validationAtServer(this, values)
+            ? this.props.validationAtServer.apply(this, values)
             : true;
+        var self = this;
 
         if (promise.isPrototypeOf(isValidAtServer)) {
             return isValidAtServer.then(function () {
@@ -83,9 +84,9 @@ module.exports = {
             console.error('no controlsToValidate props found in Validator');
             return null;
         }
+
         var style;
         var message;
-
         switch (this.state.validateState) {
             case ValidateState.DEFAULT:
                 message = this.props.defaultMessage;
@@ -113,7 +114,7 @@ module.exports = {
                 >
                 {message}
             </label>
-        )
+        );
     }
 };
 

@@ -29,7 +29,7 @@ module.exports = {
     "loginReset": "更改手机号码",
     "enterCode": "请输入验证码",
     "sendCodeNotice": "验证码已通过短信发送<br/>请在下面输入验证码",
-    "codeError": "不匹配的验证码",
+    "codeError": "验证码不匹配",
     "codeSuccess": "验证码匹配成功",
     "confirm": "确定",
     "cancel": "取消",
@@ -48,6 +48,8 @@ module.exports = {
     // chat-box
     "close": "关闭",
     "modify": "修改",
+    "today": "今天",
+    "yesterday": "昨天",
 
     // chat-message-toolbar
     "send": "发送",

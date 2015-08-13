@@ -48,7 +48,7 @@ module.exports = {
         var groupTitleStyle = groupStyle && groupStyle.title || {};
 
         var list = _.map(data, function (data, key) {
-            var groupKey = data.key || data.id || key;
+            var groupKey = parseInt(data.key || data.id || key) || key;
 
             while (_.includes(this._itemKeys, groupKey)) {
                 groupKey = parseInt(groupKey, 10) + 1;

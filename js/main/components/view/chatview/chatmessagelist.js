@@ -7,19 +7,40 @@ var _ = require('lodash');
 var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var commonStyle = require('../../../style/common');
+var Lang = require('../../../locales/zh-cn');
 
 var createGenerator = require('../../base/creator/createReactClassGenerator');
+var groupableMixin = require('../../base/specs/list/groupable');
 var listableMixin = require('../../base/specs/list/listable');
 var Avatar = require('../../avatar');
 
 //private fields
-var createListClass = createGenerator({
-    mixins: [listableMixin]
+var createGroupableClass = createGenerator({
+    mixins: [groupableMixin]
 });
+var now = new Date();
 
 //core module to export
-module.exports = createListClass({
+module.exports = createGroupableClass({
     displayName: 'ChatMessageList',
+    groupBy: function (data, key) {
+        var time = data.time;
+        if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
+            return time.toDateString();
+        }
+        if (time.getDate() === now.getDate()) {
+            return Lang.today;
+        }
+        if (time.getDate() + 1 === now.getDate()) {
+            return Lang.yesterday;
+        }
+        return time.toDateString();
+    },
+    renderGroupTitle: function (data, props, key) {
+        return (
+            <div {...props}><p style={props.style.time}>{key}</p></div>
+        )
+    },
     renderItem: function (data, props, key) {
         if (!isValidMessageData(data)) {
             return null;
@@ -41,7 +62,7 @@ module.exports = createListClass({
                     className={className + '-time'}
                     style={makeStyle(style.time)}
                     >
-                    {data.time}
+                    {data.time.toLocaleTimeString()}
                 </div>
                 <div
                     className={className + '-body'}
