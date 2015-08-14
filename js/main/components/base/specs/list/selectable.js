@@ -16,11 +16,25 @@ var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 // exports
 module.exports = {
     getInitialState: function () {
-        return {selectedKey: -1};
+        return {selectedKeys: [], enableSelect: !!this.props.intialEnableSelect};
+    },
+    getDefaultProps: function () {
+        return {intialEnableSelect: true};
+    },
+    enableSelect: function () {
+        this.setState({enableSelect: true});
+    },
+    disableSelect: function () {
+        this.setState({enableSelect: false, selectedKeys: []});
     },
     _onSelect: function (event) {
+        if (!this.state.enableSelect) {
+            return;
+        }
+
         var target = event && event.currentTarget;
         var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
+        key = parseInt(key, 10) || key;
         var component = key && this.refs[key];
         var lastSelectedKey = this.state.selectedKey;
         var lastSelectedComponent = this.refs[lastSelectedKey];
@@ -44,7 +58,7 @@ module.exports = {
         }
     },
     _onSiblingSelect: function (offset) {
-        if (!this._itemKeys || _.isEmpty(this._itemKeys)) {
+        if (!this.state.enableSelect || !this._itemKeys || _.isEmpty(this._itemKeys)) {
             return;
         }
 

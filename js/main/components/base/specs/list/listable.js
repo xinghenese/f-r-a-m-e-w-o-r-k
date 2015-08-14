@@ -79,6 +79,7 @@ module.exports = {
                 )
             }
 
+            // TODO: renderItem().props should be merged into itemProps
             return React.createElement(
                 'li',
                 itemProps,
