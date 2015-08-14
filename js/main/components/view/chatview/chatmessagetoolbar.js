@@ -57,7 +57,7 @@ var toolbar = module.exports = React.createClass({
         }
     },
     _showInputToolbar: function() {
-        this.setState({modifyEnable: false});
+        emitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: false});
     },
     _showModificationToolbar: function(event) {
         this.setState({modifyEnable: !!(event && event.modifyEnable)});

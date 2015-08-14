@@ -39,7 +39,7 @@ var MessageStore = ChangeableStore.extend({
         if (groupId in this._groupHistoryMessages) {
             this._groupHistoryMessages[groupId].appendMessage(message);
         } else {
-            var historyMessages = new GroupHistoryMessages({rid: groupId});
+            var historyMessages = GroupHistoryMessages.create({rid: groupId});
             historyMessages.appendMessage(message);
             this._groupHistoryMessages[groupId] = historyMessages;
         }
@@ -50,7 +50,7 @@ var MessageStore = ChangeableStore.extend({
         if (userId in this._privateHistoryMessages) {
             this._privateHistoryMessages[userId].appendMessage(message);
         } else {
-            var historyMessages = new PrivateHistoryMessages({uid: userId});
+            var historyMessages = PrivateHistoryMessages.create({uid: userId});
             historyMessages.appendMessage(message);
             this._privateHistoryMessages[userId] = historyMessages;
         }
@@ -343,7 +343,7 @@ function _handleGroupHistoryMessages(messages) {
             });
             groupHistoryMessages.prependMessages(previousMessages.reverse());
         } else {
-            groupHistoryMessages = new GroupHistoryMessages(v);
+            groupHistoryMessages = GroupHistoryMessages.create(v);
             MessageStore.addGroupHistoryMessages(groupHistoryMessages.getGroupId(), groupHistoryMessages);
         }
 
@@ -367,7 +367,7 @@ function _handlePrivateHistoryMessages(messages) {
             });
             privateHistoryMessages.prependMessages(previousMessages.reverse());
         } else {
-            privateHistoryMessages = new PrivateHistoryMessages(v);
+            privateHistoryMessages = PrivateHistoryMessages.create(v);
             MessageStore.addPrivateHistoryMessages(privateHistoryMessages.getUserId(), privateHistoryMessages);
         }
 

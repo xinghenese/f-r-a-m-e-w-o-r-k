@@ -59,37 +59,69 @@ module.exports = {
         padding: "0 32px 0 38px",
         overflowY: "auto",
         listStyle: "none",
-        // chatmessage
-        item: {
-            paddingTop: "22px",
-            // avatar
-            avatar: {
-                boxSizing: "border-box",
-                float: "left",
-                width: "36px",
-                height: "36px",
-                lineHeight: "36px",
-                overflow: "hidden",
-                marginRight: "18px",
-                background: "#499dd9",
-                cursor: "pointer",
-                borderRadius: "50%"
-            },
-            // messagebody
-            messagebody: {
-                fontSize: "14px",
-                margin: "0 82px 0 54px",
-                // messagecontent
-                messagecontent: {
-                    color: "#313232"
+        // group
+        group: {
+            listStyle: "none",
+            // title
+            title: {
+                textAlign: "center",
+                paddingTop: "22px",
+                time: {
+                    width: "137px",
+                    lineHeight: "18px",
+                    fontSize: "12px",
+                    background: "#d5d5d5",
+                    color: "#fff",
+                    borderRadius: "2em",
+                    margin: "0 auto"
                 }
             },
-            // time
-            time: {
-                float: "right",
-                color: "#939393",
-                fontSize: "12px",
-                padding: "0 0 20px 10px"
+            // chatmessage
+            item: {
+                paddingTop: "22px",
+                // avatar
+                avatar: {
+                    boxSizing: "border-box",
+                    float: "left",
+                    width: "36px",
+                    height: "36px",
+                    lineHeight: "36px",
+                    overflow: "hidden",
+                    marginRight: "18px",
+                    background: "#499dd9",
+                    cursor: "pointer",
+                    borderRadius: "50%"
+                },
+                // messagebody
+                messagebody: {
+                    fontSize: "14px",
+                    margin: "0 82px 0 54px",
+                    // messagecontent
+                    messagecontent: {
+                        color: "#313232"
+                    }
+                },
+                // time
+                time: {
+                    float: "right",
+                    color: "#939393",
+                    fontSize: "12px",
+                    padding: "0 0 20px 10px"
+                },
+                // checkbox
+                checkbox: {
+                    float: "right",
+                    width: "24px",
+                    height: "24px",
+                    marginLeft: "24px",
+                    marginTop: "-4px",
+                    lineHeight: "24px",
+                    textAlign: "center",
+                    background: "#b3cadb",
+                    color: "#fff",
+                    borderRadius: "50%",
+                    cursor: "pointer"
+                }
             }
         }
     },

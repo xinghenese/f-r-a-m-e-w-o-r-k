@@ -5,6 +5,7 @@
 
 // dependencies
 var _ = require('lodash');
+var React = require('react');
 var fields = require('./fields');
 
 // private fields
@@ -14,12 +15,26 @@ var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 // exports
 module.exports = {
     getInitialState: function () {
-        return {selectedKeys: []};
+        return {selectedKeys: [], enableSelect: !!this.props.intialEnableSelect};
+    },
+    getDefaultProps: function () {
+        return {intialEnableSelect: true};
+    },
+    enableSelect: function () {
+        this.setState({enableSelect: true});
+    },
+    disableSelect: function () {
+        this.setState({enableSelect: false, selectedKeys: []});
     },
     _onSelect: function (event) {
+        if (!this.state.enableSelect) {
+            return;
+        }
+
         var target = event && event.currentTarget;
         var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
-        var component = key && this.refs[key];
+        key = !isNaN(parseInt(key, 10)) ? parseInt(key, 10) : key;
+        var component = this.refs[key];
 
         if (!component) {
             return;
@@ -50,21 +65,19 @@ module.exports = {
             }
         }
     },
-    render: function (list) {
-        var items = React.Children.map(list.props.children, function (child) {
-            var key = child.props[DATA_ITEM_KEY_FIELD];
-            var selected = _.includes(this.state.selectedKeys, key);
-            var props = {
-                selected: selected,
-                onClick: this._onSelect,
-                onMouseEnter: this._onHoverIn,
-                onMouseLeave: this._onHoverOut
-            };
+    renderItem: function (item) {
+        if (!React.isValidElement(item)) {
+            return null;
+        }
 
-            return React.cloneElement(child, props);
-        }, this);
+        var key = item.props[DATA_ITEM_KEY_FIELD];
+        var selected = _.includes(this.state.selectedKeys, key);
+        var props = {
+            selected: selected,
+            onClick: this._onSelect
+        };
 
-        return React.cloneElement(list, null, items);
+        return React.cloneElement(item, props);
     }
 };
 
