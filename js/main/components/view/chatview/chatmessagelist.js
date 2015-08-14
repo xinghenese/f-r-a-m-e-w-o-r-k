@@ -8,21 +8,26 @@ var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var commonStyle = require('../../../style/common');
 var Lang = require('../../../locales/zh-cn');
+var emitter = require('../../../utils/eventemitter');
+var EventTypes = require('../../../constants/eventtypes');
 
 var createGenerator = require('../../base/creator/createReactClassGenerator');
 var groupableMixin = require('../../base/specs/list/groupable');
-var listableMixin = require('../../base/specs/list/listable');
+var multiselectableMixin = require('../../base/specs/list/multiselectable');
 var Avatar = require('../../avatar');
 
 //private fields
 var createGroupableClass = createGenerator({
-    mixins: [groupableMixin]
+    mixins: [groupableMixin, multiselectableMixin]
 });
 var now = new Date();
 
 //core module to export
 module.exports = createGroupableClass({
     displayName: 'ChatMessageList',
+    getDefaultProps: function () {
+        return {intialEnableSelect: false};
+    },
     groupBy: function (data, key) {
         var time = data.time;
         if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
@@ -36,6 +41,18 @@ module.exports = createGroupableClass({
         }
         return time.toDateString();
     },
+    _modifyCurrentChat: function (event) {
+        this.setState({
+            enableSelect: !!(event && event.modifyEnable),
+            selectedKeys: []
+        });
+    },
+    componentDidMount: function () {
+        emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
+    },
+    compnonentWillUnmount: function () {
+        emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
+    },
     renderGroupTitle: function (data, props, key) {
         return (
             <div {...props}><p style={props.style.time}>{key}</p></div>
@@ -47,6 +64,19 @@ module.exports = createGroupableClass({
         }
         var className = props.className || 'chat-message';
         var style = props.style || {};
+        var checkbox = null;
+
+        if (this.state.enableSelect) {
+            checkbox = (
+                <div
+                    className={className + '-checkbox'}
+                    style={style.checkbox}
+                    dangerouslySetInnerHTML={{
+                        __html: _.includes(this.state.selectedKeys, key) ? '&#10003;' : ''
+                    }}
+                    />
+            );
+        }
 
         return (
             <li>
@@ -57,7 +87,7 @@ module.exports = createGroupableClass({
                     src={data.senderAvatar}
                     index={data.senderId}
                     />
-
+                {checkbox}
                 <div
                     className={className + '-time'}
                     style={makeStyle(style.time)}

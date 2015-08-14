@@ -40,7 +40,8 @@ module.exports = {
 
         var list = _.map(data, function (data, key) {
             data = Object(data);
-            var itemKey = parseInt(data.key || data.id || key, 10) || key;
+            var itemKey = data.key || data.id || key;
+            itemKey = !isNaN(parseInt(itemKey, 10)) ? parseInt(itemKey, 10): itemKey;
 
             // TODO: create keys more reasonably
             while (_.includes(this._itemKeys, itemKey)) {
@@ -79,6 +80,7 @@ module.exports = {
                 )
             }
 
+            // TODO: renderItem().props should be merged into itemProps
             return React.createElement(
                 'li',
                 itemProps,
