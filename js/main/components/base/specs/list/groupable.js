@@ -48,7 +48,8 @@ module.exports = {
         var groupTitleStyle = groupStyle && groupStyle.title || {};
 
         var list = _.map(data, function (data, key) {
-            var groupKey = parseInt(data.key || data.id || key) || key;
+            var groupKey = data.key || data.id || key;
+            groupKey = !isNaN(parseInt(groupKey, 10)) ? parseInt(groupKey, 10) : groupKey;
 
             while (_.includes(this._itemKeys, groupKey)) {
                 groupKey = parseInt(groupKey, 10) + 1;

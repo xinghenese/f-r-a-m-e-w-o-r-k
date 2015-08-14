@@ -34,8 +34,8 @@ module.exports = {
 
         var target = event && event.currentTarget;
         var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
-        key = parseInt(key, 10) || key;
-        var component = key && this.refs[key];
+        key = !isNaN(parseInt(key, 10)) ? parseInt(key, 10) : key;
+        var component = this.refs[key];
         var lastSelectedKey = this.state.selectedKey;
         var lastSelectedComponent = this.refs[lastSelectedKey];
 
