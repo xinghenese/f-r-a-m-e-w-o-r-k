@@ -7,6 +7,7 @@
 var _ = require('lodash');
 var Lang = require('../locales/zh-cn');
 var User = require('../datamodel/user');
+var config = require('../etc/config');
 var objects = require('../utils/objects');
 
 // private fields
@@ -38,7 +39,10 @@ Group.prototype.countOfMembers = function () {
 };
 
 Group.prototype.picture = function () {
-    return this._data["pt"] || "";
+    if (this._data["pt"]) {
+        return config.resourceDomain + this._data["pt"];
+    }
+    return null;
 };
 
 Group.prototype.tooManyMessages = function () {
