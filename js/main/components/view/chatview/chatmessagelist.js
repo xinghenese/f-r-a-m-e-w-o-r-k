@@ -15,6 +15,7 @@ var createGenerator = require('../../base/creator/createReactClassGenerator');
 var groupableMixin = require('../../base/specs/list/groupable');
 var multiselectableMixin = require('../../base/specs/list/multiselectable');
 var Avatar = require('../../avatar');
+var messageConstants = require('../../../constants/messageconstants');
 
 //private fields
 var createGroupableClass = createGenerator({
@@ -56,7 +57,7 @@ module.exports = createGroupableClass({
     renderGroupTitle: function (data, props, key) {
         return (
             <div {...props}><p style={props.style.time}>{key}</p></div>
-        )
+        );
     },
     renderItem: function (data, props, key) {
         if (!isValidMessageData(data)) {
@@ -76,6 +77,14 @@ module.exports = createGroupableClass({
                     }}
                     />
             );
+        }
+
+        if (data.type === messageConstants.MessageTypes.SYSTEM) {
+            return (
+                <li style={style.system}>
+                    <p style={props.style.system}>{data.message}</p>
+                </li>
+            )
         }
 
         return (

@@ -79,6 +79,16 @@ module.exports = {
             // chatmessage
             item: {
                 paddingTop: "22px",
+                // system message
+                system: {
+                    width: "137px",
+                    lineHeight: "18px",
+                    fontSize: "12px",
+                    background: "#d5d5d5",
+                    color: "#fff",
+                    borderRadius: "2em",
+                    margin: "0 auto"
+                },
                 // avatar
                 avatar: {
                     boxSizing: "border-box",
