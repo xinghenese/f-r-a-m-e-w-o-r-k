@@ -2,6 +2,8 @@
  * Created by Reco on 2015/6/23.
  */
 
+var commonStyle = require('./common');
+
 //core module to export
 module.exports = {
     position: 'absolute',
@@ -81,13 +83,15 @@ module.exports = {
                 paddingTop: "22px",
                 // system message
                 system: {
-                    width: "137px",
+                    display: "inline-block",
                     lineHeight: "18px",
                     fontSize: "12px",
                     background: "#d5d5d5",
                     color: "#fff",
                     borderRadius: "2em",
-                    margin: "0 auto"
+                    textAlign: "center",
+                    margin: "0 auto",
+                    '@mixin': commonStyle.singleLineText
                 },
                 // avatar
                 avatar: {
