@@ -121,6 +121,10 @@ Message.prototype.getStatus = function() {
     return this._status;
 };
 
+Message.prototype.getProp = function(key) {
+    return this._data[key];
+};
+
 Message.prototype.setStatus = function(status) {
     this._status = status;
 };
