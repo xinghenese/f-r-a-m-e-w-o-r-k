@@ -11,8 +11,8 @@ var serverInfoEmitter = require('../emitters/serverInfos');
 var socket = null;
 var connectPromise = null;
 var initPromise = null;
-//var serverInfos = _.shuffle(['192.168.1.66', '192.168.1.67', '192.168.1.68']);
-var serverInfos = _.shuffle(['42.62.27.170']);
+var serverInfos = _.shuffle(['192.168.1.66', '192.168.1.67', '192.168.1.68']);
+//var serverInfos = _.shuffle(['42.62.27.170']);
 var serverPort = 443;
 var serverInfoIndex = 0;
 
