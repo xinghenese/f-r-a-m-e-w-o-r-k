@@ -29,7 +29,16 @@ var MessageConstants = {
         SENT: 5
     },
     MessageTypes: {
-        SYSTEM: 5
+        TEXT: 0,
+        PICTURE: 1,
+        AUDIO: 2,
+        LOCATION: 3,
+        VIBRATION: 4,
+        SYSTEM: 5,
+        EMOTION: 6,
+        PREDEFINED: 7,
+        CONTACT: 10,
+        GROUP_CARD: 11
     },
     SystemMessageTypes: {
         INVITED_INTO_GROUP: 100,

@@ -234,6 +234,7 @@ function _buildGroupRenderObject(item, collector) {
             senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
+            messageType: message.getMessageType(),
             time: new Date(message.getTimestamp()),
             type: message.getMessageType()
         });
@@ -258,6 +259,7 @@ function _buildUserRenderObject(item, collector) {
             senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
+            messageType: message.getMessageType(),
             time: new Date(message.getTimestamp()),
             type: message.getMessageType()
         });

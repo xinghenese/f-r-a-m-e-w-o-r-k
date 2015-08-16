@@ -16,6 +16,7 @@ var groupableMixin = require('../../base/specs/list/groupable');
 var multiselectableMixin = require('../../base/specs/list/multiselectable');
 var Avatar = require('../../avatar');
 var messageConstants = require('../../../constants/messageconstants');
+var ChatMessage = require('./chatmessage');
 
 //private fields
 var createGroupableClass = createGenerator({
@@ -116,7 +117,7 @@ module.exports = createGroupableClass({
                         className={className + '-content'}
                         style={makeStyle(style.messagebody.messagecontent)}
                         >
-                        {data.message}
+                        <ChatMessage messageType={data.messageType} message={data.message} />
                     </p>
                 </div>
             </li>
