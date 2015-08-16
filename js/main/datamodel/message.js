@@ -47,7 +47,7 @@ Message.prototype.getBriefText = function() {
     var type = this.getMessageType();
     switch (type) {
         case 0:
-            return this.getContent();
+            return this._data["msg"]["t"];
         case 1:
             return Lang.pictureMessage;
         case 2:

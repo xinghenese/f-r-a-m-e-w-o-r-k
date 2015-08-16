@@ -33,12 +33,14 @@ function createMessageNode(type, msg) {
             var width = Math.min(msg.width, PICTURE_MAX_WIDTH);
             var height = msg.height / msg.width * width;
             var src = msg.url.indexOf(RESOURCE_URL) > -1 ? msg.url : RESOURCE_URL + msg.url;
-            return <img src={src} width={width} height={height} />;
+            return <img src={src} width={width} height={height} onDoubleClick={function(e) {
+
+            }}/>;
         case MessageTypes.AUDIO:
             src = msg.url.indexOf(RESOURCE_URL) > -1 ? msg.url : RESOURCE_URL + msg.url;
             return <audio src={src} />;
         case MessageTypes.SYSTEM:
-            return <span>{msg.tp || ''}</span>;
+            return <span>{msg.t || ''}</span>;
         default :
             return <span>{msg.t || ''}</span>;
     }

@@ -84,8 +84,8 @@ module.exports = createGroupableClass({
 
         if (data.type === messageConstants.MessageTypes.SYSTEM) {
             return (
-                <li style={style.system}>
-                    <p style={props.style.system}>{data.message}</p>
+                <li style={makeStyle(style.system)}>
+                    <p style={props.system.message}>{data.message}</p>
                 </li>
             )
         }
