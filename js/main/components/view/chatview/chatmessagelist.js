@@ -85,7 +85,7 @@ module.exports = createGroupableClass({
         if (data.type === messageConstants.MessageTypes.SYSTEM) {
             return (
                 <li style={makeStyle(style.system)}>
-                    <p style={props.system.message}>{data.message}</p>
+                    <span style={style.system.message}>{data.message}</span>
                 </li>
             )
         }
@@ -127,5 +127,5 @@ module.exports = createGroupableClass({
 
 //private function
 function isValidMessageData(data) {
-    return data && !_.isEmpty(data) && data.senderName && data.message;
+    return data && !_.isEmpty(data) && data.senderName;
 }
