@@ -83,15 +83,17 @@ module.exports = {
                 paddingTop: "22px",
                 // system message
                 system: {
-                    display: "inline-block",
-                    lineHeight: "18px",
-                    fontSize: "12px",
-                    background: "#d5d5d5",
-                    color: "#fff",
-                    borderRadius: "2em",
                     textAlign: "center",
-                    margin: "0 auto",
-                    '@mixin': commonStyle.singleLineText
+                    message: {
+                        lineHeight: "18px",
+                        fontSize: "12px",
+                        background: "#d5d5d5",
+                        color: "#fff",
+                        borderRadius: "2em",
+                        textAlign: "center",
+                        padding: "0 2em",
+                        '@mixin': commonStyle.singleLineText
+                    }
                 },
                 // avatar
                 avatar: {
