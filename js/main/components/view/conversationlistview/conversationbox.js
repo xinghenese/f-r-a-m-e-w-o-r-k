@@ -15,6 +15,7 @@ var Search = require('../../tools/Search');
 var Lang = require('../../../locales/zh-cn');
 var groups = require('../../../datamodel/groups');
 var users = require('../../../datamodel/users');
+var ConversationConstants = require('../../../constants/conversationconstants');
 var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
 var Formats = require('../../../utils/formats');
@@ -260,7 +261,7 @@ function _buildGroupRenderObject(item, collector) {
         message: message,
         time: time,
         id: item.groupId,
-        type: 'group'
+        type: ConversationConstants.GROUP_TYPE
     });
 }
 
@@ -284,6 +285,6 @@ function _buildUserRenderObject(item, collector) {
         message: message,
         time: time,
         id: item.userId,
-        type: 'user'
+        type: ConversationConstants.PRIVATE_TYPE
     });
 }

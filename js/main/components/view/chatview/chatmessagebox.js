@@ -221,25 +221,22 @@ function _buildGroupRenderObject(item, collector) {
     if (!group) {
         return;
     }
-    var groupName = group.name();
-    var avatar = group.picture();
-    var messageContent = "";
-    var time = "";
 
+    var avatar = group.picture();
     _.forEach(item.messages, function (message) {
         if (!message) {
             return;
         }
 
-        messageContent = message.getContent();
-        time = Formats.formatTime(message.getTimestamp());
+        var messageContent = message.getContent();
         collector.push({
             senderId: message.getUserId(),
             senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
+            messageType: message.getMessageType(),
             time: new Date(message.getTimestamp()),
-            type: ConversationConstants.GROUP_TYPE
+            type: message.getMessageType()
         });
     });
 }
@@ -249,25 +246,22 @@ function _buildUserRenderObject(item, collector) {
     if (!user) {
         return;
     }
-    var userName = user.getNickname();
-    var avatar = user.picture();
-    var messageContent = "";
-    var time = "";
 
+    var avatar = user.picture();
     _.forEach(item.messages, function (message) {
         if (!message) {
             return;
         }
 
-        messageContent = message.getContent();
-        time = Formats.formatTime(message.getTimestamp());
+        var messageContent = message.getContent();
         collector.push({
             senderId: message.getUserId(),
-            senderName: message.getUserNickname() || 'myself',
+            senderName: _getSenderNickname(message),
             senderAvatar: avatar,
             message: messageContent,
+            messageType: message.getMessageType(),
             time: new Date(message.getTimestamp()),
-            type: ConversationConstants.GROUP_TYPE
+            type: message.getMessageType()
         });
     });
 }

@@ -17,7 +17,7 @@ var defaultColor = "#499dd9";
 //core module to export
 var Avatar = React.createClass({
     render: function () {
-        var name = this.props.name && this.props.name[0] || '';
+        var name = this.props.name && this.props.name[0].toUpperCase() || '';
         var img = name;
 
         if (this.props.src) {

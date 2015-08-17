@@ -37,10 +37,10 @@ var MessageStore = ChangeableStore.extend({
     },
     appendGroupMessage: function(groupId, message) {
         if (groupId in this._groupHistoryMessages) {
-            this._groupHistoryMessages[groupId].appendMessage(message);
+            this._groupHistoryMessages[groupId].addMessage(message);
         } else {
             var historyMessages = GroupHistoryMessages.create({rid: groupId});
-            historyMessages.appendMessage(message);
+            historyMessages.addMessage(message);
             this._groupHistoryMessages[groupId] = historyMessages;
         }
 
@@ -48,10 +48,10 @@ var MessageStore = ChangeableStore.extend({
     },
     appendPrivateMessage: function(userId, message) {
         if (userId in this._privateHistoryMessages) {
-            this._privateHistoryMessages[userId].appendMessage(message);
+            this._privateHistoryMessages[userId].addMessage(message);
         } else {
             var historyMessages = PrivateHistoryMessages.create({uid: userId});
-            historyMessages.appendMessage(message);
+            historyMessages.addMessage(message);
             this._privateHistoryMessages[userId] = historyMessages;
         }
 
@@ -95,7 +95,6 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 });
 
 socketconnection.monitor("TM").then(function(data) {
-    console.log("got message");
     _handleReceivedTalkMessage(data);
     var message = new Message(data);
     emitter.emit(EventTypes.SHOW_NOTIFICATION, {
@@ -249,20 +248,9 @@ function _handleReceivedGroupSystemMessage(data) {
     var type = parseInt(data["tp"]);
     switch (type) {
         case MessageConstants.SystemMessageTypes.INVITED_INTO_GROUP:
-            var referedMembers = data["referobj"] || [];
-            var members = _.map(referedMembers, function(member) {
-                return {
-                    uid: member["referid"],
-                    unk: member["refern"]
-                };
-            });
-            var group = new Group({
-                rid: data["msrid"],
-                jml: members
-            });
-            groups.addGroup(group);
-            break;
+            // fall through
         case MessageConstants.SystemMessageTypes.USER_INVITED_INTO_GROUP:
+            _maybeAddGroupFromSystemMessage(data);
             break;
         default:
             console.log("Unknown system message received: ", type);
@@ -388,9 +376,42 @@ function _markGroupHistoryMessagesAsRequested(groupId) {
     }
 }
 
+function _markHistoryMessagesOfNewlyCreatedGroupAsRequested(groupId) {
+    var historyMessages = GroupHistoryMessages.create({rid: groupId});
+    historyMessages.setRequested();
+    MessageStore._groupHistoryMessages[groupId] = historyMessages;
+}
+
 function _markPrivateHistoryMessagesAsRequested(userId) {
     var history = MessageStore.getPrivateHistoryMessages(userId);
     if (history) {
         history.setRequested();
     }
+}
+
+function _maybeAddGroupFromSystemMessage(data) {
+    if (!("msrid" in data)) {
+        return;
+    }
+
+    var groupId = parseInt(data["msrid"]);
+    var group = groups.getGroup(groupId);
+    if (group) {
+        return;
+    }
+
+    var referedMembers = data["referobj"] || [];
+    var members = _.map(referedMembers, function(member) {
+        return {
+            uid: member["referid"],
+            unk: member["refern"]
+        };
+    });
+    group = new Group({
+        rid: data["msrid"],
+        jml: members
+    });
+    groups.addGroup(group);
+
+    _markHistoryMessagesOfNewlyCreatedGroupAsRequested(groupId);
 }

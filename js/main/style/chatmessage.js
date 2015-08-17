@@ -2,6 +2,8 @@
  * Created by Reco on 2015/6/23.
  */
 
+var commonStyle = require('./common');
+
 //core module to export
 module.exports = {
     position: 'absolute',
@@ -79,6 +81,20 @@ module.exports = {
             // chatmessage
             item: {
                 paddingTop: "22px",
+                // system message
+                system: {
+                    textAlign: "center",
+                    message: {
+                        lineHeight: "18px",
+                        fontSize: "12px",
+                        background: "#d5d5d5",
+                        color: "#fff",
+                        borderRadius: "1em",
+                        textAlign: "center",
+                        padding: "1px 2em",
+                        '@mixin': commonStyle.singleLineText
+                    }
+                },
                 // avatar
                 avatar: {
                     boxSizing: "border-box",

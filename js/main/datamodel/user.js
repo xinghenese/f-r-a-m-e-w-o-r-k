@@ -4,6 +4,7 @@
 'use strict';
 
 // dependencies
+var config = require('../etc/config');
 var objects = require('../utils/objects');
 
 // exports
@@ -28,7 +29,10 @@ User.prototype.getNickname = function () {
 };
 
 User.prototype.picture = function () {
-    return this._data["pt"];
+    if (this._data["pt"]) {
+        return config.resourceDomain + this._data["pt"];
+    }
+    return null;
 };
 
 User.prototype.code = function () {

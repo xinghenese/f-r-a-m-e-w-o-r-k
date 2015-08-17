@@ -5,16 +5,18 @@
 //dependencies
 var _ = require('lodash');
 var promise = require('../../utils/promise');
-var serverInfoEmitter = require('../emitters/serverInfos');
+var HTTPConnection = require('./httpconnection');
 
 //private fields
 var socket = null;
 var connectPromise = null;
 var initPromise = null;
-var serverInfos = _.shuffle(['192.168.1.66', '192.168.1.67', '192.168.1.68']);
+var serverInfos;
 //var serverInfos = _.shuffle(['42.62.27.170']);
-var serverPort = 443;
+var defaultServerPort = 443;
 var serverInfoIndex = 0;
+var currentReconnectTimes = 0;
+var maxReconnectTimes = 3;
 
 module.exports = {
     /**
@@ -31,17 +33,21 @@ function send(data) {
             var host, port;
             if (_.isPlainObject(serverInfo)) {
                 host = serverInfo.host || serverInfo.ip;
-                port = serverInfo.port || serverPort;
+                port = serverInfo.port || defaultServerPort;
             } else {
                 host = "" + serverInfo;
-                port = serverPort;
+                port = defaultServerPort;
             }
+
             return connect(host, port);
         })
         .then(function () {
             socket.send(data);
         }, function () {
             //handle reconnect
+            if (++ currentReconnectTimes > maxReconnectTimes) {
+                throw new Error('socket fails to connect even after reconnecting for several times');
+            }
             return reset().then(function () {
                 return send(data);
             });
@@ -52,24 +58,22 @@ function send(data) {
 }
 
 function init() {
-    if (!initPromise) {
-        if (serverInfos && serverInfos[serverInfoIndex]) {
-            initPromise = promise.create(serverInfos[serverInfoIndex++]);
-        } else {
-            initPromise = serverInfoEmitter.once(serverInfoEmitter.events.serverInfos)
-                .then(function (infos) {
-                    console.log(infos);
-                    return _.shuffle(infos)[serverInfoIndex];
-                })
-            ;
-        }
+    if (!initPromise || !serverInfos) {
+        initPromise = HTTPConnection.request({
+            url: 'srv/gsi',
+            data: { tp: 2 }
+        }).then(function (res) {
+            serverInfos = _.shuffle(res);
+            return serverInfos[serverInfoIndex ++];
+        }, function (err) {
+            initPromise = 'initPromise';
+        });
     }
     return initPromise;
 }
 
 function reset() {
     return promise.create(function (resolve, reject) {
-        initPromise = null;
         connectPromise = null;
         resolve('reset');
     });

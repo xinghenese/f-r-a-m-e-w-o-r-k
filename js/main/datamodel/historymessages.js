@@ -17,8 +17,16 @@ function HistoryMessages(data) {
 module.exports = HistoryMessages;
 
 // module initialization
-HistoryMessages.prototype.appendMessage = function(message) {
-    this._messages.push(message);
+HistoryMessages.prototype.addMessage = function(message) {
+    if (_isNewerThanCurrentMessages(this._messages, message)) {
+        this._messages.push(message);
+    } else {
+        // it works even if it returns -1 on no such message found
+        var lastIndex = _.findLastIndex(this._messages, function(item) {
+            return parseInt(item["mscs"]) < parseInt(message["mscs"]);
+        });
+        this._messages.splice(lastIndex + 1, 0, message);
+    }
 };
 
 HistoryMessages.prototype.prependMessages = function(messages) {
@@ -67,4 +75,13 @@ function _parseMessages(arr) {
     return _.map(arr, function(v) {
         return new Message(v);
     });
+}
+
+function _isNewerThanCurrentMessages(messages, message) {
+    if (_.isEmpty(messages)) {
+        return true;
+    }
+
+    var last = _.last(messages);
+    return parseInt(last.getCursor()) < parseInt(message.getCursor());
 }

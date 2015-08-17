@@ -30,8 +30,8 @@ app.on('ready', function() {
     mainWindow = new BrowserWindow({
         "width": 1000,
         "height": 725,
-        //"max-width": 1000,
-        //"max-height": 725,
+        "max-width": 1000,
+        "max-height": 725,
         "min-width": 1000,
         "min-height": 725
     });
@@ -40,7 +40,7 @@ app.on('ready', function() {
     mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
     // Open the devtools.
-    mainWindow.openDevTools();
+    //mainWindow.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
