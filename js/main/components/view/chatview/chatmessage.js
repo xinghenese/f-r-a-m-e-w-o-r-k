@@ -10,6 +10,7 @@ var MessageConstants = require('../../../constants/messageconstants');
 var MessageTypes = MessageConstants.MessageTypes;
 var Lang = require('../../../locales/zh-cn');
 var makeStyle = require('../../../style/styles').makeStyle;
+var setStyle = require('../../../style/styles').setStyle;
 var Strings = require('../../../utils/strings');
 var config = require('../../../etc/config');
 var Overlay = require('../../box/Overlay');
@@ -25,12 +26,35 @@ var TextMessage = React.createClass({
 });
 
 var PictureMessage = React.createClass({
-    _showOriginalImage: function () {
+    _showOriginalImage: function (event) {
         var message = this.props.message;
         var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
         Overlay.show(
-            <img src={src} width={message.width} height={message.height} />
+            <img src={src} width={message.width} height={message.height} onWheel={this._resizeImage}
+                data-original-width={message.width} data-original-height={message.height}
+                data-delta-size={0}/>
         );
+    },
+    _resizeImage: function (event) {
+        var target = event.currentTarget;
+
+        var originalWidth = parseInt(target.getAttribute('data-original-width'));
+        var originalHeight = parseInt(target.getAttribute('data-original-height'));
+        var deltaSize = parseInt(target.getAttribute('data-delta-size'));
+        var deltaY = parseInt(event.deltaY);
+
+        if (!deltaY) {
+            return;
+        }
+
+        deltaSize -= deltaY;
+        var deltaRate = 1 + deltaSize / 1000;
+
+        setStyle(
+            target,
+            {width: deltaRate * originalWidth + 'px', height: deltaRate * originalHeight + 'px'}
+        );
+        target.setAttribute('data-delta-size', String(deltaSize));
     },
     render: function () {
         var message = this.props.message;
