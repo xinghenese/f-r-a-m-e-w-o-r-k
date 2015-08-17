@@ -53,6 +53,7 @@ var toolbar = module.exports = React.createClass({
     _handleSubmit: function(event) {
         if (objects.containsValuedProp(event.data, "chat-message-input") &&
             _.trim(event.data["chat-message-input"]).length > 0) {
+            console.log('write a message: ', event);
             this.props.onSubmit(event);
         }
     },
@@ -148,12 +149,3 @@ var toolbar = module.exports = React.createClass({
         );
     }
 });
-
-//private functions
-function onInputBlur(event) {
-    event.target.style.borderBottom = style.toolbar.input.borderBottom;
-}
-
-function onInputFocus(event) {
-    event.target.style.borderBottom = style.toolbar.inputFocus.borderBottom;
-}
