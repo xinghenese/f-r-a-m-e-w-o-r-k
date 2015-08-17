@@ -91,7 +91,7 @@ module.exports = {
                         color: "#fff",
                         borderRadius: "2em",
                         textAlign: "center",
-                        padding: "0 2em",
+                        padding: "1px 2em",
                         '@mixin': commonStyle.singleLineText
                     }
                 },

@@ -35,11 +35,13 @@ Message.prototype.getAtUserId = function() {
 };
 
 Message.prototype.getContent = function() {
-    if (objects.hasHierarchicalProps(this._data, ["msg", "t"])) {
-        return this._data["msg"]["t"];
-    } else {
-        return this.getBriefText();
+    if (this._data["msg"]) {
+        return _.clone(this._data["msg"]);
     }
+    return {
+        type: parseInt(this._data['tp']) || 1,
+        referobj: _.clone(this._data["referobj"])
+    };
 };
 
 Message.prototype.getBriefText = function() {
@@ -106,7 +108,7 @@ Message.prototype.getAltText = function() {
 
 Message.prototype.getCursor = function() {
     return this._data["mscs"];
-}
+};
 
 Message.prototype.getTimestamp = function() {
     return parseInt(this._data["tmstp"]);

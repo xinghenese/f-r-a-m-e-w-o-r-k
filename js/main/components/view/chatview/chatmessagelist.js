@@ -82,10 +82,10 @@ module.exports = createGroupableClass({
 
         console.log(data);
 
-        if (data.type === messageConstants.MessageTypes.SYSTEM) {
+        if (data.type == messageConstants.MessageTypes.SYSTEM) {
             return (
                 <li style={makeStyle(style.system)}>
-                    <span style={style.system.message}>{data.message}</span>
+                    <ChatMessage data={data} style={style.system.message}/>
                 </li>
             )
         }
@@ -117,7 +117,7 @@ module.exports = createGroupableClass({
                         className={className + '-content'}
                         style={makeStyle(style.messagebody.messagecontent)}
                         >
-                        <ChatMessage messageType={data.messageType} message={data.message} />
+                        <ChatMessage data={data}/>
                     </p>
                 </div>
             </li>
