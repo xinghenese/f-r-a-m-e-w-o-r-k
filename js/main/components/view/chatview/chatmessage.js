@@ -17,6 +17,69 @@ var config = require('../../../etc/config');
 var PICTURE_MAX_WIDTH = 477;
 var RESOURCE_URL = config.resourceDomain;
 
+var TextMessage = React.createClass({
+    render: function () {
+        return <span style={makeStyle(this.props.style)}>{String(this.props.message.t || this.props.message || '')}</span>;
+    }
+});
+
+var PictureMessage = React.createClass({
+    render: function () {
+        var message = this.props.message;
+
+        if (!message.url || !message.width || !message.height) {
+            return null;
+        }
+
+        var width = Math.min(parseInt(message.width), PICTURE_MAX_WIDTH);
+        var height = parseInt(message.height) / parseInt(message.width) * width;
+        var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
+
+        return <img src={src} width={width} height={height} onDoubleClick={function(e) {}} style={makeStyle(this.props.style)} />;
+    }
+});
+
+var AudioMessage = React.createClass({
+    render: function () {
+        var url = this.props.message.url;
+
+        if (!url) {
+            return null;
+        }
+
+        return <audio src={url.indexOf(RESOURCE_URL) > -1 ? url : RESOURCE_URL + url} style={makeStyle(this.props.style)} />;
+    }
+});
+
+var SystemMessage = React.createClass({
+    render: function () {
+        var message = this.props.message;
+        var userId = this.props.userId;
+        var userName = this.props.userName;
+
+        if (!message.type || !message.referobj || _.isEmpty(message.referobj)) {
+            return <span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>
+        }
+
+        var nicknames = _.reduce(message.referobj, function (memo, item) {
+            if (!item.referid || !item.refern || item.referid == userId) {
+                return memo;
+            }
+            memo.push(item.refern);
+            return memo;
+        }, []);
+
+        switch (message.type) {
+            case MessageTypes.SYSTEM.INVITED_INTO_GROUP:
+                return <span style={makeStyle(this.props.style)}>{Strings.template(Lang.invitedIntoGroup, userName, nicknames)}</span>;
+            case MessageTypes.SYSTEM.USER_INVITED_INTO_GROUP:
+                return <span style={makeStyle(this.props.style)}>{Strings.template(Lang.userInvitedIntoGroup, nicknames)}</span>;
+            default :
+                return <span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>;
+        }
+    }
+});
+
 // exports
 module.exports = React.createClass({
     displayName: 'ChatMessage',
@@ -26,12 +89,11 @@ module.exports = React.createClass({
         if (!data || _.isEmpty(data)) {
             return null;
         }
-
         var element = createMessageNode(data);
 
         return element && React.cloneElement(
             element,
-            {style: makeStyle(this.props.style)}
+            { style: makeStyle(this.props.style) }
         );
     }
 });
@@ -52,38 +114,14 @@ function createMessageNode(data) {
 
     switch (type) {
         case MessageTypes.TEXT:
-            return <span>{message.t || ''}</span>;
+            return <TextMessage message={message} />;
         case MessageTypes.PICTURE:
-            var width = Math.min(message.width, PICTURE_MAX_WIDTH);
-            var height = message.height / message.width * width;
-            var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
-            return <img src={src} width={width} height={height} onDoubleClick={function(e) {
-
-            }}/>;
+            return <PictureMessage message={message} />;
         case MessageTypes.AUDIO:
-            src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
-            return <audio src={src}/>;
+            return <AudioMessage message={message} />;
         case Number(MessageTypes.SYSTEM):
-            if (!message.type || !message.referobj || _.isEmpty(message.referobj)) {
-                return <span>{Lang.systemMessage}</span>
-            }
-
-            var nicknames = _.reduce(message.referobj, function (memo, item) {
-                if (!item.referid || !item.refern || item.referid == userId) {
-                    return memo;
-                }
-                memo.push(item.refern);
-                return memo;
-            }, []);
-            switch (message.type) {
-                case MessageTypes.SYSTEM.INVITED_INTO_GROUP:
-                    return <span>{Strings.template(Lang.invitedIntoGroup, userName, nicknames)}</span>;
-                case MessageTypes.SYSTEM.USER_INVITED_INTO_GROUP:
-                    return <span>{Strings.template(Lang.userInvitedIntoGroup, nicknames)}</span>;
-                default :
-                    return <span>{Lang.systemMessage}</span>;
-            }
+            return <SystemMessage message={message} userId={userId} userName={userName} />;
         default :
-            return <span>{message.t || ''}</span>;
+            return <TextMessage message={message} />;
     }
 }

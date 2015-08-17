@@ -15,6 +15,8 @@ var serverInfos;
 //var serverInfos = _.shuffle(['42.62.27.170']);
 var defaultServerPort = 443;
 var serverInfoIndex = 0;
+var currentReconnectTimes = 0;
+var maxReconnectTimes = 3;
 
 module.exports = {
     /**
@@ -43,6 +45,9 @@ function send(data) {
             socket.send(data);
         }, function () {
             //handle reconnect
+            if (++ currentReconnectTimes > maxReconnectTimes) {
+                throw new Error('socket fails to connect even after reconnecting for several times');
+            }
             return reset().then(function () {
                 return send(data);
             });
@@ -53,13 +58,15 @@ function send(data) {
 }
 
 function init() {
-    if (!initPromise) {
+    if (!initPromise || !serverInfos) {
         initPromise = HTTPConnection.request({
             url: 'srv/gsi',
             data: { tp: 2 }
         }).then(function (res) {
             serverInfos = _.shuffle(res);
             return serverInfos[serverInfoIndex ++];
+        }, function (err) {
+            initPromise = 'initPromise';
         });
     }
     return initPromise;
@@ -67,7 +74,6 @@ function init() {
 
 function reset() {
     return promise.create(function (resolve, reject) {
-        initPromise = null;
         connectPromise = null;
         resolve('reset');
     });

@@ -80,8 +80,6 @@ module.exports = createGroupableClass({
             );
         }
 
-        console.log(data);
-
         if (data.type == messageConstants.MessageTypes.SYSTEM) {
             return (
                 <li style={makeStyle(style.system)}>

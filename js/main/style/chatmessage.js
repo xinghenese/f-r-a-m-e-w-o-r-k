@@ -89,7 +89,7 @@ module.exports = {
                         fontSize: "12px",
                         background: "#d5d5d5",
                         color: "#fff",
-                        borderRadius: "2em",
+                        borderRadius: "1em",
                         textAlign: "center",
                         padding: "1px 2em",
                         '@mixin': commonStyle.singleLineText
