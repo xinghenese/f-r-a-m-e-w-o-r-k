@@ -41,5 +41,16 @@ module.exports = {
             });
         }
         return result;
+    },
+    template: function(tpl) {
+        var index = 1,
+            items = arguments;
+        return (tpl || '').replace(/{(\w*)}/g, function(match, p1) {
+            var item = items[index++];
+            if (_.isArray(item)) {
+                item = item.join(item, ',');
+            }
+            return item  || p1 || match;
+        });
     }
 };

@@ -12,6 +12,7 @@ var Lang = require('../../../locales/zh-cn');
 var makeStyle = require('../../../style/styles').makeStyle;
 var Strings = require('../../../utils/strings');
 var config = require('../../../etc/config');
+var Overlay = require('../../box/Overlay');
 
 // private fields
 var PICTURE_MAX_WIDTH = 477;
@@ -24,6 +25,13 @@ var TextMessage = React.createClass({
 });
 
 var PictureMessage = React.createClass({
+    _showOriginalImage: function () {
+        var message = this.props.message;
+        var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
+        Overlay.show(
+            <img src={src} width={message.width} height={message.height} />
+        );
+    },
     render: function () {
         var message = this.props.message;
 
@@ -35,7 +43,7 @@ var PictureMessage = React.createClass({
         var height = parseInt(message.height) / parseInt(message.width) * width;
         var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
 
-        return <img src={src} width={width} height={height} onDoubleClick={function(e) {}} style={makeStyle(this.props.style)} />;
+        return <img src={src} width={width} height={height} onDoubleClick={this._showOriginalImage} style={makeStyle(this.props.style)} />;
     }
 });
 
