@@ -16,13 +16,8 @@ var PRIME = "f488fd584e49dbcd20b49de49107366b336c380d451d0f7c88b31c7c5b2d8ef" +
     "e1b1294018118d7c84a70a72d686c40319c807297aca950cd9969fabd00a509b0246d3083" +
     "d66a45d419f9c7cbd894b221926baaba25ec355e92f78c7";
 var BASE = "2";
-var privateKey = (function buildPrivateKey() {
-    var privateKey = '';
-    for (var i = 0; i < 12; i++) {
-        privateKey += (Math.random() * 1e20).toString(16);
-    }
-    return privateKey;
-})();
+var privateKey = "6c8d06a30131282a50e67f0da618ee00c9da747b027ff6df53d906548c" +
+    "f8c79d3255c357d38a3efdca6ab6d750";
 
 var p = new BigInteger(PRIME, 16, true);
 var g = new BigInteger(BASE, 16, true);
