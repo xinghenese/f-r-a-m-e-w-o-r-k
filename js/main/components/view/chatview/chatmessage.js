@@ -46,7 +46,7 @@ function createMessageNode(data) {
     var userId = data.senderId;
     var userName = data.senderName;
 
-    if (!type || !message || _.isEmpty(message)) {
+    if (!message || _.isEmpty(message)) {
         return null;
     }
 
