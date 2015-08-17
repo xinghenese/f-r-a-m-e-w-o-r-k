@@ -35,12 +35,11 @@ Message.prototype.getAtUserId = function() {
 };
 
 Message.prototype.getContent = function() {
-    //if (objects.hasHierarchicalProps(this._data, ["msg", "t"])) {
-    //    return this._data["msg"]["t"];
-    //} else {
-    //    return this.getBriefText();
-    //}
-    return _.clone(this._data["msg"]);
+    if (objects.hasHierarchicalProps(this._data, ["msg", "t"])) {
+        return this._data["msg"]["t"];
+    } else {
+        return this.getBriefText();
+    }
 };
 
 Message.prototype.getBriefText = function() {

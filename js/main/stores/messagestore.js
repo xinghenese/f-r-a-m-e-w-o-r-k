@@ -37,10 +37,10 @@ var MessageStore = ChangeableStore.extend({
     },
     appendGroupMessage: function(groupId, message) {
         if (groupId in this._groupHistoryMessages) {
-            this._groupHistoryMessages[groupId].appendMessage(message);
+            this._groupHistoryMessages[groupId].addMessage(message);
         } else {
             var historyMessages = GroupHistoryMessages.create({rid: groupId});
-            historyMessages.appendMessage(message);
+            historyMessages.addMessage(message);
             this._groupHistoryMessages[groupId] = historyMessages;
         }
 
@@ -48,10 +48,10 @@ var MessageStore = ChangeableStore.extend({
     },
     appendPrivateMessage: function(userId, message) {
         if (userId in this._privateHistoryMessages) {
-            this._privateHistoryMessages[userId].appendMessage(message);
+            this._privateHistoryMessages[userId].addMessage(message);
         } else {
             var historyMessages = PrivateHistoryMessages.create({uid: userId});
-            historyMessages.appendMessage(message);
+            historyMessages.addMessage(message);
             this._privateHistoryMessages[userId] = historyMessages;
         }
 

@@ -17,7 +17,7 @@ function HistoryMessages(data) {
 module.exports = HistoryMessages;
 
 // module initialization
-HistoryMessages.prototype.appendMessage = function(message) {
+HistoryMessages.prototype.addMessage = function(message) {
     if (_isNewerThanCurrentMessages(this._messages, message)) {
         this._messages.push(message);
     } else {
@@ -83,5 +83,5 @@ function _isNewerThanCurrentMessages(messages, message) {
     }
 
     var last = _.last(messages);
-    return parseInt(message["mscs"]) >= parseInt(last["mscs"]);
+    return parseInt(last.getCursor()) < parseInt(message.getCursor());
 }
