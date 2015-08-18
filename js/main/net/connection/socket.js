@@ -12,7 +12,6 @@ var socket = null;
 var connectPromise = null;
 var initPromise = null;
 var serverInfos;
-//var serverInfos = _.shuffle(['42.62.27.170']);
 var defaultServerPort = 443;
 var serverInfoIndex = 0;
 var currentReconnectTimes = 0;
