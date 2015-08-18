@@ -32,8 +32,8 @@ var PictureMessage = React.createClass({
         var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
         Overlay.show(
             <img src={src} width={message.width} height={message.height} onWheel={this._resizeImage}
-                data-original-width={message.width} data-original-height={message.height}
-                data-delta-size={0}/>
+                 data-original-width={message.width} data-original-height={message.height}
+                 data-delta-size={0}/>
         );
     },
     _resizeImage: function (event) {
@@ -67,7 +67,8 @@ var PictureMessage = React.createClass({
         var height = parseInt(message.height) / parseInt(message.width) * width;
         var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
 
-        return <img src={src} width={width} height={height} onDoubleClick={this._showOriginalImage} style={makeStyle(this.props.style)} />;
+        return <img src={src} width={width} height={height} onDoubleClick={this._showOriginalImage}
+                    style={makeStyle(this.props.style)}/>;
     }
 });
 
@@ -79,7 +80,8 @@ var AudioMessage = React.createClass({
             return null;
         }
 
-        return <audio src={url.indexOf(RESOURCE_URL) > -1 ? url : RESOURCE_URL + url} style={makeStyle(this.props.style)} />;
+        return <audio src={url.indexOf(RESOURCE_URL) > -1 ? url : RESOURCE_URL + url}
+                      style={makeStyle(this.props.style)}/>;
     }
 });
 
@@ -99,7 +101,7 @@ var SystemMessage = React.createClass({
             }
             memo.push(item.refern);
             return memo;
-        }, []);
+        }, []).join(Lang.nicknameSeparator);
 
         switch (message.type) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
@@ -128,9 +130,9 @@ module.exports = React.createClass({
         var element = createMessageNode(data);
 
         return element && React.cloneElement(
-            element,
-            { style: makeStyle(this.props.style) }
-        );
+                element,
+                {style: makeStyle(this.props.style)}
+            );
     }
 });
 
