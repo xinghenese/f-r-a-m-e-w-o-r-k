@@ -24,25 +24,25 @@ function detectOS() {
 
     switch (true) {
         case (platform === "Win32") || (platform === "Windows"):
-            return "windows";
+            return "Windows";
         case (platform === "Mac68K") || (platform === "MacPPC") || (platform === "Macintosh") || (platform === "MacIntel"):
-            return "mac";
+            return "Mac";
         case platform === "X11":
-            return "unix";
+            return "Unix";
         case /windows ce/i.test(userAgent):
-            return "windows ce";
+            return "Windows CE";
         case /ipad/i.test(userAgent):
-            return "ipad";
+            return "iPad";
         case /iphone os/i.test(userAgent):
-            return "ios";
+            return "iOS";
         case /android/i.test(userAgent):
-            return "android";
+            return "Android";
         case /windows mobile/i.test(userAgent):
-            return "windows mobile";
+            return "Windows Mobile";
         case /linux/i.test(platform):
-            return "linux";
+            return "Linux";
         default:
-            return "unknown";
+            return "Unknown";
     }
 }
 

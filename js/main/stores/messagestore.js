@@ -20,22 +20,19 @@ var groups = require('../datamodel/groups');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
-var socketconnection = require('../net/connection/socketconnection');
+var socketConnection = require('../net/connection/socketconnection');
+var users = require('../datamodel/users');
 var ChangeableStore = require('./changeablestore');
+var ConversationConstants = require('../constants/conversationconstants');
 var Message = require('../datamodel/message');
 var MessageConstants = require('../constants/messageconstants');
 
 // exports
 var MessageStore = ChangeableStore.extend({
+    _pendingGroupMessages: {},
     _groupHistoryMessages: {},
     _privateHistoryMessages: {},
-    addGroupHistoryMessages: function(groupId, groupHistoryMessages) {
-        this._groupHistoryMessages[groupId] = groupHistoryMessages;
-    },
-    addPrivateHistoryMessages: function(userId, privateHistoryMessages) {
-        this._privateHistoryMessages[userId] = privateHistoryMessages;
-    },
-    appendGroupMessage: function(groupId, message) {
+    addGroupMessage: function(groupId, message) {
         if (groupId in this._groupHistoryMessages) {
             this._groupHistoryMessages[groupId].addMessage(message);
         } else {
@@ -46,7 +43,10 @@ var MessageStore = ChangeableStore.extend({
 
         this.emitChange();
     },
-    appendPrivateMessage: function(userId, message) {
+    addGroupHistoryMessages: function(groupId, groupHistoryMessages) {
+        this._groupHistoryMessages[groupId] = groupHistoryMessages;
+    },
+    addPrivateMessage: function(userId, message) {
         if (userId in this._privateHistoryMessages) {
             this._privateHistoryMessages[userId].addMessage(message);
         } else {
@@ -57,6 +57,9 @@ var MessageStore = ChangeableStore.extend({
 
         this.emitChange();
     },
+    addPrivateHistoryMessages: function(userId, privateHistoryMessages) {
+        this._privateHistoryMessages[userId] = privateHistoryMessages;
+    },
     getGroupHistoryMessages: function(groupId) {
         return this._groupHistoryMessages[groupId];
     },
@@ -65,6 +68,16 @@ var MessageStore = ChangeableStore.extend({
     },
     getPrivateHistoryMessages: function(userId) {
         return this._privateHistoryMessages[userId];
+    },
+    removeGroupConversation: function(groupId) {
+        if (groupId in this._groupHistoryMessages) {
+            delete this._groupHistoryMessages[groupId];
+        }
+    },
+    removePrivateConversation: function(userId) {
+        if (userId in this._privateHistoryMessages) {
+            delete this._privateHistoryMessages[userId];
+        }
     }
 });
 
@@ -83,7 +96,7 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
             _handleGroupHistoryMessagesRequest(action);
             break;
         case ActionTypes.REQUEST_HISTORY_MESSAGES:
-            _handleHistoryMessagesRequest(action);
+            _handleInitialHistoryMessagesRequest(action);
             break;
         case ActionTypes.REQUEST_PRIVATE_HISTORY_MESSAGES:
             _handlePrivateHistoryMessagesRequest(action);
@@ -94,7 +107,7 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
     }
 });
 
-socketconnection.monitor("TM").then(function(data) {
+socketConnection.monitor("TM").then(function(data) {
     _handleReceivedTalkMessage(data);
     var message = new Message(data);
     emitter.emit(EventTypes.SHOW_NOTIFICATION, {
@@ -102,17 +115,79 @@ socketconnection.monitor("TM").then(function(data) {
         message: message.getBriefText()
     });
     console.log("sent notification");
+}).done();
+
+socketConnection.monitor("RDLG").then(function(data) {
+    var referId = parseInt(data["referid"]);
+    var conversationType = parseInt(data["rmtp"]);
+    switch (conversationType) {
+        case ConversationConstants.GROUP_INT_TYPE:
+            MessageStore.removeGroupConversation(referId);
+            MessageStore.emitChange();
+            break;
+        case ConversationConstants.PRIVATE_INT_TYPE:
+            MessageStore.removePrivateConversation(referId);
+            MessageStore.emitChange();
+            break;
+        default:
+            console.error("Unknown type of removed conversation - ", conversationType);
+            break;
+    }
+});
+
+socketConnection.monitor("ICH").then(function(data) {
+    var type = parseInt(data["tp"]);
+    switch (type) {
+        case 0:
+            _doHistoryMessagesRequest({
+                msich: {
+                    cs: myself.cursor
+                }
+            });
+            break;
+        case 1:
+            // fall through
+        case 2:
+            _doHistoryMessagesRequest({
+                rich: {
+                    cs: groups.getCursor()
+                }
+            });
+            break;
+        case 3:
+            /* todo
+            var groupId = parseInt(data["msrid"]);
+            _doHistoryMessagesRequest({
+                rmmich: {
+                    ich: [{
+                        rid: groupId,
+                        cs: groups.getGroup(groupId).getMembersCursor()
+                    }]
+                }
+            });
+            */
+            break;
+        case 4:
+            _doHistoryMessagesRequest({
+                uich: {
+                    cs: users.getCursor()
+                }
+            });
+            break;
+        default:
+            console.error("Unknow ICH type: ", type);
+    }
 });
 
 // private functions
 function _appendMessage(data) {
-    data["tmstp"] = new Date().valueOf();
+    data["mscs"] = data["tmstp"] = new Date().valueOf();
     var message = new Message(data);
 
     if (objects.containsValuedProp(data, "msrid")) {
-        MessageStore.appendGroupMessage(parseInt(data["msrid"]), message);
+        MessageStore.addGroupMessage(parseInt(data["msrid"]), message);
     } else {
-        MessageStore.appendPrivateMessage(parseInt(data["mstuid"]), message);
+        MessageStore.addPrivateMessage(parseInt(data["mstuid"]), message);
     }
 
     return message;
@@ -150,6 +225,19 @@ function _collectLastMessages() {
     });
 }
 
+function _doHistoryMessagesRequest(data) {
+    socketConnection.request({
+        tag: "HM",
+        responseTag: "HM",
+        data: {
+            data: data
+        }
+    }).then(function(response) {
+        _handleHistoryMessagesResponse(response);
+        MessageStore.emitChange();
+    });
+}
+
 function _handleDeleteGroupMessages(id) {
     if (id in MessageStore._groupHistoryMessages) {
         delete MessageStore._groupHistoryMessages[id];
@@ -171,7 +259,7 @@ function _handleGroupHistoryMessagesRequest(action) {
     }
 
     var first = _.first(groupHistoryMessages.getMessages());
-    socketconnection.request({
+    socketConnection.request({
         tag: "HM",
         responseTag: "HM",
         data: {
@@ -193,23 +281,20 @@ function _handleGroupHistoryMessagesRequest(action) {
     });
 }
 
-function _handleHistoryMessagesRequest(action) {
-    socketconnection.request({
-        tag: "HM",
-        responseTag: "HM",
-        data: {
-            data: {
-                msich: {
-                    cs: myself.cursor
-                },
-                rmsg: {},
-                pmsg: {},
-                dmc: {}
-            }
-        }
-    }).then(function(response) {
-        _handleHistoryMessagesResponse(response);
-        MessageStore.emitChange();
+function _handleInitialHistoryMessagesRequest(action) {
+    _doHistoryMessagesRequest({
+        rmsg: {},
+        pmsg: {},
+        msich: {
+            cs: myself.cursor
+        },
+        rich: {
+            cs: groups.getCursor()
+        },
+        uich: {
+            cs: users.getCursor()
+        },
+        dmc: {}
     });
 }
 
@@ -220,7 +305,7 @@ function _handlePrivateHistoryMessagesRequest(action) {
     }
 
     var first = _.first(privateHistoryMessages.getMessages());
-    socketconnection.request({
+    socketConnection.request({
         tag: "HM",
         responseTag: "HM",
         data: {
@@ -240,31 +325,44 @@ function _handlePrivateHistoryMessagesRequest(action) {
     });
 }
 
+/**
+ * Handles group system messages.
+ * @param data
+ * @returns {boolean} true to prevent default behavior, not adding to history messages; false for otherwise.
+ * @private
+ */
 function _handleReceivedGroupSystemMessage(data) {
     if (!("msgtp" in data && parseInt(data["msgtp"]) === MessageConstants.MessageTypes.SYSTEM && "tp" in data)) {
-        return;
+        return false;
     }
 
+    var message = new Message(data);
     var type = parseInt(data["tp"]);
     switch (type) {
         case MessageConstants.SystemMessageTypes.INVITED_INTO_GROUP:
             // fall through
         case MessageConstants.SystemMessageTypes.USER_INVITED_INTO_GROUP:
-            _maybeAddGroupFromSystemMessage(data);
-            break;
+            if (message.getGroupId() in MessageStore._pendingGroupMessages) {
+                MessageStore._pendingGroupMessages[message.getGroupId()].push(message);
+            } else {
+                MessageStore._pendingGroupMessages[message.getGroupId()] = [message];
+            }
+            return true;
         default:
             console.log("Unknown system message received: ", type);
-            break;
+            return false;
     }
 }
 
 function _handleReceivedTalkMessage(data) {
     var message = new Message(data);
     if (objects.containsValuedProp(data, "msrid")) {
-        _handleReceivedGroupSystemMessage(data);
-        MessageStore.appendGroupMessage(message.getGroupId(), message);
+        var pending = _handleReceivedGroupSystemMessage(data);
+        if (!pending) {
+            MessageStore.addGroupMessage(message.getGroupId(), message);
+        }
     } else if (objects.containsValuedProp(data, "msuid")) {
-        MessageStore.appendPrivateMessage(message.getUserId(), message);
+        MessageStore.addPrivateMessage(message.getUserId(), message);
     } else {
         console.error("Unknow type of talk message received");
     }
@@ -287,7 +385,7 @@ function _handleSendTalkMessage(action) {
     objects.copyValuedProp(action, "atUserId", data, "atuid");
 
     var message = _appendMyMessage(_.cloneDeep(data));
-    socketconnection.request({
+    socketConnection.request({
         tag: "TM",
         data: data,
         responseTag: "SCF",
@@ -304,6 +402,34 @@ function _handleSendTalkMessage(action) {
     });
 }
 
+function _handleRoomInfoChangedResponse(response) {
+    if (response.data.rich.cs) {
+        groups.setCursor(response.data.rich.cs);
+    }
+
+    if (response.data.rich.ich) {
+        _.forEach(response.data.rich.ich, function(item) {
+            var groupId = parseInt(item["rid"]);
+            var group = new Group(item);
+            groups.removeGroup(groupId);
+            groups.addGroup(group);
+
+            if (groupId in MessageStore._pendingGroupMessages) {
+                _.forEach(MessageStore._pendingGroupMessages[groupId], function(message) {
+                    MessageStore.addGroupMessage(groupId, message);
+                });
+
+                delete MessageStore._pendingGroupMessages[groupId];
+                MessageStore.emitChange();
+            }
+        });
+    }
+}
+
+function _handleContactInfoChangedResponse(response) {
+    // todo
+}
+
 function _handleHistoryMessagesResponse(response) {
     if (response.data.rmsg && response.data.rmsg.cvs && response.data.rmsg.cvs.length > 0) {
         _handleGroupHistoryMessages(response.data.rmsg.cvs);
@@ -311,6 +437,14 @@ function _handleHistoryMessagesResponse(response) {
 
     if (response.data.pmsg && response.data.pmsg.cvs && response.data.pmsg.cvs.length > 0) {
         _handlePrivateHistoryMessages(response.data.pmsg.cvs);
+    }
+
+    if (response.data.rich) {
+        _handleRoomInfoChangedResponse(response);
+    }
+
+    if (response.data.uich) {
+        _handleContactInfoChangedResponse(response);
     }
 
     // todo

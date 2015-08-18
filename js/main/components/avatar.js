@@ -9,6 +9,7 @@ var React = require('react');
 var commonStyle = require('../style/common');
 var defaultStyle = require('../style/default');
 var makeStyle = require('../style/styles').makeStyle;
+var Image = require('./tools/IntelImage');
 
 //private fields
 var avatarColors = {};
@@ -17,16 +18,12 @@ var defaultColor = "#499dd9";
 //core module to export
 var Avatar = React.createClass({
     render: function () {
-        var name = this.props.name && this.props.name[0].toUpperCase() || '';
+        var name = String(this.props.name && this.props.name[0] || '').toUpperCase();
         var img = name;
 
         if (this.props.src) {
-            img = <img
-                alt={name}
-                src={this.props.src}
-                width="100%"
-                height="100%"
-                />;
+            img = <Image alt={name} src={this.props.src}
+                replacedElementOnError={function() {return <span>{name}</span>}} />;
         }
 
         return (

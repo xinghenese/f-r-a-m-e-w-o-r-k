@@ -10,6 +10,7 @@ var Group = require('./group');
 // exports
 var groups = {
     _cursor: "",
+    // todo: to be optimized, use map to save the groups
     _groups: [],
     addGroup: function (group) {
         this._groups.push(group);

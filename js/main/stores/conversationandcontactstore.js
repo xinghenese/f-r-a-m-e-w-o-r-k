@@ -13,6 +13,7 @@ var Group = require('../datamodel/group');
 var HttpConnection = require('../net/connection/httpconnection');
 var User = require('../datamodel/user');
 var groups = require('../datamodel/groups');
+var socketConnection = require('../net/connection/socketconnection');
 var users = require('../datamodel/users');
 
 // exports

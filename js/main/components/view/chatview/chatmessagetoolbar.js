@@ -148,12 +148,3 @@ var toolbar = module.exports = React.createClass({
         );
     }
 });
-
-//private functions
-function onInputBlur(event) {
-    event.target.style.borderBottom = style.toolbar.input.borderBottom;
-}
-
-function onInputFocus(event) {
-    event.target.style.borderBottom = style.toolbar.inputFocus.borderBottom;
-}
