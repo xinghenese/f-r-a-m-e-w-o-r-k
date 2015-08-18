@@ -48,7 +48,7 @@ module.exports = {
         return (tpl || '').replace(/{(\w*)}/g, function(match, p1) {
             var item = items[index++];
             if (_.isArray(item)) {
-                item = item.join(item, ',');
+                item = item.join();
             }
             return item  || p1 || match;
         });
