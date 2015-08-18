@@ -102,11 +102,11 @@ socketconnection.monitor("TM").then(function(data) {
         message: message.getBriefText()
     });
     console.log("sent notification");
-});
+}).done();
 
 // private functions
 function _appendMessage(data) {
-    data["tmstp"] = new Date().valueOf();
+    data["mscs"] = data["tmstp"] = new Date().valueOf();
     var message = new Message(data);
 
     if (objects.containsValuedProp(data, "msrid")) {
