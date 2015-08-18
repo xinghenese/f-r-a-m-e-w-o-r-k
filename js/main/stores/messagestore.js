@@ -115,7 +115,7 @@ socketConnection.monitor("TM").then(function(data) {
         message: message.getBriefText()
     });
     console.log("sent notification");
-});
+}).done();
 
 socketConnection.monitor("RDLG").then(function(data) {
     var referId = parseInt(data["referid"]);
@@ -181,7 +181,7 @@ socketConnection.monitor("ICH").then(function(data) {
 
 // private functions
 function _appendMessage(data) {
-    data["tmstp"] = new Date().valueOf();
+    data["mscs"] = data["tmstp"] = new Date().valueOf();
     var message = new Message(data);
 
     if (objects.containsValuedProp(data, "msrid")) {

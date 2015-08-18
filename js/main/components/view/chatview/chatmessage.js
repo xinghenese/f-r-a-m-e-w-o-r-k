@@ -43,11 +43,10 @@ var PictureMessage = React.createClass({
         var deltaSize = parseInt(target.getAttribute('data-delta-size'));
         var deltaY = parseInt(event.deltaY);
 
-        if (!deltaY) {
+        deltaSize -= deltaY;
+        if (!deltaY || deltaSize < -500 || deltaSize > 500) {
             return;
         }
-
-        deltaSize -= deltaY;
         var deltaRate = 1 + deltaSize / 1000;
 
         setStyle(
