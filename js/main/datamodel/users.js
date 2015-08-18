@@ -14,7 +14,7 @@ var users = {
     addUser: function(user) {
         this._users.push(user);
     },
-    getCursor: function(cursor) {
+    getCursor: function() {
         return this._cursor;
     },
     getUser: function(userId) {
