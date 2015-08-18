@@ -70,6 +70,7 @@ module.exports = {
     "predefinedMessage": "[预定义消息]",
     "contactMessage": "[名片消息]",
     "groupCardMessage": "[群名片消息]",
+    "groupNameChanged": "{0}把群更名为{1}",
     "invitedIntoGroup": "{0}邀请了{1}加入群聊",
     "userInvitedIntoGroup": "{0}加入了群聊"
 };

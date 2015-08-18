@@ -34,13 +34,7 @@ var MessageConstants = {
         AUDIO: 2,
         LOCATION: 3,
         VIBRATION: 4,
-        SYSTEM: {
-            INVITED_INTO_GROUP: 100,
-            USER_INVITED_INTO_GROUP: 101,
-            valueOf: function () {
-                return 5;
-            }
-        },
+        SYSTEM: 5,
         EMOTION: 6,
         PREDEFINED: 7,
         CONTACT: 10,
@@ -48,7 +42,8 @@ var MessageConstants = {
     },
     SystemMessageTypes: {
         INVITED_INTO_GROUP: 100,
-        USER_INVITED_INTO_GROUP: 101
+        USER_INVITED_INTO_GROUP: 101,
+        GROUP_NAME_CHANGED: 104
     }
 };
 

@@ -8,6 +8,7 @@ var _ = require('lodash');
 var React = require('react');
 var MessageConstants = require('../../../constants/messageconstants');
 var MessageTypes = MessageConstants.MessageTypes;
+var SystemMessageTypes = MessageConstants.SystemMessageTypes;
 var Lang = require('../../../locales/zh-cn');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -101,10 +102,14 @@ var SystemMessage = React.createClass({
         }, []);
 
         switch (message.type) {
-            case MessageTypes.SYSTEM.INVITED_INTO_GROUP:
+            case SystemMessageTypes.INVITED_INTO_GROUP:
                 return <span style={makeStyle(this.props.style)}>{Strings.template(Lang.invitedIntoGroup, userName, nicknames)}</span>;
-            case MessageTypes.SYSTEM.USER_INVITED_INTO_GROUP:
+            case SystemMessageTypes.USER_INVITED_INTO_GROUP:
                 return <span style={makeStyle(this.props.style)}>{Strings.template(Lang.userInvitedIntoGroup, nicknames)}</span>;
+            case SystemMessageTypes.GROUP_NAME_CHANGED:
+                var nickname = message["unk"];
+                var groupName = message["refern"];
+                return <span style={makeStyle(this.props.style)}>{Strings.format(Lang.userInvitedIntoGroup, [nickname, groupName])}</span>;
             default :
                 return <span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>;
         }
@@ -150,7 +155,7 @@ function createMessageNode(data) {
             return <PictureMessage message={message} />;
         case MessageTypes.AUDIO:
             return <AudioMessage message={message} />;
-        case Number(MessageTypes.SYSTEM):
+        case MessageTypes.SYSTEM:
             return <SystemMessage message={message} userId={userId} userName={userName} />;
         default :
             return <TextMessage message={message} />;
