@@ -32,8 +32,8 @@ var NUMBER_NOT_SET = -1;
 
 // exports
 function Message(data) {
-    _.forEach(keyMap, function (value, key) {
-        this[key] = data[value];
+    _.forEach(keyMap, function (sourceKey, targetkey) {
+        this[targetkey] = data[sourceKey];
     }, this);
 
     // adjustment
