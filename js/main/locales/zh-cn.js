@@ -51,6 +51,9 @@ module.exports = {
     "today": "今天",
     "yesterday": "昨天",
 
+    // audio-player
+    "voiceMessage": "语音消息",
+
     // chat-message-toolbar
     "send": "发送",
     "accessory": "附",

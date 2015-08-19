@@ -15,6 +15,7 @@ var setStyle = require('../../../style/styles').setStyle;
 var Strings = require('../../../utils/strings');
 var config = require('../../../etc/config');
 var Overlay = require('../../box/Overlay');
+var Audio = require('../../tools/IntelAudio');
 
 // private fields
 var PICTURE_MAX_WIDTH = 477;
@@ -75,13 +76,14 @@ var PictureMessage = React.createClass({
 var AudioMessage = React.createClass({
     render: function () {
         var url = this.props.message.url;
+        var duration = this.props.message.duration;
 
         if (!url) {
             return null;
         }
 
-        return <audio src={url.indexOf(RESOURCE_URL) > -1 ? url : RESOURCE_URL + url}
-                      style={makeStyle(this.props.style)}/>;
+        return <Audio src={url.indexOf(RESOURCE_URL) > -1 ? url : RESOURCE_URL + url}
+                      duration={duration}/>;
     }
 });
 

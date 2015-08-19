@@ -16,7 +16,7 @@ gulp.task('clean', function(done) {
 var browserifyOptions = {
     entries: ['./main.js'],
     basedir: './js/',
-    transform: [require('reactify')],
+    transform: [require('reactify'), require('cssify')],
     debug: !isProduct,
     cache: {},
     packageCache: {},

@@ -111,12 +111,12 @@ module.exports = createGroupableClass({
                     <div className={className + '-nickname'}>
                         {data.senderName}
                     </div>
-                    <p
+                    <div
                         className={className + '-content'}
                         style={makeStyle(style.messagebody.messagecontent)}
                         >
                         <ChatMessage data={data}/>
-                    </p>
+                    </div>
                 </div>
             </li>
         )
