@@ -57,13 +57,23 @@ var router = Router.create(routes);
 // exports
 module.exports = {
     start: function (element) {
-        router.run(function (Handler, state) {
-            React.render(<Handler params={state.routes.params}/>, element);
-        });
+        _startRouter(element);
+        _initNotificationAgent();
     }
 };
 
 // private functions
+function _initNotificationAgent() {
+    var notificationAgent = require('./notificationagent');
+    notificationAgent.init();
+}
+
+function _startRouter(element) {
+    router.run(function(Handler, state) {
+        React.render(<Handler params={state.routes.params}/>, element);
+    });
+}
+
 function _wrapComponent(Component, props) {
     return React.createClass({
         displayName: "WrapComponent",

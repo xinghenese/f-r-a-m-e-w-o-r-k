@@ -88,32 +88,23 @@ var AudioMessage = React.createClass({
 var SystemMessage = React.createClass({
     render: function () {
         var message = this.props.message;
-        var userId = this.props.userId;
-        var userName = this.props.userName;
-
-        if (!message.type || !message.referobj || _.isEmpty(message.referobj)) {
-            return <span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>
-        }
-
-        var nicknames = _.reduce(message.referobj, function (memo, item) {
-            if (!item.referid || !item.refern || item.referid == userId) {
-                return memo;
-            }
-            memo.push(item.refern);
-            return memo;
-        }, []).join(Lang.nicknameSeparator);
-
         switch (message.type) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
-                return <span style={makeStyle(this.props.style)}>{Strings.template(Lang.invitedIntoGroup, userName, nicknames)}</span>;
+                return (<span style={makeStyle(this.props.style)}>{
+                    Strings.template(Lang.invitedIntoGroup, this.props.userName, _generateNicknames(this.props))
+                }</span>);
             case SystemMessageTypes.USER_INVITED_INTO_GROUP:
-                return <span style={makeStyle(this.props.style)}>{Strings.template(Lang.userInvitedIntoGroup, nicknames)}</span>;
+                return (<span style={makeStyle(this.props.style)}>{
+                    Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(this.props))
+                }</span>);
             case SystemMessageTypes.GROUP_NAME_CHANGED:
-                var nickname = message["unk"];
-                var groupName = message["refern"];
-                return <span style={makeStyle(this.props.style)}>{Strings.format(Lang.userInvitedIntoGroup, [nickname, groupName])}</span>;
+                var nickname = message.getUserNickname();
+                var groupName = message.getProp("refern");
+                return (<span style={makeStyle(this.props.style)}>{
+                    Strings.format(Lang.groupNameChanged, [nickname, groupName])
+                }</span>);
             default :
-                return <span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>;
+                return (<span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>);
         }
     }
 });
@@ -127,7 +118,7 @@ module.exports = React.createClass({
         if (!data || _.isEmpty(data)) {
             return null;
         }
-        var element = createMessageNode(data);
+        var element = _createMessageNode(data);
 
         return element && React.cloneElement(
                 element,
@@ -136,11 +127,8 @@ module.exports = React.createClass({
     }
 });
 
-// module initialization
-
-
 // private functions
-function createMessageNode(data) {
+function _createMessageNode(data) {
     var type = data.messageType;
     var message = data.message;
     var userId = data.senderId;
@@ -162,4 +150,16 @@ function createMessageNode(data) {
         default :
             return <TextMessage message={message} />;
     }
+}
+
+function _generateNicknames(data) {
+    var userId = data.userId;
+    var message = data.message;
+    return _.reduce(message.referobj, function (memo, item) {
+        if (!item.referid || !item.refern || item.referid == userId) {
+            return memo;
+        }
+        memo.push(item.refern);
+        return memo;
+    }, []).join(Lang.nicknameSeparator);
 }

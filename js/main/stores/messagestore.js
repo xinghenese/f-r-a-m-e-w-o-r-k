@@ -109,12 +109,6 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 
 socketConnection.monitor("TM").then(function(data) {
     _handleReceivedTalkMessage(data);
-    var message = new Message(data);
-    emitter.emit(EventTypes.SHOW_NOTIFICATION, {
-        title: message.getUserNickname(),
-        message: message.getBriefText()
-    });
-    console.log("sent notification");
 }).done();
 
 socketConnection.monitor("RDLG").then(function(data) {
@@ -133,7 +127,7 @@ socketConnection.monitor("RDLG").then(function(data) {
             console.error("Unknown type of removed conversation - ", conversationType);
             break;
     }
-});
+}).done();
 
 socketConnection.monitor("ICH").then(function(data) {
     var type = parseInt(data["tp"]);
@@ -176,8 +170,9 @@ socketConnection.monitor("ICH").then(function(data) {
             break;
         default:
             console.error("Unknow ICH type: ", type);
+            break;
     }
-});
+}).done();
 
 // private functions
 function _appendMessage(data) {
@@ -367,6 +362,8 @@ function _handleReceivedTalkMessage(data) {
         console.error("Unknow type of talk message received");
     }
     MessageStore.emitChange();
+    console.log("sending notification");
+    emitter.emit(EventTypes.NEW_MESSAGE_RECEIVED, message);
 }
 
 function _handleSendTalkMessage(action) {
