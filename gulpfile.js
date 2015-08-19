@@ -93,8 +93,9 @@ gulp.task('package', ['build'], function() {
         platform: ["darwin", "win32"],
         arch: "x64",
         version: "0.30.3",
+        icon: "images/logomac.icns",
         asar: true,
-		overwrite: true,
+        overwrite: true,
         ignore: [
             "node_modules/asar",
             "node_modules/bower-resolve",
