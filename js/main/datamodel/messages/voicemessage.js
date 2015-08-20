@@ -7,11 +7,14 @@
 var _ = require('lodash');
 var React = require('react');
 var Message = require('./message');
+var KeyInfo = require('../keyinfo');
+var urls = require('../../utils/urls');
+var Audio = require('../../components/tools/IntelAudio');
 
 // private fields
 var contentKeyMap = {
-    duration: 'duration',
-    url: 'url'
+    duration:   new KeyInfo('duration',     KeyInfo.NUMBER_NOT_SET),
+    url:        new KeyInfo('url',          KeyInfo.STRING_NOT_SET)
 };
 
 // exports
@@ -21,8 +24,15 @@ function VoiceMessage(data) {
 }
 
 _.assign(VoiceMessage.prototype, Message.prototype, {
-    toElement: function () {
-        return <audio src={this.content.url} />;
+    toElement: function (props) {
+        var url = this.content.url;
+        var duration = this.content.duration;
+
+        if (!url || duration == KeyInfo.NUMBER_NOT_SET) {
+            return null;
+        }
+
+        return <Audio src={urls.getResourceUrl(url)} duration={duration} {...props}/>;
     }
 });
 
