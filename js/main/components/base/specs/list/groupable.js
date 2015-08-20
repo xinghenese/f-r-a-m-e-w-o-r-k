@@ -21,6 +21,7 @@ module.exports = {
         return title;
     },
     renderItem: function (item) {
+        console.info('Groupable#item: ', item);
         return item;
     },
     _itemKeys: [],

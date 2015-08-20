@@ -7,10 +7,6 @@ var _ = require('lodash');
 var React = require('react');
 var paths = require('../../../utils/paths');
 var helper = require('./traverseSubNodes');
-var emitter = require('../../../utils/eventemitter');
-
-//private fields
-
 
 //core module to export
 module.exports = {

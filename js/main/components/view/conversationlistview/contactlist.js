@@ -10,7 +10,7 @@ var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/contactlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var Lang = require('../../../locales/zh-cn');
 
 var groups = require('../../../datamodel/groups');
@@ -48,12 +48,12 @@ module.exports = createGroupClass({
         this._onSiblingSelect(1);
     },
     componentDidMount: function() {
-        emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
-        emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
+        globalEmitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
+        globalEmitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
     },
     componentWillUnmount: function() {
-        emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
-        emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
+        globalEmitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousContact);
+        globalEmitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextContact);
     },
     renderGroupTitle: function (data, props, key) {
         return (
@@ -142,5 +142,5 @@ function defaultOnSelect(event) {
             index
         );
     }
-    emitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
+    globalEmitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
 }

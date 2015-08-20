@@ -12,7 +12,7 @@ var ConversationConstants = require('../../../constants/conversationconstants');
 var style = require('../../../style/chatmessage');
 var makeStyle = require('../../../style/styles').makeStyle;
 var MessageStore = require('../../../stores/messagestore');
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var groups = require('../../../datamodel/groups');
 var myself = require('../../../datamodel/myself');
 var users = require('../../../datamodel/users');
@@ -51,7 +51,7 @@ var ChatMessageBox = React.createClass({
     _handleSubmit: function (event) {
         var data = _.values(event.data)[0];
         if (this.state.id && data) {
-            emitter.emit(EventTypes.BEFORE_SENDING_MESSAGE);
+            globalEmitter.emit(EventTypes.BEFORE_SENDING_MESSAGE);
 
             var roomId = null;
             var toUserId = null;
@@ -137,7 +137,7 @@ var ChatMessageBox = React.createClass({
         });
 
         _.defer(function() {
-            emitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
+            globalEmitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
         });
     },
     _scrollToBottom: function () {
@@ -150,12 +150,12 @@ var ChatMessageBox = React.createClass({
         this.setState({id: '', name: ''});
     },
     _modifyCurrentChat: function () {
-        emitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: true});
+        globalEmitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: true});
     },
     componentDidMount: function () {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
-        emitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
+        globalEmitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
     componentDidUpdate: function () {
         this._scrollToBottom();
@@ -163,7 +163,7 @@ var ChatMessageBox = React.createClass({
     componentWillUnmount: function () {
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
-        emitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
+        globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
     render: function () {
         if (this.state.id) {
@@ -207,13 +207,13 @@ module.exports = ChatMessageBox;
 
 //private functions
 function addConversationListSelectedHandler(box) {
-    emitter.on(EventTypes.SELECT_CONVERSATION, function (info) {
+    globalEmitter.on(EventTypes.SELECT_CONVERSATION, function (info) {
         box._updateMessages(info.id, info.type);
     });
 }
 
 function removeConversationListSelectedHandler(box) {
-    emitter.removeAllListeners(EventTypes.SELECT_CONVERSATION);
+    globalEmitter.removeAllListeners(EventTypes.SELECT_CONVERSATION);
 }
 
 function _buildGroupRenderObject(item, collector) {
@@ -228,16 +228,17 @@ function _buildGroupRenderObject(item, collector) {
             return;
         }
 
-        var messageContent = message.getContent();
-        collector.push({
-            senderId: message.getUserId(),
-            senderName: _getSenderNickname(message),
-            senderAvatar: avatar,
-            message: messageContent,
-            messageType: message.getMessageType(),
-            time: new Date(message.getTimestamp()),
-            type: message.getMessageType()
-        });
+        console.info('[groupMessage]: ', message);
+        //collector.push({
+        //    senderId: message.user.getUserId(),
+        //    senderName: _getSenderNickname(message),
+        //    senderAvatar: message.group.picture(),
+        //    message: messageContent,
+        //    messageType: message.type,
+        //    time: new Date(message.timestamp),
+        //    type: message.type
+        //});
+        collector.push(message);
     });
 }
 
@@ -253,16 +254,17 @@ function _buildUserRenderObject(item, collector) {
             return;
         }
 
-        var messageContent = message.getContent();
-        collector.push({
-            senderId: message.getUserId(),
-            senderName: _getSenderNickname(message),
-            senderAvatar: avatar,
-            message: messageContent,
-            messageType: message.getMessageType(),
-            time: new Date(message.getTimestamp()),
-            type: message.getMessageType()
-        });
+        console.info('[privateMessage]: ', message);
+        //collector.push({
+        //    senderId: message.user.getUserId(),
+        //    senderName: _getSenderNickname(message),
+        //    senderAvatar: message.group.picture(),
+        //    message: messageContent,
+        //    messageType: message.type,
+        //    time: new Date(message.timestamp),
+        //    type: message.type
+        //});
+        collector.push(message);
     });
 }
 

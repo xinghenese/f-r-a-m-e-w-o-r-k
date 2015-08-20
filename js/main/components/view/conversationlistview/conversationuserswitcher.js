@@ -8,7 +8,7 @@ var React = require('react');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var EventTypes = require('../../../constants/eventtypes');
 
 var createGenerator = require('../../base/creator/createReactClassGenerator');
@@ -58,7 +58,7 @@ module.exports = createListClass({
 
 //private functions
 function defaultOnSelect(event) {
-    emitter.emit(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, {
+    globalEmitter.emit(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, {
         option: event.currentTarget.getAttribute('data-option')
     });
 }

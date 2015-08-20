@@ -8,7 +8,7 @@ var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var commonStyle = require('../../../style/common');
 var Lang = require('../../../locales/zh-cn');
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var EventTypes = require('../../../constants/eventtypes');
 
 var createGenerator = require('../../base/creator/createReactClassGenerator');
@@ -30,8 +30,8 @@ module.exports = createGroupableClass({
     getDefaultProps: function () {
         return {intialEnableSelect: false};
     },
-    groupBy: function (data, key) {
-        var time = data.time;
+    groupBy: function (message, key) {
+        var time = new Date(message.timestamp);
         if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
             return time.toDateString();
         }
@@ -50,18 +50,19 @@ module.exports = createGroupableClass({
         });
     },
     componentDidMount: function () {
-        emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
+        globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
     compnonentWillUnmount: function () {
-        emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
+        globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
     renderGroupTitle: function (data, props, key) {
         return (
             <div {...props}><p style={props.style.time}>{key}</p></div>
         );
     },
-    renderItem: function (data, props, key) {
-        if (!isValidMessageData(data)) {
+    renderItem: function (message, props, key) {
+        if (!isValidMessageData(message)) {
+            console.info('inValidMessageData');
             return null;
         }
         var className = props.className || 'chat-message';
@@ -80,10 +81,11 @@ module.exports = createGroupableClass({
             );
         }
 
-        if (data.type == messageConstants.MessageTypes.SYSTEM) {
+        if (message.type == messageConstants.MessageTypes.SYSTEM) {
+            console.info('chatMessageList#renderItem: , SystemMessage');
             return (
                 <li style={makeStyle(style.system)}>
-                    <ChatMessage data={data} style={style.system.message}/>
+                    <ChatMessage data={message} style={style.system.message}/>
                 </li>
             )
         }
@@ -93,30 +95,30 @@ module.exports = createGroupableClass({
                 <Avatar
                     className={className + '-avatar'}
                     style={makeStyle(style.avatar)}
-                    name={data.senderName}
-                    src={data.senderAvatar}
-                    index={data.senderId}
+                    name={message.user.getNickname()}
+                    src={message.user.picture()}
+                    index={message.user.getUserId()}
                     />
                 {checkbox}
                 <div
                     className={className + '-time'}
                     style={makeStyle(style.time)}
                     >
-                    {data.time.toLocaleTimeString()}
+                    {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
                 <div
                     className={className + '-body'}
                     style={makeStyle(commonStyle.message, style.messagebody)}
                     >
                     <div className={className + '-nickname'}>
-                        {data.senderName}
+                        {message.user.getNickname()}
                     </div>
-                    <p
+                    <div
                         className={className + '-content'}
                         style={makeStyle(style.messagebody.messagecontent)}
                         >
-                        <ChatMessage data={data}/>
-                    </p>
+                        <ChatMessage data={message}/>
+                    </div>
                 </div>
             </li>
         )
@@ -125,5 +127,5 @@ module.exports = createGroupableClass({
 
 //private function
 function isValidMessageData(data) {
-    return data && !_.isEmpty(data) && data.senderName;
+    return data && !_.isEmpty(data) && data.user && data.user.getNickname();
 }

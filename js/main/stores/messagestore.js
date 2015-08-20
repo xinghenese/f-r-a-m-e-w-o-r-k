@@ -15,7 +15,7 @@ var PrivateHistoryMessages = require('../datamodel/privatehistorymessages');
 var User = require('../datamodel/user');
 var UuidGenerator = require('../utils/uuidgenerator');
 var assign = require('object-assign');
-var emitter = require('../utils/eventemitter');
+var globalEmitter = require('../events/globalemitter');
 var groups = require('../datamodel/groups');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
@@ -24,7 +24,8 @@ var socketConnection = require('../net/connection/socketconnection');
 var users = require('../datamodel/users');
 var ChangeableStore = require('./changeablestore');
 var ConversationConstants = require('../constants/conversationconstants');
-var Message = require('../datamodel/message');
+//var Message = require('../datamodel/message');
+var Message = require('../datamodel/messages/message');
 var MessageConstants = require('../constants/messageconstants');
 
 // exports
@@ -109,12 +110,6 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 
 socketConnection.monitor("TM").then(function(data) {
     _handleReceivedTalkMessage(data);
-    var message = new Message(data);
-    emitter.emit(EventTypes.SHOW_NOTIFICATION, {
-        title: message.getUserNickname(),
-        message: message.getBriefText()
-    });
-    console.log("sent notification");
 }).done();
 
 socketConnection.monitor("RDLG").then(function(data) {
@@ -133,7 +128,7 @@ socketConnection.monitor("RDLG").then(function(data) {
             console.error("Unknown type of removed conversation - ", conversationType);
             break;
     }
-});
+}).done();
 
 socketConnection.monitor("ICH").then(function(data) {
     var type = parseInt(data["tp"]);
@@ -176,13 +171,15 @@ socketConnection.monitor("ICH").then(function(data) {
             break;
         default:
             console.error("Unknow ICH type: ", type);
+            break;
     }
-});
+}).done();
 
 // private functions
 function _appendMessage(data) {
     data["mscs"] = data["tmstp"] = new Date().valueOf();
-    var message = new Message(data);
+    //var message = new Message(data);
+    var message = Message.create(data);
 
     if (objects.containsValuedProp(data, "msrid")) {
         MessageStore.addGroupMessage(parseInt(data["msrid"]), message);
@@ -336,7 +333,8 @@ function _handleReceivedGroupSystemMessage(data) {
         return false;
     }
 
-    var message = new Message(data);
+    //var message = new Message(data);
+    var message = Message.create(data);
     var type = parseInt(data["tp"]);
     switch (type) {
         case MessageConstants.SystemMessageTypes.INVITED_INTO_GROUP:
@@ -355,7 +353,8 @@ function _handleReceivedGroupSystemMessage(data) {
 }
 
 function _handleReceivedTalkMessage(data) {
-    var message = new Message(data);
+    //var message = new Message(data);
+    var message = Message.create(data);
     if (objects.containsValuedProp(data, "msrid")) {
         var pending = _handleReceivedGroupSystemMessage(data);
         if (!pending) {
@@ -367,6 +366,7 @@ function _handleReceivedTalkMessage(data) {
         console.error("Unknow type of talk message received");
     }
     MessageStore.emitChange();
+    globalEmitter.emit(EventTypes.NEW_MESSAGE_RECEIVED, message);
 }
 
 function _handleSendTalkMessage(action) {
@@ -461,7 +461,8 @@ function _handleGroupHistoryMessages(messages) {
         var groupHistoryMessages = MessageStore.getGroupHistoryMessages(groupId);
         if (groupHistoryMessages) {
             var previousMessages = _.map(v["tms"], function(item) {
-                return new Message(item);
+                //return new Message(item);
+                return Message.create(item);
             });
             groupHistoryMessages.prependMessages(previousMessages.reverse());
         } else {
@@ -485,7 +486,8 @@ function _handlePrivateHistoryMessages(messages) {
         var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
         if (privateHistoryMessages) {
             var previousMessages = _.map(v["tms"], function(item) {
-                return new Message(item);
+                //return new Message(item);
+                return Message.create(item);
             });
             privateHistoryMessages.prependMessages(previousMessages.reverse());
         } else {

@@ -13,7 +13,7 @@ var KeyCodes = require('../../../constants/keycodes');
 var TextArea = require('./../../form/control/MultilineInputBox');
 var Submit = require('./../../form/control/Submit');
 var Lang = require('../../../locales/zh-cn');
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var objects = require('../../../utils/objects');
 
 //core module to export
@@ -40,11 +40,11 @@ var toolbar = module.exports = React.createClass({
         }
 
         if (event.keyCode === KeyCodes.UP) {
-            emitter.emit(EventTypes.SELECT_PREVIOUS_CONVERSATION);
+            globalEmitter.emit(EventTypes.SELECT_PREVIOUS_CONVERSATION);
         } else if (event.keyCode === KeyCodes.DOWN) {
-            emitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
+            globalEmitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
         } else if (event.keyCode === KeyCodes.ESCAPE) {
-            emitter.emit(EventTypes.ESCAPE_MESSAGE_INPUT);
+            globalEmitter.emit(EventTypes.ESCAPE_MESSAGE_INPUT);
         }
     },
     _handleTextAreaSubmit: function(event) {
@@ -57,18 +57,18 @@ var toolbar = module.exports = React.createClass({
         }
     },
     _showInputToolbar: function() {
-        emitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: false});
+        globalEmitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: false});
     },
     _showModificationToolbar: function(event) {
         this.setState({modifyEnable: !!(event && event.modifyEnable)});
     },
     componentDidMount: function() {
-        emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
-        emitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
+        globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+        globalEmitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
     },
     componentWillUnmount: function() {
-        emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
-        emitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
+        globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+        globalEmitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
     },
     render: function() {
         var style = this.props.style;

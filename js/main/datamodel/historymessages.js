@@ -5,7 +5,8 @@
 
 // dependencies
 var _ = require('lodash');
-var Message = require('./message');
+//var Message = require('./message');
+var Message = require('./messages/message');
 
 // exports
 function HistoryMessages(data) {
@@ -73,7 +74,8 @@ HistoryMessages.prototype.setRequested = function() {
 // private functions
 function _parseMessages(arr) {
     return _.map(arr, function(v) {
-        return new Message(v);
+        //return new Message(v);
+        return Message.create(v);
     });
 }
 
