@@ -12,11 +12,14 @@ module.exports = function (base, extras) {
 
     if (_.isFunction(base)) {
         proto = base.prototype;
+        extras = _.assign({init: base}, extras);
     } else if (_.isObject(base)) {
         proto = base;
+        extras = _.assign({init: base.constructor}, extras);
     } else {
         proto = Object.getPrototypeOf && Object.getPrototypeOf(base)
             || base.constructor.prototype;
+        extras = _.assign({init: base.constructor}, extras);
     }
 
     return _.create(proto, _.assign({}, origin, extras));

@@ -23,7 +23,7 @@ var RESOURCE_URL = config.resourceDomain;
 
 var TextMessage = React.createClass({
     render: function () {
-        return <span style={makeStyle(this.props.style)}>{String(this.props.message.t || this.props.message || '')}</span>;
+        return <span style={makeStyle(this.props.style)}>{String(this.props.message.text || this.props.message || '')}</span>;
     }
 });
 
@@ -90,6 +90,9 @@ var AudioMessage = React.createClass({
 var SystemMessage = React.createClass({
     render: function () {
         var message = this.props.message;
+
+        console.info('SystemMessage#render: ', message);
+
         switch (message.type) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
                 return (<span style={makeStyle(this.props.style)}>{
@@ -131,10 +134,10 @@ module.exports = React.createClass({
 
 // private functions
 function _createMessageNode(data) {
-    var type = data.messageType;
-    var message = data.message;
-    var userId = data.senderId;
-    var userName = data.senderName;
+    var type = data.type;
+    var message = data.content;
+    var userId = data.user.getUserId();
+    var userName = data.user.getNickname();
 
     if (!message || _.isEmpty(message)) {
         return null;
@@ -148,6 +151,7 @@ function _createMessageNode(data) {
         case MessageTypes.AUDIO:
             return <AudioMessage message={message} />;
         case MessageTypes.SYSTEM:
+            console.info('systemMessage');
             return <SystemMessage message={message} userId={userId} userName={userName} />;
         default :
             return <TextMessage message={message} />;

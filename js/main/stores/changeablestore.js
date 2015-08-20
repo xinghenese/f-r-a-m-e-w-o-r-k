@@ -14,9 +14,11 @@ var index = 0;
 // exports
 var ChangeableStore = EventEmitter.extend({
     addChangeListener: function (callback) {
+        console.info('[changeable.js] - addChangeListener: ', this.toString());
         this.on(CHANGE_EVENT, callback);
     },
     emitChange: function () {
+        console.info('[changeable.js] - emitChange: ', this.toString());
         this.emit(CHANGE_EVENT);
     },
     removeAllChangeListener: function () {

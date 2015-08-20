@@ -24,7 +24,8 @@ var socketConnection = require('../net/connection/socketconnection');
 var users = require('../datamodel/users');
 var ChangeableStore = require('./changeablestore');
 var ConversationConstants = require('../constants/conversationconstants');
-var Message = require('../datamodel/message');
+//var Message = require('../datamodel/message');
+var Message = require('../datamodel/messages/message');
 var MessageConstants = require('../constants/messageconstants');
 
 // exports
@@ -177,7 +178,8 @@ socketConnection.monitor("ICH").then(function(data) {
 // private functions
 function _appendMessage(data) {
     data["mscs"] = data["tmstp"] = new Date().valueOf();
-    var message = new Message(data);
+    //var message = new Message(data);
+    var message = Message.create(data);
 
     if (objects.containsValuedProp(data, "msrid")) {
         MessageStore.addGroupMessage(parseInt(data["msrid"]), message);
@@ -331,7 +333,8 @@ function _handleReceivedGroupSystemMessage(data) {
         return false;
     }
 
-    var message = new Message(data);
+    //var message = new Message(data);
+    var message = Message.create(data);
     var type = parseInt(data["tp"]);
     switch (type) {
         case MessageConstants.SystemMessageTypes.INVITED_INTO_GROUP:
@@ -350,7 +353,8 @@ function _handleReceivedGroupSystemMessage(data) {
 }
 
 function _handleReceivedTalkMessage(data) {
-    var message = new Message(data);
+    //var message = new Message(data);
+    var message = Message.create(data);
     if (objects.containsValuedProp(data, "msrid")) {
         var pending = _handleReceivedGroupSystemMessage(data);
         if (!pending) {
@@ -457,7 +461,8 @@ function _handleGroupHistoryMessages(messages) {
         var groupHistoryMessages = MessageStore.getGroupHistoryMessages(groupId);
         if (groupHistoryMessages) {
             var previousMessages = _.map(v["tms"], function(item) {
-                return new Message(item);
+                //return new Message(item);
+                return Message.create(item);
             });
             groupHistoryMessages.prependMessages(previousMessages.reverse());
         } else {
@@ -481,7 +486,8 @@ function _handlePrivateHistoryMessages(messages) {
         var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
         if (privateHistoryMessages) {
             var previousMessages = _.map(v["tms"], function(item) {
-                return new Message(item);
+                //return new Message(item);
+                return Message.create(item);
             });
             privateHistoryMessages.prependMessages(previousMessages.reverse());
         } else {

@@ -22,19 +22,19 @@ Message.prototype.getGroupId = function() {
     return parseInt(this._data["msrid"] || -1);
 };
 
-Message.prototype.getUserId = function() {
+Message.prototype.getUserId = function () {
     return parseInt(this._data["msuid"] || -1);
 };
 
-Message.prototype.getTargetUserIds = function() {
+Message.prototype.getTargetUserIds = function () {
     return parseInt(this._data["mstuid"] || -1);
 };
 
-Message.prototype.getAtUserId = function() {
+Message.prototype.getAtUserId = function () {
     return parseInt(this._data["atuid"] || -1);
 };
 
-Message.prototype.getContent = function() {
+Message.prototype.getContent = function () {
     if (this._data["msg"]) {
         return _.clone(this._data["msg"]);
     }
@@ -44,7 +44,7 @@ Message.prototype.getContent = function() {
     };
 };
 
-Message.prototype.getBriefText = function() {
+Message.prototype.getBriefText = function () {
     var type = this.getMessageType();
     switch (type) {
         case 0:
@@ -72,49 +72,49 @@ Message.prototype.getBriefText = function() {
     }
 };
 
-Message.prototype.getUuid = function() {
+Message.prototype.getUuid = function () {
     return this._data["uuid"];
 };
 
-Message.prototype.getUserNickname = function() {
+Message.prototype.getUserNickname = function () {
     return this._data["unk"];
 };
 
 /**
  * Conversation type of string, 0 for group, 1 for private.
  */
-Message.prototype.getConversationType = function() {
+Message.prototype.getConversationType = function () {
     return this._data["rmtp"];
 };
 
 /**
  * see http://wiki.topcmm.net/doku.php?id=wiki:liao_enum#msgtp
  */
-Message.prototype.getMessageType = function() {
+Message.prototype.getMessageType = function () {
     return parseInt(this._data["msgtp"]);
 };
 
-Message.prototype.getVersion = function() {
+Message.prototype.getVersion = function () {
     return this._data["ver"];
 };
 
-Message.prototype.getMinVersion = function() {
+Message.prototype.getMinVersion = function () {
     return this._data["minver"];
 };
 
-Message.prototype.getAltText = function() {
+Message.prototype.getAltText = function () {
     return this._data["alt"];
 };
 
-Message.prototype.getCursor = function() {
+Message.prototype.getCursor = function () {
     return this._data["mscs"];
 };
 
-Message.prototype.getTimestamp = function() {
+Message.prototype.getTimestamp = function () {
     return parseInt(this._data["tmstp"]);
 };
 
-Message.prototype.getStatus = function() {
+Message.prototype.getStatus = function () {
     if (!objects.containsValuedProp(this, "_status")) {
         return MessageConstants.Status.UNKNOWN;
     }
@@ -122,11 +122,11 @@ Message.prototype.getStatus = function() {
     return this._status;
 };
 
-Message.prototype.getProp = function(key) {
+Message.prototype.getProp = function (key) {
     return this._data[key];
 };
 
-Message.prototype.setStatus = function(status) {
+Message.prototype.setStatus = function (status) {
     this._status = status;
 };
 
@@ -151,10 +151,10 @@ function _generateSystemMessageContent(data) {
 
 function _generateJoinedNicknames(data) {
     var referedMembers = data["referobj"] || [];
-    var membersWithoutInviter = _.filter(referedMembers, function(member) {
+    var membersWithoutInviter = _.filter(referedMembers, function (member) {
         return member["referid"] !== data["msuid"];
     });
-    var nicknames = _.map(membersWithoutInviter, function(member) {
+    var nicknames = _.map(membersWithoutInviter, function (member) {
         return member["refern"];
     });
     return strings.join(nicknames, Lang.nicknameSeparator);

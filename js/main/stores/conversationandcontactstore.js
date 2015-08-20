@@ -60,6 +60,7 @@ function _handleGetChatListRequest(action) {
         _processConversationListResponse(response);
         _processContactListResponse(response);
         ConversationAndContactStore.emitChange();
+        console.info('[conversatinnstore.js] - ConversationStore.emitted: ', ConversationAndContactStore.toString());
     }, function (error) {
         console.log(error);
     });

@@ -9,6 +9,7 @@ var React = require('react');
 
 var KeyInfo = require('../keyinfo');
 var groups = require('../groups');
+var Group = require('../group');
 var users = require('../users');
 var User = require('../user');
 var MessageTypes = require('../../constants/messageconstants').MessageTypes;
@@ -23,27 +24,43 @@ var STRING_NOT_SET = KeyInfo.STRING_NOT_SET;
 var NUMBER_NOT_SET = KeyInfo.NUMBER_NOT_SET;
 
 var keyMap = {
-    group:          new KeyInfo('msrid',    NUMBER_NOT_SET),
-    user:           new KeyInfo('msuid',    NUMBER_NOT_SET),
-    targetUser:     new KeyInfo('mstuid',   NUMBER_NOT_SET),
-    atUser:         new KeyInfo('atuid',    NUMBER_NOT_SET),
-    uuid:           new KeyInfo('uuid',     NUMBER_NOT_SET),
-    roomType:       new KeyInfo('rmtp',     NUMBER_NOT_SET),
-    version:        new KeyInfo('ver',      STRING_NOT_SET),
-    minVersion:     new KeyInfo('minver',   STRING_NOT_SET),
-    alternate:      new KeyInfo('alt',      STRING_NOT_SET),
-    cursor:         new KeyInfo('mscs',     NUMBER_NOT_SET),
-    timeStamp:      new KeyInfo('tmstp',    NUMBER_NOT_SET),
-    status:         new KeyInfo('status',   NUMBER_NOT_SET),
-    content:        new KeyInfo('msg',      STRING_NOT_SET),
-    type:           new KeyInfo('msgtp')
+    group:          new KeyInfo('msrid',    Number),
+    user:           new KeyInfo('msuid',    Number),
+    targetUser:     new KeyInfo('mstuid',   Number),
+    atUser:         new KeyInfo('atuid',    Number),
+    uuid:           new KeyInfo('uuid',     String),
+    roomType:       new KeyInfo('rmtp',     Number),
+    version:        new KeyInfo('ver',      String),
+    minVersion:     new KeyInfo('minver',   String),
+    alternate:      new KeyInfo('alt',      String),
+    cursor:         new KeyInfo('mscs',     Number),
+    timestamp:      new KeyInfo('tmstp',    Number),
+    time:           new KeyInfo('time',     Date),
+    status:         new KeyInfo('status',   Number),
+    content:        new KeyInfo('msg',      Object),
+    type:           new KeyInfo('msgtp',    Number)
 };
 
 // exports
+
+var Model = modelgenerator();
+
 function Message(data) {
     _.forEach(keyMap, function (sourceKeyInfo, targetKey) {
         if (sourceKeyInfo instanceof KeyInfo) {
-            this[targetKey] = data[sourceKeyInfo.fieldName] || sourceKeyInfo.defaultValue;
+            var fieldType = sourceKeyInfo.fieldType;
+            var sourceFieldName = sourceKeyInfo.fieldName;
+            var defaultValue = sourceKeyInfo.defaultValue;
+            var sourceValue = data[sourceFieldName];
+            sourceValue = _.isUndefined(sourceValue) || _.isNaN(sourceValue) ? defaultValue : sourceValue;
+
+            if (!fieldType) {
+                this[targetKey] = sourceValue;
+            } else if (_.isFunction(fieldType.create)) {
+                this[targetKey] = fieldType.create(sourceValue);
+            } else if (_.isFunction(fieldType)) {
+                this[targetKey] = fieldType(sourceValue);
+            }
         } else {
             this[targetKey] = data[sourceKeyInfo];
         }
@@ -51,16 +68,16 @@ function Message(data) {
 
     // adjustment
     var groupId = parseInt(this.group);
-    this.group = groupId && groups.getGroup(groupId) || null;
+    this.group = groupId && groups.getGroup(groupId) || Group.emptyGroup;
 
     var userId = parseInt(this.user);
-    this.user = userId ? users.getUser(userId) || new User({uid: data['msuid'], unk: data['unk']}) : null;
+    this.user = userId ? users.getUser(userId) || new User({uid: data['msuid'], unk: data['unk']}) : User.emptyUser;
 
     var targetUserId = parseInt(this.targetUser);
-    this.targetUser = targetUserId ? users.getUser(targetUserId) || new User({uid: data['mstuid']}) : null;
+    this.targetUser = targetUserId ? users.getUser(targetUserId) || new User({uid: data['mstuid']}) : User.emptyUser;
 
     var atUserId = parseInt(this.atUser);
-    this.atUser = atUserId ? users.getUser(atUserId) || new User({uid: data['atuid']}) : null;
+    this.atUser = atUserId ? users.getUser(atUserId) || new User({uid: data['atuid']}) : User.emptyUser;
 
     // backwards-compat with ../message.js
     this._data = data;
@@ -181,22 +198,16 @@ _.assign(Message, {
         }, this);
     },
     create: function (data) {
-        console.info('messageType: ', data['msgtp']);
         switch (parseInt(data['msgtp'])) {
             case MessageTypes.TEXT:
-                console.info('TextMessage');
                 return new (require('./textmessage'))(data);
             case MessageTypes.PICTURE:
-                console.info('PictureMessage');
                 return new (require('./picturemessage'))(data);
             case MessageTypes.AUDIO:
-                console.info('VoiceMessage');
                 return new (require('./voicemessage'))(data);
             case MessageTypes.SYSTEM:
-                console.info('SystemMessage');
                 return new (require('./systemmessage'))(data);
             default:
-                console.info('Message');
                 return new Message(data);
         }
     }

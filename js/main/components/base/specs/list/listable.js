@@ -63,6 +63,8 @@ module.exports = {
             var item = _.isFunction(this.renderItem)
                 && this.renderItem(data, _.clone(itemProps), itemKey);
 
+            console.info('item: ', item);
+
             if (!item) {
                 return null;
             }

@@ -66,6 +66,7 @@ module.exports = {
         }
     },
     renderItem: function (item) {
+        console.info('MultiSelectable#item: ', item);
         if (!React.isValidElement(item)) {
             return null;
         }

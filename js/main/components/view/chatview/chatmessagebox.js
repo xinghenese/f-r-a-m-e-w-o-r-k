@@ -228,16 +228,17 @@ function _buildGroupRenderObject(item, collector) {
             return;
         }
 
-        var messageContent = message.getContent();
-        collector.push({
-            senderId: message.getUserId(),
-            senderName: _getSenderNickname(message),
-            senderAvatar: avatar,
-            message: messageContent,
-            messageType: message.getMessageType(),
-            time: new Date(message.getTimestamp()),
-            type: message.getMessageType()
-        });
+        console.info('[groupMessage]: ', message);
+        //collector.push({
+        //    senderId: message.user.getUserId(),
+        //    senderName: _getSenderNickname(message),
+        //    senderAvatar: message.group.picture(),
+        //    message: messageContent,
+        //    messageType: message.type,
+        //    time: new Date(message.timestamp),
+        //    type: message.type
+        //});
+        collector.push(message);
     });
 }
 
@@ -253,16 +254,17 @@ function _buildUserRenderObject(item, collector) {
             return;
         }
 
-        var messageContent = message.getContent();
-        collector.push({
-            senderId: message.getUserId(),
-            senderName: _getSenderNickname(message),
-            senderAvatar: avatar,
-            message: messageContent,
-            messageType: message.getMessageType(),
-            time: new Date(message.getTimestamp()),
-            type: message.getMessageType()
-        });
+        console.info('[privateMessage]: ', message);
+        //collector.push({
+        //    senderId: message.user.getUserId(),
+        //    senderName: _getSenderNickname(message),
+        //    senderAvatar: message.group.picture(),
+        //    message: messageContent,
+        //    messageType: message.type,
+        //    time: new Date(message.timestamp),
+        //    type: message.type
+        //});
+        collector.push(message);
     });
 }
 
