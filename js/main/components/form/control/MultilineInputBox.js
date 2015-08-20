@@ -7,7 +7,6 @@ var _ = require('lodash');
 var React = require('react');
 var EventTypes = require('../../../constants/eventtypes');
 var commonStyle = require('../../../style/common');
-var emitter = require('../../../utils/eventemitter');
 var theme = require('../../../style/default');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;

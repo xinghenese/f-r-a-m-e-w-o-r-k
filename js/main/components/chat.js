@@ -19,7 +19,7 @@ var SocketConnection = require('../net/connection/socketconnection');
 var myself = require('../datamodel/myself');
 var setStyle = require('../style/styles').setStyle;
 var UserInfoBox = require('./view/infoview/userinfobox');
-var emitter = require('../utils/eventemitter');
+var globalEmitter = require('../events/globalemitter');
 
 //private fields
 var boxType = {
@@ -51,7 +51,7 @@ var Chat = React.createClass({
     },
     _onSelectConversation: function (data) {
         this.setState({rightBoxType: boxType.messsagebox});
-        emitter.emit(EventTypes.SELECT_CONVERSATION, data);
+        globalEmitter.emit(EventTypes.SELECT_CONVERSATION, data);
     },
     _showSettings: function () {
         this.setState(function (previousState) {

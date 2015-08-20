@@ -15,7 +15,7 @@ var PrivateHistoryMessages = require('../datamodel/privatehistorymessages');
 var User = require('../datamodel/user');
 var UuidGenerator = require('../utils/uuidgenerator');
 var assign = require('object-assign');
-var emitter = require('../utils/eventemitter');
+var globalEmitter = require('../events/globalemitter');
 var groups = require('../datamodel/groups');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
@@ -362,8 +362,7 @@ function _handleReceivedTalkMessage(data) {
         console.error("Unknow type of talk message received");
     }
     MessageStore.emitChange();
-    console.log("sending notification");
-    emitter.emit(EventTypes.NEW_MESSAGE_RECEIVED, message);
+    globalEmitter.emit(EventTypes.NEW_MESSAGE_RECEIVED, message);
 }
 
 function _handleSendTalkMessage(action) {

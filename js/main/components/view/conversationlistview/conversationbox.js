@@ -6,7 +6,7 @@
 var _ = require('lodash');
 var React = require('react');
 var ConversationList = require('./conversationlist');
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var EventTypes = require('../../../constants/eventtypes');
@@ -53,12 +53,12 @@ var SideList = React.createClass({
         });
     },
     componentDidMount: function () {
-        //emitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
-        emitter.on('search', this._updateSql);
+        //globalEmitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
+        globalEmitter.on('search', this._updateSql);
     },
     componentWillUnmount: function () {
-        //emitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
-        emitter.removeListener('search', this._updateSql);
+        //globalEmitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
+        globalEmitter.removeListener('search', this._updateSql);
     },
     render: function () {
         var matchedMessageList = null;
@@ -124,12 +124,12 @@ var ConversationBox = React.createClass({
                 }
                 break;
             case KeyCodes.DOWN:
-                emitter.emit(EventTypes.SELECT_FIRST_CONVERSATION);
+                globalEmitter.emit(EventTypes.SELECT_FIRST_CONVERSATION);
                 break;
         }
     },
     _filterData: function(data) {
-        emitter.emit('search', {
+        globalEmitter.emit('search', {
             displayData: data && data.name || this.state.data,
             matchedMessages: data && data.message,
             type: this.state.type
@@ -171,16 +171,16 @@ var ConversationBox = React.createClass({
     componentDidMount: function() {
         ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
-        emitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
-        emitter.on(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
-        emitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
+        globalEmitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
+        globalEmitter.on(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
+        globalEmitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
     },
     componentWillUnmount: function() {
         ConversationAndContactStore.removeChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.removeChangeListener(this._updateMessages);
-        emitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
-        emitter.removeListener(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
-        emitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
+        globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._focusSearchInput);
+        globalEmitter.removeListener(EventTypes.BEFORE_SENDING_MESSAGE, this._beforeSendingMessage);
+        globalEmitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
     },
     render: function() {
         return (

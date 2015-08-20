@@ -8,7 +8,7 @@ var React = require('react');
 var makeStyle = require('../../../style/styles').makeStyle;
 var commonStyle = require('../../../style/common');
 var Lang = require('../../../locales/zh-cn');
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var EventTypes = require('../../../constants/eventtypes');
 
 var createGenerator = require('../../base/creator/createReactClassGenerator');
@@ -50,10 +50,10 @@ module.exports = createGroupableClass({
         });
     },
     componentDidMount: function () {
-        emitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
+        globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
     compnonentWillUnmount: function () {
-        emitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
+        globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
     renderGroupTitle: function (data, props, key) {
         return (

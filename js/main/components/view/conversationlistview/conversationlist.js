@@ -11,7 +11,7 @@ var EventTypes = require('../../../constants/eventtypes');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
-var emitter = require('../../../utils/eventemitter');
+var globalEmitter = require('../../../events/globalemitter');
 var groups = require('../../../datamodel/groups');
 var protocols = require('../../../utils/protocols');
 
@@ -46,7 +46,7 @@ module.exports = createListClass({
         }
 
         var first = _.first(this.props.data);
-        emitter.emit(EventTypes.SELECT_CONVERSATION, {id: first.id, type: first.type});
+        globalEmitter.emit(EventTypes.SELECT_CONVERSATION, {id: first.id, type: first.type});
     },
     _selectPreviousConversation: function () {
         this._onSiblingSelect(-1);
@@ -55,14 +55,14 @@ module.exports = createListClass({
         this._onSiblingSelect(1);
     },
     componentDidMount: function () {
-        emitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
-        emitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
-        emitter.on(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
+        globalEmitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
+        globalEmitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+        globalEmitter.on(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     componentWillUnmount: function () {
-        emitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
-        emitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
-        emitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
+        globalEmitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
+        globalEmitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
+        globalEmitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     renderItem: function (data, props, key) {
         if (!isValidConversationData(data)) {
@@ -166,5 +166,5 @@ function defaultOnSelect(event) {
             index
         );
     }
-    emitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
+    globalEmitter.emit(EventTypes.SELECT_CONVERSATION, {id: index, type: type});
 }
