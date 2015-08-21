@@ -12,6 +12,8 @@ function User(data) {
     this._data = data;
 }
 
+User.emptyUser = new User({});
+
 User.prototype.getUserId = function () {
     return this._data["uid"];
 };

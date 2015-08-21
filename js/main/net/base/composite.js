@@ -105,9 +105,11 @@ module.exports = {
 function chain(methods, dir) {
     return serialize(methods || arguments, function (memo, method, args) {
         if (_.isFunction(method)) {
-            if (memo) {
+            if (!_.isUndefined(memo)) {
                 return method.call(this, memo);
             }
+            // allow to pass initial arguments for the first time. here we distinguish
+            // out the first invocation via whether memo is undefined.
             return method.apply(this, args);
         }
         return memo;
@@ -115,7 +117,7 @@ function chain(methods, dir) {
 }
 
 function sequence(methods, dir) {
-    return serialize(methods, function (memo, method, args) {
+    return serialize(methods || arguments, function (memo, method, args) {
         if (_.isFunction(method)) {
             method.apply(this, args);
         }

@@ -23,7 +23,7 @@ var RESOURCE_URL = config.resourceDomain;
 
 var TextMessage = React.createClass({
     render: function () {
-        return <span style={makeStyle(this.props.style)}>{String(this.props.message.t || this.props.message || '')}</span>;
+        return <span style={makeStyle(this.props.style)}>{String(this.props.message.text || this.props.message || '')}</span>;
     }
 });
 
@@ -131,10 +131,10 @@ module.exports = React.createClass({
 
 // private functions
 function _createMessageNode(data) {
-    var type = data.messageType;
-    var message = data.message;
-    var userId = data.senderId;
-    var userName = data.senderName;
+    var type = data.type;
+    var message = data.content;
+    var userId = data.user.getUserId();
+    var userName = data.user.getNickname();
 
     if (!message || _.isEmpty(message)) {
         return null;
