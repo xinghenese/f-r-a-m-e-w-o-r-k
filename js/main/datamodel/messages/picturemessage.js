@@ -12,11 +12,11 @@ var urls = require('../../utils/urls');
 
 // private fields
 var contentKeyMap = {
-    original:   new KeyInfo('original',     KeyInfo.NUMBER_ZERO),
-    width:      new KeyInfo('width',        KeyInfo.NUMBER_ZERO),
-    height:     new KeyInfo('height',       KeyInfo.NUMBER_ZERO),
-    url:        new KeyInfo('url',          KeyInfo.STRING_NOT_SET),
-    size:       new KeyInfo('size',         KeyInfo.NUMBER_ZERO)
+    original:   new KeyInfo('original',     Number,     KeyInfo.NUMBER_ZERO),
+    width:      new KeyInfo('width',        Number,     KeyInfo.NUMBER_ZERO),
+    height:     new KeyInfo('height',       Number,     KeyInfo.NUMBER_ZERO),
+    url:        new KeyInfo('url',          String),
+    size:       new KeyInfo('size',         Number,     KeyInfo.NUMBER_ZERO)
 };
 var PICTURE_MAX_WIDTH = 477;
 
@@ -26,6 +26,9 @@ function PictureMessage(data) {
     Message.formatContent.call(this, contentKeyMap);
 }
 
+module.exports = PictureMessage;
+
+// module initialization
 _.assign(PictureMessage.prototype, Message.prototype, {
     toElement: function (props) {
         var url = this.content.url;
@@ -43,9 +46,8 @@ _.assign(PictureMessage.prototype, Message.prototype, {
     }
 });
 
-module.exports = PictureMessage;
-
-// module initialization
-
+PictureMessage.create = function (data) {
+    return new PictureMessage(data);
+};
 
 // private functions

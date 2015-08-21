@@ -13,8 +13,8 @@ var Audio = require('../../components/tools/IntelAudio');
 
 // private fields
 var contentKeyMap = {
-    duration:   new KeyInfo('duration',     KeyInfo.NUMBER_NOT_SET),
-    url:        new KeyInfo('url',          KeyInfo.STRING_NOT_SET)
+    duration:   new KeyInfo('duration',     Number),
+    url:        new KeyInfo('url',          String)
 };
 
 // exports
@@ -23,6 +23,9 @@ function VoiceMessage(data) {
     Message.formatContent.call(this, contentKeyMap);
 }
 
+module.exports = VoiceMessage;
+
+// module initialization
 _.assign(VoiceMessage.prototype, Message.prototype, {
     toElement: function (props) {
         var url = this.content.url;
@@ -36,9 +39,8 @@ _.assign(VoiceMessage.prototype, Message.prototype, {
     }
 });
 
-module.exports = VoiceMessage;
-
-// module initialization
-
+VoiceMessage.create = function (data) {
+    return new VoiceMessage(data);
+};
 
 // private functions

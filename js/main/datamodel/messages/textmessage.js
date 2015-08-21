@@ -11,7 +11,7 @@ var KeyInfo = require('../keyinfo');
 
 // private fields
 var contentKeyMap = {
-    text:   new KeyInfo('t', KeyInfo.STRING_NOT_SET)
+    text:   new KeyInfo('t',    String)
 };
 
 // exports
@@ -20,15 +20,18 @@ function TextMessage(data) {
     Message.formatContent.call(this, contentKeyMap);
 }
 
+module.exports = TextMessage;
+
+// module initialization
 _.assign(TextMessage.prototype, Message.prototype, {
     toElement: function (props) {
         return <span {...props}>{this.content.text}</span>;
     }
 });
 
-module.exports = TextMessage;
-
-// module initialization
+TextMessage.create = function (data) {
+    return new TextMessage(data);
+};
 
 
 // private functions

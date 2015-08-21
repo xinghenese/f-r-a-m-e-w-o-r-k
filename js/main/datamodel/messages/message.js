@@ -78,11 +78,12 @@ function Message(data) {
 
     // backwards-compat with ../message.js
     this._data = data;
+    this.content = this.getBriefText();
 }
 
 module.exports = Message;
 
-// module initalization
+// module initialization
 _.assign(Message.prototype, {
     toElement: function() {
         var content = String(this.content);

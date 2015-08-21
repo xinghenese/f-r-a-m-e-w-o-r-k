@@ -209,10 +209,9 @@ function _buildGroupRenderObject(item, collector) {
     }
 
     _.forEach(item.messages, function(message) {
-        if (!message) {
-            return;
+        if (message) {
+            collector.push(message);
         }
-        collector.push(message);
     });
 }
 
@@ -223,10 +222,9 @@ function _buildUserRenderObject(item, collector) {
     }
 
     _.forEach(item.messages, function(message) {
-        if (!message) {
-            return;
+        if (message) {
+            collector.push(message);
         }
-        collector.push(message);
     });
 }
 
