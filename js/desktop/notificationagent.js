@@ -20,17 +20,11 @@ module.exports = NotificationAgent;
 
 // private functions
 function _handleNewMessageReceived(message) {
-    /*
     notifier.notify({
         title: message.getUserNickname(),
         message: message.getBriefText(),
         icon: "images/logo144.png",
         sound: true,
         wait: false
-    });
-    */
-    globalEmitter.emit(EventTypes.SHOW_NOTIFICATION, {
-        title: message.getUserNickname(),
-        message: message.getBriefText()
     });
 }

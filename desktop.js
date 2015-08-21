@@ -7,12 +7,14 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var EventTypes = require('./js/main/constants/eventtypes');
-var emitter = require('./js/main/utils/eventemitter');
+var globalEmitter = require('./js/main/events/globalemitter');
+var notificationAgent = require('./js/desktop/notificationagent');
 
 require('crash-reporter').start();
 
 // private fields
 var mainWindow = null;
+var appIcon = null;
 
 // desktop logic
 app.on('window-all-closed', function() {
@@ -26,7 +28,19 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
-    // Create the browser window.
+    _initMainWindow();
+    _initNotificationHandlers();
+});
+
+// private functions
+function _initDockNotificationHandlers() {
+    globalEmitter.on(EventTypes.UPDATE_DESKTOP_BADGE, function(badge) {
+        app.dock.setBadge(badge);
+    });
+}
+
+function _initMainWindow() {
+// Create the browser window.
     mainWindow = new BrowserWindow({
         "width": 1000,
         "height": 725,
@@ -49,11 +63,9 @@ app.on('ready', function() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
+}
 
-    // Handle notifications
-    var notifier = require('node-notifier');
-    emitter.on(EventTypes.SHOW_NOTIFICATION, function(notification) {
-        console.log("got notification");
-        notifier.notify(notification);
-    });
-});
+function _initNotificationHandlers() {
+    notificationAgent.init();
+    _initDockNotificationHandlers();
+}

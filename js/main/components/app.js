@@ -64,7 +64,7 @@ module.exports = {
 
 // private functions
 function _initNotificationAgent() {
-    var notificationAgent = require('./notificationagent');
+    var notificationAgent = require('./../../desktop/notificationagent');
     notificationAgent.init();
 }
 
