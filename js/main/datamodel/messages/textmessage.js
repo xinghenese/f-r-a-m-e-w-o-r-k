@@ -7,10 +7,11 @@
 var _ = require('lodash');
 var React = require('react');
 var Message = require('./message');
+var KeyInfo = require('../keyinfo');
 
 // private fields
 var contentKeyMap = {
-    text: 't'
+    text:   new KeyInfo('t', KeyInfo.STRING_NOT_SET)
 };
 
 // exports
@@ -20,8 +21,8 @@ function TextMessage(data) {
 }
 
 _.assign(TextMessage.prototype, Message.prototype, {
-    toElement: function () {
-        return <span>{this.content.text}</span>;
+    toElement: function (props) {
+        return <span {...props}>{this.content.text}</span>;
     }
 });
 

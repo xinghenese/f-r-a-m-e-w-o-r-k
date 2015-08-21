@@ -227,17 +227,7 @@ function _buildGroupRenderObject(item, collector) {
         if (!message) {
             return;
         }
-
-        var messageContent = message.getContent();
-        collector.push({
-            senderId: message.getUserId(),
-            senderName: _getSenderNickname(message),
-            senderAvatar: avatar,
-            message: messageContent,
-            messageType: message.getMessageType(),
-            time: new Date(message.getTimestamp()),
-            type: message.getMessageType()
-        });
+        collector.push(message);
     });
 }
 
@@ -252,17 +242,7 @@ function _buildUserRenderObject(item, collector) {
         if (!message) {
             return;
         }
-
-        var messageContent = message.getContent();
-        collector.push({
-            senderId: message.getUserId(),
-            senderName: _getSenderNickname(message),
-            senderAvatar: avatar,
-            message: messageContent,
-            messageType: message.getMessageType(),
-            time: new Date(message.getTimestamp()),
-            type: message.getMessageType()
-        });
+        collector.push(message);
     });
 }
 

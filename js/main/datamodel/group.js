@@ -18,6 +18,8 @@ function Group(data) {
     this._data = data;
 }
 
+Group.emptyGroup = new Group({});
+
 Group.prototype.getGroupId = function () {
     return parseInt(this._data["rid"]);
 };

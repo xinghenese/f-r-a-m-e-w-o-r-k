@@ -41,6 +41,7 @@ var MessageConstants = {
         GROUP_CARD: 11
     },
     SystemMessageTypes: {
+        COMMON_USED: 1,
         INVITED_INTO_GROUP: 100,
         USER_INVITED_INTO_GROUP: 101,
         GROUP_NAME_CHANGED: 104
