@@ -23,7 +23,7 @@ var Button = require('../../form/control/Button');
 
 //core module to export
 var ChatMessageBox = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {
             id: '',
             name: '',
@@ -32,8 +32,8 @@ var ChatMessageBox = React.createClass({
             data: []
         };
     },
-    _deleteConversation: function (id, type) {
-        return function () {
+    _deleteConversation: function(id, type) {
+        return function() {
             var idNumber = parseInt(id);
             switch (type) {
                 case ConversationConstants.GROUP_TYPE:
@@ -48,7 +48,7 @@ var ChatMessageBox = React.createClass({
             }
         };
     },
-    _handleSubmit: function (event) {
+    _handleSubmit: function(event) {
         var data = _.values(event.data)[0];
         if (this.state.id && data) {
             globalEmitter.emit(EventTypes.BEFORE_SENDING_MESSAGE);
@@ -71,14 +71,14 @@ var ChatMessageBox = React.createClass({
             );
         }
     },
-    _updateMessages: function (id, type) {
+    _updateMessages: function(id, type) {
         id = id || this.state.id;
         type = type || this.state.type;
         if (!id || !type) {
             return;
         }
 
-        var data;
+        var data = [];
         var enabled = true;
         var name;
 
@@ -95,10 +95,7 @@ var ChatMessageBox = React.createClass({
                     MessageActions.requestGroupHistoryMessages(id);
                 }
 
-                data = {
-                    groupId: id,
-                    messages: groupHistoryMessages.getMessages()
-                };
+                data = groupHistoryMessages.getMessages();
             }
         } else {
             var user = users.getUser(id);
@@ -112,24 +109,12 @@ var ChatMessageBox = React.createClass({
                     MessageActions.requestPrivateHistoryMessages(id);
                 }
 
-                data = {
-                    userId: id,
-                    messages: privateHistoryMessages.getMessages()
-                };
-            }
-        }
-
-        var result = [];
-        if (data) {
-            if ("groupId" in data) {
-                _buildGroupRenderObject(data, result);
-            } else {
-                _buildUserRenderObject(data, result);
+                data = privateHistoryMessages.getMessages();
             }
         }
 
         this.setState({
-            data: result,
+            data: data,
             id: id,
             name: name,
             type: type,
@@ -140,32 +125,32 @@ var ChatMessageBox = React.createClass({
             globalEmitter.emit(EventTypes.FOCUS_MESSAGE_INPUT);
         });
     },
-    _scrollToBottom: function () {
+    _scrollToBottom: function() {
         var messageList = React.findDOMNode(this.refs.messagelist);
         if (messageList) {
             messageList.scrollTop = messageList.scrollHeight;
         }
     },
-    _closeCurrentChat: function () {
+    _closeCurrentChat: function() {
         this.setState({id: '', name: ''});
     },
-    _modifyCurrentChat: function () {
+    _modifyCurrentChat: function() {
         globalEmitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: true});
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         MessageStore.addChangeListener(this._updateMessages);
         addConversationListSelectedHandler(this);
         globalEmitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
-    componentDidUpdate: function () {
+    componentDidUpdate: function() {
         this._scrollToBottom();
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
         globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
-    render: function () {
+    render: function() {
         if (this.state.id) {
             return (
                 <div className="chat-message-box" style={makeStyle(style)}>
@@ -174,15 +159,16 @@ var ChatMessageBox = React.createClass({
                             value={Lang.close}
                             style={makeStyle(style.header.button, style.header.button.close)}
                             onClick={this._closeCurrentChat}
-                        />
+                            />
                         <span>{this.state.name}</span>
                         <Button
                             value={Lang.modify}
                             style={makeStyle(style.header.button, style.header.button.modify)}
                             onClick={this._modifyCurrentChat}
-                        />
+                            />
                     </div>
-                    <ChatMessageList id="chat-message-list" ref="messagelist" data={this.state.data} style={style.chatmessagelist}/>
+                    <ChatMessageList id="chat-message-list" ref="messagelist" data={this.state.data}
+                                     style={style.chatmessagelist}/>
                     <ChatMessageToolbar
                         onSubmit={this._handleSubmit}
                         inputEnabled={this.state.inputEnabled}
@@ -207,7 +193,7 @@ module.exports = ChatMessageBox;
 
 //private functions
 function addConversationListSelectedHandler(box) {
-    globalEmitter.on(EventTypes.SELECT_CONVERSATION, function (info) {
+    globalEmitter.on(EventTypes.SELECT_CONVERSATION, function(info) {
         box._updateMessages(info.id, info.type);
     });
 }
@@ -222,8 +208,7 @@ function _buildGroupRenderObject(item, collector) {
         return;
     }
 
-    var avatar = group.picture();
-    _.forEach(item.messages, function (message) {
+    _.forEach(item.messages, function(message) {
         if (!message) {
             return;
         }
@@ -237,8 +222,7 @@ function _buildUserRenderObject(item, collector) {
         return;
     }
 
-    var avatar = user.picture();
-    _.forEach(item.messages, function (message) {
+    _.forEach(item.messages, function(message) {
         if (!message) {
             return;
         }

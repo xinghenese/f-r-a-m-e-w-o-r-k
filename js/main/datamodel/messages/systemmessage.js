@@ -12,8 +12,8 @@ var KeyInfo = require('../keyinfo');
 
 // private fields
 var rereferObjectKeyMap = {
-    referUserId:    'referid',
-    referUserName:  'refern'
+    referUserId: 'referid',
+    referUserName: 'refern'
 };
 var inverseReferObjectKeyMap = _.invert(rereferObjectKeyMap);
 
@@ -32,8 +32,8 @@ function SystemMessage(data) {
         case SystemMessageTypes.INVITED_INTO_GROUP:
         case SystemMessageTypes.USER_INVITED_INTO_GROUP:
             var referInfo = this.content.referInfo = [];
-            _.forEach(data['referobj'], function (info, index) {
-                referInfo[index] = _.mapKeys(info, function (value, key) {
+            _.forEach(data['referobj'], function(info, index) {
+                referInfo[index] = _.mapKeys(info, function(value, key) {
                     return inverseReferObjectKeyMap[key] || key;
                 })
             }, this);
@@ -45,7 +45,7 @@ function SystemMessage(data) {
 }
 
 _.assign(SystemMessage.prototype, Message.prototype, {
-    toElement: function (props) {
+    toElement: function(props) {
         return <span {...props}>{this.content && this.content.text}</span>;
     }
 });

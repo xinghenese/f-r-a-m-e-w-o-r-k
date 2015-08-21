@@ -22,13 +22,14 @@ var PICTURE_MAX_WIDTH = 477;
 var RESOURCE_URL = config.resourceDomain;
 
 var TextMessage = React.createClass({
-    render: function () {
-        return <span style={makeStyle(this.props.style)}>{String(this.props.message.text || this.props.message || '')}</span>;
+    render: function() {
+        return <span
+            style={makeStyle(this.props.style)}>{String(this.props.message.text || this.props.message || '')}</span>;
     }
 });
 
 var PictureMessage = React.createClass({
-    _showOriginalImage: function (event) {
+    _showOriginalImage: function(event) {
         var message = this.props.message;
         var src = message.url.indexOf(RESOURCE_URL) > -1 ? message.url : RESOURCE_URL + message.url;
         Overlay.show(
@@ -37,7 +38,7 @@ var PictureMessage = React.createClass({
                  data-delta-size={0}/>
         );
     },
-    _resizeImage: function (event) {
+    _resizeImage: function(event) {
         var target = event.currentTarget;
 
         var originalWidth = parseInt(target.getAttribute('data-original-width'));
@@ -57,7 +58,7 @@ var PictureMessage = React.createClass({
         );
         target.setAttribute('data-delta-size', String(deltaSize));
     },
-    render: function () {
+    render: function() {
         var message = this.props.message;
 
         if (!message.url || !message.width || !message.height) {
@@ -74,7 +75,7 @@ var PictureMessage = React.createClass({
 });
 
 var AudioMessage = React.createClass({
-    render: function () {
+    render: function() {
         var url = this.props.message.url;
         var duration = this.props.message.duration;
 
@@ -88,7 +89,7 @@ var AudioMessage = React.createClass({
 });
 
 var SystemMessage = React.createClass({
-    render: function () {
+    render: function() {
         var message = this.props.message;
         switch (message.type) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
@@ -100,10 +101,8 @@ var SystemMessage = React.createClass({
                     Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, this.props.userId))
                 }</span>);
             case SystemMessageTypes.GROUP_NAME_CHANGED:
-                var nickname = message.getUserNickname();
-                var groupName = message.getProp("refern");
                 return (<span style={makeStyle(this.props.style)}>{
-                    Strings.format(Lang.groupNameChanged, [nickname, groupName])
+                    Strings.format(Lang.groupNameChanged, [this.props.userName, this.props.message.referName])
                 }</span>);
             default :
                 return (<span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>);
@@ -114,7 +113,7 @@ var SystemMessage = React.createClass({
 // exports
 module.exports = React.createClass({
     displayName: 'ChatMessage',
-    render: function () {
+    render: function() {
         var data = this.props.data;
 
         if (!data || _.isEmpty(data)) {
@@ -142,20 +141,20 @@ function _createMessageNode(data) {
 
     switch (type) {
         case MessageTypes.TEXT:
-            return <TextMessage message={message} />;
+            return <TextMessage message={message}/>;
         case MessageTypes.PICTURE:
-            return <PictureMessage message={message} />;
+            return <PictureMessage message={message}/>;
         case MessageTypes.AUDIO:
-            return <AudioMessage message={message} />;
+            return <AudioMessage message={message}/>;
         case MessageTypes.SYSTEM:
-            return <SystemMessage message={message} userId={userId} userName={userName} />;
-        default :
-            return <TextMessage message={message} />;
+            return <SystemMessage message={message} userId={userId} userName={userName}/>;
+        default:
+            return <TextMessage message={message}/>;
     }
 }
 
 function _generateNicknames(message, userId) {
-    return _.reduce(message.referInfo, function (memo, item) {
+    return _.reduce(message.referInfo, function(memo, item) {
         if (!item.referUserId || !item.referUserName || item.referUserId == userId) {
             return memo;
         }

@@ -23,7 +23,7 @@ HistoryMessages.prototype.addMessage = function(message) {
     } else {
         // it works even if it returns -1 on no such message found
         var lastIndex = _.findLastIndex(this._messages, function(item) {
-            return parseInt(item["mscs"]) < parseInt(message["mscs"]);
+            return item.getCursor() < message.getCursor();
         });
         this._messages.splice(lastIndex + 1, 0, message);
     }

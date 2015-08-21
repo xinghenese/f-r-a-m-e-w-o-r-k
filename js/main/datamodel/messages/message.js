@@ -24,26 +24,26 @@ var STRING_NOT_SET = KeyInfo.STRING_NOT_SET;
 var NUMBER_NOT_SET = KeyInfo.NUMBER_NOT_SET;
 
 var keyMap = {
-    group:          new KeyInfo('msrid',    Number),
-    user:           new KeyInfo('msuid',    Number),
-    targetUser:     new KeyInfo('mstuid',   Number),
-    atUser:         new KeyInfo('atuid',    Number),
-    uuid:           new KeyInfo('uuid',     String),
-    roomType:       new KeyInfo('rmtp',     Number),
-    version:        new KeyInfo('ver',      String),
-    minVersion:     new KeyInfo('minver',   String),
-    alternate:      new KeyInfo('alt',      String),
-    cursor:         new KeyInfo('mscs',     Number),
-    timestamp:      new KeyInfo('tmstp',    Number),
-    time:           new KeyInfo('time',     Date),
-    status:         new KeyInfo('status',   Number),
-    content:        new KeyInfo('msg',      Object),
-    type:           new KeyInfo('msgtp',    Number)
+    group: new KeyInfo('msrid', Number),
+    user: new KeyInfo('msuid', Number),
+    targetUser: new KeyInfo('mstuid', Number),
+    atUser: new KeyInfo('atuid', Number),
+    uuid: new KeyInfo('uuid', String),
+    roomType: new KeyInfo('rmtp', Number),
+    version: new KeyInfo('ver', String),
+    minVersion: new KeyInfo('minver', String),
+    alternate: new KeyInfo('alt', String),
+    cursor: new KeyInfo('mscs', Number),
+    timestamp: new KeyInfo('tmstp', Number),
+    time: new KeyInfo('time', Date),
+    status: new KeyInfo('status', Number),
+    content: new KeyInfo('msg', Object),
+    type: new KeyInfo('msgtp', Number)
 };
 
 // exports
 function Message(data) {
-    _.forEach(keyMap, function (sourceKeyInfo, targetKey) {
+    _.forEach(keyMap, function(sourceKeyInfo, targetKey) {
         if (sourceKeyInfo instanceof KeyInfo) {
             var fieldType = sourceKeyInfo.fieldType;
             var sourceFieldName = sourceKeyInfo.fieldName;
@@ -84,7 +84,7 @@ module.exports = Message;
 
 // module initalization
 _.assign(Message.prototype, {
-    toElement: function () {
+    toElement: function() {
         var content = String(this.content);
         if (_.isObject(this.content)) {
             content = JSON.stringify(this.content);
@@ -92,19 +92,19 @@ _.assign(Message.prototype, {
         return <span>{content}</span>;
     }
     ,// backwards-compat with ../message.js
-    getGroupId: function () {
+    getGroupId: function() {
         return parseInt(this._data["msrid"] || -1);
     },
-    getUserId: function () {
+    getUserId: function() {
         return parseInt(this._data["msuid"] || -1);
     },
-    getTargetUserIds: function () {
+    getTargetUserIds: function() {
         return parseInt(this._data["mstuid"] || -1);
     },
-    getAtUserId: function () {
+    getAtUserId: function() {
         return parseInt(this._data["atuid"] || -1);
     },
-    getContent:  function () {
+    getContent: function() {
         if (this._data["msg"]) {
             return _.clone(this._data["msg"]);
         }
@@ -113,7 +113,7 @@ _.assign(Message.prototype, {
             referobj: _.clone(this._data["referobj"])
         };
     },
-    getBriefText:  function () {
+    getBriefText: function() {
         var type = this.getMessageType();
         switch (type) {
             case 0:
@@ -140,53 +140,53 @@ _.assign(Message.prototype, {
                 return Lang.unknownMessage;
         }
     },
-    getUuid:  function () {
+    getUuid: function() {
         return this._data["uuid"];
     },
-    getUserNickname: function () {
+    getUserNickname: function() {
         return this._data["unk"];
     },
-    getConversationType: function () {
+    getConversationType: function() {
         return this._data["rmtp"];
     },
-    getMessageType: function () {
+    getMessageType: function() {
         return parseInt(this._data["msgtp"]);
     },
-    getVersion: function () {
+    getVersion: function() {
         return this._data["ver"];
     },
-    getMinVersion: function () {
+    getMinVersion: function() {
         return this._data["minver"];
     },
-    getAltText: function () {
+    getAltText: function() {
         return this._data["alt"];
     },
-    getCursor: function () {
+    getCursor: function() {
+        return parseInt(this._data["mscs"]);
+    },
+    getTimestamp: function() {
         return parseInt(this._data["tmstp"]);
     },
-    getTimestamp: function () {
-        return parseInt(this._data["tmstp"]);
-    },
-    getStatus: function () {
+    getStatus: function() {
         if (!objects.containsValuedProp(this, "_status")) {
             return MessageConstants.Status.UNKNOWN;
         }
 
         return this._status;
     },
-    setStatus: function (status) {
+    setStatus: function(status) {
         this._status = status;
     }
 });
 
 _.assign(Message, {
-    formatContent: function (contentKeyMap) {
+    formatContent: function(contentKeyMap) {
         var content = this.content;
         this.content = {};
         if (!content) {
             return;
         }
-        _.forEach(contentKeyMap, function (sourceKeyInfo, targetKey) {
+        _.forEach(contentKeyMap, function(sourceKeyInfo, targetKey) {
             if (sourceKeyInfo instanceof KeyInfo) {
                 this.content[targetKey] = content[sourceKeyInfo.fieldName] || sourceKeyInfo.defaultValue;
             } else {
@@ -194,7 +194,7 @@ _.assign(Message, {
             }
         }, this);
     },
-    create: function (data) {
+    create: function(data) {
         switch (parseInt(data['msgtp'])) {
             case MessageTypes.TEXT:
                 return new (require('./textmessage'))(data);
@@ -232,10 +232,10 @@ function _generateSystemMessageContent(data) {
 
 function _generateJoinedNicknames(data) {
     var referedMembers = data["referobj"] || [];
-    var membersWithoutInviter = _.filter(referedMembers, function (member) {
+    var membersWithoutInviter = _.filter(referedMembers, function(member) {
         return member["referid"] !== data["msuid"];
     });
-    var nicknames = _.map(membersWithoutInviter, function (member) {
+    var nicknames = _.map(membersWithoutInviter, function(member) {
         return member["refern"];
     });
     return strings.join(nicknames, Lang.nicknameSeparator);
