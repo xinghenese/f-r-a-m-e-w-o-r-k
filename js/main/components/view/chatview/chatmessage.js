@@ -93,11 +93,11 @@ var SystemMessage = React.createClass({
         switch (message.type) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
                 return (<span style={makeStyle(this.props.style)}>{
-                    Strings.template(Lang.invitedIntoGroup, this.props.userName, _generateNicknames(this.props))
+                    Strings.template(Lang.invitedIntoGroup, this.props.userName, _generateNicknames(message, this.props.userId))
                 }</span>);
             case SystemMessageTypes.USER_INVITED_INTO_GROUP:
                 return (<span style={makeStyle(this.props.style)}>{
-                    Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(this.props))
+                    Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, this.props.userId))
                 }</span>);
             case SystemMessageTypes.GROUP_NAME_CHANGED:
                 var nickname = message.getUserNickname();
@@ -154,14 +154,12 @@ function _createMessageNode(data) {
     }
 }
 
-function _generateNicknames(data) {
-    var userId = data.userId;
-    var message = data.message;
-    return _.reduce(message.referobj, function (memo, item) {
-        if (!item.referid || !item.refern || item.referid == userId) {
+function _generateNicknames(message, userId) {
+    return _.reduce(message.referInfo, function (memo, item) {
+        if (!item.referUserId || !item.referUserName || item.referUserId == userId) {
             return memo;
         }
-        memo.push(item.refern);
+        memo.push(item.referUserName);
         return memo;
     }, []).join(Lang.nicknameSeparator);
 }
