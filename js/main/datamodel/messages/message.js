@@ -78,7 +78,7 @@ function Message(data) {
 
     // backwards-compat with ../message.js
     this._data = data;
-    _.assign(this.content, {toString: function () { return this.getBriefText(); }});
+    _.assign(this.content, {toString: _.bind(function () { return this.getBriefText(); }, this)});
 }
 
 module.exports = Message;
