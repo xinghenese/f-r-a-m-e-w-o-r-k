@@ -5,8 +5,8 @@
 
 // dependencies
 var _ = require('lodash');
-var EventTypes = require('../constants/eventtypes');
-var globalEmitter = require('../events/globalemitter');
+var EventTypes = require('../main/constants/eventtypes');
+var globalEmitter = require('../main/events/globalemitter');
 var notifier = require('node-notifier');
 
 // exports
@@ -20,11 +20,17 @@ module.exports = NotificationAgent;
 
 // private functions
 function _handleNewMessageReceived(message) {
+    /*
     notifier.notify({
         title: message.getUserNickname(),
         message: message.getBriefText(),
         icon: "images/logo144.png",
         sound: true,
         wait: false
+    });
+    */
+    globalEmitter.emit(EventTypes.SHOW_NOTIFICATION, {
+        title: message.getUserNickname(),
+        message: message.getBriefText()
     });
 }

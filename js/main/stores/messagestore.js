@@ -317,6 +317,7 @@ function _handlePrivateHistoryMessagesRequest(action) {
         _handleHistoryMessagesResponse(response);
         _markPrivateHistoryMessagesAsRequested(action.userId);
         MessageStore.emitChange();
+        globalEmitter.emit(EventTypes.UPDATE_DESKTOP_BADGE, "10");
     });
 }
 
