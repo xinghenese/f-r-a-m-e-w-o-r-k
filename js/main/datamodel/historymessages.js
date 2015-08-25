@@ -28,6 +28,7 @@ HistoryMessages.prototype.addMessage = function(message) {
         });
         this._messages.splice(lastIndex + 1, 0, message);
     }
+    this._totalUnreadCount++;
 };
 
 HistoryMessages.prototype.prependMessages = function(messages) {
@@ -52,11 +53,11 @@ HistoryMessages.prototype.isDirectionChanged = function() {
 };
 
 HistoryMessages.prototype.getReadCursor = function() {
-    return this._data["rcs"];
+    return parseInt(this._data["rcs"] || 0);
 };
 
 HistoryMessages.prototype.getCleanCursor = function() {
-    return this._data["ccs"];
+    return parseInt(this._data["ccs"] || 0);
 };
 
 HistoryMessages.prototype.getMessages = function() {

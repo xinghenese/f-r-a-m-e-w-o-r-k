@@ -23,6 +23,10 @@ module.exports = NotificationAgent;
 
 // private functions
 function _handleNewMessageReceived(message) {
+    if (document.hasFocus()) {
+        return;
+    }
+
     new Notification(message.getUserNickname(), {
         body: message.getBriefText()
     });
@@ -31,7 +35,6 @@ function _handleNewMessageReceived(message) {
 function _handleUnreadCountChange() {
     var badge;
     var count = MessageStore.getUnreadCount();
-    console.log("unread: ", count);
     if (count <= 0) {
         badge = "";
     } else {

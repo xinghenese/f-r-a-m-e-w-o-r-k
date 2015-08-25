@@ -36,7 +36,6 @@ app.on('ready', function() {
 function _initDockNotificationHandlers() {
     ipc.on(EventTypes.UPDATE_DOCK_BADGE, function(event, badge) {
         app.dock.setBadge(badge);
-        app.dock.bounce();
     });
 }
 
