@@ -52,5 +52,7 @@ function _ipcAsync(channel, message) {
         ipc = window.require('ipc');
     }
 
-    ipc.send(channel, message);
+    if (ipc) {
+        ipc.send(channel, message);
+    }
 }

@@ -25,6 +25,7 @@ var HANDSHAKE_TAG = "HSK";
 var AUTH_TAG = "AUTH";
 var PING_TAG = "P";
 var SOCKET_HOSTS = [];
+var PING_INTERVAL = 5 * 60 * 1000;
 var DEFAULT_CONFIG = {
     'needEncrypt': true,
     'needDecrypt': true,
@@ -81,7 +82,6 @@ var socketconnection = module.exports = connection.extend({
         }
         return get(String(tag));
     },
-    ping: ping,
     getState: function() {
         return state;
     },
@@ -202,6 +202,7 @@ function authorize() {
                 throw new Error("sequence invalid with ", _.get(data, 'msqsid'));
             }
             isAuthorized = true;
+            ping();
             return data;
         });
     }
@@ -233,8 +234,8 @@ function ping() {
                 , authentication.nextEncodedSequence()),
             responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
         })
-    }).then(function(data) {
-        return data;
+    }).then(function() {
+        _.delay(ping, PING_INTERVAL);
     });
 }
 
