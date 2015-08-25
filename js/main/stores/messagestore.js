@@ -20,6 +20,7 @@ var groups = require('../datamodel/groups');
 var myself = require('../datamodel/myself');
 var objects = require('../utils/objects');
 var predicates = require('../utils/predicates');
+var ProtocolConstants = require('../constants/protocolconstants');
 var socketConnection = require('../net/connection/socketconnection');
 var users = require('../datamodel/users');
 var ChangeableStore = require('./changeablestore');
@@ -69,6 +70,16 @@ var MessageStore = ChangeableStore.extend({
     getPrivateHistoryMessages: function(userId) {
         return this._privateHistoryMessages[userId];
     },
+    getUnreadCount: function() {
+        var count = 0;
+        _.forEach(this._groupHistoryMessages, function(history) {
+            count += history.getTotalUnreadCount();
+        });
+        _.forEach(this._privateHistoryMessages, function(history) {
+            count += history.getTotalUnreadCount();
+        });
+        return count;
+    },
     removeGroupConversation: function(groupId) {
         if (groupId in this._groupHistoryMessages) {
             delete this._groupHistoryMessages[groupId];
@@ -91,6 +102,12 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
             break;
         case ActionTypes.DELETE_PRIVATE_MESSAGES:
             _handleDeletePrivateMessages(action.id);
+            break;
+        case ActionTypes.MARK_GROUP_MESSAGES_AS_READ:
+            _handleMarkGroupMessagesAsReadRequest(action);
+            break;
+        case ActionTypes.MARK_PRIVATE_MESSAGES_AS_READ:
+            _handleMarkPrivateMessagesAsReadRequest(action);
             break;
         case ActionTypes.REQUEST_GROUP_HISTORY_MESSAGES:
             _handleGroupHistoryMessagesRequest(action);
@@ -174,6 +191,26 @@ socketConnection.monitor("ICH").then(function(data) {
     }
 }).done();
 
+socketConnection.monitor(ProtocolConstants.TAG_READ_CONFIRM).then(function(data) {
+    var conversationType = parseInt(data["rmtp"]);
+    var cursor = parseInt(data["mscs"]);
+    switch (conversationType) {
+        case ConversationConstants.GROUP_INT_TYPE:
+            var groupId = parseInt(data["msrid"]);
+            var groupHistoryMessages = MessageStore.getGroupHistoryMessages(groupId);
+            _changeUnreadCount(groupHistoryMessages, cursor);
+            break;
+        case ConversationConstants.PRIVATE_INT_TYPE:
+            var userId = parseInt(data["msuid"]);
+            var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
+            _changeUnreadCount(privateHistoryMessages, cursor);
+            break;
+        default:
+            console.error("Unknown conversation type: ", conversationType);
+            break;
+    }
+});
+
 // private functions
 function _appendMessage(data) {
     data["mscs"] = data["tmstp"] = new Date().valueOf();
@@ -192,6 +229,14 @@ function _appendMyMessage(data) {
     data["msuid"] = myself.uid;
     data["unk"] = myself.nickname;
     return _appendMessage(data);
+}
+
+function _changeUnreadCount(historyMessages, cursor) {
+    if (historyMessages) {
+        if (historyMessages.markAsReadBeforeCursor(cursor)) {
+            MessageStore.emitChange();
+        }
+    }
 }
 
 function _collectLastMessages() {
@@ -293,6 +338,28 @@ function _handleInitialHistoryMessagesRequest(action) {
     });
 }
 
+function _handleMarkGroupMessagesAsReadRequest(action) {
+    var id = action.id;
+    var groupHistoryMessages = MessageStore.getGroupHistoryMessages(id);
+    if (groupHistoryMessages && groupHistoryMessages.getTotalUnreadCount() > 0) {
+        groupHistoryMessages.markAsRead();
+        var last = _.last(groupHistoryMessages.getMessages());
+        _sendReadConfirmProtocol(id, null, last.getCursor(), last.getUuid());
+        MessageStore.emitChange();
+    }
+}
+
+function _handleMarkPrivateMessagesAsReadRequest(action) {
+    var id = action.id;
+    var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(id);
+    if (privateHistoryMessages && privateHistoryMessages.getTotalUnreadCount() > 0) {
+        privateHistoryMessages.markAsRead();
+        var last = _.last(privateHistoryMessages.getMessages());
+        _sendReadConfirmProtocol(null, id, last.getCursor(), last.getUuid());
+        MessageStore.emitChange();
+    }
+}
+
 function _handlePrivateHistoryMessagesRequest(action) {
     var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(action.userId);
     if (!privateHistoryMessages || _.isEmpty(privateHistoryMessages.getMessages())) {
@@ -304,20 +371,21 @@ function _handlePrivateHistoryMessagesRequest(action) {
         tag: "HM",
         responseTag: "HM",
         data: {
-            pmsg: {
-                cvstp: 1, // request history messages of single user
-                cvs: [{
-                    uid: action.userId,
-                    cs: first.getCursor(),
-                    tp: 1
-                }]
+            data: {
+                pmsg: {
+                    cvstp: 1, // request history messages of single user
+                    cvs: [{
+                        uid: action.userId,
+                        cs: first.getCursor(),
+                        tp: 1
+                    }]
+                }
             }
         }
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
         _markPrivateHistoryMessagesAsRequested(action.userId);
         MessageStore.emitChange();
-        globalEmitter.emit(EventTypes.UPDATE_DESKTOP_BADGE, "10");
     });
 }
 
@@ -545,4 +613,28 @@ function _maybeAddGroupFromSystemMessage(data) {
     groups.addGroup(group);
 
     _markHistoryMessagesOfNewlyCreatedGroupAsRequested(groupId);
+}
+
+function _sendReadConfirmProtocol(roomId, userId, cursor, uuid) {
+    var data = {
+        mscs: cursor,
+        uuid: uuid
+    };
+    if (roomId) {
+        data["msrid"] = roomId;
+        data["rmtp"] = 0;
+    } else {
+        data["mstuid"] = userId;
+        data["rmtp"] = 1;
+    }
+
+    socketConnection.request({
+        tag: ProtocolConstants.TAG_READ_CONFIRM,
+        responseTag: ProtocolConstants.TAG_READ_CONFIRM,
+        data: data,
+        predicate: predicates.uuidPredicate(uuid)
+    }).catch(function(reason) {
+        // todo: resend the ReadConfirm protocol
+        console.log(reason);
+    });
 }

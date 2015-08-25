@@ -14,7 +14,7 @@
         "cssify": "^0.7.0",
         "del": "~1.2.0",
         "electron-packager": "^5.0.1",
-        "electron-prebuilt": "^0.30.2",
+        "electron-prebuilt": "^0.31.0",
         "flux": "~2.0.3",
         "glob": "^5.0.14",
         "gulp": "~3.9.0",
@@ -37,6 +37,7 @@
     },
     "dependencies": {
         "electron-builder": "^2.0.0",
+        "electron-prebuilt": "^0.31.0",
         "node-notifier": "^4.2.3"
     }
 }

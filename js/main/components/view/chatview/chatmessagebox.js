@@ -96,11 +96,12 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = groupHistoryMessages.getMessages();
+                MessageActions.markGroupMessagesAsRead(id);
             }
         } else {
             var user = users.getUser(id);
             if (user) {
-                name = user.getNickname();
+                name = user.nickname();
             }
 
             var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(id);
@@ -110,6 +111,7 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = privateHistoryMessages.getMessages();
+                MessageActions.markPrivateMessagesAsRead(id);
             }
         }
 
@@ -244,7 +246,7 @@ function _getSenderNickname(message) {
 
     var user = users.getUser(userId);
     if (user) {
-        return user.getNickname();
+        return user.nickname();
     }
 
     return "";

@@ -12,6 +12,8 @@ var ActionTypes = keyMirror({
     JOIN_CONVERSATION: null,
     LOGIN: null,
     LOGOUT: null,
+    MARK_GROUP_MESSAGES_AS_READ: null,
+    MARK_PRIVATE_MESSAGES_AS_READ: null,
     QUIT_CONVERSATION: null,
     REGISTER: null,
     REQUEST_GROUP_HISTORY_MESSAGES: null,

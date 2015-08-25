@@ -30,7 +30,7 @@ var ConversationAndContactStore = ChangeableStore.extend({
         var userArr = _.map(users.getUsers(), function(item) {
             return {
                 type: ConversationConstants.PRIVATE_TYPE,
-                name: item.getNickname(),
+                name: item.nickname(),
                 id: item.getUserId(),
                 online: false, // todo
                 lastActiveTime: 0

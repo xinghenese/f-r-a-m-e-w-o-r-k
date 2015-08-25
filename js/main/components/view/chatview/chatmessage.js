@@ -133,7 +133,7 @@ function _createMessageNode(data) {
     var type = data.type;
     var message = data.content;
     var userId = data.user.getUserId();
-    var userName = data.user.getNickname();
+    var userName = data.user.nickname();
 
     if (!message || _.isEmpty(message)) {
         return null;

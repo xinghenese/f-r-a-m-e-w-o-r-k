@@ -8,7 +8,7 @@ var app = require('app');
 var BrowserWindow = require('browser-window');
 var EventTypes = require('./js/main/constants/eventtypes');
 var globalEmitter = require('./js/main/events/globalemitter');
-var notificationAgent = require('./js/desktop/notificationagent');
+var ipc = require('ipc');
 
 require('crash-reporter').start();
 
@@ -34,8 +34,9 @@ app.on('ready', function() {
 
 // private functions
 function _initDockNotificationHandlers() {
-    globalEmitter.on(EventTypes.UPDATE_DESKTOP_BADGE, function(badge) {
+    ipc.on(EventTypes.UPDATE_DOCK_BADGE, function(event, badge) {
         app.dock.setBadge(badge);
+        app.dock.bounce();
     });
 }
 
@@ -66,6 +67,5 @@ function _initMainWindow() {
 }
 
 function _initNotificationHandlers() {
-    notificationAgent.init();
     _initDockNotificationHandlers();
 }

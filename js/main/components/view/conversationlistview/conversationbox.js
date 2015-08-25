@@ -254,12 +254,16 @@ function _buildGroupRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = Formats.formatTime(item.message.getTimestamp());
     }
+
+    var history = MessageStore.getGroupHistoryMessages(item.groupId);
+    var unreadCount = history ? history.getTotalUnreadCount() : 0;
     collector.push({
         name: groupName,
         senderName: groupName,
         senderAvatar: avatar,
         message: message,
         time: time,
+        unreadCount: unreadCount,
         id: item.groupId,
         type: ConversationConstants.GROUP_TYPE
     });
@@ -270,7 +274,7 @@ function _buildUserRenderObject(item, collector) {
     if (!user) {
         return;
     }
-    var userName = user.getNickname();
+    var userName = user.nickname();
     var avatar = user.picture();
     var message = "";
     var time = "";
@@ -278,12 +282,16 @@ function _buildUserRenderObject(item, collector) {
         message = item.message.getBriefText();
         time = Formats.formatTime(item.message.getTimestamp());
     }
+
+    var history = MessageStore.getPrivateHistoryMessages(item.userId);
+    var unreadCount = history ? history.getTotalUnreadCount() : 0;
     collector.push({
         name: userName,
         senderName: userName,
         senderAvatar: avatar,
         message: message,
         time: time,
+        unreadCount: unreadCount,
         id: item.userId,
         type: ConversationConstants.PRIVATE_TYPE
     });

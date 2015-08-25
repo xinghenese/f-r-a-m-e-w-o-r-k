@@ -21,6 +21,18 @@ module.exports = {
             id: id
         });
     },
+    markGroupMessagesAsRead: function(groupId) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.MARK_GROUP_MESSAGES_AS_READ,
+            id: groupId
+        });
+    },
+    markPrivateMessagesAsRead: function(userId) {
+        AppDispatcher.dispatch({
+            type: ActionTypes.MARK_PRIVATE_MESSAGES_AS_READ,
+            id: userId
+        });
+    },
     requestGroupHistoryMessages: function(groupId) {
         AppDispatcher.dispatch({
             type: ActionTypes.REQUEST_GROUP_HISTORY_MESSAGES,

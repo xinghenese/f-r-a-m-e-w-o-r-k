@@ -26,7 +26,7 @@ User.prototype.listedInContacts = function () {
     return objects.getBool(this._data["ic"]);
 };
 
-User.prototype.getNickname = function () {
+User.prototype.nickname = function () {
     return this._data["unk"];
 };
 

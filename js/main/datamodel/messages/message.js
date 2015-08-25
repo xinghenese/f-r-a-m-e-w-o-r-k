@@ -91,8 +91,10 @@ _.assign(Message.prototype, {
             content = JSON.stringify(this.content);
         }
         return <span>{content}</span>;
-    }
-    ,// backwards-compat with ../message.js
+    },
+    dontCount: function() {
+        return objects.getBool(this._data["dntcnt"]);
+    },
     getGroupId: function() {
         return parseInt(this._data["msrid"] || -1);
     },

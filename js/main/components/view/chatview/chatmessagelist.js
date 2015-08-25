@@ -93,7 +93,7 @@ module.exports = createGroupableClass({
                 <Avatar
                     className={className + '-avatar'}
                     style={makeStyle(style.avatar)}
-                    name={message.user.getNickname()}
+                    name={message.user.nickname()}
                     src={message.user.picture()}
                     index={message.user.getUserId()}
                     />
@@ -109,7 +109,7 @@ module.exports = createGroupableClass({
                     style={makeStyle(commonStyle.message, style.messagebody)}
                     >
                     <div className={className + '-nickname'}>
-                        {message.user.getNickname()}
+                        {message.user.nickname()}
                     </div>
                     <div
                         className={className + '-content'}
@@ -125,5 +125,5 @@ module.exports = createGroupableClass({
 
 //private function
 function isValidMessageData(data) {
-    return data && !_.isEmpty(data) && data.user && data.user.getNickname();
+    return data && !_.isEmpty(data) && data.user && data.user.nickname();
 }

@@ -92,7 +92,7 @@ gulp.task('package', ['build'], function() {
         name: "chaoxin",
         platform: ["darwin", "win32"],
         arch: "x64",
-        version: "0.30.3",
+        version: "0.31.0",
         icon: "images/logomac.icns",
         asar: true,
         overwrite: true,

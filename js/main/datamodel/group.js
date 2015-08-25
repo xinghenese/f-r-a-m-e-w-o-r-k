@@ -84,7 +84,7 @@ Group.prototype._generateNameFromMembers = function() {
             } else {
                 name = name.concat(Lang.nicknameSeparator);
             }
-            name = name.concat(member.getNickname());
+            name = name.concat(member.nickname());
         });
     }
     return name;
