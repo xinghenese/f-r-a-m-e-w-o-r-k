@@ -35,10 +35,8 @@ function send(data) {
             port = defaultServerPort;
         }
 
-        console.log("connecting host: ", host, ", port: ", port);
         return connect(host, port);
     }).then(function() {
-        console.log(socket);
         socket.send(data);
     }).catch(function(error) {
         getConnection().emit('closed');
