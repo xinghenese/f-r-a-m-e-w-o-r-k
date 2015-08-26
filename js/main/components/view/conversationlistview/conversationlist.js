@@ -8,6 +8,7 @@ var React = require('react');
 var ConversationActions = require('../../../actions/conversationactions');
 var ConversationConstants = require('../../../constants/conversationconstants');
 var EventTypes = require('../../../constants/eventtypes');
+var elements = require('../../../utils/elements');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -65,7 +66,10 @@ module.exports = createListClass({
         globalEmitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     componentDidUpdate: function() {
-        React.findDOMNode(this.refs[this.state.selectedKey]).scrollIntoView();
+        var selectItem = React.findDOMNode(this.refs[this.state.selectedKey]);
+        if (!elements.isElementInViewport(selectItem)) {
+            selectItem.scrollIntoView();
+        }
     },
     renderItem: function(data, props, key) {
         if (!isValidConversationData(data)) {
@@ -124,9 +128,6 @@ module.exports = createListClass({
         );
     }
 });
-
-//module initialization
-
 
 //private functions
 function isValidConversationData(data) {
