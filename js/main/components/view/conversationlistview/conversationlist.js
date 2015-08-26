@@ -31,7 +31,7 @@ var createListClass = createGenerator({
 //core module to export
 module.exports = createListClass({
     displayName: 'ConversationList',
-    getDefaultProps: function () {
+    getDefaultProps: function() {
         return {
             onHoverIn: defaultOnHoverIn,
             onHoverOut: defaultOnHoverOut,
@@ -40,7 +40,7 @@ module.exports = createListClass({
             style: style.conversationlist
         }
     },
-    _selectFirstConversation: function () {
+    _selectFirstConversation: function() {
         if (!this.props.data || _.isEmpty(this.props.data)) {
             return;
         }
@@ -48,23 +48,26 @@ module.exports = createListClass({
         var first = _.first(this.props.data);
         globalEmitter.emit(EventTypes.SELECT_CONVERSATION, {id: first.id, type: first.type});
     },
-    _selectPreviousConversation: function () {
+    _selectPreviousConversation: function() {
         this._onSiblingSelect(-1);
     },
-    _selectNextConversation: function () {
+    _selectNextConversation: function() {
         this._onSiblingSelect(1);
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         globalEmitter.on(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         globalEmitter.on(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
         globalEmitter.on(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
         globalEmitter.removeListener(EventTypes.SELECT_PREVIOUS_CONVERSATION, this._selectPreviousConversation);
         globalEmitter.removeListener(EventTypes.SELECT_NEXT_CONVERSATION, this._selectNextConversation);
         globalEmitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
-    renderItem: function (data, props, key) {
+    componentDidUpdate: function() {
+        React.findDOMNode(this.refs[this.state.selectedKey]).scrollIntoView();
+    },
+    renderItem: function(data, props, key) {
         if (!isValidConversationData(data)) {
             return null;
         }
@@ -74,7 +77,7 @@ module.exports = createListClass({
         var liStyle = (key == this.state.selectedKey) && style.active;
 
         return (
-            <li data-conversation-type={data.type} style={liStyle}>
+            <li data-conversation-type={data.type} style={liStyle} ref={key}>
                 <Avatar
                     className={className + '-avatar'}
                     /* props */
