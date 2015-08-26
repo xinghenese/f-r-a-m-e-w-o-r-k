@@ -81,8 +81,9 @@ var CodeForm = React.createClass({
                                 return (/(\d){5,}/).test(code);
                             }}
                             validationAtServer={_.bind(function(code) {
+                                var result = promise.create(this._awaitSMSCodeValidationResult);
                                 this._requestSMSCodeValidation(code);
-                                return promise.create(this._awaitSMSCodeValidationResult);
+                                return result;
                             }, this)}
                             />
                         <InputBox

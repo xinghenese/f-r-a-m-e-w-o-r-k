@@ -28,7 +28,6 @@ function observeStore(store, predicate) {
 
         cacheListener(store, predicate, performCheck);
         store.addChangeListener(performCheck);
-        performCheck();
     }).finally(function () {
         store.removeChangeListener(performCheck);
         unobserveStore(store, predicate);
