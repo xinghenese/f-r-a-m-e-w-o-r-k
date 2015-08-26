@@ -100,9 +100,7 @@ function connect(host, port, path, protocol) {
                 connectPromise = null;
                 serverInfos = null;
                 socket = null;
-                _.defer(function() {
-                    getConnection().emit('closed', event);
-                });
+                getConnection().emit('closed', event);
             };
             socket.onerror = function(event) {
                 reject(event);
