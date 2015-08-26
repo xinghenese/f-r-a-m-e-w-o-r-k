@@ -201,7 +201,7 @@ socketConnection.monitor(ProtocolConstants.TAG_READ_CONFIRM).then(function(data)
             _changeUnreadCount(groupHistoryMessages, cursor);
             break;
         case ConversationConstants.PRIVATE_INT_TYPE:
-            var userId = parseInt(data["msuid"]);
+            var userId = parseInt(data["mstuid"]);
             var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
             _changeUnreadCount(privateHistoryMessages, cursor);
             break;
@@ -209,7 +209,7 @@ socketConnection.monitor(ProtocolConstants.TAG_READ_CONFIRM).then(function(data)
             console.error("Unknown conversation type: ", conversationType);
             break;
     }
-});
+}).done();
 
 // private functions
 function _appendMessage(data) {
@@ -333,8 +333,7 @@ function _handleInitialHistoryMessagesRequest(action) {
         },
         uich: {
             cs: users.getCursor()
-        },
-        dmc: {}
+        }
     });
 }
 
@@ -511,9 +510,6 @@ function _handleHistoryMessagesResponse(response) {
     if (response.data.uich) {
         _handleContactInfoChangedResponse(response);
     }
-
-    // todo
-    // dmc node not implemented
 }
 
 function _handleGroupHistoryMessages(messages) {
