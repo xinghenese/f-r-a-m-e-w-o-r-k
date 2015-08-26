@@ -67,7 +67,7 @@ module.exports = createListClass({
     },
     componentDidUpdate: function() {
         var selectItem = React.findDOMNode(this.refs[this.state.selectedKey]);
-        if (!elements.isElementInViewport(selectItem)) {
+        if (selectItem && !elements.isElementInViewport(selectItem)) {
             selectItem.scrollIntoView();
         }
     },
