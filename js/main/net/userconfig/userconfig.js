@@ -4,6 +4,7 @@
 
 //dependencies
 var _ = require('lodash');
+var uuidGenerator = require('node-uuid');
 
 //private fields
 var profile = {
@@ -11,7 +12,7 @@ var profile = {
     'di': "pc",
     'dv': "1",
     'uid': "212",
-    'uuid': "7e9d-501c-dbd816078039",
+    'uuid': uuidGenerator.v1(),
     'ver': "1.0",
     'zip': "1",
     'devn': "Sony Z3+",
