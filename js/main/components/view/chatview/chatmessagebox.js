@@ -20,9 +20,11 @@ var EventTypes = require('../../../constants/eventtypes');
 var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
 var Button = require('../../form/control/Button');
+var windowFocusedRunner = require('../../../utils/windowfocusedrunner');
 
 //core module to export
 var ChatMessageBox = React.createClass({
+    _pendingFocusCallbacks: [],
     getInitialState: function() {
         return {
             id: '',
@@ -96,7 +98,10 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = groupHistoryMessages.getMessages();
-                MessageActions.markGroupMessagesAsRead(id);
+
+               _runTaskOnFocus(this, function() {
+                    MessageActions.markGroupMessagesAsRead(id);
+                });
             }
         } else {
             var user = users.getUser(id);
@@ -111,7 +116,10 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = privateHistoryMessages.getMessages();
-                MessageActions.markPrivateMessagesAsRead(id);
+
+                _runTaskOnFocus(this, function() {
+                    MessageActions.markPrivateMessagesAsRead(id);
+                });
             }
         }
 
@@ -151,6 +159,9 @@ var ChatMessageBox = React.createClass({
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
         globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
+        _.forEach(this._pendingFocusCallbacks, function(task) {
+            windowFocusedRunner.cancel(task);
+        });
     },
     render: function() {
         if (this.state.id) {
@@ -250,4 +261,15 @@ function _getSenderNickname(message) {
     }
 
     return "";
+}
+
+function _runTaskOnFocus(box, task) {
+    var markAsReadFn = function() {
+        task.apply(box);
+        _.remove(box._pendingFocusCallbacks, function(each) {
+            return each === task;
+        });
+    };
+    box._pendingFocusCallbacks.push(markAsReadFn);
+    windowFocusedRunner.run(markAsReadFn);
 }
