@@ -27,6 +27,7 @@
         "keymirror": "~0.1.1",
         "lodash": "~3.10.0",
         "moment": "~2.10.6",
+        "node-uuid": "^1.4.3",
         "object-assign": "~3.0.0",
         "q": "~1.4.1",
         "react": "^0.13.3",
