@@ -14,8 +14,6 @@ var initPromise = null;
 var serverInfos;
 var defaultServerPort = 443;
 var serverInfoIndex = 0;
-var currentReconnectTimes = 0;
-var maxReconnectTimes = 3;
 
 module.exports = {
     /**
@@ -27,32 +25,25 @@ module.exports = {
 
 //private fields
 function send(data) {
-    var pro = init()
-        .then(function (serverInfo) {
-            var host, port;
-            if (_.isPlainObject(serverInfo)) {
-                host = serverInfo.host || serverInfo.ip;
-                port = serverInfo.port || defaultServerPort;
-            } else {
-                host = "" + serverInfo;
-                port = defaultServerPort;
-            }
+    var pro = init().then(function(serverInfo) {
+        var host, port;
+        if (_.isPlainObject(serverInfo)) {
+            host = serverInfo.host || serverInfo.ip;
+            port = serverInfo.port || defaultServerPort;
+        } else {
+            host = "" + serverInfo;
+            port = defaultServerPort;
+        }
 
-            return connect(host, port);
-        })
-        .then(function () {
-            socket.send(data);
-        }, function () {
-            //handle reconnect
-            if (++ currentReconnectTimes > maxReconnectTimes) {
-                throw new Error('socket fails to connect even after reconnecting for several times');
-            }
-            return reset().then(function () {
-                return send(data);
-            });
-        }).catch(function (error) {
-            console.error(error);
-        });
+        console.log("connecting host: ", host, ", port: ", port);
+        return connect(host, port);
+    }).then(function() {
+        console.log(socket);
+        socket.send(data);
+    }).catch(function(error) {
+        getConnection().emit('closed');
+        console.error(error);
+    });
     return pro;
 }
 
@@ -60,19 +51,17 @@ function init() {
     if (!initPromise || !serverInfos) {
         initPromise = HTTPConnection.request({
             url: 'srv/gsi',
-            data: { tp: 2 }
-        }).then(function (res) {
+            data: {tp: 2}
+        }).then(function(res) {
             serverInfos = _.shuffle(res);
-            return serverInfos[serverInfoIndex ++];
-        }, function (err) {
-            initPromise = 'initPromise';
+            return serverInfos[serverInfoIndex++ % serverInfos.length];
         });
     }
     return initPromise;
 }
 
 function reset() {
-    return promise.create(function (resolve, reject) {
+    return promise.create(function(resolve, reject) {
         connectPromise = null;
         resolve('reset');
     });
@@ -80,7 +69,7 @@ function reset() {
 
 function connect(host, port, path, protocol) {
     if (!(socket && connectPromise)) {
-        connectPromise = promise.create(function (resolve, reject) {
+        connectPromise = promise.create(function(resolve, reject) {
             var url;
 
             if (!host) {
@@ -103,20 +92,22 @@ function connect(host, port, path, protocol) {
             getConnection().emit('ready');
 
             //set handler
-            socket.onopen = function (event) {
-//        console.log(event);
+            socket.onopen = function(event) {
                 resolve(event);
                 getConnection().emit('connect', event);
             };
-            socket.onclose = function (event) {
-                console.log(event);
+            socket.onclose = function(event) {
+                connectPromise = null;
+                serverInfos = null;
+                socket = null;
+                _.defer(function() {
+                    getConnection().emit('closed', event);
+                });
             };
-            socket.onerror = function (event) {
-                console.log(event);
+            socket.onerror = function(event) {
                 reject(event);
             };
-            socket.onmessage = function (event) {
-//        console.log(event);
+            socket.onmessage = function(event) {
                 getConnection().emit('message', event.data);
             };
         });

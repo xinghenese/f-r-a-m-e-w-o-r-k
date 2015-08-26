@@ -26,6 +26,7 @@ var AUTH_TAG = "AUTH";
 var PING_TAG = "P";
 var SOCKET_HOSTS = [];
 var PING_INTERVAL = 5 * 60 * 1000;
+var RECONNECT_INTERVAL = 2 * 1000;
 var DEFAULT_CONFIG = {
     'needEncrypt': true,
     'needDecrypt': true,
@@ -47,6 +48,7 @@ var handshakePromise = null;
 var authorizePromise = null;
 var state = State.INITIALIZING;
 var isAuthorized = false;
+var autoReconnect = true;
 
 //core module to export
 var socketconnection = module.exports = connection.extend({
@@ -76,7 +78,7 @@ var socketconnection = module.exports = connection.extend({
      * @param tag {String}
      * @returns {Q.Promise}
      */
-    monitor: function (tag) {
+    monitor: function(tag) {
         if (!tag) {
             throw new Error('invalid tag');
         }
@@ -94,9 +96,22 @@ var socketconnection = module.exports = connection.extend({
 socketconnection.on('ready', function() {
     state = State.CONNECTING;
 }).done();
-socketconnection.on('connect', function () {
+socketconnection.on('connect', function() {
     state = State.CONNECTED;
     socketconnection.on('message', onMessageReceived).done();
+}).done();
+socketconnection.on('closed', function() {
+    authorizePromise = null;
+    handshakePromise = null;
+    if (autoReconnect) {
+        // use ping to trigger reconnection
+        console.log("reconnecting");
+        _.delay(_sendPingPacket, RECONNECT_INTERVAL);
+    }
+}).done();
+socketconnection.monitor("D").then(function(data) {
+    var mode = data["m"] || 0;
+    autoReconnect = parseInt(mode) == 4;
 }).done();
 state = State.INITIALIZED;
 
@@ -228,12 +243,7 @@ function handshake() {
 
 function ping() {
     return authorize().then(function() {
-        return post({
-            tag: PING_TAG,
-            data: _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
-                , authentication.nextEncodedSequence()),
-            responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
-        })
+        return _sendPingPacket();
     }).then(function() {
         _.delay(ping, PING_INTERVAL);
     });
@@ -248,4 +258,13 @@ function notifyImmediately(tag, data) {
         'tag': tag,
         'data': data
     }));
+}
+
+function _sendPingPacket() {
+    return post({
+        tag: PING_TAG,
+        data: _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
+            , authentication.nextEncodedSequence()),
+        responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
+    });
 }
