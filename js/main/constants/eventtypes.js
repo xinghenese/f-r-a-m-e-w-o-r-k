@@ -17,6 +17,5 @@ module.exports = {
     SELECT_PREVIOUS_CONVERSATION: "selectPreviousConversation",
     SELECT_NEXT_CONVERSATION: "selectNextConversation",
     SWITCH_CONVERSATIONS_OR_CONTACTS: "switchConversationsOrContacts",
-    SHOW_NOTIFICATION: "showNotification",
     UPDATE_DOCK_BADGE: "updateDockBadge"
 };

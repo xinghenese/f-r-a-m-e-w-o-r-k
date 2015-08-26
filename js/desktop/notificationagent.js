@@ -14,7 +14,6 @@ var ipc = null;
 var NotificationAgent = {
     init: function() {
         globalEmitter.on(EventTypes.NEW_MESSAGE_RECEIVED, _handleNewMessageReceived);
-        globalEmitter.on(EventTypes.UPDATE_DOCK_BADGE, _handleUpdateDockBadge);
         MessageStore.addChangeListener(_handleUnreadCountChange);
     }
 };
@@ -40,10 +39,6 @@ function _handleUnreadCountChange() {
     } else {
         badge = count.toString();
     }
-    _ipcAsync(EventTypes.UPDATE_DOCK_BADGE, badge);
-}
-
-function _handleUpdateDockBadge(badge) {
     _ipcAsync(EventTypes.UPDATE_DOCK_BADGE, badge);
 }
 
