@@ -26,7 +26,8 @@ var toolbar = module.exports = React.createClass({
         }
     },
     _focusTextArea: function() {
-        this.refs.form && this.refs.form.refs.textArea.focus();
+        var textArea = React.findDOMNode(this.refs.textArea || this.refs.form && this.refs.form.refs.textArea);
+        textArea && textArea.focus();
     },
     _handleInputChange: function(event) {
         this.setState({

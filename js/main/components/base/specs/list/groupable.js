@@ -33,16 +33,27 @@ module.exports = {
         }
 
         // render groupedList
+        var itemKeys = [];
         var groupedList = _.reduce(dataList, function (acc, dataGroup, key) {
             // render group title
             var groupTitle = _.isFunction(this.renderTitle) && this.renderTitle(dataGroup, key);
             acc.push(React.isValidElement(groupTitle) ? React.cloneElement(groupTitle, {key: key}) : null);
 
             // render group items
+            if (!dataGroup || _.isEmpty(dataGroup)) {
+                return acc;
+            }
+
             return acc.concat(_.map(dataGroup, function (data, key) {
                 data = Object(data);
                 key = data.key || data.id || key;
                 currentItemKey = !isNaN(parseInt(key, 10)) ? parseInt(key, 10) : key;
+
+                // TODO: create keys more reasonably
+                while (_.includes(itemKeys, currentItemKey)) {
+                    currentItemKey = parseInt(currentItemKey, 10) + 1;
+                }
+                itemKeys.push(currentItemKey);
 
                 var item = _.isFunction(this.renderItem) && this.renderItem(data, currentItemKey);
 

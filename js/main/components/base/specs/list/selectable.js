@@ -93,8 +93,10 @@ module.exports = {
             }));
         }
     },
-    _shouldResetItemKeys: true,
-    _itemKeys: [],
+    componentWillMount: function () {
+        this._shouldResetItemKeys = true;
+        this._itemKeys = [];
+    },
     renderItem: function (item) {
         if (!React.isValidElement(item)) {
             return null;
@@ -105,14 +107,10 @@ module.exports = {
             this._shouldResetItemKeys = false;
         }
 
-        var itemKey = item.key;
-        // TODO: create keys more reasonably
-        while (_.includes(this._itemKeys, itemKey)) {
-            itemKey = parseInt(itemKey, 10) + 1;
-        }
+        var itemKey = !isNaN(parseInt(item.key, 10)) ? parseInt(item.key, 10) : item.key;
         this._itemKeys.push(itemKey);
 
-        console.info('item.key: ', itemKey);
+        //console.info('item.key: ', itemKey);
 
         return React.cloneElement(
             item,
