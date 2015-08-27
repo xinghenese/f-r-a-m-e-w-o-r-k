@@ -14,6 +14,7 @@ var AccountStore = require('../stores/accountstore');
 var style = require('../style/login');
 var makeStyle = require('../style/styles').makeStyle;
 var stores = require('../utils/stores');
+var promise = require('../utils/promise');
 
 var Wrapper = require('./form/control/Wrapper');
 var InputBox = require('./form/control/InputBox');
@@ -74,16 +75,7 @@ var PhoneForm = React.createClass({
             requested = true;
         }
 
-        AccountActions.requestVerificationCode(
-            this.state.countryCode,
-            this.state.phoneNumber
-        );
-    },
-    _handleVerificationCodeSent: function() {
         this.props.onVerificationCodeSent();
-    },
-    _handleVerificationCodeNotSent: function(error) {
-        console.log(error);
     },
     _getCountryName: function(code) {
         for (var i = 0; i < Countries.length; i++) {
@@ -103,25 +95,24 @@ var PhoneForm = React.createClass({
         }
         return "";
     },
-    _verificationCodeSendSuccessPredicate: function() {
-        return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
-    },
-    _verificationCodeSendFailedPredicate: function() {
-        return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
+    _awaitPhoneNumberCheckResult: function(code, phone, resolve, reject) {
+        // observe AccountStore
+        stores.observe(AccountStore, function() {
+            return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
+        }).then(function() {
+            if (AccountStore.checkWhetherRegistered()) {
+                resolve(AccountStore.VerificationCodeState.SENT);
+            } else {
+                reject(AccountStore.VerificationCodeState.SENT_FAILED);
+            }
+        });
+        AccountActions.requestVerificationCode(code, phone);
     },
     componentDidMount: function() {
         this._focusPhoneInput();
     },
     componentWillMount: function() {
-        // observe AccountStore
-        var self = this;
-        stores.observe(AccountStore, this._verificationCodeSendSuccessPredicate).then(function() {
-            self._handleVerificationCodeSent();
-        });
-        stores.observe(AccountStore, this._verificationCodeSendFailedPredicate).then(function() {
-            self._handleVerificationCodeNotSent();
-        });
-
+        requested = false;
         // update state if necessary
         var query = this.props.query;
         if (query && !_.isEmpty(query)) {
@@ -132,12 +123,12 @@ var PhoneForm = React.createClass({
         }
     },
     componentWillUnmount: function() {
-        stores.unobserve(AccountStore, this._verificationCodeSendSuccessPredicate);
-        stores.unobserve(AccountStore, this._verificationCodeSendFailedPredicate);
+        //stores.unobserve(AccountStore, this._verificationCodeSendSuccessPredicate);
+        //stores.unobserve(AccountStore, this._verificationCodeSendFailedPredicate);
     },
     render: function() {
         if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {
-            this._handleVerificationCodeSent();
+            this.props.onVerificationCodeSent();
         }
 
         var login = style.login;
@@ -187,13 +178,22 @@ var PhoneForm = React.createClass({
                             <CustomValidator
                                 style={loginForm.label}
                                 defaultMessage={Lang.phone}
-                                errorMessage={Lang.invalidPhone}
+                                errorMessage={_({0: Lang.invalidPhone}).set(
+                                    AccountStore.VerificationCodeState.SENT,
+                                    AccountStore.VerificationCodeState.SENT
+                                ).set(
+                                    AccountStore.VerificationCodeState.SENT_FAILED,
+                                    'NOT_REGISTERED'
+                                ).value()}
                                 successMessage={Lang.phone}
                                 controlsToValidate={["code-input", "phone-input"]}
                                 controlToFocus="phone-input"
                                 validationAtClient={function(code, phone) {
                                     return code != "+86" || phoneRegex.test(phone);
                                 }}
+                                validationAtServer={_.bind(function(code, phone) {
+                                    return promise.create(_.bind(this._awaitPhoneNumberCheckResult, this, code, phone));
+                                }, this)}
                                 />
                             <InputBox
                                 id="phone-input"

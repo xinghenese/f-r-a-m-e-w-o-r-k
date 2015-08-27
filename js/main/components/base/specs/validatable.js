@@ -21,7 +21,7 @@ module.exports = {
     displayName: 'Validator',
     propTypes: {
         defaultMessage: React.PropTypes.string,
-        errorMessage: React.PropTypes.string,
+        errorMessage: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
         successMessage: React.PropTypes.string,
         validationAtServer: React.PropTypes.func,
         validationAtClient: React.PropTypes.func
@@ -51,17 +51,23 @@ module.exports = {
         }
 
         //first validate at client end
-        var isValidAtClient = _.isFunction(this.props.validationAtClient)
-            ? !!this.props.validationAtClient.apply(this, values)
-            : true;
+        try {
+            var isValidAtClient = _.isFunction(this.props.validationAtClient)
+                ? !!this.props.validationAtClient.apply(this, values)
+                : true;
 
-        if (!isValidAtClient) {
-            return handleError(this);
+            console.info('isValidAtClient: ', isValidAtClient);
+
+            if (!isValidAtClient) {
+                return handleError(this, 0);
+            }
+        } catch (err) {
+            return handleError(this, err);
         }
 
         //then validate at server end
         var isValidAtServer = _.isFunction(this.props.validationAtServer)
-            ? this.props.validationAtServer.apply(this, values)
+            ? this.props.validationAtServer.apply(null, values)
             : true;
         var self = this;
 
@@ -94,9 +100,10 @@ module.exports = {
             case ValidateState.FAILED:
                 //differ various errorType
                 var errMsg = this.props.errorMessage;
-                message = !_.isString(errMsg)
-                    && errMsg[this.state.errorType]
-                    || errMsg;
+                var errType = this.state.errorType;
+                message = _.isObject(errMsg)
+                    ? errMsg[errType] || errType || _.values(errMsg)[0]
+                    : errType || errMsg;
                 style = defaultStyle.errorText;
                 break;
             case ValidateState.SUCCESS:
@@ -112,7 +119,7 @@ module.exports = {
                 style={makeStyle(this.props.style, style)}
                 className={this.props.className}
                 >
-                {message}
+                {String(message)}
             </label>
         );
     }
