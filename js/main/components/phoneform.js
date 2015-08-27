@@ -36,6 +36,7 @@ var PhoneForm = React.createClass({
         return {
             countryName: "中国",
             countryCode: "+86",
+            error: null,
             phoneNumber: "",
             promptInvalidPhone: false,
             verificationState: null
@@ -68,6 +69,17 @@ var PhoneForm = React.createClass({
             promptInvalidPhone: false
         });
     },
+    _handleRequestCodeResponse: function() {
+        if (AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT) {
+            if (AccountStore.hasRegistered()) {
+                this._handleVerificationCodeSent();
+            } else {
+                this._handlePhoneNotRegistered();
+            }
+        } else {
+            this._handleVerificationCodeNotSent();
+        }
+    },
     _handleSubmit: function() {
         if (requested) {
             return;
@@ -76,6 +88,12 @@ var PhoneForm = React.createClass({
         }
 
         this.props.onVerificationCodeSent();
+    },
+    _handleVerificationCodeNotSent: function() {
+        this.setState({error: AccountStore.getError()});
+    },
+    _handlePhoneNotRegistered: function() {
+        this.handlePhoneNotRegistered(false);
     },
     _getCountryName: function(code) {
         for (var i = 0; i < Countries.length; i++) {
@@ -100,19 +118,20 @@ var PhoneForm = React.createClass({
         stores.observe(AccountStore, function() {
             return AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
         }).then(function() {
-            if (AccountStore.checkWhetherRegistered()) {
-                resolve(AccountStore.VerificationCodeState.SENT);
+            if (AccountStore.hasRegistered()) {
+                resolve();
             } else {
-                reject(AccountStore.VerificationCodeState.SENT_FAILED);
+                reject("notRegisteredPhone");
             }
         });
         AccountActions.requestVerificationCode(code, phone);
     },
-    componentDidMount: function() {
-        this._focusPhoneInput();
-    },
     componentWillMount: function() {
         requested = false;
+    },
+    componentDidMount: function() {
+        this._focusPhoneInput();
+
         // update state if necessary
         var query = this.props.query;
         if (query && !_.isEmpty(query)) {
@@ -121,10 +140,6 @@ var PhoneForm = React.createClass({
                 countryCode: query.countryCode
             });
         }
-    },
-    componentWillUnmount: function() {
-        //stores.unobserve(AccountStore, this._verificationCodeSendSuccessPredicate);
-        //stores.unobserve(AccountStore, this._verificationCodeSendFailedPredicate);
     },
     render: function() {
         if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {
@@ -178,18 +193,18 @@ var PhoneForm = React.createClass({
                             <CustomValidator
                                 style={loginForm.label}
                                 defaultMessage={Lang.phone}
-                                errorMessage={_({0: Lang.invalidPhone}).set(
-                                    AccountStore.VerificationCodeState.SENT,
-                                    AccountStore.VerificationCodeState.SENT
-                                ).set(
-                                    AccountStore.VerificationCodeState.SENT_FAILED,
-                                    'NOT_REGISTERED'
-                                ).value()}
+                                errorMessage={{
+                                    invalidPhone: Lang.invalidPhone,
+                                    notRegisteredPhone: Lang.notRegisteredPhone
+                                }}
                                 successMessage={Lang.phone}
                                 controlsToValidate={["code-input", "phone-input"]}
                                 controlToFocus="phone-input"
                                 validationAtClient={function(code, phone) {
-                                    return code != "+86" || phoneRegex.test(phone);
+                                    if (code != "+86" || phoneRegex.test(phone)) {
+                                        return true;
+                                    }
+                                    throw "invalidPhone";
                                 }}
                                 validationAtServer={_.bind(function(code, phone) {
                                     return promise.create(_.bind(this._awaitPhoneNumberCheckResult, this, code, phone));

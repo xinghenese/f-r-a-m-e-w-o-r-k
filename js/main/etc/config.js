@@ -4,6 +4,6 @@
 'use strict';
 
 module.exports = {
-    device: 4,
-    resourceDomain: "http://r.shanliao.com/"
+    device: 3,
+    resourceDomain: "http://r.chaoxin.im/"
 };

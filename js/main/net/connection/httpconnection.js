@@ -18,8 +18,8 @@ var UserAgent = require('../../utils/useragent');
 var PUBLIC_KEY_FIELD = "pk";
 var UUID_FILED = "uuid";
 var TOKEN_FIELD = "tk";
-var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
-//var DEFAULT_ROOT = "http://api.shanliao.com/";
+//var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
+var DEFAULT_ROOT = "https://api.chaoxin.im/";
 var DEFAULT_CONFIG = {
     'needEncrypt': true,
     'needDecrypt': true,
