@@ -4,6 +4,7 @@ var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventTypes = require('../constants/eventtypes');
 var HttpConnection = require('../net/connection/httpconnection');
+var OsQueryConstants = require('../constants/osqueryconstants');
 var SocketConnection = require('../net/connection/socketconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
@@ -25,7 +26,7 @@ var _requestAccount = {
 var VerificationCodeState = {
     NOT_SENT: 0,
     SENT: 1,
-    SENT_FAILED: 2
+    SEND_FAILED: 2
 };
 
 var LoginState = {
@@ -52,12 +53,16 @@ var AccountStore = ChangeableStore.extend({
         LOGOUT_FAILED: 'logoutFailed'
     },
     _error: null,
-    _verificationCodeState: VerificationCodeState.NOT_SENT,
+    _hasRegistered: false,
     _loginState: LoginState.DEFAULT,
     _loginStatusCode: 0,
+    _verificationCodeState: VerificationCodeState.NOT_SENT,
     _whereVerificationCodeSent: WhereVerificationCodeSent.UNKNOWN,
     getCode: function() {
         return _requestAccount.code;
+    },
+    getError: function() {
+        return this._error;
     },
     getLoginErrorCode: function() {
         return this._loginStatusCode;
@@ -76,6 +81,9 @@ var AccountStore = ChangeableStore.extend({
     },
     getWhereVerificationCodeSent: function() {
         return this._whereVerificationCodeSent;
+    },
+    hasRegistered: function() {
+        return this._hasRegistered;
     },
     markLoginFailure: function(code) {
         this._loginState = LoginState.FAILED;
@@ -258,12 +266,14 @@ function _handleVerificationCodeRequest(action) {
         cc: code,
         mid: action.phone,
         tp: action.requestType,
-        mt: action.codeType
+        mt: action.codeType,
+        dv: parseInt(systems.ipcSync(EventTypes.OS_QUERY, OsQueryConstants.DEVICE) || Config.device)
     };
     HttpConnection.request({
         url: "sms/sc",
         data: data
     }).then(function(data) {
+        AccountStore._hasRegistered = objects.getBool(data["hr"]);
         AccountStore._verificationCodeState = VerificationCodeState.SENT;
         AccountStore._whereVerificationCodeSent = parseInt(data["hl"]);
         AccountStore.emitChange();

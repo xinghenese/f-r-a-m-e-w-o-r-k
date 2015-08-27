@@ -14,6 +14,7 @@ module.exports = {
     "invalidVerificationCode": "不正确的验证码",
     "loginFailed": "登录失败，请重试！",
     "nicknameSeparator": "、",
+    "notRegisteredPhone": "该手机号尚未注册，请通过手机客户端注册！",
     "phone": "手机号码",
     "registerFailed": "注册失败，请重试！",
     "requestVerificationCodeFailed": "发送验证码失败，请重试！",

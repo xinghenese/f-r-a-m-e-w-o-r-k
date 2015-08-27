@@ -7,6 +7,8 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var EventTypes = require('./js/main/constants/eventtypes');
+var OsQueryConstants = require('./js/main/constants/osqueryconstants');
+var desktopConfig = require('./js/desktop/desktopconfig');
 var globalEmitter = require('./js/main/events/globalemitter');
 var ipc = require('ipc');
 var systems = require('./js/desktop/systems');
@@ -74,8 +76,11 @@ function _initNotificationHandlers() {
 function _initOsRelatedQueries() {
     ipc.on(EventTypes.OS_QUERY, function(event, type) {
         switch (type) {
-            case "os":
+            case OsQueryConstants.OS:
                 event.returnValue = _getDevice();
+                break;
+            case OsQueryConstants.DEVICE:
+                event.returnValue = desktopConfig.device;
                 break;
             default:
                 event.returnValue = "Unknown";
