@@ -20,11 +20,9 @@ var EventTypes = require('../../../constants/eventtypes');
 var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
 var Button = require('../../form/control/Button');
-var windowFocusedRunner = require('../../../utils/windowfocusedrunner');
 
 //core module to export
 var ChatMessageBox = React.createClass({
-    _pendingFocusCallbacks: [],
     getInitialState: function() {
         return {
             id: '',
@@ -98,10 +96,7 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = groupHistoryMessages.getMessages();
-
-               _runTaskOnFocus(this, function() {
-                    MessageActions.markGroupMessagesAsRead(id);
-                });
+                MessageActions.markGroupMessagesAsRead(id);
             }
         } else {
             var user = users.getUser(id);
@@ -116,10 +111,7 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = privateHistoryMessages.getMessages();
-
-                _runTaskOnFocus(this, function() {
-                    MessageActions.markPrivateMessagesAsRead(id);
-                });
+                MessageActions.markPrivateMessagesAsRead(id);
             }
         }
 
@@ -159,15 +151,12 @@ var ChatMessageBox = React.createClass({
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
         globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
-        _.forEach(this._pendingFocusCallbacks, function(task) {
-            windowFocusedRunner.cancel(task);
-        });
     },
     render: function() {
         if (this.state.id) {
             return (
-                <div className="chat-message-box" style={makeStyle(style)}>
-                    <div className="chat-message-box-header" style={makeStyle(style.header)}>
+                <div className="main session messages">
+                    <div className="header">
                         <Button
                             value={Lang.close}
                             style={makeStyle(style.header.button, style.header.button.close)}
@@ -180,23 +169,22 @@ var ChatMessageBox = React.createClass({
                             onClick={this._modifyCurrentChat}
                             />
                     </div>
-                    <ChatMessageList id="chat-message-list" ref="messagelist" data={this.state.data}
-                                     style={style.chatmessagelist}/>
+                    <ChatMessageList className="main" ref="messagelist" data={this.state.data} />
                     <ChatMessageToolbar
+                        className="footer"
                         onSubmit={this._handleSubmit}
                         inputEnabled={this.state.inputEnabled}
                         deleteHandler={this._deleteConversation(this.state.id, this.state.type)}
-                        style={style.toolbar}
                         />
                 </div>
             );
         }
 
         return (
-            <div className="chat-message-box" style={makeStyle(style)}>
-                <div className="chat-message-box-header" style={makeStyle(style.header)}/>
-                <div style={style.chattips}>{Lang.chatBoxTips}</div>
-                <div className="chat-message-box-footer" style={makeStyle(style.footer)}/>
+            <div className="main welcome">
+                <div className="header" />
+                <div className="main"><p>{Lang.chatBoxTips}</p></div>
+                <div className="footer" />
             </div>
         );
     }
@@ -207,6 +195,7 @@ module.exports = ChatMessageBox;
 //private functions
 function addConversationListSelectedHandler(box) {
     globalEmitter.on(EventTypes.SELECT_CONVERSATION, function(info) {
+        console.info('selectedInfo: ', info);
         box._updateMessages(info.id, info.type);
     });
 }
@@ -261,15 +250,4 @@ function _getSenderNickname(message) {
     }
 
     return "";
-}
-
-function _runTaskOnFocus(box, task) {
-    var markAsReadFn = function() {
-        task.apply(box);
-        _.remove(box._pendingFocusCallbacks, function(each) {
-            return each === task;
-        });
-    };
-    box._pendingFocusCallbacks.push(markAsReadFn);
-    windowFocusedRunner.run(markAsReadFn);
 }

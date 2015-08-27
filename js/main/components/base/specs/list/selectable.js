@@ -10,13 +10,12 @@ var fields = require('./fields');
 var setStyle = require('../../../../style/styles').setStyle;
 
 // private fields
-var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 
 // exports
 module.exports = {
     getInitialState: function () {
-        return {selectedKeys: [], enableSelect: !!this.props.intialEnableSelect};
+        return {selectedKey: -1, enableSelect: !!this.props.intialEnableSelect};
     },
     getDefaultProps: function () {
         return {intialEnableSelect: true};
@@ -25,39 +24,12 @@ module.exports = {
         this.setState({enableSelect: true});
     },
     disableSelect: function () {
-        this.setState({enableSelect: false, selectedKeys: []});
+        this.setState({enableSelect: false, selectedKey: -1});
     },
-    _onSelect: function (event) {
-        if (!this.state.enableSelect) {
-            return;
-        }
-
-        var target = event && event.currentTarget;
-        var key = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
-        key = !isNaN(parseInt(key, 10)) ? parseInt(key, 10) : key;
-        var component = this.refs[key];
-        var lastSelectedKey = this.state.selectedKey;
-        var lastSelectedComponent = this.refs[lastSelectedKey];
-
-        if (!component
-            || (lastSelectedKey && key == lastSelectedKey)
-            || (lastSelectedComponent && component === lastSelectedComponent)
-        ) {
-            return;
-        }
-
-        this.setState({selectedKey: key});
-
-        if (_.isFunction(this.props.onSelect)) {
-            this.props.onSelect(_.assign(event, {
-                selectedKey: key,
-                selectedId: component.props[DATA_ITEM_ID_FIELD],
-                currentComponent: component,
-                previousComponent: lastSelectedComponent
-            }));
-        }
+    checkItemSelected: function (item) {
+        return this.state.selectedKey == (item && item.props && item.props[DATA_ITEM_KEY_FIELD] || item);
     },
-    _onSiblingSelect: function (offset) {
+    selectSibling: function (offset) {
         if (!this.state.enableSelect || !this._itemKeys || _.isEmpty(this._itemKeys)) {
             return;
         }
@@ -66,46 +38,91 @@ module.exports = {
         var selectedComponent = this.refs[selectedKey];
         var position = _.indexOf(this._itemKeys, selectedKey);
         var targetComponent;
-        var nextselectedKey;
+        var nextSelectedKey;
         offset = ~~(Number(offset));
 
         if (offset > 0) {
-            nextselectedKey = this._itemKeys[position + 1];
+            nextSelectedKey = this._itemKeys[position + 1];
         } else if (offset < 0) {
-            nextselectedKey = this._itemKeys[position - 1];
+            nextSelectedKey = this._itemKeys[position - 1];
         }
 
-        targetComponent = nextselectedKey && this.refs[nextselectedKey];
+        targetComponent = nextSelectedKey && this.refs[nextSelectedKey];
 
         if (!targetComponent) {
             return;
         }
 
-        this.setState({selectedKey: nextselectedKey});
+        this.setState({selectedKey: nextSelectedKey});
 
         if (_.isFunction(this.props.onSelect)) {
             this.props.onSelect({
                 currentTarget: React.findDOMNode(targetComponent),
-                selectedKey: nextselectedKey,
-                selectedId: targetComponent.props[DATA_ITEM_ID_FIELD],
+                selectedKey: nextSelectedKey,
                 currentComponent: targetComponent,
                 previousComponent: selectedComponent
             });
         }
     },
+    _onSelect: function (event) {
+        if (!this.state.enableSelect) {
+            return;
+        }
+
+        var target = event && event.currentTarget;
+        var selectedKey = target && target.getAttribute(DATA_ITEM_KEY_FIELD);
+        selectedKey = !isNaN(parseInt(selectedKey, 10)) ? parseInt(selectedKey, 10) : selectedKey;
+        var component = this.refs[selectedKey];
+        var lastSelectedKey = this.state.selectedKey;
+        var lastSelectedComponent = this.refs[lastSelectedKey];
+
+        if (!component
+            || (lastSelectedKey && selectedKey == lastSelectedKey)
+            || (lastSelectedComponent && component === lastSelectedComponent)
+        ) {
+            return;
+        }
+
+        this.setState({selectedKey: selectedKey});
+
+        if (_.isFunction(this.props.onSelect)) {
+            this.props.onSelect(_.assign(event, {
+                selectedKey: selectedKey,
+                currentComponent: component,
+                previousComponent: lastSelectedComponent
+            }));
+        }
+    },
+    _shouldResetItemKeys: true,
+    _itemKeys: [],
     renderItem: function (item) {
         if (!React.isValidElement(item)) {
             return null;
         }
 
-        var key = item.props[DATA_ITEM_KEY_FIELD];
-        var selected = this.state.selectedKey == key;
-        var props = {
-            selected: selected,
-            onClick: this._onSelect
-        };
+        if (this._shouldResetItemKeys) {
+            this._itemKeys = [];
+            this._shouldResetItemKeys = false;
+        }
 
-        return React.cloneElement(item, props);
+        var itemKey = item.key;
+        // TODO: create keys more reasonably
+        while (_.includes(this._itemKeys, itemKey)) {
+            itemKey = parseInt(itemKey, 10) + 1;
+        }
+        this._itemKeys.push(itemKey);
+
+        console.info('item.key: ', itemKey);
+
+        return React.cloneElement(
+            item,
+            _.set({onClick: this._onSelect}, DATA_ITEM_KEY_FIELD, itemKey)
+        );
+    },
+    render: function (item) {
+        //console.info('itemKeys: ', this._itemKeys);
+        this._shouldResetItemKeys = true;
+        return item;
     }
 };
 

@@ -5,6 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var classNames = require('classnames');
 var makeStyle = require('../../../style/styles').makeStyle;
 var promise = require('../../../utils/promise');
 var defaultStyle = require('../../../style/default');
@@ -55,13 +56,15 @@ module.exports = {
             ? !!this.props.validationAtClient.apply(this, values)
             : true;
 
+        console.info('isValidAtClient: ', isValidAtClient);
+
         if (!isValidAtClient) {
             return handleError(this);
         }
 
         //then validate at server end
         var isValidAtServer = _.isFunction(this.props.validationAtServer)
-            ? this.props.validationAtServer.apply(this, values)
+            ? this.props.validationAtServer.apply(null, values)
             : true;
         var self = this;
 
@@ -85,8 +88,8 @@ module.exports = {
             return null;
         }
 
-        var style;
         var message;
+        var isError = false;
         switch (this.state.validateState) {
             case ValidateState.DEFAULT:
                 message = this.props.defaultMessage;
@@ -97,7 +100,7 @@ module.exports = {
                 message = !_.isString(errMsg)
                     && errMsg[this.state.errorType]
                     || errMsg;
-                style = defaultStyle.errorText;
+                isError = true;
                 break;
             case ValidateState.SUCCESS:
                 message = this.props.successMessage;
@@ -108,12 +111,7 @@ module.exports = {
         }
 
         return (
-            <label
-                style={makeStyle(this.props.style, style)}
-                className={this.props.className}
-                >
-                {message}
-            </label>
+            <label className={classNames(this.props.className, {error: isError})}>{message}</label>
         );
     }
 };

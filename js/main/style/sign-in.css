@@ -1,0 +1,181 @@
+body {
+    background-color: #EAEAEA;
+}
+body > .sign-in {
+    width: 100%;
+}
+body > .sign-in .form-group > button.btn.primary {
+    width: 100%;
+    height: 47px;
+    margin: 35px 0 0;
+    cursor: pointer;
+    color: #FFF;
+    border: none;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    outline: none;
+    background-color: #00B1F8;
+}
+body > .sign-in .form-group > label.error {
+    color: #E83236 !important;
+}
+body > .sign-in > .main {
+    width: 400px;
+    height: 450px;
+    padding: 45px 65px;
+    border: 1px solid #EDEDED;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    background-color: #FFF;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+}
+body > .sign-in > .main > h1.title {
+    font-size: 20px;
+    font-weight: normal;
+    margin: 0;
+}
+body > .sign-in > .main.step1 label {
+    font-size: 14px;
+    color: #B5B5B5;
+}
+body > .sign-in > .main.step1 > h1.title {
+    font-size: 20px;
+    font-weight: bolder;
+    margin: 0;
+    color: #1D1D1D;
+}
+body > .sign-in > .main.step1 > h2.subtitle {
+    font-size: 14px;
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 56px;
+    color: #B5B5B5;
+}
+body > .sign-in > .main.step1 > .form-group.country-code > input,
+body > .sign-in > .main.step1 > .form-group.mobile-number > input,
+body > .sign-in > .main.step1 > .form-group.country-selector > input {
+    display: block;
+    width: 100%;
+    -webkit-transition: border-bottom-color 0.5s linear;
+    -moz-transition: border-bottom-color 0.5s linear;
+    -o-transition: border-bottom-color 0.5s linear;
+    transition: border-bottom-color 0.5s linear;
+    border: none;
+    border-bottom: 1px solid #E6E6E6;
+    outline: none;
+}
+body > .sign-in > .main.step1 > .form-group.country-code > input:hover,
+body > .sign-in > .main.step1 > .form-group.mobile-number > input:hover,
+body > .sign-in > .main.step1 > .form-group.country-selector > input:hover {
+    border-bottom-color: #8ACCFE;
+}
+body > .sign-in > .main.step1 > .form-group.country-selector > input {
+    font-size: 14px;
+    padding: 10px 0;
+    text-align: left;
+    background-color: transparent;
+}
+body > .sign-in > .main.step1 > .form-group.country-code,
+body > .sign-in > .main.step1 > .form-group.mobile-number {
+    margin-top: 24px;
+}
+body > .sign-in > .main.step1 > .form-group.country-code > input,
+body > .sign-in > .main.step1 > .form-group.mobile-number > input {
+    font-size: 16px;
+    padding: 13px 0 8px;
+    color: #1D1D1D;
+}
+body > .sign-in > .main.step1 > .form-group.country-code {
+    float: left;
+    width: 25%;
+}
+body > .sign-in > .main.step1 > .form-group.mobile-number {
+    float: right;
+    width: 70%;
+}
+body > .sign-in > .main.step2 > h1.title {
+    text-align: center;
+    color: #282828;
+}
+body > .sign-in > .main.step2 > .form-group.filter {
+    margin-top: 16px;
+    margin-bottom: 12px;
+}
+body > .sign-in > .main.step2 > .form-group.filter > input {
+    font-size: 14px;
+    line-height: 2.2em;
+    width: 100%;
+    height: 2.2em;
+    text-align: center;
+    color: #BEBEBE;
+    border: none;
+    outline: none;
+    background-color: #F2F2F2;
+}
+body > .sign-in > .main.step2 > .form-group.countries {
+    overflow: auto;
+    max-height: 15em;
+    margin: 0;
+    padding: 0 30px 28px;
+    list-style: none;
+    background-color: #F2F2F2;
+}
+body > .sign-in > .main.step2 > .form-group.countries > .item {
+    overflow: auto;
+    padding-top: 20px;
+    padding-bottom: 6px;
+    cursor: pointer;
+    border-bottom: 1px solid #E1E1E1;
+}
+body > .sign-in > .main.step2 > .form-group.countries > .item > .name {
+    font-size: 14px;
+    line-height: 1.14em;
+    float: left;
+    color: #3E3E3E;
+}
+body > .sign-in > .main.step2 > .form-group.countries > .item > .code {
+    font-size: 16px;
+    float: right;
+    color: #282828;
+}
+body > .sign-in > .main.confirm > .form-group {
+    text-align: center;
+}
+body > .sign-in > .main.confirm > .form-group > .help-text {
+    font-size: 12px;
+    color: #A8A8A8;
+}
+body > .sign-in > .main.confirm > .form-group.caption > .mobile-number {
+    font-size: 20px;
+    color: #1D1D1D;
+}
+body > .sign-in > .main.confirm > .form-group.code {
+    margin-top: 70px;
+}
+body > .sign-in > .main.confirm > .form-group.code > input {
+    font-size: 16px;
+    line-height: 2;
+    display: block;
+    width: 100%;
+    height: 2em;
+    -webkit-transition: border-bottom-color 0.5s linear;
+    -moz-transition: border-bottom-color 0.5s linear;
+    -o-transition: border-bottom-color 0.5s linear;
+    transition: border-bottom-color 0.5s linear;
+    text-align: center;
+    border: none;
+    border-bottom: 1px solid #E6E6E6;
+    outline: none;
+}
+body > .sign-in > .main.confirm > .form-group.code > input:hover,
+body > .sign-in > .main.confirm > .form-group.code > input:focus,
+body > .sign-in > .main.confirm > .form-group.code > input:active {
+    border-bottom-color: #8ACCFE;
+}

@@ -71,79 +71,22 @@ var toolbar = module.exports = React.createClass({
         globalEmitter.removeListener(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
     },
     render: function() {
-        var style = this.props.style;
+        var props = _.omit(this.props, ['onSubmit']);
 
-        if (this.state.modifyEnable) {
+        if (!this.props.inputEnabled) {
             return (
-                <div className="chat-message-toolbar" style={makeStyle(style)}>
-                    <Button
-                        value={Lang.deleteMessage}
-                        onClick={this.props.deleteHandler}
-                        style={style.button}
-                        />
-                    <Button
-                        value={Lang.forwardMessage}
-                        onClick={this.props.deleteHandler}
-                        style={style.button}
-                        />
-                    <Button
-                        value={Lang.reply}
-                        onClick={this.props.deleteHandler}
-                        style={style.button}
-                        />
-                    <Button
-                        value={Lang.cancel}
-                        onClick={this._showInputToolbar}
-                        style={style.send}
-                        />
+                <div className="footer remove-session">
+                    <button onClick={this.props.deleteHandler}>{Lang.deleteConversation}</button>
                 </div>
             );
         }
 
-        if (!this.props.inputEnabled) {
-            return (
-                <Button
-                    value={Lang.deleteConversation}
-                    onClick={this.props.deleteHandler}
-                    />
-            );
-        }
-
         return (
-            <Form
-                className="chat-message-toolbar"
-                style={style}
-                onSubmit={this._handleSubmit}
-                ref="form"
-                >
-                <Button
-                    value={Lang.accessory}
-                    className="chat-message-toolbar-accessory"
-                    style={style.accessory}
-                    onClick={this._toggleAccessory}
-                    >
-                </Button>
-                <Submit
-                    value={Lang.send}
-                    className="chat-message-toolbar-send"
-                    style={style.send}
-                    />
-                <Button
-                    className="chat-message-toolbar-emoji"
-                    style={style.emoji}
-                    onClick={this._toggleEmoji}
-                    />
-                <TextArea
-                    id="chat-message-input"
-                    className="chat-message-toolbar-input"
-                    defaultValue={Lang.chatMessageInputTips}
-                    style={style.input}
-                    onKeyDown={this._handleInputKeyDown}
-                    onSubmit={this._handleTextAreaSubmit}
-                    ref="textArea"
-                    >
-                    <div className="dev"/>
-                </TextArea>
+            <Form className="footer tab-bar" onSubmit={this._handleSubmit} ref="form" {...props}>
+                <label className="message">
+                    <input type="text" className="content" ref="textArea"/>
+                </label>
+                <button type="submit" className="send">{Lang.send}</button>
             </Form>
         );
     }

@@ -7,24 +7,32 @@
 var _ = require('lodash');
 var React = require('react');
 var fields = require('./fields');
+var Selectable = require('./selectable');
 
 // private fields
 var CURRENT_SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
 var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
 
 // exports
-module.exports = {
+module.exports = _.create(Selectable, {
     getInitialState: function () {
         return {selectedKeys: [], enableSelect: !!this.props.intialEnableSelect};
     },
-    getDefaultProps: function () {
-        return {intialEnableSelect: true};
-    },
-    enableSelect: function () {
-        this.setState({enableSelect: true});
-    },
     disableSelect: function () {
         this.setState({enableSelect: false, selectedKeys: []});
+    },
+    checkItemSelected: function (item) {
+        return _.includes(this.state.selectedKey, (item && item.props && item.props[DATA_ITEM_KEY_FIELD] || item));
+    },
+    selectAll: function () {
+        if (this.state.enableSelect && _.isArray(this._itemKeys)) {
+            this.setState({selectedKeys: this._itemKeys.slice(0)});
+        }
+    },
+    unselectAll: function () {
+        if (this.state.enableSelect) {
+            this.setState({selectedKeys: []});
+        }
     },
     _onSelect: function (event) {
         if (!this.state.enableSelect) {
@@ -64,22 +72,8 @@ module.exports = {
                 });
             }
         }
-    },
-    renderItem: function (item) {
-        if (!React.isValidElement(item)) {
-            return null;
-        }
-
-        var key = item.props[DATA_ITEM_KEY_FIELD];
-        var selected = _.includes(this.state.selectedKeys, key);
-        var props = {
-            selected: selected,
-            onClick: this._onSelect
-        };
-
-        return React.cloneElement(item, props);
     }
-};
+});
 
 // module initialization
 

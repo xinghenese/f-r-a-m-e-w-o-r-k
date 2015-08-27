@@ -26,42 +26,32 @@ var UserInfoBox = React.createClass({
     },
     render: function () {
         return (
-            <div className="user-info-box" style={makeStyle(style)}>
-                <div className="user-info-box-header" style={makeStyle(style.header)}/>
-                <div className="user-info-box-body" style={makeStyle(style.body)}>
-                    <div className="user-info-avatar" style={makeStyle(style.body.avatarRow)}>
-                        <Avatar
-                            name={this.props.user.name || 'hello'}
-                            index={this.props.user.id || 3234}
-                            src={this.props.user.avatar}
-                            style={makeStyle(style.body.avatarRow.avatar)}
-                            />
-                        <span>{this.props.user.name || 'hello'}</span>
+            <div className="main settings">
+                <div className="header" />
+                <div className="main" >
+                    <div className="form-group summary">
+                        <Avatar name={this.props.user.name} index={this.props.user.id} src={this.props.user.avatar}/>
+                        <span className="name">{this.props.user.name}</span>
                     </div>
-                    <div className="user-info-content">
-                        <div className="user-info-mobile" style={makeStyle(style.body.contentRow)}>
-                            <span>{Lang.mobile}</span>
-                            <span style={makeStyle(style.body.contentRow.infoText)}>
-                                {this.props.mobile || '153-3333-3333'}
-                            </span>
+                    <div className="form-group options">
+                        <div className="option mobile-number" >
+                            <span className="control-label">{Lang.mobile}</span>
+                            <input className="form-control" type="text" readOnly value={this.props.mobile} />
                         </div>
-                        <div className="user-info-audio-enable" style={makeStyle(style.body.contentRow)}>
-                            <span>{Lang.audioEnable}</span>
-                            <SwitchButton style={makeStyle(style.body.contentRow.infoSwitch)}/>
+                        <div className="option control audio">
+                            <span className="control-label">{Lang.audioEnable}</span>
+                            <SwitchButton className="form-control" />
                         </div>
-                        <div className="user-info-notification-enable" style={makeStyle(style.body.contentRow)}>
-                            <span>{Lang.notificationEnable}</span>
-                            <SwitchButton style={makeStyle(style.body.contentRow.infoSwitch)}/>
+                        <div className="option control notification">
+                            <span className="control-label">{Lang.notificationEnable}</span>
+                            <SwitchButton className="form-control" />
                         </div>
-                        <Button
-                            className="user-info-log-out-button"
-                            value={Lang.logout}
-                            style={style.body.logoutButton}
-                            onClick={this.props.onLogout}
-                            />
+                    </div>
+                    <div className="form-group sign-out">
+                        <button className="sign-out">{Lang.logout}</button>
                     </div>
                 </div>
-                <div className="user-info-box-footer" style={makeStyle(style.footer)}/>
+                <div className="footer" />
             </div>
         )
     }

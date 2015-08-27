@@ -6,6 +6,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var classNames = require('classnames');
 var commonStyle = require('../style/common');
 var defaultStyle = require('../style/default');
 var makeStyle = require('../style/styles').makeStyle;
@@ -13,7 +14,7 @@ var Image = require('./tools/IntelImage');
 
 //private fields
 var avatarColors = {};
-var defaultColor = "#499dd9";
+var colors = ['blue', 'cyan-blue', 'green', 'orange', 'purple', 'red', 'yellow'];
 
 //core module to export
 var Avatar = React.createClass({
@@ -26,20 +27,7 @@ var Avatar = React.createClass({
                 replacedElementOnError={function() {return <span>{name}</span>}} />;
         }
 
-        return (
-            <a
-                title={this.props.name}
-                className={this.props.className}
-                style={makeStyle(
-                    commonStyle.avatar,
-                    defaultStyle.avatar,
-                    this.props.style,
-                    {backgroundColor: getColor(this.props.index)}
-                )}
-                >
-                {img}
-            </a>
-        )
+        return <a title={this.props.name} className={classNames('avatar', this.props.className, getColor(this.props.index))} {..._.omit(this.props, ['className'])}>{img}</a>;
     }
 });
 
@@ -51,14 +39,14 @@ module.exports = Avatar;
 //private functions
 function getColor(id) {
     if (!id) {
-        return defaultColor;
+        return colors[0];
     }
     if (!_.has(avatarColors, id)) {
         _.set(avatarColors, id, generateRandomColor());
     }
-    return _.get(avatarColors, id)
+    return _.get(avatarColors, id);
 }
 
 function generateRandomColor() {
-    return '#' + _.padLeft((~~(Math.random() * 0x1000000)).toString(16), 6, '0');
+    return colors[~~(Math.random() * 8)];
 }

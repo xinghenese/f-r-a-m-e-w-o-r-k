@@ -12,73 +12,53 @@ var makeStyle = require('../../../../style/styles').makeStyle;
 
 // private fields
 var SELECT_REF_FIELD = fields.SELECT_REF_FIELD;
-var DATA_ITEM_ID_FIELD = fields.DATA_ITEM_ID_FIELD;
 var DATA_ITEM_KEY_FIELD = fields.DATA_ITEM_KEY_FIELD;
+
+var currentItemKey;
 
 // exports
 module.exports = {
-    renderGroupTitle: function (title) {
-        return title;
-    },
     renderItem: function (item) {
-        return item;
+        if (React.isValidElement(item)) {
+            return React.cloneElement(item, {key: currentItemKey, ref: currentItemKey});
+        }
     },
-    _itemKeys: [],
     render: function () {
-        if (_.isFunction(this.setState)) {
-            this._itemKeys = [];
+        var dataList = _.isFunction(this.preprocessData) && this.preprocessData(this.props.data) || this.props.data;
+
+        // check whether data is empty and render a default element by renderByDefault
+        if (!dataList || _.isEmpty(dataList)) {
+            var defaultList = _.isFunction(this.renderByDefault) && this.renderByDefault();
+            return React.isValidElement(defaultList) ? defaultList : null;
         }
 
-        var data = this.props.data;
+        // render groupedList
+        var groupedList = _.reduce(dataList, function (acc, dataGroup, key) {
+            // render group title
+            var groupTitle = _.isFunction(this.renderTitle) && this.renderTitle(dataGroup, key);
+            acc.push(React.isValidElement(groupTitle) ? React.cloneElement(groupTitle, {key: key}) : null);
 
-        if (!data || _.isEmpty(data) || this.props.groupBy) {
-            return null;
-        }
+            // render group items
+            return acc.concat(_.map(dataGroup, function (data, key) {
+                data = Object(data);
+                key = data.key || data.id || key;
+                currentItemKey = !isNaN(parseInt(key, 10)) ? parseInt(key, 10) : key;
 
-        var listProps = _(this.props)
-            .omit('data')
-            .set('style', makeStyle(this.props.style))
-            .value();
+                var item = _.isFunction(this.renderItem) && this.renderItem(data, currentItemKey);
 
-        data = _.groupBy(data, this.groupBy);
+                if (!item) { return null; }
 
-        var groupClassName = this.props.className && this.props.className + '-group';
-        var groupStyle = this.props.style && this.props.style.group || {};
-        var groupTitleClassName = groupClassName + '-title';
-        var groupTitleStyle = groupStyle && groupStyle.title || {};
+                if (!React.isValidElement(item)) {
+                    // TODO: renderItem().props should be merged into itemProps
+                    return React.cloneElement('div', item.props);
+                }
+                return item;
 
-        var list = _.map(data, function (data, key) {
-            var groupKey = data.key || data.id || key;
-            groupKey = !isNaN(parseInt(groupKey, 10)) ? parseInt(groupKey, 10) : groupKey;
-
-            while (_.includes(this._itemKeys, groupKey)) {
-                groupKey = parseInt(groupKey, 10) + 1;
-            }
-            data.key = groupKey;
-            data.id = data.id || key;
-
-            var groupTitle = _.isFunction(this.renderGroupTitle)
-                && this.renderGroupTitle(data, {
-                    className: groupTitleClassName,
-                    style: groupTitleStyle
-                }, groupKey);
-
-            var group = listable.render.call({
-                props: {
-                    data: data,
-                    className: groupClassName,
-                    style: groupStyle
-                },
-                renderItem: this.renderItem,
-                _itemKeys: this._itemKeys,
-                shouldKeepItemKeys: true
-            });
-
-            return [groupTitle, group];
-        }, this);
+            }, this))
+        }, [], this);
 
         return (
-            <ul {...listProps}>{list}</ul>
+            <div {..._.omit(this.props, ['data'])}>{groupedList}</div>
         );
     }
 };

@@ -5,6 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var classNames = require('classnames');
 var ConversationList = require('./conversationlist');
 var globalEmitter = require('../../../events/globalemitter');
 var style = require('../../../style/conversationlist');
@@ -28,7 +29,7 @@ var Settings = require('../../tools/Settings');
 //private fields
 var listType = {
     conversation: 'conversation',
-    contacts: 'contacts'
+    contact: 'contact'
 };
 
 var SEARCH_FIELDS = [
@@ -82,9 +83,18 @@ var SideList = React.createClass({
         }
 
         if (this.state.listType === listType.conversation) {
-            mainList = <ConversationList data={this.state.displayData} />;
-        } else if (this.state.listType === listType.contacts) {
-            mainList = <ContactList data={this.state.displayData} />;
+            mainList = <ConversationList />;
+        } else if (this.state.listType === listType.contact) {
+            mainList = <ContactList />;
+        }
+
+        mainList = React.cloneElement(mainList, {
+            className: 'main',
+            data: this.state.displayData
+        });
+
+        if (!matchedMessagesCountNode) {
+            return mainList;
         }
 
         return (
@@ -136,6 +146,7 @@ var ConversationBox = React.createClass({
         });
     },
     _switchList: function(event) {
+        console.info('switch-event: ', event);
         var newType = listType[event.option] || listType.conversation;
         var data;
 
@@ -160,7 +171,7 @@ var ConversationBox = React.createClass({
         });
     },
     _updateMessages: function() {
-        if (this.state.type === listType.contacts) {
+        if (this.state.type === listType.contact) {
             return;
         }
 
@@ -184,42 +195,27 @@ var ConversationBox = React.createClass({
     },
     render: function() {
         return (
-            <div className="conversation-list-box" style={makeStyle(style)}>
-                <div className="conversation-list-box-header"
-                     style={makeStyle(style.header)}
-                    >
-                    <div
-                        className="conversation-list-search"
-                        style={makeStyle(style.header.searchbar)}
-                        >
-                        <Search
-                            defaultValue={Lang.search}
-                            datasource={this.state.data}
-                            fields={['name', 'message']}
-                            onSearch={this._filterData}
-                            onKeyDown={this._onKeyDownInSearchBox}
-                            style={style.header.searchbar.search}
-                            caseSensitive={false}
-                            ref="search"
-                            />
-                        <Settings
-                            className="conversation-list-settings"
-                            onSettings={this.props.showSettings}
-                            style={style.header.searchbar.settings}
-                            />
-                    </div>
+            <div className="sidebar">
+                <div className="header">
+                    <Search
+                        className="search"
+                        placeholder={Lang.search}
+                        datasource={this.state.data}
+                        fields={['name', 'message']}
+                        onSearch={this._filterData}
+                        onKeyDown={this._onKeyDownInSearchBox}
+                        caseSensitive={false}
+                        ref="search"
+                        />
+                    <input type="button" className="settings" onClick={this.props.showSettings} />
                 </div>
 
                 <SideList
+                    className="main"
                     initialData={this.state.data}
                     initialListType={listType.conversation}
                     />
-
-                <div className="conversation-list-box-footer"
-                     style={makeStyle(style.footer)}
-                    >
-                    <Switcher data={listType}/>
-                </div>
+                <Switcher className="footer tabs" data={listType}/>
             </div>
         )
     }
@@ -252,7 +248,8 @@ function _buildGroupRenderObject(item, collector) {
     var time = "";
     if (item.message) {
         message = item.message.getBriefText();
-        time = Formats.formatTime(item.message.getTimestamp());
+        //time = Formats.formatTime(item.message.getTimestamp());
+        time = new Date(item.message.getTimestamp());
     }
 
     var history = MessageStore.getGroupHistoryMessages(item.groupId);
@@ -280,7 +277,8 @@ function _buildUserRenderObject(item, collector) {
     var time = "";
     if (item.message) {
         message = item.message.getBriefText();
-        time = Formats.formatTime(item.message.getTimestamp());
+        //time = Formats.formatTime(item.message.getTimestamp());
+        time = new Date(item.message.getTimestamp());
     }
 
     var history = MessageStore.getPrivateHistoryMessages(item.userId);

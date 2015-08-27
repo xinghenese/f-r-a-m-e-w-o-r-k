@@ -5,6 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var classNames = require('classnames');
 var style = require('../../../style/conversationlist');
 var makeStyle = require('../../../style/styles').makeStyle;
 var setStyle = require('../../../style/styles').setStyle;
@@ -25,31 +26,16 @@ var createListClass = createGenerator({
 module.exports = createListClass({
     displayName: 'ConversationUserSwitcher',
     getInitialState: function () {
-        return {
-            selectedKey: _.keys(this.props.data)[0] || -1
-        }
+        return {selectedKey: _.keys(this.props.data)[0] || -1};
     },
     getDefaultProps: function () {
-        return {
-            className: 'conversations-contacts-switcher',
-            onSelect: defaultOnSelect,
-            style: style.footer.switcher
-        }
+        return {onSelect: defaultOnSelect};
     },
-    renderItem: function (option, props, key) {
+    renderItem: function (option, key, props) {
         option = String(option);
-        var currentStyle = style.footer.switcher[option].inactive;
+        console.info('option: ', option);
 
-        if (key == this.state.selectedKey) {
-            currentStyle = style.footer.switcher[option].active;
-        }
-        return (
-            <li
-                key={key}
-                data-option={option}
-                style={makeStyle(style.footer.switcher.option, currentStyle)}
-                />
-        )
+        return <button className={classNames(option, {active: this.checkItemSelected(key)})} data-option={option}/>;
     }
 });
 
@@ -58,6 +44,7 @@ module.exports = createListClass({
 
 //private functions
 function defaultOnSelect(event) {
+    console.info('[switch]');
     globalEmitter.emit(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, {
         option: event.currentTarget.getAttribute('data-option')
     });

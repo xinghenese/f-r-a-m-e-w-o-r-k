@@ -4,6 +4,8 @@
 'use strict';
 
 // dependencies
+//require('../style/main.css');
+
 var _ = require('lodash');
 var React = require('react');
 var Router = require('react-router');
@@ -68,19 +70,19 @@ var Chat = React.createClass({
         // 1 for groups, 2 for contacts
         ConversationAndContactActions.getConversationAndContactList();
         AccountActions.switchStatus(1);
-        modifyPageStyle();
+        //modifyPageStyle();
     },
     componentWillUnmount: function () {
         ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
     },
     render: function () {
         return (
-            <div>
-                <RightSideBox boxType={this.state.rightBoxType}/>
+            <div className="main">
                 <ConversationBox
                     showSettings={this._showSettings}
                     onSelectConversation={this._onSelectConversation}
-                />
+                    />
+                <RightSideBox boxType={this.state.rightBoxType}/>
             </div>
         );
     }

@@ -23,30 +23,12 @@ var createListClass = createGenerator({
 
 var CountryList = createListClass({
     displayName: 'CountryList',
-    renderItem: function (data, props, key) {
-        var className = props.className || 'country-list-item';
-        var style = props.style || {};
-
+    renderItem: function (data, key, props) {
         return (
-            <li
-                className={className}
-                data-name={data.name}
-                data-code={data.code}
-                style={makeStyle(style)}
-                >
-                <span
-                    className={className + '-name'}
-                    style={style.name || style.countryName}
-                    >
-                    {data.name}
-                </span>
-                <span
-                    className={className + '-code'}
-                    style={style.code || style.countryCode}
-                    >
-                    {data.code}
-                </span>
-            </li>
+            <div className="item" data-name={data.name} data-code={data.code}>
+                <span className="name">{data.name}</span>
+                <span className="code">{data.code}</span>
+            </div>
         )
     }
 });
@@ -68,25 +50,22 @@ module.exports = React.createClass({
         this.setState({displayData: data ? data.name : countries});
     },
     render: function () {
-        var style = loginStyle.country;
-
         return (
-            <div style={makeStyle(style)}>
-                <p style={style.title}>{Lang.countryFormTitle}</p>
-                <Search
-                    datasource={countries}
-                    fields={'name'}
-                    defaultValue={Lang.countrySearchTips}
-                    onSearch={this._onSearch}
-                    style={style.search}
-                    />
-
-                <div className="country-list-wrapper" style={makeStyle(style.wrapper)}>
+            <div className="sign-in">
+                <div className="main step2">
+                    <h1 className="title">{Lang.countryFormTitle}</h1>
+                    <div className="form-group filter">
+                        <Search
+                            datasource={countries}
+                            fields={'name'}
+                            placeholder={Lang.countrySearchTips}
+                            onSearch={this._onSearch}
+                            />
+                    </div>
                     <CountryList
-                        className="country-list"
+                        className="form-group countries"
                         data={this.state.displayData}
                         onSelect={this._onSelect}
-                        style={style.wrapper.countrylist}
                         />
                 </div>
             </div>

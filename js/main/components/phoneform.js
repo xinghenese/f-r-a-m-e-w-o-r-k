@@ -4,6 +4,8 @@
 'use strict';
 
 //dependencies
+//require('../style/sign-in.css');
+
 var _ = require('lodash');
 var React = require('react');
 var Lang = require('../locales/zh-cn');
@@ -55,7 +57,7 @@ var PhoneForm = React.createClass({
     },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
-            this._handleSubmit();
+            this.refs.form.submit(event);
         }
     },
     _handleCountryReadyToSelect: function() {
@@ -70,9 +72,8 @@ var PhoneForm = React.createClass({
     _handleSubmit: function() {
         if (requested) {
             return;
-        } else {
-            requested = true;
         }
+        requested = true;
 
         AccountActions.requestVerificationCode(
             this.state.countryCode,
@@ -144,72 +145,61 @@ var PhoneForm = React.createClass({
         var loginForm = login.form;
 
         return (
-            <div style={makeStyle(login)}>
-                <Form className="login-form" style={makeStyle(loginForm)} onSubmit={this._handleSubmit}>
-                    <p style={makeStyle(loginForm.title)}>{Lang.loginTitle}</p>
-
-                    <p style={makeStyle(loginForm.p)}>{Lang.loginSubTitle}</p>
-                    <Wrapper className="login-form-country-name" style={makeStyle(loginForm.countryName)}>
+            <div className="sign-in">
+                <Form className="main step1" ref="form" onSubmit={this._handleSubmit}>
+                    <h1 className="title">{Lang.loginTitle}</h1>
+                    <h2 className="subtitle">{Lang.loginSubTitle}</h2>
+                    <div className="form-group country-selector">
                         <RequiredValidator
-                            style={loginForm.label}
                             defaultMessage={Lang.country}
                             errorMessage={Lang.country}
                             successMessage={Lang.country}
                             controlsToValidate="country-input"
                             />
-                        <InputBox
+                        <input
                             id="country-input"
-                            style={makeStyle(loginForm.input, loginForm.input.country)}
+                            type="button"
                             onChange={this._handleCountryNameChange}
                             onClick={this._handleCountryReadyToSelect}
-                            defaultValue={this.state.countryName}
-                            initialValue={this.state.countryName}
+                            placeholder={this.state.countryName}
+                            value={this.state.countryName}
                             />
-                    </Wrapper>
-                    <Wrapper>
-                        <Wrapper className="login-form-country-code" style={makeStyle(loginForm.countryCode)}>
-                            <RequiredValidator
-                                style={loginForm.label}
-                                defaultMessage={Lang.code}
-                                errorMessage={Lang.code}
-                                successMessage={Lang.code}
-                                controlsToValidate="code-input"
-                                />
-                            <InputBox
-                                id="code-input"
-                                style={makeStyle(loginForm.input)}
-                                onChange={this._handleCountryCodeChange}
-                                defaultValue={this.state.countryCode}
-                                initialValue={this.state.countryCode}
-                                />
-                        </Wrapper>
-                        <Wrapper className="login-form-phone-number" style={makeStyle(loginForm.phoneNumber)}>
-                            <CustomValidator
-                                style={loginForm.label}
-                                defaultMessage={Lang.phone}
-                                errorMessage={Lang.invalidPhone}
-                                successMessage={Lang.phone}
-                                controlsToValidate={["code-input", "phone-input"]}
-                                controlToFocus="phone-input"
-                                validationAtClient={function(code, phone) {
-                                    return code != "+86" || phoneRegex.test(phone);
-                                }}
-                                />
-                            <InputBox
-                                id="phone-input"
-                                style={loginForm.input}
-                                value={this.state.phoneNumber}
-                                onKeyDown={this._handleKeyDown}
-                                onChange={this._handlePhoneNumberChange}
-                                />
-                        </Wrapper>
-                    </Wrapper>
-                    <Wrapper>
-                        <Submit
-                            value={Lang.next}
-                            style={loginForm.button}
+                    </div>
+                    <div className="form-group country-code">
+                        <RequiredValidator
+                            defaultMessage={Lang.code}
+                            errorMessage={Lang.code}
+                            successMessage={Lang.code}
+                            controlsToValidate="code-input"
                             />
-                    </Wrapper>
+                        <input
+                            id="code-input"
+                            onChange={this._handleCountryCodeChange}
+                            placeholder={this.state.countryCode}
+                            value={this.state.countryCode}
+                            />
+                    </div>
+                    <div className="form-group mobile-number">
+                        <CustomValidator
+                            defaultMessage={Lang.phone}
+                            errorMessage={Lang.invalidPhone}
+                            successMessage={Lang.phone}
+                            controlsToValidate={["code-input", "phone-input"]}
+                            controlToFocus="phone-input"
+                            validationAtClient={function(code, phone) {
+                                return code != "+86" || phoneRegex.test(phone);
+                            }}
+                            />
+                        <input
+                            id="phone-input"
+                            value={this.state.phoneNumber}
+                            onKeyDown={this._handleKeyDown}
+                            onChange={this._handlePhoneNumberChange}
+                            />
+                    </div>
+                    <div className="form-group next">
+                        <button type="submit" className="btn primary">{Lang.next}</button>
+                    </div>
                 </Form>
             </div>
         );

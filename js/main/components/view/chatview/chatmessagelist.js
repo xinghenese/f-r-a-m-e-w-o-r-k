@@ -20,7 +20,7 @@ var ChatMessage = require('./chatmessage');
 
 //private fields
 var createGroupableClass = createGenerator({
-    mixins: [groupableMixin, multiselectableMixin]
+    mixins: [multiselectableMixin, groupableMixin]
 });
 var now = new Date();
 
@@ -30,18 +30,20 @@ module.exports = createGroupableClass({
     getDefaultProps: function () {
         return {intialEnableSelect: false};
     },
-    groupBy: function (message, key) {
-        var time = new Date(message.timestamp);
-        if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
+    preprocessData: function (data) {
+        return _.groupBy(data, function (message) {
+            var time = new Date(message.timestamp);
+            if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
+                return time.toDateString();
+            }
+            if (time.getDate() === now.getDate()) {
+                return Lang.today;
+            }
+            if (time.getDate() + 1 === now.getDate()) {
+                return Lang.yesterday;
+            }
             return time.toDateString();
-        }
-        if (time.getDate() === now.getDate()) {
-            return Lang.today;
-        }
-        if (time.getDate() + 1 === now.getDate()) {
-            return Lang.yesterday;
-        }
-        return time.toDateString();
+        })
     },
     _modifyCurrentChat: function (event) {
         this.setState({
@@ -55,70 +57,33 @@ module.exports = createGroupableClass({
     compnonentWillUnmount: function () {
         globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
-    renderGroupTitle: function (data, props, key) {
-        return (
-            <div {...props}><p style={props.style.time}>{key}</p></div>
-        );
+    renderTitle: function (data, key) {
+        return <div className="message system"><p>{key}</p></div>;
     },
-    renderItem: function (message, props, key) {
+    renderItem: function (message, key, props) {
         if (!isValidMessageData(message)) {
             return null;
-        }
-        var className = props.className || 'chat-message';
-        var style = props.style || {};
-        var checkbox = null;
-
-        if (this.state.enableSelect) {
-            checkbox = (
-                <div
-                    className={className + '-checkbox'}
-                    style={style.checkbox}
-                    dangerouslySetInnerHTML={{
-                        __html: _.includes(this.state.selectedKeys, key) ? '&#10003;' : ''
-                    }}
-                    />
-            );
         }
 
         if (message.type == messageConstants.MessageTypes.SYSTEM) {
             return (
-                <li style={makeStyle(style.system)}>
-                    <ChatMessage data={message} style={style.system.message}/>
-                </li>
+                <div>
+                    <ChatMessage data={message}/>
+                </div>
             )
         }
 
         return (
-            <li>
-                <Avatar
-                    className={className + '-avatar'}
-                    style={makeStyle(style.avatar)}
-                    name={message.user.nickname()}
-                    src={message.user.picture()}
-                    index={message.user.getUserId()}
-                    />
-                {checkbox}
-                <div
-                    className={className + '-time'}
-                    style={makeStyle(style.time)}
-                    >
-                    {new Date(message.timestamp).toLocaleTimeString()}
+            <div className="message">
+                <Avatar name={message.user.nickname()} src={message.user.picture()} index={message.user.getUserId()}/>
+                <div className="status">
+                    <a className="sender-name">{message.user.nickname()}</a>
+                    <span className="sender-time">{new Date(message.timestamp).toLocaleTimeString()}</span>
                 </div>
-                <div
-                    className={className + '-body'}
-                    style={makeStyle(commonStyle.message, style.messagebody)}
-                    >
-                    <div className={className + '-nickname'}>
-                        {message.user.nickname()}
-                    </div>
-                    <div
-                        className={className + '-content'}
-                        style={makeStyle(style.messagebody.messagecontent)}
-                        >
-                        <ChatMessage data={message}/>
-                    </div>
+                <div className="contents">
+                    <ChatMessage className="content" data={message}/>
                 </div>
-            </li>
+            </div>
         )
     }
 });

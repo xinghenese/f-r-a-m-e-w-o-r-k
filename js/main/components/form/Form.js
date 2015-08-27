@@ -31,14 +31,21 @@ var ValidatorClassString = [
 module.exports = createDownWalkableClass({
     displayName: 'Form',
     submit: function (event) {
-        doSubmit(this)(event);
+        this.walkDescendants(validate).then(_.bind(function (data) {
+            event.data = data;
+            this.props.onSubmit(event);
+            React.findDOMNode(this).reset();
+        }, this));
+
+        event.stopPropagation();
+        event.preventDefault();
+        event.returnValue = false;
     },
     render: function () {
         return (
             <form
-                onSubmit={doSubmit(this)}
-                className={this.props.className}
-                style={makeStyle(this.props.style)}
+                onSubmit={this.submit}
+                {..._.omit(this.props, ['onSubmit'])}
                 >
                 {this.props.children}
             </form>
@@ -47,20 +54,6 @@ module.exports = createDownWalkableClass({
 });
 
 //private functions
-function doSubmit(form) {
-    return function (event) {
-        form.walkDescendants(validate).then(function (data) {
-            event.data = data;
-            form.props.onSubmit(event);
-            React.findDOMNode(form).reset();
-        });
-
-        event.stopPropagation();
-        event.preventDefault();
-        event.returnValue = false;
-    };
-}
-
 function validate(element, result) {
     result = result || promise.create({});
 
