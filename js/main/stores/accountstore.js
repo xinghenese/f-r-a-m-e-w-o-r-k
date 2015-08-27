@@ -34,6 +34,12 @@ var LoginState = {
     FAILED: 2
 };
 
+var WhereVerificationCodeSent = {
+    UNKNOWN: -1,
+    SMS: 0,
+    OTHER_DEVICE: 1
+};
+
 var AccountStore = ChangeableStore.extend({
     Events: {
         CHECK_PHONE_STATUS_SUCCESS: 'checkPhoneStatusSuccess',
@@ -49,23 +55,27 @@ var AccountStore = ChangeableStore.extend({
     _verificationCodeState: VerificationCodeState.NOT_SENT,
     _loginState: LoginState.DEFAULT,
     _loginStatusCode: 0,
-    getCode: function () {
+    _whereVerificationCodeSent: WhereVerificationCodeSent.UNKNOWN,
+    getCode: function() {
         return _requestAccount.code;
     },
     getLoginErrorCode: function() {
         return this._loginStatusCode;
     },
-    getLoginState: function () {
+    getLoginState: function() {
         return this._loginState;
     },
-    getPhone: function () {
+    getPhone: function() {
         return _requestAccount.phone;
     },
-    getRequestType: function () {
+    getRequestType: function() {
         return _requestAccount.requestType;
     },
-    getVerificationCodeState: function () {
+    getVerificationCodeState: function() {
         return this._verificationCodeState;
+    },
+    getWhereVerificationCodeSent: function() {
+        return this._whereVerificationCodeSent;
     },
     markLoginFailure: function(code) {
         this._loginState = LoginState.FAILED;
@@ -82,8 +92,9 @@ module.exports = AccountStore;
 // module modifications
 AccountStore.VerificationCodeState = VerificationCodeState;
 AccountStore.LoginState = LoginState;
+AccountStore.WhereVerificationCodeSent = WhereVerificationCodeSent;
 
-AccountStore.dispatchToken = AppDispatcher.register(function (action) {
+AccountStore.dispatchToken = AppDispatcher.register(function(action) {
     switch (action.type) {
         case ActionTypes.LOGIN:
             _handleLoginRequest(action);
@@ -117,12 +128,12 @@ function _handleLoginRequest(action) {
     HttpConnection.login({
         url: "usr/lg",
         data: data
-    }).then(function (response) {
+    }).then(function(response) {
         _handleLoginSuccess(response);
         _afterLogin();
         AccountStore.markLoginSuccess();
         AccountStore.emitChange();
-    }, function (statusCode) {
+    }, function(statusCode) {
         AccountStore.markLoginFailure(statusCode);
         AccountStore.emitChange();
     });
@@ -169,7 +180,7 @@ function _handleLoginSuccess(response) {
 function _handleLogoutRequest(action) {
     HttpConnection.request({
         url: "usr/lo"
-    }).then(function (response) {
+    }).then(function(response) {
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.LOGOUT_SUCCESS);
@@ -178,7 +189,7 @@ function _handleLogoutRequest(action) {
                 AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
                 break;
         }
-    }, function (error) {
+    }, function(error) {
         AccountStore.emit(AccountStore.Events.LOGOUT_FAILED);
     });
 }
@@ -198,7 +209,7 @@ function _handleRegisterRequest(action) {
     HttpConnection.request({
         url: "usr/reg",
         data: data
-    }).then(function (response) {
+    }).then(function(response) {
         switch (response.r) {
             case 0: // success
                 AccountStore.emit(AccountStore.Events.REGISTER_SUCCESS, _stripStatusCodeInResponse(response));
@@ -225,7 +236,7 @@ function _handleRegisterRequest(action) {
                 AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
                 break;
         }
-    }, function () {
+    }, function() {
         AccountStore.emit(AccountStore.Events.REGISTER_FAILED, Lang.registerFailed);
     });
 }
@@ -252,10 +263,11 @@ function _handleVerificationCodeRequest(action) {
     HttpConnection.request({
         url: "sms/sc",
         data: data
-    }).then(function () {
+    }).then(function(data) {
         AccountStore._verificationCodeState = VerificationCodeState.SENT;
+        AccountStore._whereVerificationCodeSent = parseInt(data["hl"]);
         AccountStore.emitChange();
-    }, function (error) {
+    }, function(error) {
         switch (error) {
             case 1: // failed
             case 5: // invalid arguments

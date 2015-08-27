@@ -28,7 +28,8 @@ module.exports = {
     // login-code form
     "loginReset": "更改手机号码",
     "enterCode": "请输入验证码",
-    "sendCodeNotice": "验证码已通过短信发送<br/>请在下面输入验证码",
+    "sendCodeFromSms": "验证码已通过短信发送",
+    "sendCodeFromDevice": "验证码已发送到您的其它已登录设备",
     "codeError": "验证码不匹配",
     "codeSuccess": "验证码匹配成功",
     "confirm": "确定",

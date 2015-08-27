@@ -56,6 +56,17 @@ var CodeForm = React.createClass({
         var login = style.login;
         var loginForm = login.form;
         var codeForm = login.codeForm;
+        var noticeText;
+
+        switch (AccountStore.getWhereVerificationCodeSent()) {
+            case AccountStore.WhereVerificationCodeSent.OTHER_DEVICE:
+                noticeText = Lang.sendCodeFromDevice;
+                break;
+            default:
+                noticeText = Lang.sendCodeFromSms;
+                break;
+        }
+
         return (
             <div style={makeStyle(login)}>
                 <Form className="login-code-form" style={codeForm} onSubmit={this._handleSubmit} ref="form">
@@ -63,11 +74,10 @@ var CodeForm = React.createClass({
                         {AccountStore.getCode() + " - " + AccountStore.getPhone()}
                     </p>
 
-                    <p
-                        className="login-send-code-notice"
+                    <p className="login-send-code-notice"
                         style={makeStyle(codeForm.commonText, codeForm.notice)}
-                        dangerouslySetInnerHTML={{__html: Lang.sendCodeNotice}}
                         >
+                        {noticeText}
                     </p>
 
                     <Wrapper className="login-enter-code">
