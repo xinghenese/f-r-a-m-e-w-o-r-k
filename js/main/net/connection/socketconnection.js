@@ -103,10 +103,11 @@ socketconnection.on('connect', function() {
 socketconnection.on('closed', function() {
     authorizePromise = null;
     handshakePromise = null;
+    _.set(DEFAULT_CONFIG, 'encryptKey', '');
     if (autoReconnect) {
         // use ping to trigger reconnection
         console.log("reconnecting");
-        _.delay(_sendPingPacket, RECONNECT_INTERVAL);
+        _.delay(ping, RECONNECT_INTERVAL);
     }
 }).done();
 socketconnection.monitor("D").then(function(data) {
