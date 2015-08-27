@@ -85,10 +85,13 @@ function _initOsRelatedQueries() {
 }
 
 function _getDevice() {
-    switch (process.platform) {
-        case "darwin":
-            return "Mac";
-        default:
-            return process.platform;
+    if (/^win/.test(process.platform)) {
+        return "Windows";
+    } else if (/^darwin/.test(process.platform)) {
+        return "Mac";
+    } else if (/^linux/.test(process.platform)) {
+        return "Linux";
+    } else {
+        return process.platform;
     }
 }
