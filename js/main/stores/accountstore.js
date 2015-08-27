@@ -2,6 +2,7 @@
 
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
+var EventTypes = require('../constants/eventtypes');
 var HttpConnection = require('../net/connection/httpconnection');
 var SocketConnection = require('../net/connection/socketconnection');
 var objects = require('../utils/objects');
@@ -11,6 +12,7 @@ var Config = require('../etc/config');
 var ChangeableStore = require('./changeablestore');
 var keyMirror = require('keymirror');
 var myself = require('../datamodel/myself');
+var systems = require('../../desktop/systems');
 var userconfig = require('../net/userconfig/userconfig');
 
 //private fields
@@ -103,7 +105,7 @@ function _handleLoginRequest(action) {
     var data = {
         mid: action.phone,
         os: UserAgent.getOS(),
-        di: UserAgent.getDeviceInfo(),
+        di: systems.ipcSync(EventTypes.OS_QUERY, "os") || UserAgent.getDeviceInfo(),
         dv: Config.device
     };
     // code is optional, default to 86

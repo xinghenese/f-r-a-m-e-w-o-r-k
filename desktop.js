@@ -21,9 +21,9 @@ var appIcon = null;
 app.on('window-all-closed', function() {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform != 'darwin') {
+    //if (process.platform != 'darwin') {
         app.quit();
-    }
+    //}
 });
 
 // This method will be called when Electron has finished
@@ -31,6 +31,7 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
     _initMainWindow();
     _initNotificationHandlers();
+    _initOsRelatedQueries();
 });
 
 // private functions
@@ -41,7 +42,7 @@ function _initDockNotificationHandlers() {
 }
 
 function _initMainWindow() {
-// Create the browser window.
+    // Create the browser window.
     mainWindow = new BrowserWindow({
         "width": 1000,
         "height": 725,
@@ -68,4 +69,26 @@ function _initMainWindow() {
 
 function _initNotificationHandlers() {
     _initDockNotificationHandlers();
+}
+
+function _initOsRelatedQueries() {
+    ipc.on(EventTypes.OS_QUERY, function(event, type) {
+        switch (type) {
+            case "os":
+                event.returnValue = _getDevice();
+                break;
+            default:
+                event.returnValue = "Unknown";
+                break;
+        }
+    });
+}
+
+function _getDevice() {
+    switch (process.platform) {
+        case "darwin":
+            return "Mac";
+        default:
+            return process.platform;
+    }
 }
