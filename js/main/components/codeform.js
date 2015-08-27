@@ -21,6 +21,9 @@ var CodeForm = React.createClass({
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode || this.refs.form.refs.smscode).focus();
     },
+    _backToPhoneForm: function () {
+        this.props.onPhoneNumberReadyToAlter();
+    },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
             this.refs.form.submit(event);
@@ -58,7 +61,7 @@ var CodeForm = React.createClass({
             <div className="sign-in">
                 <Form className="main confirm" onSubmit={this._handleSubmit} ref="form">
                     <div className="form-group caption">
-                        <p className="mobile-number">{AccountStore.getCode() + " - " + AccountStore.getPhone()}</p>
+                        <p className="mobile-number" onClick={this._backToPhoneForm}>{AccountStore.getCode() + " - " + AccountStore.getPhone()}</p>
                         <p className="help-text" dangerouslySetInnerHTML={{__html: Lang.sendCodeNotice}} />
                     </div>
 
@@ -69,7 +72,7 @@ var CodeForm = React.createClass({
                             successMessage={Lang.codeSuccess}
                             controlsToValidate={["sms-code-input"]}
                             validationAtClient={function(code) {
-                                return (/(\d){5,}/).test(code);
+                                return (/(\d){6,}/).test(code);
                             }}
                             validationAtServer={_.bind(function(code) {
                                 console.info('validationAtServer: ', code);

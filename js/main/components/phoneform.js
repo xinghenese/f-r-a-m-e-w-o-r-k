@@ -4,7 +4,7 @@
 'use strict';
 
 //dependencies
-//require('../style/sign-in.css');
+require('../style/sign-in.css');
 
 var _ = require('lodash');
 var React = require('react');
@@ -37,7 +37,7 @@ var PhoneForm = React.createClass({
         return {
             countryName: "中国",
             countryCode: "+86",
-            phoneNumber: "",
+            phoneNumber: AccountStore.getPhone() || '',
             promptInvalidPhone: false,
             verificationState: null
         };
@@ -114,6 +114,7 @@ var PhoneForm = React.createClass({
         this._focusPhoneInput();
     },
     componentWillMount: function() {
+        requested = false;
         // observe AccountStore
         var self = this;
         stores.observe(AccountStore, this._verificationCodeSendSuccessPredicate).then(function() {

@@ -35,7 +35,7 @@ module.exports = createListClass({
         option = String(option);
         console.info('option: ', option);
 
-        return <button className={classNames(option, {active: this.checkItemSelected(key)})} data-option={option}/>;
+        return <button className={classNames(option, {active: this.checkItemSelected(key), unread: true})} data-option={option}/>;
     }
 });
 

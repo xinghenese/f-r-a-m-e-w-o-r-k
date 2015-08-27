@@ -100,7 +100,6 @@ var SideList = React.createClass({
         return (
             <div
                 className={this.props.className || "conversation-list-container"}
-                style={style.body}
                 >
                 {mainList}
                 {matchedMessagesCountNode}

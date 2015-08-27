@@ -75,10 +75,8 @@ module.exports = createListClass({
         return (
             <div data-conversation-type={data.type} data-item-id={data.id || key} className={classNames('item', {active: key == this.state.selectedKey})}>
                 <Avatar name={data.senderName} src={data.senderAvatar} index={key}/>
-                <p className="name">{data.senderName}
-                    <span className="message-last-time">{data.time && data.time.toLocaleTimeString()}</span>
-                </p>
-                <p className="state">{data.message}</p>
+                <p className="name"><span className="message-last-time">{data.time && data.time.toLocaleTimeString()}</span>{data.senderName}</p>
+                <p className="state"><span className="message-unread">{data.unreadCount || ''}</span>{data.message}</p>
             </div>
         );
     }

@@ -16,7 +16,7 @@ module.exports = filter.create({
      * @returns {Object}
      */
     'processReadable': function (value, options) {
-        console.log("=> " + value);
+        console.log("[" + (new Date()).toLocaleTimeString() + "] => " + value);
         return JSON.parse(value.replace(/^[^{]*?\{/, '{').replace(/[\r\n]/gm, ''));
     },
     /**
@@ -27,7 +27,7 @@ module.exports = filter.create({
      */
     'processWritable': function (value, options) {
         var result = JSON.stringify(value);
-        console.log("<= " + result);
+        console.log("[" + (new Date()).toLocaleTimeString() + "] <= " + result);
         return result;
     }
 });

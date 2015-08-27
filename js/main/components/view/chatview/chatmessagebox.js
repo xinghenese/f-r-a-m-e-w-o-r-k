@@ -33,7 +33,7 @@ var ChatMessageBox = React.createClass({
         };
     },
     _deleteConversation: function(id, type) {
-        return function() {
+        return _.bind(function() {
             var idNumber = parseInt(id);
             switch (type) {
                 case ConversationConstants.GROUP_TYPE:
@@ -46,7 +46,8 @@ var ChatMessageBox = React.createClass({
                     console.error("Unknow type of conversation to delete");
                     break;
             }
-        };
+            this.setState({id: '', data: []});
+        }, this);
     },
     _handleSubmit: function(event) {
         var data = _.values(event.data)[0];
@@ -156,18 +157,11 @@ var ChatMessageBox = React.createClass({
         if (this.state.id) {
             return (
                 <div className="main session messages">
-                    <div className="header">
-                        <Button
-                            value={Lang.close}
-                            style={makeStyle(style.header.button, style.header.button.close)}
-                            onClick={this._closeCurrentChat}
-                            />
-                        <span>{this.state.name}</span>
-                        <Button
-                            value={Lang.modify}
-                            style={makeStyle(style.header.button, style.header.button.modify)}
-                            onClick={this._modifyCurrentChat}
-                            />
+                    <div className="header navigation-bar">
+                        <p className="title">
+                            <span className="name">{this.state.name}</span>
+                            <span className="status online">Online</span>
+                        </p>
                     </div>
                     <ChatMessageList className="main" ref="messagelist" data={this.state.data} />
                     <ChatMessageToolbar

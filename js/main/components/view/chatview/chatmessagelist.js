@@ -5,8 +5,6 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var makeStyle = require('../../../style/styles').makeStyle;
-var commonStyle = require('../../../style/common');
 var Lang = require('../../../locales/zh-cn');
 var globalEmitter = require('../../../events/globalemitter');
 var EventTypes = require('../../../constants/eventtypes');
@@ -16,7 +14,8 @@ var groupableMixin = require('../../base/specs/list/groupable');
 var multiselectableMixin = require('../../base/specs/list/multiselectable');
 var Avatar = require('../../avatar');
 var messageConstants = require('../../../constants/messageconstants');
-var ChatMessage = require('./chatmessage');
+var SystemMessage = require('./systemmessage');
+var ChatMessageContents = require('./chatmessagecontents');
 
 //private fields
 var createGroupableClass = createGenerator({
@@ -57,6 +56,9 @@ module.exports = createGroupableClass({
     compnonentWillUnmount: function () {
         globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
+    renderByDefault: function () {
+        return <div className="main" />;
+    },
     renderTitle: function (data, key) {
         return <div className="message system"><p>{key}</p></div>;
     },
@@ -67,8 +69,8 @@ module.exports = createGroupableClass({
 
         if (message.type == messageConstants.MessageTypes.SYSTEM) {
             return (
-                <div>
-                    <ChatMessage data={message}/>
+                <div className="message system">
+                    <SystemMessage data={message}/>
                 </div>
             )
         }
@@ -80,9 +82,7 @@ module.exports = createGroupableClass({
                     <a className="sender-name">{message.user.nickname()}</a>
                     <span className="sender-time">{new Date(message.timestamp).toLocaleTimeString()}</span>
                 </div>
-                <div className="contents">
-                    <ChatMessage className="content" data={message}/>
-                </div>
+                <ChatMessageContents className="contents" data={message}></ChatMessageContents>
             </div>
         )
     }

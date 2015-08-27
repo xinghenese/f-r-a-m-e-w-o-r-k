@@ -154,6 +154,7 @@ body > .sign-in > .main.confirm > .form-group > .help-text {
 }
 body > .sign-in > .main.confirm > .form-group.caption > .mobile-number {
     font-size: 20px;
+    cursor: pointer;
     color: #1D1D1D;
 }
 body > .sign-in > .main.confirm > .form-group.code {
