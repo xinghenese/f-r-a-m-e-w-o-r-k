@@ -24,7 +24,7 @@ var windowFocusedRunner = require('../../../utils/windowfocusedrunner');
 
 //core module to export
 var ChatMessageBox = React.createClass({
-    _pendingFocusCallbacks: [],
+    _pendingMarkAsReadCallback: null,
     getInitialState: function() {
         return {
             id: '',
@@ -159,9 +159,10 @@ var ChatMessageBox = React.createClass({
         MessageStore.removeChangeListener(this._updateMessages);
         removeConversationListSelectedHandler(this);
         globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
-        _.forEach(this._pendingFocusCallbacks, function(task) {
-            windowFocusedRunner.cancel(task);
-        });
+
+        if (this._pendingMarkAsReadCallback) {
+            windowFocusedRunner.cancel(this._pendingMarkAsReadCallback);
+        }
     },
     render: function() {
         if (this.state.id) {
@@ -264,12 +265,12 @@ function _getSenderNickname(message) {
 }
 
 function _runTaskOnFocus(box, task) {
-    var markAsReadFn = function() {
+    if (box._pendingMarkAsReadCallback) {
+        windowFocusedRunner.cancel(box._pendingMarkAsReadCallback);
+    }
+    box._pendingMarkAsReadCallback = function() {
+        box._pendingMarkAsReadCallback = null;
         task.apply(box);
-        _.remove(box._pendingFocusCallbacks, function(each) {
-            return each === task;
-        });
     };
-    box._pendingFocusCallbacks.push(markAsReadFn);
-    windowFocusedRunner.run(markAsReadFn);
+    windowFocusedRunner.run(box._pendingMarkAsReadCallback);
 }
