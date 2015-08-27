@@ -37,7 +37,7 @@ var CodeForm = React.createClass({
             code
         );
     },
-    _awaitSMSCodeValidationResult: function(resolve, reject) {
+    _awaitSMSCodeValidationResult: function(code, resolve, reject) {
         stores.observe(AccountStore, function() {
             return AccountStore.getLoginState() === AccountStore.LoginState.SUCCESS;
         }).then(function() {
@@ -48,6 +48,7 @@ var CodeForm = React.createClass({
         }).then(function() {
             reject(AccountStore.getLoginErrorCode());
         });
+        this._requestSMSCodeValidation(code);
     },
     componentDidMount: function() {
         this._focusInput();
@@ -91,9 +92,7 @@ var CodeForm = React.createClass({
                                 return (/(\d){5,}/).test(code);
                             }}
                             validationAtServer={_.bind(function(code) {
-                                var result = promise.create(this._awaitSMSCodeValidationResult);
-                                this._requestSMSCodeValidation(code);
-                                return result;
+                                return promise.create(_.bind(this._awaitSMSCodeValidationResult, this, code));
                             }, this)}
                             />
                         <InputBox
