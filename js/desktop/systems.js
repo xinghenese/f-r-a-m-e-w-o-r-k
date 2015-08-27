@@ -5,13 +5,13 @@
 
 // exports
 module.exports = {
-    ipcSync: function(channel, message) {
+    ipcSync: function(channel, message, alternative) {
         if (!this.isIpcAvailable()) {
-            return null;
+            return alternative;
         }
 
         var ipc = window.require('ipc');
-        return ipc.sendSync(channel, message);
+        return ipc.sendSync(channel, message) || alternative;
     },
     isIpcAvailable: function() {
         return window.require && window.require('ipc');
