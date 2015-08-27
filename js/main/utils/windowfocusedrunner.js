@@ -7,16 +7,21 @@
 var _ = require('lodash');
 
 // private fields
+var DELAY_TO_EXECUTE = 300;
+
 var runner = {
     _windowFocused: true,
     _tasks: [],
     _handleWindowFocused: function() {
         this._windowFocused = true;
 
-        while (!_.isEmpty(this._tasks)) {
-            var task = this._tasks.shift();
-            task();
-        }
+        var self = this;
+        _.delay(function() {
+            while (!_.isEmpty(self._tasks)) {
+                var task = self._tasks.shift();
+                task();
+            }
+        }, DELAY_TO_EXECUTE);
     },
     _handleWindowBlurred: function() {
         this._windowFocused = false;
