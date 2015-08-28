@@ -47,6 +47,9 @@ function SystemMessage(data) {
 _.assign(SystemMessage.prototype, Message.prototype, {
     toElement: function(props) {
         return <span {...props}>{this.content && this.content.text}</span>;
+    },
+    getRemarkName: function() {
+        return this._data["rmk"];
     }
 });
 

@@ -27,7 +27,7 @@ var now = new Date();
 //core module to export
 module.exports = createGroupableClass({
     displayName: 'ChatMessageList',
-    getDefaultProps: function () {
+    getDefaultProps: function() {
         return {intialEnableSelect: false};
     },
     preprocessData: function (data) {
@@ -45,16 +45,16 @@ module.exports = createGroupableClass({
             return time.toDateString();
         })
     },
-    _modifyCurrentChat: function (event) {
+    _modifyCurrentChat: function(event) {
         this.setState({
             enableSelect: !!(event && event.modifyEnable),
             selectedKeys: []
         });
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
-    compnonentWillUnmount: function () {
+    compnonentWillUnmount: function() {
         globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
     renderByDefault: function () {

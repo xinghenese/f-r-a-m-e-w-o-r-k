@@ -10,6 +10,7 @@ var EventTypes = require('./js/main/constants/eventtypes');
 var OsQueryConstants = require('./js/main/constants/osqueryconstants');
 var desktopConfig = require('./js/desktop/desktopconfig');
 var globalEmitter = require('./js/main/events/globalemitter');
+var interops = require('./js/desktop/interops');
 var ipc = require('ipc');
 var systems = require('./js/desktop/systems');
 
@@ -32,16 +33,11 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     _initMainWindow();
-    _initNotificationHandlers();
-    _initOsRelatedQueries();
+    interops.init(app);
 });
 
 // private functions
-function _initDockNotificationHandlers() {
-    ipc.on(EventTypes.UPDATE_DOCK_BADGE, function(event, badge) {
-        systems.setBadge(app, badge);
-    });
-}
+
 
 function _initMainWindow() {
     // Create the browser window.
@@ -67,36 +63,4 @@ function _initMainWindow() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
-}
-
-function _initNotificationHandlers() {
-    _initDockNotificationHandlers();
-}
-
-function _initOsRelatedQueries() {
-    ipc.on(EventTypes.OS_QUERY, function(event, type) {
-        switch (type) {
-            case OsQueryConstants.OS:
-                event.returnValue = _getDevice();
-                break;
-            case OsQueryConstants.DEVICE:
-                event.returnValue = desktopConfig.device;
-                break;
-            default:
-                event.returnValue = "Unknown";
-                break;
-        }
-    });
-}
-
-function _getDevice() {
-    if (/^win/.test(process.platform)) {
-        return "Windows";
-    } else if (/^darwin/.test(process.platform)) {
-        return "Mac";
-    } else if (/^linux/.test(process.platform)) {
-        return "Linux";
-    } else {
-        return process.platform;
-    }
 }

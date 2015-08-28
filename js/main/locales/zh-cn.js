@@ -14,7 +14,7 @@ module.exports = {
     "invalidVerificationCode": "不正确的验证码",
     "loginFailed": "登录失败，请重试！",
     "nicknameSeparator": "、",
-    "notRegisteredPhone": "该手机号尚未注册，请通过手机客户端注册！",
+    "notRegisteredPhone": "请通过手机客户端注册后使用！",
     "phone": "手机号码",
     "registerFailed": "注册失败，请重试！",
     "requestVerificationCodeFailed": "发送验证码失败，请重试！",
@@ -80,6 +80,9 @@ module.exports = {
     "predefinedMessage": "[预定义消息]",
     "contactMessage": "[名片消息]",
     "groupCardMessage": "[群名片消息]",
+
+    // system messages
+    "contactJoined": "{0}加入超信啦！",
     "groupNameChanged": "{0}把群更名为{1}",
     "invitedIntoGroup": "{0}邀请了{1}加入群聊",
     "userInvitedIntoGroup": "{0}加入了群聊"
