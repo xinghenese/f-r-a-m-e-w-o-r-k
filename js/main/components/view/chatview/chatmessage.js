@@ -19,7 +19,7 @@ var Audio = require('../../tools/IntelAudio');
 var Urls = require('../../../utils/urls');
 
 // private fields
-var PICTURE_MAX_WIDTH = 477;
+var PICTURE_MAX_WIDTH = 462;
 var RESOURCE_URL = config.resourceDomain;
 
 var TextMessage = React.createClass({
@@ -64,7 +64,14 @@ var PictureMessage = React.createClass({
             return null;
         }
 
-        return <div className="content image"><img src={Urls.getResourceUrl(message.url)} onDoubleClick={this._showOriginalImage}/></div>;
+        var width = Math.min(parseInt(message.width), PICTURE_MAX_WIDTH);
+        var height = parseInt(message.height) / parseInt(message.width) * width;
+
+        return (
+            <div className="content image">
+                <img src={Urls.getResourceUrl(message.url)} width={width} height={height} onDoubleClick={this._showOriginalImage}/>
+            </div>
+        );
     }
 });
 
