@@ -95,7 +95,7 @@ module.exports = createListClass({
         }
         return <div className="title"/>;
     },
-    renderItem: function (data, key, props) {
+    renderItem: function (data, key) {
         if (!isValidConversationData(data)) {
             return this.renderByDefault();
         }

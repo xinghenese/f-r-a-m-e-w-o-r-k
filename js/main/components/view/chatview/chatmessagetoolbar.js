@@ -85,7 +85,7 @@ var toolbar = module.exports = React.createClass({
         return (
             <Form className="footer tab-bar" onSubmit={this._handleSubmit} ref="form" {...props}>
                 <label className="message">
-                    <input type="text" className="content" ref="textArea"/>
+                    <input type="text" className="content" ref="textArea" onKeyDown={this._handleInputKeyDown}/>
                 </label>
                 <button type="submit" className="send">{Lang.send}</button>
             </Form>

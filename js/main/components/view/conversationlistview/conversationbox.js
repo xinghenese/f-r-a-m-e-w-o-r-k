@@ -77,20 +77,20 @@ var ConversationBox = React.createClass({
 
         this.setState({
             type: newType,
-            data: data
+            store: data
         });
     },
     _onGroupsAndContactsChanged: function() {
         if (this.state.type === listType.contact) {
             this.setState({
-                data: ConversationAndContactStore.getGroupsAndContacts()
+                store: ConversationAndContactStore.getGroupsAndContacts()
             });
         }
     },
     _updateMessages: function() {
         if (this.state.type === listType.conversation) {
             this.setState({
-                data: _getLastMessages()
+                store: _getLastMessages()
             });
         }
     },
