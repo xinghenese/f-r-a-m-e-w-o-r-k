@@ -3,6 +3,7 @@
  */
 
 //dependencies
+var _ = require('lodash');
 var React = require('react');
 var style = require('../../../style/common');
 var theme = require('../../../style/default');
@@ -15,18 +16,15 @@ var setStyle = require('../../../style/styles').setStyle;
 //core module to export
 var InputBox = React.createClass({
     render: function () {
+        //var { defaultValue, initialValue, ...others } = this.props;
+        var defaultValue = this.props.defaultValue;
+        var initialValue = this.props.initialValue;
+        var others = _.omit(this.props, ['defaultValue', 'initialValue']);
         return (
             <input
-                id={this.props.id}
-                style={makeStyle(style.input, theme.input, this.props.style)}
-                className={this.props.className}
-                autoComplete="off" type="tel"
-                onChange={this.props.onChange}
-                onBlur={onInputBlur}
-                onFocus={onInputFocus}
-                onClick={this.props.onClick}
-                placeholder={this.props.defaultValue}
-                value={this.props.initialValue}
+                placeholder={defaultValue}
+                value={initialValue}
+                {...others}
                 />
         )
     }
@@ -35,13 +33,3 @@ var InputBox = React.createClass({
 module.exports = InputBox;
 
 //module initialization
-
-
-//private functions
-function onInputBlur(event) {
-    setStyle(event.target.style, theme.input.blur);
-}
-
-function onInputFocus(event) {
-    setStyle(event.target.style, theme.input.focus);
-}

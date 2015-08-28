@@ -61,7 +61,7 @@ function _handleGetChatListRequest(action) {
         _processContactListResponse(response);
         ConversationAndContactStore.emitChange();
     }, function (error) {
-        console.log(error);
+        console.error(error);
     });
 }
 

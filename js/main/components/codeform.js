@@ -1,5 +1,4 @@
 'use strict';
-
 var _ = require('lodash');
 var React = require('react');
 var Lang = require('../locales/zh-cn');
@@ -22,9 +21,12 @@ var CodeForm = React.createClass({
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode || this.refs.form.refs.smscode).focus();
     },
+    _backToPhoneForm: function () {
+        this.props.onPhoneNumberReadyToAlter();
+    },
     _handleKeyDown: function(event) {
         if (event.keyCode == KeyCodes.ENTER) {
-            this._handleSubmit();
+            this.refs.form.submit(event);
         }
     },
     _handleSubmit: function() {
@@ -54,9 +56,6 @@ var CodeForm = React.createClass({
         this._focusInput();
     },
     render: function() {
-        var login = style.login;
-        var loginForm = login.form;
-        var codeForm = login.codeForm;
         var noticeText;
 
         switch (AccountStore.getWhereVerificationCodeSent()) {
@@ -69,45 +68,34 @@ var CodeForm = React.createClass({
         }
 
         return (
-            <div style={makeStyle(login)}>
-                <Form className="login-code-form" style={codeForm} onSubmit={this._handleSubmit} ref="form">
-                    <p className="login-current-phone" style={loginForm.title}>
-                        {AccountStore.getCode() + " - " + AccountStore.getPhone()}
-                    </p>
-
-                    <p className="login-send-code-notice"
-                        style={makeStyle(codeForm.commonText, codeForm.notice)}
-                        >
-                        {noticeText}
-                    </p>
-
-                    <Wrapper className="login-enter-code">
+            <div className="sign-in">
+                <Form className="main confirm" onSubmit={this._handleSubmit} ref="form">
+                    <div className="form-group caption">
+                        <p className="mobile-number" onClick={this._backToPhoneForm}>{AccountStore.getCode() + " - " + AccountStore.getPhone()}</p>
+                        <p className="help-text">{noticeText}</p>
+                    </div>
+                    <div className="form-group code">
                         <CustomValidator
-                            style={makeStyle(loginForm.label)}
                             defaultMessage={Lang.enterCode}
                             errorMessage={Lang.codeError}
                             successMessage={Lang.codeSuccess}
                             controlsToValidate={["sms-code-input"]}
                             validationAtClient={function(code) {
-                                return (/(\d){5,}/).test(code);
+                                return (/(\d){6,}/).test(code);
                             }}
                             validationAtServer={_.bind(function(code) {
                                 return promise.create(_.bind(this._awaitSMSCodeValidationResult, this, code));
                             }, this)}
                             />
-                        <InputBox
+                        <input
                             id="sms-code-input"
                             ref="smscode"
-                            style={makeStyle(loginForm.input, codeForm.commonText)}
                             onKeyDown={this._handleKeyDown}
                             />
-                    </Wrapper>
-                    <Wrapper>
-                        <Submit
-                            value={Lang.next}
-                            style={makeStyle(loginForm.button, codeForm.submit)}
-                            />
-                    </Wrapper>
+                    </div>
+                    <div className="form-group">
+                        <button type="submit" className="btn primary">{Lang.next}</button>
+                    </div>
                 </Form>
             </div>
         );

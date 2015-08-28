@@ -20,7 +20,6 @@ var EventTypes = require('../../../constants/eventtypes');
 var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
 var Button = require('../../form/control/Button');
-var windowFocusedRunner = require('../../../utils/windowfocusedrunner');
 
 //core module to export
 var ChatMessageBox = React.createClass({
@@ -35,7 +34,7 @@ var ChatMessageBox = React.createClass({
         };
     },
     _deleteConversation: function(id, type) {
-        return function() {
+        return _.bind(function() {
             var idNumber = parseInt(id);
             switch (type) {
                 case ConversationConstants.GROUP_TYPE:
@@ -48,7 +47,8 @@ var ChatMessageBox = React.createClass({
                     console.error("Unknow type of conversation to delete");
                     break;
             }
-        };
+            this.setState({id: '', data: []});
+        }, this);
     },
     _handleSubmit: function(event) {
         var data = _.values(event.data)[0];
@@ -98,10 +98,7 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = groupHistoryMessages.getMessages();
-
-               _runTaskOnFocus(this, function() {
-                    MessageActions.markGroupMessagesAsRead(id);
-                });
+                MessageActions.markGroupMessagesAsRead(id);
             }
         } else {
             var user = users.getUser(id);
@@ -116,10 +113,7 @@ var ChatMessageBox = React.createClass({
                 }
 
                 data = privateHistoryMessages.getMessages();
-
-                _runTaskOnFocus(this, function() {
-                    MessageActions.markPrivateMessagesAsRead(id);
-                });
+                MessageActions.markPrivateMessagesAsRead(id);
             }
         }
 
@@ -167,37 +161,29 @@ var ChatMessageBox = React.createClass({
     render: function() {
         if (this.state.id) {
             return (
-                <div className="chat-message-box" style={makeStyle(style)}>
-                    <div className="chat-message-box-header" style={makeStyle(style.header)}>
-                        <Button
-                            value={Lang.close}
-                            style={makeStyle(style.header.button, style.header.button.close)}
-                            onClick={this._closeCurrentChat}
-                            />
-                        <span>{this.state.name}</span>
-                        <Button
-                            value={Lang.modify}
-                            style={makeStyle(style.header.button, style.header.button.modify)}
-                            onClick={this._modifyCurrentChat}
-                            />
+                <div className="main session messages">
+                    <div className="header navigation-bar">
+                        <p className="title">
+                            <span className="name">{this.state.name}</span>
+                            <span className="status online">Online</span>
+                        </p>
                     </div>
-                    <ChatMessageList id="chat-message-list" ref="messagelist" data={this.state.data}
-                                     style={style.chatmessagelist}/>
+                    <ChatMessageList className="main" ref="messagelist" data={this.state.data} />
                     <ChatMessageToolbar
+                        className="footer"
                         onSubmit={this._handleSubmit}
                         inputEnabled={this.state.inputEnabled}
                         deleteHandler={this._deleteConversation(this.state.id, this.state.type)}
-                        style={style.toolbar}
                         />
                 </div>
             );
         }
 
         return (
-            <div className="chat-message-box" style={makeStyle(style)}>
-                <div className="chat-message-box-header" style={makeStyle(style.header)}/>
-                <div style={style.chattips}>{Lang.chatBoxTips}</div>
-                <div className="chat-message-box-footer" style={makeStyle(style.footer)}/>
+            <div className="main welcome">
+                <div className="header" />
+                <div className="main"><p>{Lang.chatBoxTips}</p></div>
+                <div className="footer" />
             </div>
         );
     }
@@ -208,6 +194,7 @@ module.exports = ChatMessageBox;
 //private functions
 function addConversationListSelectedHandler(box) {
     globalEmitter.on(EventTypes.SELECT_CONVERSATION, function(info) {
+        console.info('selectedInfo: ', info);
         box._updateMessages(info.id, info.type);
     });
 }

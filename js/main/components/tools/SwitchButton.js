@@ -6,11 +6,12 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
+var classNames = require('classnames');
 var makeStyle = require('../../style/styles').makeStyle;
 var defaultStyle = require('../../style/default');
 
 //private fields
-var buttonState = ['off', 'on'];
+
 
 //core module to export
 var SwitchButton = React.createClass({
@@ -28,17 +29,10 @@ var SwitchButton = React.createClass({
         }
     },
     render: function () {
-        var style = defaultStyle.switchButton;
-        var state = buttonState[+this.state.on];
-
         return (
-            <div
-                className={this.props.className}
-                style={makeStyle(style, style[state], this.props.style)}
-                onClick={this._switch}
-                >
-                <div style={makeStyle(style.bullet, style.bullet[state])}/>
-            </div>
+            <label onClick={this._switch} {..._.omit(this.props, ['onClick'])}>
+                <button className={classNames('toggle', {active: this.state.on})}/>
+            </label>
         )
     }
 });

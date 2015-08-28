@@ -11,6 +11,7 @@
 
 //core module to export
 module.exports = [
+    {"name": "中国", "code": "+86"},
     {"name": "阿尔巴尼亚", "code": "+355"},
     {"name": "阿尔及利亚", "code": "+213"},
     {"name": "阿富汗", "code": "+93"},
@@ -225,7 +226,6 @@ module.exports = [
     {"name": "亚美尼亚", "code": "+374"},
     {"name": "牙买加", "code": "+1876"},
     {"name": "中非", "code": "+236"},
-    {"name": "中国", "code": "+86"},
     {"name": "智利", "code": "+56"},
     {"name": "直布罗陀", "code": "+350"},
     {"name": "乍得", "code": "+235"},

@@ -66,18 +66,14 @@ var Search = React.createClass({
         return React.findDOMNode(this.refs.searchInput).value || "";
     },
     render: function() {
+        var others = _.omit(this.props, ['onChange', 'onKeyDown', 'value']);
         return (
             <input
-                type="text"
-                id={this.props.id}
-                className={this.props.className}
-                placeholder={this.props.defaultValue}
+                type="search"
                 onChange={this._doSearch}
-                onBlur={onBlur}
-                onFocus={onFocus}
                 onKeyDown={this._onKeyDown}
-                style={makeStyle(commonStyle.input, this.props.style)}
                 ref="searchInput"
+                {...others}
                 />
         )
     }
@@ -108,12 +104,4 @@ function startSearch(search, event) {
     }
 
     return result;
-}
-
-function onBlur(event) {
-    setStyle(event.target.style, defaultStyle.search.blur);
-}
-
-function onFocus(event) {
-    setStyle(event.target.style, defaultStyle.search.focus);
 }

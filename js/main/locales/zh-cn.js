@@ -7,7 +7,7 @@ module.exports = {
     "next": "下一步",
     "code": "代码",
     "country": "国家",
-    "deleteConversation": "删除会话",
+    "deleteConversation": "删除该群及聊天记录",
     "invalidCountryCode": "不正确的区号",
     "invalidNickname": "不可用的昵称",
     "invalidPhone": "不正确的手机号码",
@@ -31,6 +31,7 @@ module.exports = {
     "enterCode": "请输入验证码",
     "sendCodeFromSms": "验证码已通过短信发送",
     "sendCodeFromDevice": "验证码已发送到您的其它已登录设备",
+    "sendCodeNotice": "我们已将验证码通过短消息发送给您",
     "codeError": "验证码不匹配",
     "codeSuccess": "验证码匹配成功",
     "confirm": "确定",
@@ -63,6 +64,10 @@ module.exports = {
     "deleteMessage": "删除",
     "forwardMessage": "转发",
     "reply": "回复",
+
+    // time
+    "am": "上午",
+    "pm": "下午",
 
     // text alternatives of non-text messages
     "unknownMessage": "[未知消息]",

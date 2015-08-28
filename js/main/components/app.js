@@ -26,6 +26,9 @@ var app = {
             countryCode: countryInfo.countryCode
         });
     },
+    _handlePhoneNumberReadyToAlter: function (phoneNumber) {
+        router.transitionTo("/");
+    },
     _handleLoginSuccess: function () {
         router.transitionTo("chat");
     },
@@ -41,7 +44,8 @@ var WrappedCountryForm = _wrapComponent(CountryForm, {
     onCountryCodeSelected: app._handleCountryCodeSelected
 });
 var WrappedCodeForm = _wrapComponent(CodeForm, {
-    onLoginSuccess: app._handleLoginSuccess
+    onLoginSuccess: app._handleLoginSuccess,
+    onPhoneNumberReadyToAlter: app._handlePhoneNumberReadyToAlter
 });
 var routes = (
     <Route name="app" path="/">

@@ -5,7 +5,7 @@
 //dependencies
 var _ = require('lodash');
 var filter = require('./filter');
-var userconfigs = require('../userconfig/userconfig');
+var formats = require('../../utils/formats');
 
 //core module to export
 module.exports = filter.create({
@@ -16,7 +16,7 @@ module.exports = filter.create({
      * @returns {Object}
      */
     'processReadable': function (value, options) {
-        console.log("=> " + value);
+        console.log("[" + formats.formatTime() + "] => " + value);
         return JSON.parse(value.replace(/^[^{]*?\{/, '{').replace(/[\r\n]/gm, ''));
     },
     /**
@@ -27,7 +27,7 @@ module.exports = filter.create({
      */
     'processWritable': function (value, options) {
         var result = JSON.stringify(value);
-        console.log("<= " + result);
+        console.log("[" + formats.formatTime() + "] <= " + result);
         return result;
     }
 });
