@@ -27,10 +27,10 @@ var now = new Date();
 //core module to export
 module.exports = createGroupableClass({
     displayName: 'ChatMessageList',
-    getDefaultProps: function () {
+    getDefaultProps: function() {
         return {intialEnableSelect: false};
     },
-    groupBy: function (message, key) {
+    groupBy: function(message, key) {
         var time = new Date(message.timestamp);
         if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
             return time.toDateString();
@@ -43,24 +43,24 @@ module.exports = createGroupableClass({
         }
         return time.toDateString();
     },
-    _modifyCurrentChat: function (event) {
+    _modifyCurrentChat: function(event) {
         this.setState({
             enableSelect: !!(event && event.modifyEnable),
             selectedKeys: []
         });
     },
-    componentDidMount: function () {
+    componentDidMount: function() {
         globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
-    compnonentWillUnmount: function () {
+    compnonentWillUnmount: function() {
         globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
-    renderGroupTitle: function (data, props, key) {
+    renderGroupTitle: function(data, props, key) {
         return (
             <div {...props}><p style={props.style.time}>{key}</p></div>
         );
     },
-    renderItem: function (message, props, key) {
+    renderItem: function(message, props, key) {
         if (!isValidMessageData(message)) {
             return null;
         }

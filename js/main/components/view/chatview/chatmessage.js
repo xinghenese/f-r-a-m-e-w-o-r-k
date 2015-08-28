@@ -104,6 +104,10 @@ var SystemMessage = React.createClass({
                 return (<span style={makeStyle(this.props.style)}>{
                     Strings.format(Lang.groupNameChanged, [this.props.userName, this.props.message.referName])
                 }</span>);
+            case SystemMessageTypes.CONTACT_JOINED:
+                return (<span style={makeStyle(this.props.style)}>{
+                    Strings.format(Lang.contactJoined, [this.props.data.getRemarkName()])
+                    }</span>);
             default :
                 return (<span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>);
         }
@@ -147,7 +151,7 @@ function _createMessageNode(data) {
         case MessageTypes.AUDIO:
             return <AudioMessage message={message}/>;
         case MessageTypes.SYSTEM:
-            return <SystemMessage message={message} userId={userId} userName={userName}/>;
+            return <SystemMessage message={message} userId={userId} userName={userName} data={data}/>;
         default:
             return <TextMessage message={message}/>;
     }
