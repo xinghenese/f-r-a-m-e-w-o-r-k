@@ -33,8 +33,6 @@ module.exports = createListClass({
     },
     renderItem: function (option, key, props) {
         option = String(option);
-        console.info('option: ', option);
-
         return <button className={classNames(option, {active: this.checkItemSelected(key), unread: true})} data-option={option}/>;
     }
 });
@@ -44,7 +42,6 @@ module.exports = createListClass({
 
 //private functions
 function defaultOnSelect(event) {
-    console.info('[switch]');
     globalEmitter.emit(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, {
         option: event.currentTarget.getAttribute('data-option')
     });

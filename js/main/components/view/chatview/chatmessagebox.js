@@ -194,7 +194,6 @@ module.exports = ChatMessageBox;
 //private functions
 function addConversationListSelectedHandler(box) {
     globalEmitter.on(EventTypes.SELECT_CONVERSATION, function(info) {
-        console.info('selectedInfo: ', info);
         box._updateMessages(info.id, info.type);
     });
 }

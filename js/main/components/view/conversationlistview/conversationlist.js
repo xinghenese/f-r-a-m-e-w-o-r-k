@@ -93,9 +93,6 @@ function isValidConversationData(data) {
 }
 
 function defaultOnSelect(event) {
-
-    console.info('selected');
-
     var component = event.currentComponent;
     var index = component.props['data-item-id'];
     var type = component.props['data-conversation-type'];
