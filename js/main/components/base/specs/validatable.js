@@ -16,6 +16,7 @@ var ValidateState = {
     FAILED: 1,
     SUCCESS: 2
 };
+var DEFAULT_ERROR_TYPE = 0;
 
 //core module to export
 module.exports = {
@@ -28,7 +29,7 @@ module.exports = {
         validationAtClient: React.PropTypes.func
     },
     getInitialState: function () {
-        return {validateState: ValidateState.DEFAULT, errorType: -1};
+        return {validateState: ValidateState.DEFAULT, errorType: DEFAULT_ERROR_TYPE};
     },
     validate: function () {
         var fieldValues = {};
@@ -48,38 +49,44 @@ module.exports = {
             return handleSuccess(this, fieldValues);
         }
         if (this.state.validateState == ValidateState.FAILED) {
-            return handleError(this);
+            return handleError(this, DEFAULT_ERROR_TYPE);
         }
 
         //first validate at client end
-        try {
-            var isValidAtClient = _.isFunction(this.props.validationAtClient)
-                ? !!this.props.validationAtClient.apply(this, values)
-                : true;
+        var isValidAtClient = !_.isFunction(this.props.validationAtClient);
 
-            if (!isValidAtClient) {
-                return handleError(this, 0);
+        if (!isValidAtClient) {
+            try {
+                isValidAtClient = this.props.validationAtClient.apply(null, values);
+            } catch (err) {
+                return handleError(this, err.message || err);
             }
-        } catch (err) {
-            return handleError(this, err);
+        }
+
+        if (!isValidAtClient) {
+            return handleError(this, DEFAULT_ERROR_TYPE);
         }
 
         //then validate at server end
-        var isValidAtServer = _.isFunction(this.props.validationAtServer)
-            ? this.props.validationAtServer.apply(null, values)
-            : true;
-        var self = this;
+        var isValidAtServer = !_.isFunction(this.props.validationAtServer);
 
-        if (promise.isPrototypeOf(isValidAtServer)) {
-            return isValidAtServer.then(function () {
-                return handleSuccess(self, fieldValues);
-            }, function (err) {
-                return handleError(self, err.message || err);
-            });
+        if (!isValidAtServer) {
+            try {
+                isValidAtServer = this.props.validationAtServer.apply(null, values);
+                if (promise.isPrototypeOf(isValidAtServer)) {
+                    return isValidAtServer.then(_.bind(function () {
+                        return handleSuccess(this, fieldValues);
+                    }, this), _.bind(function (err) {
+                        return handleError(this, err);
+                    }, this));
+                }
+            } catch (err) {
+                return handleError(this, err.message || err);
+            }
         }
 
         if (!isValidAtServer) {
-            return handleError(this);
+            return handleError(this, DEFAULT_ERROR_TYPE);
         }
 
         return handleSuccess(this, fieldValues);
@@ -137,10 +144,10 @@ function doFocus(validator) {
 }
 
 function handleError(validator, error) {
-    validator.setState({validateState: ValidateState.FAILED, errorType: error || -1});
+    validator.setState({validateState: ValidateState.FAILED, errorType: error || DEFAULT_ERROR_TYPE});
     restoreDefaultStyleAfterChange(validator);
     doFocus(validator);
-    throw new Error('invalid value');
+    throw new Error(error.message || error);
 }
 
 function handleSuccess(validator, data) {

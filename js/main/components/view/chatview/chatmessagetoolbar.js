@@ -46,6 +46,8 @@ var toolbar = module.exports = React.createClass({
             globalEmitter.emit(EventTypes.SELECT_NEXT_CONVERSATION);
         } else if (event.keyCode === KeyCodes.ESCAPE) {
             globalEmitter.emit(EventTypes.ESCAPE_MESSAGE_INPUT);
+        } else if (event.keyCode === KeyCodes.ENTER && !event.ctrlKey) {
+            this._handleTextAreaSubmit(event);
         }
     },
     _handleTextAreaSubmit: function(event) {
@@ -64,7 +66,7 @@ var toolbar = module.exports = React.createClass({
         this.setState({modifyEnable: !!(event && event.modifyEnable)});
     },
     componentDidMount: function() {
-        globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar)
+        globalEmitter.on(EventTypes.MODIFY_CHAT_MESSAGES, this._showModificationToolbar);
         globalEmitter.on(EventTypes.FOCUS_MESSAGE_INPUT, this._focusTextArea);
     },
     componentWillUnmount: function() {
@@ -85,7 +87,7 @@ var toolbar = module.exports = React.createClass({
         return (
             <Form className="footer tab-bar" onSubmit={this._handleSubmit} ref="form" {...props}>
                 <label className="message">
-                    <input type="text" className="content" ref="textArea" onKeyDown={this._handleInputKeyDown}/>
+                    <input id="chat-message-input" type="text" className="content" ref="textArea" onKeyDown={this._handleInputKeyDown}/>
                 </label>
                 <button type="submit" className="send">{Lang.send}</button>
             </Form>
