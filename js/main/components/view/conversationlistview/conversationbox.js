@@ -6,10 +6,8 @@
 var _ = require('lodash');
 var React = require('react');
 var classNames = require('classnames');
-var ConversationList = require('./conversationlist');
+var SideList = require('./conversationlist');
 var globalEmitter = require('../../../events/globalemitter');
-var style = require('../../../style/conversationlist');
-var makeStyle = require('../../../style/styles').makeStyle;
 var EventTypes = require('../../../constants/eventtypes');
 var KeyCodes = require('../../../constants/keycodes');
 var Search = require('../../tools/Search');
@@ -19,9 +17,7 @@ var users = require('../../../datamodel/users');
 var ConversationConstants = require('../../../constants/conversationconstants');
 var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
-var Formats = require('../../../utils/formats');
 
-var ContactList = require('./contactlist');
 var ConversationAndContactStore = require('../../../stores/conversationandcontactstore');
 var Switcher = require('./conversationuserswitcher');
 var Settings = require('../../tools/Settings');
@@ -32,89 +28,13 @@ var listType = {
     contact: 'contact'
 };
 
-var SEARCH_FIELDS = [
-    "name",
-    "message"
-];
-
-var SideList = React.createClass({
-    displayName: 'SideList',
-    getInitialState: function () {
-        return {
-            listType: this.props.initialListType,
-            displayData: this.props.initialData,
-            matchedMessages: null
-        }
-    },
-    _updateSql: function (event) {
-        this.setState({
-            displayData: event.displayData,
-            matchedMessages: event.matchedMessages,
-            listType: event.type
-        });
-    },
-    componentDidMount: function () {
-        //globalEmitter.on(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
-        globalEmitter.on('search', this._updateSql);
-    },
-    componentWillUnmount: function () {
-        //globalEmitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchListType);
-        globalEmitter.removeListener('search', this._updateSql);
-    },
-    render: function () {
-        var matchedMessageList = null;
-        var matchedMessagesCountNode = null;
-        var mainList = null;
-
-        var matchedMessages = this.state.matchedMessages;
-
-        if (matchedMessages && !_.isEmpty(matchedMessages)) {
-            matchedMessagesCountNode = (
-                <div
-                    className="conversation-list-matched-messages-gap"
-                    style={style.gap}
-                    >
-                    found {_.size(matchedMessages)} messages
-                </div>
-            );
-            matchedMessageList = (
-                <ConversationList data={matchedMessages}/>
-            );
-        }
-
-        if (this.state.listType === listType.conversation) {
-            mainList = <ConversationList />;
-        } else if (this.state.listType === listType.contact) {
-            mainList = <ContactList />;
-        }
-
-        mainList = React.cloneElement(mainList, {
-            className: 'main',
-            data: this.state.displayData
-        });
-
-        if (!matchedMessagesCountNode) {
-            return mainList;
-        }
-
-        return (
-            <div
-                className={this.props.className || "conversation-list-container"}
-                >
-                {mainList}
-                {matchedMessagesCountNode}
-                {matchedMessageList}
-            </div>
-        )
-    }
-});
-
 //core module to export
 var ConversationBox = React.createClass({
     getInitialState: function() {
         var messages = _getLastMessages();
         return {
-            data: messages,
+            store: messages,
+            displayData: messages,
             matchedMessages: null,
             type: listType.conversation
         };
@@ -138,11 +58,11 @@ var ConversationBox = React.createClass({
         }
     },
     _filterData: function(data) {
-        globalEmitter.emit('search', {
-            displayData: data && data.name || this.state.data,
+        this.setState({
+            displayData: data && data.name || this.state.store,
             matchedMessages: data && data.message,
             type: this.state.type
-        });
+        })
     },
     _switchList: function(event) {
         console.info('switch-event: ', event);
@@ -161,22 +81,18 @@ var ConversationBox = React.createClass({
         });
     },
     _onGroupsAndContactsChanged: function() {
-        if (this.state.type === listType.conversation) {
-            return;
+        if (this.state.type === listType.contact) {
+            this.setState({
+                data: ConversationAndContactStore.getGroupsAndContacts()
+            });
         }
-
-        this.setState({
-            data: ConversationAndContactStore.getGroupsAndContacts()
-        });
     },
     _updateMessages: function() {
-        if (this.state.type === listType.contact) {
-            return;
+        if (this.state.type === listType.conversation) {
+            this.setState({
+                data: _getLastMessages()
+            });
         }
-
-        this.setState({
-            data: _getLastMessages()
-        });
     },
     componentDidMount: function() {
         ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
@@ -196,24 +112,13 @@ var ConversationBox = React.createClass({
         return (
             <div className="sidebar">
                 <div className="header">
-                    <Search
-                        className="search"
-                        placeholder={Lang.search}
-                        datasource={this.state.data}
-                        fields={['name', 'message']}
-                        onSearch={this._filterData}
-                        onKeyDown={this._onKeyDownInSearchBox}
-                        caseSensitive={false}
-                        ref="search"
-                        />
+                    <Search className="search" placeholder={Lang.search} datasource={this.state.store}
+                            fields={['name', 'message']} caseSensitive={false} ref="search"
+                            onSearch={this._filterData} onKeyDown={this._onKeyDownInSearchBox} />
                     <input type="button" className="settings" onClick={this.props.showSettings} />
                 </div>
-
-                <SideList
-                    className="main"
-                    initialData={this.state.data}
-                    initialListType={listType.conversation}
-                    />
+                <SideList className="main" isContacts={this.state.type === listType.contact}
+                          data={{data: this.state.displayData, messages: this.state.matchedMessages}}/>
                 <Switcher className="footer tabs" data={listType}/>
             </div>
         )
@@ -247,7 +152,6 @@ function _buildGroupRenderObject(item, collector) {
     var time = "";
     if (item.message) {
         message = item.message.getBriefText();
-        //time = Formats.formatTime(item.message.getTimestamp());
         time = new Date(item.message.getTimestamp());
     }
 
@@ -276,7 +180,6 @@ function _buildUserRenderObject(item, collector) {
     var time = "";
     if (item.message) {
         message = item.message.getBriefText();
-        //time = Formats.formatTime(item.message.getTimestamp());
         time = new Date(item.message.getTimestamp());
     }
 

@@ -13,22 +13,25 @@ var elements = require('../../../utils/elements');
 var globalEmitter = require('../../../events/globalemitter');
 var groups = require('../../../datamodel/groups');
 var protocols = require('../../../utils/protocols');
+var Lang = require('../../../locales/zh-cn');
 
 var Avatar = require('../../avatar');
 var createGenerator = require('../../base/creator/createReactClassGenerator');
-var listableMixin = require('../../base/specs/list/listable');
+var groupableMixin = require('../../base/specs/list/groupable');
 var selectableMixin = require('../../base/specs/list/selectable');
 var hoverableMixin = require('../../base/specs/list/hoverable');
 var formats = require('../../../utils/formats');
 
+var style = require('../../../style/conversationlist');
+
 //private fields
 var createListClass = createGenerator({
-    mixins: [selectableMixin, hoverableMixin, listableMixin]
+    mixins: [selectableMixin, hoverableMixin, groupableMixin]
 });
 
 //core module to export
 module.exports = createListClass({
-    displayName: 'ConversationList',
+    displayName: 'ConversationOrContactList',
     getDefaultProps: function () {
         return {onSelect: defaultOnSelect};
     },
@@ -62,10 +65,34 @@ module.exports = createListClass({
         //    selectItem.scrollIntoView();
         //}
     },
+    preprocessData: function (dataList) {
+        if (!dataList || _.isEmpty(dataList)) {
+            return null;
+        }
+        if (dataList.isContacts && !_.isEmpty(dataList.data)) {
+            return _.groupBy(dataList.data, function (data) {
+                if (data.type === ConversationConstants.PRIVATE_TYPE) {
+                    return data.name[0];
+                }
+                return data.type;
+            })
+        }
+        return dataList;
+    },
     renderByDefault: function () {
         return <div {...this.props} />;
     },
-    renderTitle: function () {
+    renderTitle: function (data, key) {
+        if (key === 'messages' && data  && !_.isEmpty(data)) {
+            return (
+                <div className="conversation-list-matched-messages-gap" style={style.gap}>
+                    found {_.size(data)} messages
+                </div>
+            );
+        }
+        if (key !== 'data' && data && !_.isEmpty(data)) {
+            return <h2 className="title">{Lang[key] || key}</h2>;
+        }
         return <div className="title"/>;
     },
     renderItem: function (data, key, props) {
@@ -75,9 +102,19 @@ module.exports = createListClass({
 
         return (
             <div data-conversation-type={data.type} data-item-id={data.id || key} className={classNames('item', {active: key == this.state.selectedKey})}>
-                <Avatar name={data.senderName} src={data.senderAvatar} index={key}/>
-                <p className="name"><span className="message-last-time">{formats.formatTime(data.time)}</span>{data.senderName}</p>
-                <p className="state"><span className="message-unread">{data.unreadCount || ''}</span>{data.message}</p>
+                <Avatar name={data.name} src={data.senderAvatar} index={key}/>
+                <p className="name">
+                    <span className="message-last-time">{data.time && formats.formatTime(data.time)}</span>
+                    <span title={data.name}>{data.name}</span>
+                </p>
+                <p className="state">
+                    <span className="message-unread">{data.unreadCount || ''}</span>
+                    <span title={data.message}>
+                        {this.props.isContacts
+                            ? data.count && (data.count + ' people') || (data.online && 'online' || (data.lastActiveTime + 'h ago'))
+                            : data.message}
+                    </span>
+                </p>
             </div>
         );
     }
