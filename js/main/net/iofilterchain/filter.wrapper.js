@@ -16,7 +16,7 @@ module.exports = filter.create({
     },
     'processReadable': function (value, options) {
         if (options.needUnwrap) {
-            return decodeURIComponent(value.replace(/[\r\n]/gm, ''));
+            return decodeURIComponent(value.replace(/[\r\n\s]/gm, ''));
         }
         return value;
     }
