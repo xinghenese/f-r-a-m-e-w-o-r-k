@@ -48,5 +48,5 @@ function getColor(id) {
 }
 
 function generateRandomColor() {
-    return colors[~~(Math.random() * 8)];
+    return _.sample(colors);
 }

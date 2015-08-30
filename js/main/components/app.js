@@ -22,7 +22,6 @@ var app = {
     },
     _handleCountryCodeSelected: function (countryInfo) {
         router.transitionTo("/", {}, {
-            countryName: countryInfo.countryName,
             countryCode: countryInfo.countryCode
         });
     },

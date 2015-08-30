@@ -136,7 +136,7 @@ var PhoneForm = React.createClass({
         var query = this.props.query;
         if (query && !_.isEmpty(query)) {
             this.setState({
-                countryName: query.countryName,
+                countryName: this._getCountryName(query.countryCode),
                 countryCode: query.countryCode
             });
         }

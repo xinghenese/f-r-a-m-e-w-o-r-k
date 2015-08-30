@@ -70,7 +70,6 @@ var Chat = React.createClass({
         // 1 for groups, 2 for contacts
         ConversationAndContactActions.getConversationAndContactList();
         AccountActions.switchStatus(1);
-        //modifyPageStyle();
     },
     componentWillUnmount: function () {
         ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
@@ -89,15 +88,3 @@ var Chat = React.createClass({
 });
 
 module.exports = Chat;
-
-//private functions
-function modifyPageStyle() {
-    setStyle(document.body.style, {background: '#e7ebf0'});
-    setStyle(document.getElementById('header').style, {display: 'none'});
-    setStyle(document.getElementById('content').style, {
-        position: 'relative',
-        width: '1000px',
-        margin: '0 auto',
-        background: '#fff'
-    });
-}
