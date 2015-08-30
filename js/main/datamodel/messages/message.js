@@ -35,7 +35,7 @@ var keyMap = {
     alternate: new KeyInfo('alt', String),
     cursor: new KeyInfo('mscs', Number),
     timestamp: new KeyInfo('tmstp', Number),
-    time: new KeyInfo('time', Date),
+    time: new KeyInfo('tmstp', Date),
     status: new KeyInfo('status', Number),
     content: new KeyInfo('msg', Object),
     type: new KeyInfo('msgtp', Number)
@@ -56,7 +56,12 @@ function Message(data) {
             } else if (_.isFunction(fieldType.create)) {
                 this[targetKey] = fieldType.create(sourceValue);
             } else if (_.isFunction(fieldType)) {
-                this[targetKey] = fieldType(sourceValue);
+                if (fieldType === Date) {
+                    sourceValue = parseInt(sourceValue);
+                    this[targetKey] = sourceValue ? new Date(sourceValue) : new Date();
+                } else {
+                    this[targetKey] = fieldType(sourceValue);
+                }
             }
         } else {
             this[targetKey] = data[sourceKeyInfo];

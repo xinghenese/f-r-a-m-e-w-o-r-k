@@ -22,7 +22,6 @@ var formats = require('../../../utils/formats');
 var createGroupableClass = createGenerator({
     mixins: [multiselectableMixin, groupableMixin]
 });
-var now = new Date();
 
 //core module to export
 module.exports = createGroupableClass({
@@ -30,20 +29,41 @@ module.exports = createGroupableClass({
     getDefaultProps: function() {
         return {intialEnableSelect: false};
     },
-    preprocessData: function (data) {
-        return _.groupBy(data, function (message) {
-            var time = new Date(message.timestamp);
-            if (time.getFullYear() !== now.getFullYear() || time.getMonth() !== now.getMonth()) {
-                return time.toDateString();
-            }
-            if (time.getDate() === now.getDate()) {
-                return Lang.today;
-            }
-            if (time.getDate() + 1 === now.getDate()) {
-                return Lang.yesterday;
-            }
-            return time.toDateString();
-        })
+    preprocessData: function(data) {
+        var now = Number(new Date());
+        var deltaTime = 5 * 60 * 1000;
+        var deltaDate = 24 * 60 * 60 * 1000;
+        var lastGroupTime;
+        var lastGroupDate;
+
+        return _(data)
+            .sortBy('time')
+            .groupBy(function(message, index, data) {
+                // first group by user and minutes
+                var lastMessage = data[index - 1];
+
+                if (!lastMessage || lastMessage.user.uid !== message.user.uid
+                    || message.timestamp - lastMessage.timestamp > deltaTime
+                    || message.time.getDate() != lastMessage.time.getDate()) {
+                    lastGroupTime = formats.formatTime(message.time);
+                }
+                return lastGroupTime;
+            })
+            .groupBy(function(messages, index, data) {
+                // then group by date
+                var lastMessageTimestamp = data[index - 1] && data[index - 1][0].timestamp;
+                var timestamp = messages[0].timestamp;
+
+                if (!lastMessageTimestamp || timestamp - lastMessageTimestamp > deltaDate) {
+                    lastGroupDate = now - timestamp < deltaDate
+                        ? Lang.today
+                        : now - timestamp < 2 * deltaDate
+                            ? Lang.yesterday
+                            :  messages[0].time.toLocaleDateString();
+                }
+                return lastGroupDate;
+            })
+            .value();
     },
     _modifyCurrentChat: function(event) {
         this.setState({
@@ -57,16 +77,18 @@ module.exports = createGroupableClass({
     compnonentWillUnmount: function() {
         globalEmitter.removeListener(EventTypes.MODIFY_CHAT_MESSAGES, this._modifyCurrentChat);
     },
-    renderByDefault: function () {
+    renderByDefault: function() {
         return <div className="main" />;
     },
-    renderTitle: function (data, key) {
+    renderTitle: function(data, key) {
         return <div className="message system"><p>{key}</p></div>;
     },
-    renderItem: function (message, key, props) {
-        if (!isValidMessageData(message)) {
+    renderItem: function(messages, key, props) {
+        if (!isValidMessageData(messages)) {
             return null;
         }
+
+        var message = messages[0];
 
         if (message.type == messageConstants.MessageTypes.SYSTEM) {
             return (
@@ -83,7 +105,7 @@ module.exports = createGroupableClass({
                     <a className="sender-name">{message.user.nickname()}</a>
                     <span className="sender-time">{formats.formatTime(message.timestamp)}</span>
                 </div>
-                <ChatMessageContents className="contents" data={message}></ChatMessageContents>
+                <ChatMessageContents className="contents" data={messages}></ChatMessageContents>
             </div>
         )
     }
@@ -91,5 +113,5 @@ module.exports = createGroupableClass({
 
 //private function
 function isValidMessageData(data) {
-    return data && !_.isEmpty(data) && data.user && data.user.nickname();
+    return data && !_.isEmpty(data);
 }

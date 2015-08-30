@@ -7,6 +7,7 @@
 require('../../style/audio.css');
 var _ = require('lodash');
 var React = require('react');
+var classNames = require('classnames');
 var Lang = require('../../locales/zh-cn');
 
 // private fields
@@ -97,7 +98,7 @@ module.exports = React.createClass({
         }
 
         return (
-            <div className={'audio-player ' + playClass}>
+            <div className={classNames('audio-player', playClass, this.props.className)}>
                 <button className="state" onClick={this._togglePlay}></button>
                 <div className="metainfo">
                     <p className="name">{Lang.voiceMessage}</p>

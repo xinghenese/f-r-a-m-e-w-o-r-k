@@ -69,7 +69,7 @@ module.exports = createListClass({
         if (!dataList || _.isEmpty(dataList)) {
             return null;
         }
-        if (dataList.isContacts && !_.isEmpty(dataList.data)) {
+        if (this.props.isContacts && !_.isEmpty(dataList.data)) {
             return _.groupBy(dataList.data, function (data) {
                 if (data.type === ConversationConstants.PRIVATE_TYPE) {
                     return data.name[0];
@@ -85,7 +85,7 @@ module.exports = createListClass({
     renderTitle: function (data, key) {
         if (key === 'messages' && data  && !_.isEmpty(data)) {
             return (
-                <div className="conversation-list-matched-messages-gap" style={style.gap}>
+                <div className="matched-messages-gap" style={style.gap}>
                     found {_.size(data)} messages
                 </div>
             );
@@ -93,7 +93,7 @@ module.exports = createListClass({
         if (key !== 'data' && data && !_.isEmpty(data)) {
             return <h2 className="title">{Lang[key] || key}</h2>;
         }
-        return <div className="title"/>;
+        return null;
     },
     renderItem: function (data, key) {
         if (!isValidConversationData(data)) {

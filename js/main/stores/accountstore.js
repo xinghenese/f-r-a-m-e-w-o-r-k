@@ -288,7 +288,7 @@ function _handleVerificationCodeRequest(action) {
             case 2007: // user deleted
             case 2012: // user already exist
             default:
-                console.log(error);
+                console.error(error);
                 break;
         }
         AccountStore._error = Lang.requestVerificationCodeFailed;

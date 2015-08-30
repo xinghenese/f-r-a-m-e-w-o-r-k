@@ -84,7 +84,7 @@ var AudioMessage = React.createClass({
             return null;
         }
 
-        return <Audio src={Urls.getResourceUrl(url)} duration={duration}/>;
+        return <Audio className="content" src={Urls.getResourceUrl(url)} duration={duration}/>;
     }
 });
 

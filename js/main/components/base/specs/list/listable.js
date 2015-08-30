@@ -19,6 +19,9 @@ module.exports = _.create(groupable, {
             return {data: data};
         }
         return [];
+    },
+    renderTitle: function () {
+        return null;
     }
 });
 
