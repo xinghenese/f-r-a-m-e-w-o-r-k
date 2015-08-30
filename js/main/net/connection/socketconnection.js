@@ -208,6 +208,9 @@ function onMessageReceived(msg) {
 function authorize() {
     if (!authorizePromise) {
         authorizePromise = handshake().then(function() {
+            if (!UserConfig.getToken()) {
+                throw new Error('no valid token');
+            }
             return post({
                 tag: AUTH_TAG,
                 data: UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev"),
@@ -220,6 +223,9 @@ function authorize() {
             isAuthorized = true;
             ping();
             return data;
+        }, function (err) {
+            console.error(err);
+            authorizePromise = null;
         });
     }
 
