@@ -989,10 +989,10 @@ body > .main > .sidebar > .main > .item > p.state.typing:after {
     background: url("data:image/gif;base64,R0lGODlhFAAKAPUYANr0/vD6/wCx+HnW+7fp/UDF+jHA+e/6//3+/9v0/mTQ+/n9/xy6+XHU+9fz/pDd/D7E+mPP+3LU+wq0+HDT++35/yG7+ez5/g61+Knl/T/E+oPZ/CK7+YLZ/PH7/w+2+Nz0/qvl/arl/UnH+lbL+uT3/h66+c3w/snu/t31/vv+/5/i/F3N+3vX+0PF+uP2/nzX+xW3+V7O+/z+/1zN+////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAYACwCAAQAEgAGAAAGPcCFxKCoYI6YgwPJfAieDcTxQIGEmIDA5/lMHDsTBgd0JBQGW64XA2ZYyBjzwPmkSJNVEdYjNEQuTEpMSEEAIfkECR4ABwAsAgAEABIABgAABjzAQ6p0KB5mMAONaCyiRiSQcSWoylRGQMAVw9CMpmr1VCQUBlwvWCwgH8yDZ3QqZmGLAI+QWZy1lC9NRUEAIfkEBR4AHAAsAgAEABIABgAABTggJ46cc5CVYkhLAJAZ1AQi0gj4MxSEmFiMycaHw2EGmh7nFxwuiwKMCyajcRCU4oM0MpEukdUiBAA7") center no-repeat;
 }
 body > .main > .sidebar > .main > .item.active {
-    -webkit-transition: all .8s;
-    -moz-transition: all .8s;
-    -o-transition: all .8s;
-    transition: all .8s;
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    -o-transition: all .5s;
+    transition: all .5s;
     background-color: #4D91C7;
 }
 body > .main > .sidebar > .main > .item.active > p {

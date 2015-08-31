@@ -431,11 +431,11 @@ th {
 
 @font-face {
     font-family: emoji;
-    src: local('Apple Color Emoji'), local('Android Emoji'), local(EmojiSymbols), local(Symbola), url('EmojiSymbols-Regular.woff') format('woff');
+    src: local('Apple Color Emoji'), local('Android Emoji'), local(EmojiSymbols), local(Symbola);
     unicode-range: U+1F300-1F5FF, U+1F600-1F64F, U+1F680-1F6FF, U+2600-26FF;
 }
 html {
-    font-family: emoji, 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans CN', 'Source Han Sans SC', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', NSimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'Source Han Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans CN', 'Source Han Sans SC', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', NSimHei, 'WenQuanYi Zen Hei Sharp', sans-serif, emoji;
 }
 * {
     -webkit-box-sizing: border-box;
