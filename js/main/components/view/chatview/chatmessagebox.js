@@ -73,9 +73,9 @@ var ChatMessageBox = React.createClass({
             );
         }
     },
-    _updateMessages: function(id, type) {
-        id = id || this.state.id;
-        type = type || this.state.type;
+    _updateMessages: function(info) {
+        id = info && info.id || this.state.id;
+        type = info && info.type || this.state.type;
         if (!id || !type) {
             return;
         }
@@ -141,17 +141,27 @@ var ChatMessageBox = React.createClass({
     _modifyCurrentChat: function() {
         globalEmitter.emit(EventTypes.MODIFY_CHAT_MESSAGES, {modifyEnable: true});
     },
+    componentWillMount: function() {
+        var info = this.props.info;
+        console.log('box#willMount: ', info);
+        if (info && info.id && info.type) {
+            this._updateMessages(info);
+        }
+    },
     componentDidMount: function() {
+        console.log('box#didMount');
         MessageStore.addChangeListener(this._updateMessages);
-        addConversationListSelectedHandler(this);
+        globalEmitter.on(EventTypes.SELECT_CONVERSATION, this._updateMessages);
         globalEmitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
     },
     componentDidUpdate: function() {
+        console.log('box#didUpdate');
         this._scrollToBottom();
     },
     componentWillUnmount: function() {
+        console.log('box#willUnmount');
         MessageStore.removeChangeListener(this._updateMessages);
-        removeConversationListSelectedHandler(this);
+        globalEmitter.removeListener(EventTypes.SELECT_CONVERSATION, this._updateMessages);
         globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
 
         if (this._pendingMarkAsReadCallback) {
@@ -192,16 +202,6 @@ var ChatMessageBox = React.createClass({
 module.exports = ChatMessageBox;
 
 //private functions
-function addConversationListSelectedHandler(box) {
-    globalEmitter.on(EventTypes.SELECT_CONVERSATION, function(info) {
-        box._updateMessages(info.id, info.type);
-    });
-}
-
-function removeConversationListSelectedHandler(box) {
-    globalEmitter.removeAllListeners(EventTypes.SELECT_CONVERSATION);
-}
-
 function _buildGroupRenderObject(item, collector) {
     var group = groups.getGroup(item.groupId);
     if (!group) {
