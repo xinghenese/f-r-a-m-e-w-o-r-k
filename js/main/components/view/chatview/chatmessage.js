@@ -68,8 +68,8 @@ var PictureMessage = React.createClass({
         var height = parseInt(message.height) / parseInt(message.width) * width;
 
         return (
-            <div className="content image">
-                <img src={Urls.getResourceUrl(message.url)} width={width} height={height} onDoubleClick={this._showOriginalImage}/>
+            <div className="content image" style={{width: width, height: height}}>
+                <img src={Urls.getResourceUrl(message.url)} width="100%" height="100%" onDoubleClick={this._showOriginalImage}/>
             </div>
         );
     }
