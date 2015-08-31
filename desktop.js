@@ -38,10 +38,8 @@ function _initMainWindow() {
     mainWindow = new BrowserWindow({
         "width": 1000,
         "height": 725,
-        //"max-width": 1000,
-        //"max-height": 725,
-        "min-width": 1000,
-        "min-height": 725,
+        "resizable": false,
+        "overlay-scrollbars": true,
         "icon": "images/logo144.png"
     });
 
@@ -49,7 +47,7 @@ function _initMainWindow() {
     mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
     // Open the devtools.
-    mainWindow.openDevTools();
+    //mainWindow.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {

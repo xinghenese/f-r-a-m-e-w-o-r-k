@@ -2,6 +2,7 @@
 
 module.exports = {
     // login-phone form
+    "name": "超信",
     "loginTitle": "超信登录",
     "loginSubTitle": "请选择你所在的国家并输入手机号码",
     "next": "下一步",
