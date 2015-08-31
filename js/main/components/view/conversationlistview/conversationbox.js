@@ -119,7 +119,7 @@ var ConversationBox = React.createClass({
                 </div>
                 <SideList className="main" isContacts={this.state.type === listType.contact}
                           data={{data: this.state.displayData, messages: this.state.matchedMessages}}/>
-                <Switcher className="footer tabs" data={listType}/>
+                <Switcher className="footer tabs" data={listType} unreadCount={MessageStore.getUnreadCount()}/>
             </div>
         )
     }

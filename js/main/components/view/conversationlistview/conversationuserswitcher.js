@@ -33,7 +33,13 @@ module.exports = createListClass({
     },
     renderItem: function (option, key, props) {
         option = String(option);
-        return <button className={classNames(option, {active: this.checkItemSelected(key), unread: true})} data-option={option}/>;
+        var unreadCount = parseInt(this.props.unreadCount) && Math.min(parseInt(this.props.unreadCount), 99) || '';
+
+        return (
+            <button className={classNames(option, {active: this.checkItemSelected(key), unread: unreadCount})} data-option={option}>
+                <sup>{unreadCount}</sup>
+            </button>
+        );
     }
 });
 
