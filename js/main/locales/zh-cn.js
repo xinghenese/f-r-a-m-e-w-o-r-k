@@ -85,5 +85,9 @@ module.exports = {
     "contactJoined": "{0}加入超信啦！",
     "groupNameChanged": "{0}把群更名为{1}",
     "invitedIntoGroup": "{0}邀请了{1}加入群聊",
-    "userInvitedIntoGroup": "{0}加入了群聊"
+    "userInvitedIntoGroup": "{0}加入了群聊",
+    "userKickedOutGroup": "{0}被请出了群聊",
+
+    // desktop related
+    "youHaveNewMessages": "您有{0}条新消息"
 };

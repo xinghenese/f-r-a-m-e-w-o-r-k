@@ -44,6 +44,7 @@ var MessageConstants = {
         COMMON_USED: 1,
         INVITED_INTO_GROUP: 100,
         USER_INVITED_INTO_GROUP: 101,
+        USER_KICKED_OUT_GROUP: 103,
         GROUP_NAME_CHANGED: 104,
         CONTACT_JOINED: 201
     }

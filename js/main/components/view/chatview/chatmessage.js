@@ -23,7 +23,7 @@ var PICTURE_MAX_WIDTH = 462;
 var RESOURCE_URL = config.resourceDomain;
 
 var TextMessage = React.createClass({
-    render: function () {
+    render: function() {
         return <div className="content text">{String(this.props.message.text || this.props.message || '')}</div>;
     }
 });
@@ -69,7 +69,8 @@ var PictureMessage = React.createClass({
 
         return (
             <div className="content image" style={{width: width, height: height}}>
-                <img src={Urls.getResourceUrl(message.url)} width="100%" height="100%" onDoubleClick={this._showOriginalImage}/>
+                <img src={Urls.getResourceUrl(message.url)} width="100%" height="100%"
+                     onDoubleClick={this._showOriginalImage}/>
             </div>
         );
     }
@@ -100,6 +101,10 @@ var SystemMessage = React.createClass({
                 return (<span style={makeStyle(this.props.style)}>{
                     Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, this.props.userId))
                 }</span>);
+            case SystemMessageTypes.USER_KICKED_OUT_GROUP:
+                return (<span style={makeStyle(this.props.style)}>{
+                    Strings.template(Lang.userKickedOutGroup, _generateNicknames(message, this.props.userId))
+                }</span>);
             case SystemMessageTypes.GROUP_NAME_CHANGED:
                 return (<span style={makeStyle(this.props.style)}>{
                     Strings.format(Lang.groupNameChanged, [this.props.userName, this.props.message.referName])
@@ -107,7 +112,7 @@ var SystemMessage = React.createClass({
             case SystemMessageTypes.CONTACT_JOINED:
                 return (<span style={makeStyle(this.props.style)}>{
                     Strings.format(Lang.contactJoined, [this.props.data.getRemarkName()])
-                    }</span>);
+                }</span>);
             default :
                 return (<span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>);
         }

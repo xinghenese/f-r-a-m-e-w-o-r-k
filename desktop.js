@@ -41,7 +41,8 @@ function _initMainWindow() {
         "max-width": 1000,
         "max-height": 725,
         "min-width": 1000,
-        "min-height": 725
+        "min-height": 725,
+        "icon": "images/logo144.png"
     });
 
     // and load the index.html of the app.
