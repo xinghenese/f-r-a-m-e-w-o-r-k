@@ -42,7 +42,7 @@ module.exports = createGroupableClass({
                 // first group by user and minutes
                 var lastMessage = data[index - 1];
 
-                if (!lastMessage || lastMessage.user.uid !== message.user.uid
+                if (!lastMessage || lastMessage.getUserId() !== message.getUserId()
                     || message.timestamp - lastMessage.timestamp > deltaTime
                     || message.time.getDate() != lastMessage.time.getDate()) {
                     lastGroupTime = formats.formatTime(message.time);

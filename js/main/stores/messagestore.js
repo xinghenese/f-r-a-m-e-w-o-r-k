@@ -201,7 +201,7 @@ socketConnection.monitor(ProtocolConstants.TAG_READ_CONFIRM).then(function(data)
             _changeUnreadCount(groupHistoryMessages, cursor);
             break;
         case ConversationConstants.PRIVATE_INT_TYPE:
-            var userId = parseInt(data["mstuid"]);
+            var userId = _getPeerUserIdFromJsonPrivateMessage(data);
             var privateHistoryMessages = MessageStore.getPrivateHistoryMessages(userId);
             _changeUnreadCount(privateHistoryMessages, cursor);
             break;
@@ -213,13 +213,12 @@ socketConnection.monitor(ProtocolConstants.TAG_READ_CONFIRM).then(function(data)
 
 // private functions
 function _appendMessage(data) {
-    data["mscs"] = data["tmstp"] = new Date().valueOf();
     var message = Message.create(data);
 
     if (objects.containsValuedProp(data, "msrid")) {
         MessageStore.addGroupMessage(parseInt(data["msrid"]), message);
     } else {
-        MessageStore.addPrivateMessage(parseInt(data["mstuid"]), message);
+        MessageStore.addPrivateMessage(_getPeerUserIdFromJsonPrivateMessage(data), message);
     }
 
     return message;
@@ -228,6 +227,7 @@ function _appendMessage(data) {
 function _appendMyMessage(data) {
     data["msuid"] = myself.uid;
     data["unk"] = myself.nickname;
+    data["mscs"] = data["tmstp"] = new Date().valueOf();
     return _appendMessage(data);
 }
 
@@ -276,6 +276,15 @@ function _doHistoryMessagesRequest(data) {
         _handleHistoryMessagesResponse(response);
         MessageStore.emitChange();
     });
+}
+
+function _getPeerUserIdFromJsonPrivateMessage(data) {
+    var uid = parseInt(data["msuid"]);
+    if (myself.uid !== uid) {
+        return uid;
+    }
+
+    return parseInt(data["mstuid"]);
 }
 
 function _handleDeleteGroupMessages(id) {
@@ -425,7 +434,7 @@ function _handleReceivedTalkMessage(data) {
             MessageStore.addGroupMessage(message.getGroupId(), message);
         }
     } else if (message.getTargetUserId() != -1) {
-        MessageStore.addPrivateMessage(message.getTargetUserId(), message);
+        MessageStore.addPrivateMessage(_getPeerUserIdFromJsonPrivateMessage(data), message);
     } else {
         console.error("Unknow type of talk message received");
     }
