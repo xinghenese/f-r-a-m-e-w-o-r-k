@@ -6,13 +6,7 @@
 // dependencies
 var app = require('app');
 var BrowserWindow = require('browser-window');
-var EventTypes = require('./js/main/constants/eventtypes');
-var OsQueryConstants = require('./js/main/constants/osqueryconstants');
-var desktopConfig = require('./js/desktop/desktopconfig');
-var globalEmitter = require('./js/main/events/globalemitter');
 var interops = require('./js/desktop/interops');
-var ipc = require('ipc');
-var systems = require('./js/desktop/systems');
 
 require('crash-reporter').start();
 
@@ -33,7 +27,7 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     _initMainWindow();
-    interops.init(app);
+    interops.init(app, mainWindow);
 });
 
 // private functions

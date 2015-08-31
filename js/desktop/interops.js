@@ -14,9 +14,11 @@ var systems = require('./systems');
 // exports
 module.exports = {
     _app: null,
-    init: function(app) {
+    _mainWindow: null,
+    init: function(app, mainWindow) {
         this._app = app;
-        _initDockNotificationHandlers(this._app);
+        this._mainWindow = mainWindow;
+        _initDockNotificationHandlers(this._app, this._mainWindow);
         _initOsRelatedQueries(this._app);
     }
 };
@@ -34,9 +36,9 @@ function _getDevice() {
     }
 }
 
-function _initDockNotificationHandlers(app) {
+function _initDockNotificationHandlers(app, mainWindow) {
     ipc.on(EventTypes.UPDATE_DOCK_BADGE, function(event, badge) {
-        systems.setBadge(app, badge);
+        systems.setBadge(app, mainWindow, badge);
     });
 }
 

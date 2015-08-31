@@ -6,6 +6,7 @@
 // exports
 module.exports = {
     _ipc: null,
+    _osdeps: null,
     ipcAsync: function(channel, message) {
         if (!this.isIpcAvailable()) {
             return;
@@ -23,9 +24,14 @@ module.exports = {
     isIpcAvailable: function() {
         return !!this._getIpc();
     },
-    setBadge: function(app, badge) {
+    setBadge: function(app, mainWindow, badge) {
+        // for Mac OS
         if (app.dock && app.dock.setBadge) {
             app.dock.setBadge(badge);
+        }
+
+        if (badge && mainWindow.flashFrame) {
+            mainWindow.flashFrame(true);
         }
     },
     _getIpc: function() {
@@ -39,5 +45,16 @@ module.exports = {
 
         this._ipc = window.require('ipc');
         return this._ipc;
+    },
+    _initOsDeps: function() {
+        if (!this._osdeps) {
+            if (process.platform == "darwin") {
+                this._osdeps = require('./osdeps/osx');
+            } else if (process.platform == "win32") {
+                this._osdeps = require('./osdeps/win32');
+            } else {
+                this._osdeps = require('./osdeps/general');
+            }
+        }
     }
 };
