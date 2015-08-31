@@ -9,10 +9,11 @@ var session = require('./iosession');
 var http = require('./http');
 var connection = require('./connection');
 var keyExchange = require('../crypto/factory').createKeyExchange();
-var userconfig = require('../userconfig/userconfig');
 var Config = require('../../etc/config');
 var ConnectionType = require('./connectiontype');
 var UserAgent = require('../../utils/useragent');
+
+var AccountStore = require('../../stores/accountstore');
 
 //private const fields
 var PUBLIC_KEY_FIELD = "pk";
@@ -46,8 +47,6 @@ var loginPromise = null;
 var httpconnection = module.exports = connection.extend({
     'login': function (data) {
         return this.request(data).then(function (value) {
-            var token = _.get(value, TOKEN_FIELD);
-            userconfig.setToken(token);
             isLoggedIn = true;
             return value;
         });
@@ -132,17 +131,17 @@ function get(url, options) {
 
 function authorize() {
     if (!authorizePromise) {
-        var packet = _({})
-            .set(UUID_FILED, userconfig.getUuid())
-            .set(PUBLIC_KEY_FIELD, keyExchange.getPublicKey())
-            .value();
+        var packet = _.set(
+            AccountStore.getProfile([UUID_FILED]),
+            PUBLIC_KEY_FIELD,
+            keyExchange.getPublicKey()
+        );
         var options = _.assign({}, DEFAULT_CONFIG, {'needDecompress': false});
 
         authorizePromise = post(DEFAULT_ROOT + "auth/c", packet, options)
             .then(function (value) {
                 var encryptKey = keyExchange.getEncryptKey(_.get(value, PUBLIC_KEY_FIELD));
                 _.set(DEFAULT_CONFIG, 'encryptKey', encryptKey);
-                userconfig.setUuid(_.get(value, UUID_FILED));
                 isAuthorized = true;
                 return value;
             });

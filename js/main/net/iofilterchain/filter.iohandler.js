@@ -5,7 +5,6 @@
 //dependencies
 var _ = require('lodash');
 var filter = require('./filter');
-var userconfig = require('../userconfig/userconfig');
 var ConnectionType = require('../connection/connectiontype');
 var errors = require('../../constants/errors');
 

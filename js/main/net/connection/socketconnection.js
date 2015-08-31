@@ -14,10 +14,11 @@ var session = require('./socketsession');
 var repeat = require('../../utils/repeat');
 var authentication = require('./authentication');
 var objects = require('../../utils/objects');
-var UserConfig = require('../userconfig/userconfig');
 var ConnectionType = require('./connectiontype');
 var MessageConstants = require('../../constants/messageconstants');
 var SocketRequestResponseTagMap = require('./SocketRequestResponseTagMap');
+
+var AccountStore = require('../../stores/accountstore');
 
 //private const fields
 var PUBLIC_KEY_FIELD = "pbk";
@@ -178,9 +179,11 @@ function packetFormalize(packet) {
 
 function prepareRequestPacket(tag, data) {
     if (isAuthorized) {
-        _.set(data, "msuid", UserConfig.getUid());
-        _.set(data, "msqid", authentication.nextEncodedSequence());
-        _.set(data, "ver", UserConfig.getVersion());
+        _.assign(
+            data,
+            AccountStore.getProfile(['msuid', 'ver']),
+            {msqid: authentication.nextEncodedSequence()}
+        )
     }
     return _.set({}, tag, data);
 }
@@ -208,12 +211,12 @@ function onMessageReceived(msg) {
 function authorize() {
     if (!authorizePromise) {
         authorizePromise = handshake().then(function() {
-            if (!UserConfig.getToken()) {
+            if (!AccountStore.getProfile('tk')) {
                 throw new Error('no valid token');
             }
             return post({
                 tag: AUTH_TAG,
-                data: UserConfig.socksubset("msuid", "ver", "tk", "devuuid", "dev"),
+                data: AccountStore.getProfile(['msuid', 'ver', 'tk', 'devuuid', 'dev']),
                 responseTag: SocketRequestResponseTagMap.getResponseTag(AUTH_TAG)
             });
         }).then(function(data) {
@@ -236,7 +239,7 @@ function handshake() {
     if (!handshakePromise) {
         handshakePromise = post({
             tag: HANDSHAKE_TAG,
-            data: _.set(UserConfig.socksubset("ver"), PUBLIC_KEY_FIELD
+            data: _.set(AccountStore.getProfile(['ver']), PUBLIC_KEY_FIELD
                 , keyExchange.getPublicKey())
         }).then(function(data) {
             _.set(DEFAULT_CONFIG, 'encryptKey'
@@ -270,8 +273,10 @@ function notifyImmediately(tag, data) {
 function _sendPingPacket() {
     return post({
         tag: PING_TAG,
-        data: _.set(UserConfig.socksubset('msuid', 'ver'), 'msqid'
-            , authentication.nextEncodedSequence()),
+        data: _.assign(
+            AccountStore.getProfile(['msuid', 'ver']),
+            {msqid: authentication.nextEncodedSequence()}
+        ),
         responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
     });
 }
