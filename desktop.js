@@ -56,5 +56,4 @@ function _initMainWindow() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
-
 }
