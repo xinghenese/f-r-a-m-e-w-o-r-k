@@ -3,19 +3,8 @@
  */
 'use strict';
 
-// dependencies
-
-
-// private fields
-
-
 // exports
 module.exports = {
-    setBadge: function(app, mainWindow, badge) {
+    setBadge: function(app, mainWindow, dir, badge) {
     }
 };
-
-// module initialization
-
-
-// private functions

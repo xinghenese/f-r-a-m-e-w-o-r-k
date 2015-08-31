@@ -8,8 +8,8 @@ var _ = require('lodash');
 var general = require('./general');
 
 // exports
-module.exports = _.assign(general, {
-    setBadge: function(app, mainWindow, badge) {
+module.exports = _.create(general, {
+    setBadge: function(app, mainWindow, dir, badge) {
         if (app.dock && app.dock.setBadge) {
             app.dock.setBadge(badge);
         }

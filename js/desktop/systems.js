@@ -24,8 +24,8 @@ module.exports = {
     isIpcAvailable: function() {
         return !!this._getIpc();
     },
-    setBadge: function(app, mainWindow, badge) {
-        this._getOsDeps().setBadge(app, mainWindow, badge);
+    setBadge: function(app, mainWindow, dir, badge) {
+        this._getOsDeps().setBadge(app, mainWindow, dir, badge);
     },
     _getIpc: function() {
         if (this._ipc) {

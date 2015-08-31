@@ -27,7 +27,7 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     _initMainWindow();
-    interops.init(app, mainWindow);
+    interops.init(app, mainWindow, __dirname);
 });
 
 // private functions
@@ -38,8 +38,8 @@ function _initMainWindow() {
     mainWindow = new BrowserWindow({
         "width": 1000,
         "height": 725,
-        "max-width": 1000,
-        "max-height": 725,
+        //"max-width": 1000,
+        //"max-height": 725,
         "min-width": 1000,
         "min-height": 725,
         "icon": "images/logo144.png"
@@ -49,7 +49,7 @@ function _initMainWindow() {
     mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
     // Open the devtools.
-    //mainWindow.openDevTools();
+    mainWindow.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
@@ -58,4 +58,5 @@ function _initMainWindow() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
+
 }
