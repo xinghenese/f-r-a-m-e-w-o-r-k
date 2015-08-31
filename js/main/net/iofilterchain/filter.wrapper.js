@@ -3,8 +3,8 @@
  */
 //dependencies
 var _ = require('lodash');
+var querystring = require('querystring');
 var filter = require('./filter');
-var userconfigs = require('../userconfig/userconfig');
 
 //core module to export
 module.exports = filter.create({
@@ -24,7 +24,8 @@ module.exports = filter.create({
 
 //private functions.
 function queryStringify(msg) {
-    return 'data=' + encodeURIComponent(msg)
-        + (userconfigs.getVersion() ? "&ver=" + userconfigs.getVersion() : "")
-        + (userconfigs.getUuid() ? "&uuid=" + userconfigs.getUuid() : "");
+    return querystring.stringify(_.assign(
+        {data: String(msg)},
+        require('../../stores/accountstore').getProfile(['ver', 'uuid'])
+    ));
 }

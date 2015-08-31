@@ -1,11 +1,10 @@
 'use strict';
 
+var _ = require('lodash');
 var ActionTypes = require('../constants/actiontypes');
 var AppDispatcher = require('../dispatchers/appdispatcher');
 var EventTypes = require('../constants/eventtypes');
-var HttpConnection = require('../net/connection/httpconnection');
 var OsQueryConstants = require('../constants/osqueryconstants');
-var SocketConnection = require('../net/connection/socketconnection');
 var objects = require('../utils/objects');
 var Lang = require('../locales/zh-cn');
 var UserAgent = require('../utils/useragent');
@@ -14,7 +13,6 @@ var ChangeableStore = require('./changeablestore');
 var keyMirror = require('keymirror');
 var myself = require('../datamodel/myself');
 var systems = require('../../desktop/systems');
-var userconfig = require('../net/userconfig/userconfig');
 
 //private fields
 var _requestAccount = {
@@ -82,6 +80,14 @@ var AccountStore = ChangeableStore.extend({
     getWhereVerificationCodeSent: function() {
         return this._whereVerificationCodeSent;
     },
+    getProfile: function(keys) {
+        if (_.isArray(keys)) {
+            return _.reduce(keys, function(acc, key) {
+                return _.set(acc, key, this.getProfile(key));
+            }, {}, this);
+        }
+        return myself.getProp(keys);
+    },
     hasRegistered: function() {
         return this._hasRegistered;
     },
@@ -133,23 +139,17 @@ function _handleLoginRequest(action) {
     }
     objects.copyValuedProp(action, "verificationCode", data, "c");
     objects.copyValuedProp(action, "password", data, "psw");
-    HttpConnection.login({
+    getHTTPConnection().login({
         url: "usr/lg",
         data: data
     }).then(function(response) {
         _handleLoginSuccess(response);
-        _afterLogin();
         AccountStore.markLoginSuccess();
         AccountStore.emitChange();
     }, function(statusCode) {
         AccountStore.markLoginFailure(statusCode);
         AccountStore.emitChange();
     });
-}
-
-function _afterLogin() {
-    userconfig.setUid(myself.uid);
-    userconfig.setToken(myself.token);
 }
 
 function _handleLoginSuccess(response) {
@@ -186,7 +186,7 @@ function _handleLoginSuccess(response) {
 }
 
 function _handleLogoutRequest(action) {
-    HttpConnection.request({
+    getHTTPConnection().request({
         url: "usr/lo"
     }).then(function(response) {
         switch (response.r) {
@@ -214,7 +214,7 @@ function _handleRegisterRequest(action) {
     };
     objects.copyValuedProp(action, "avatar", data, "pt");
     objects.copyValuedProp(action, "verificationCode", data, "c");
-    HttpConnection.request({
+    getHTTPConnection().request({
         url: "usr/reg",
         data: data
     }).then(function(response) {
@@ -250,7 +250,7 @@ function _handleRegisterRequest(action) {
 }
 
 function _handleSwitchStatusRequest(action) {
-    SocketConnection.request({
+    getSocketConnection().request({
         tag: "SS",
         data: {
             tp: action.statusType
@@ -269,7 +269,7 @@ function _handleVerificationCodeRequest(action) {
         mt: action.codeType,
         dv: parseInt(systems.ipcSync(EventTypes.OS_QUERY, OsQueryConstants.DEVICE) || Config.device)
     };
-    HttpConnection.request({
+    getHTTPConnection().request({
         url: "sms/sc",
         data: data
     }).then(function(data) {
@@ -312,4 +312,12 @@ function _updateAccount(action) {
     _requestAccount.code = action.code;
     _requestAccount.phone = action.phone;
     _requestAccount.requestType = action.requestType;
+}
+
+function getHTTPConnection() {
+    return require('../net/connection/httpconnection');
+}
+
+function getSocketConnection() {
+    return require('../net/connection/socketconnection');
 }

@@ -5,13 +5,14 @@
 
 // dependencies
 var filter = require('./filter');
-var userconfig = require('../userconfig/userconfig');
 
 // exports
 module.exports = filter.create({
     processWritable: function (value, options) {
-        if (options.needToken && userconfig.getToken()) {
-            value['tk'] = userconfig.getToken();
+        var AccountStore = require('../../stores/accountstore');
+
+        if (options.needToken && AccountStore.getProfile('tk')) {
+            value['tk'] = AccountStore.getProfile('tk');
         }
         return value;
     }
