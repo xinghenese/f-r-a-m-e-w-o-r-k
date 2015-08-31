@@ -35,7 +35,7 @@ var RightSideBox = React.createClass({
             return <UserInfoBox />;
         }
         if (this.props.boxType === boxType.messsagebox) {
-            return <ChatMessageBox />;
+            return <ChatMessageBox info={this.props.info}/>;
         }
         return null;
     }
@@ -45,7 +45,8 @@ var RightSideBox = React.createClass({
 var Chat = React.createClass({
     getInitialState: function () {
         return {
-            rightBoxType: boxType.messsagebox
+            rightBoxType: boxType.messsagebox,
+            chatInfo: {}
         };
     },
     _handleGroupsLoaded: function () {
@@ -60,11 +61,15 @@ var Chat = React.createClass({
             if (previousState.rightBoxType === boxType.messsagebox) {
                 return {rightBoxType: boxType.settings}
             }
-            return {rightBoxType: boxType.messsagebox};
+            return {rightBoxType: boxType.messsagebox, chatInfo: previousState.chatInfo};
         });
+    },
+    _showChatBox: function (event) {
+        this.setState({rightBoxType: boxType.messsagebox, chatInfo: event});
     },
     componentDidMount: function() {
         ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
+        globalEmitter.on(EventTypes.SELECT_CONVERSATION, this._showChatBox);
     },
     componentWillMount: function () {
         // 1 for groups, 2 for contacts
@@ -73,6 +78,7 @@ var Chat = React.createClass({
     },
     componentWillUnmount: function () {
         ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
+        globalEmitter.removeListener(EventTypes.SELECT_CONVERSATION, this._showChatBox);
     },
     render: function () {
         return (
@@ -81,7 +87,7 @@ var Chat = React.createClass({
                     showSettings={this._showSettings}
                     onSelectConversation={this._onSelectConversation}
                     />
-                <RightSideBox boxType={this.state.rightBoxType}/>
+                <RightSideBox boxType={this.state.rightBoxType} info={this.state.chatInfo}/>
             </div>
         );
     }
