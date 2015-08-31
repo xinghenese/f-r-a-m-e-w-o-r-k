@@ -80,6 +80,9 @@ var ConversationBox = React.createClass({
             store: data
         });
     },
+    _onShowSettings: function () {
+        globalEmitter.emit(EventTypes.TOGGLE_SETTINGS_SHOW);
+    },
     _onGroupsAndContactsChanged: function() {
         if (this.state.type === listType.contact) {
             this.setState({
@@ -115,7 +118,7 @@ var ConversationBox = React.createClass({
                     <Search className="search" placeholder={Lang.search} datasource={this.state.store}
                             fields={['name', 'message']} caseSensitive={false} ref="search"
                             onSearch={this._filterData} onKeyDown={this._onKeyDownInSearchBox} />
-                    <input type="button" className="settings" onClick={this.props.showSettings} />
+                    <input type="button" className="settings" onClick={this._onShowSettings} />
                 </div>
                 <SideList className="main" isContacts={this.state.type === listType.contact}
                           data={{data: this.state.displayData, messages: this.state.matchedMessages}}/>

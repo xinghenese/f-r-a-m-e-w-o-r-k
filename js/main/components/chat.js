@@ -8,68 +8,21 @@ require('../style/main.css');
 
 var _ = require('lodash');
 var React = require('react');
-var Router = require('react-router');
-var State = Router.State;
 var AccountActions = require('../actions/accountactions');
 var ConversationAndContactActions = require('../actions/conversationandcontactactions');
 var ConversationAndContactStore = require('../stores/conversationandcontactstore');
-var ConversationBox = require('./view/conversationlistview/conversationbox');
-var ChatMessageBox = require('./view/chatview/chatmessagebox');
+var SideBox = require('./view/conversationlistview/conversationbox');
+var MainBox = require('./view/chatview/chatmessagebox');
 var EventTypes = require('../constants/eventtypes');
 var MessageActions = require('../actions/messageactions');
-var SocketConnection = require('../net/connection/socketconnection');
-var myself = require('../datamodel/myself');
-var setStyle = require('../style/styles').setStyle;
-var UserInfoBox = require('./view/infoview/userinfobox');
-var globalEmitter = require('../events/globalemitter');
-
-//private fields
-var boxType = {
-    settings: 'Settings',
-    messsagebox: 'MessageBox'
-};
-
-var RightSideBox = React.createClass({
-    render: function () {
-        if (this.props.boxType === boxType.settings) {
-            return <UserInfoBox />;
-        }
-        if (this.props.boxType === boxType.messsagebox) {
-            return <ChatMessageBox info={this.props.info}/>;
-        }
-        return null;
-    }
-});
 
 // exports
 var Chat = React.createClass({
-    getInitialState: function () {
-        return {
-            rightBoxType: boxType.messsagebox,
-            chatInfo: {}
-        };
-    },
     _handleGroupsLoaded: function () {
         MessageActions.requestHistoryMessages();
     },
-    _onSelectConversation: function (data) {
-        this.setState({rightBoxType: boxType.messsagebox});
-        globalEmitter.emit(EventTypes.SELECT_CONVERSATION, data);
-    },
-    _showSettings: function () {
-        this.setState(function (previousState) {
-            if (previousState.rightBoxType === boxType.messsagebox) {
-                return {rightBoxType: boxType.settings}
-            }
-            return {rightBoxType: boxType.messsagebox, chatInfo: previousState.chatInfo};
-        });
-    },
-    _showChatBox: function (event) {
-        this.setState({rightBoxType: boxType.messsagebox, chatInfo: event});
-    },
     componentDidMount: function() {
         ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
-        globalEmitter.on(EventTypes.SELECT_CONVERSATION, this._showChatBox);
     },
     componentWillMount: function () {
         // 1 for groups, 2 for contacts
@@ -78,18 +31,9 @@ var Chat = React.createClass({
     },
     componentWillUnmount: function () {
         ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
-        globalEmitter.removeListener(EventTypes.SELECT_CONVERSATION, this._showChatBox);
     },
     render: function () {
-        return (
-            <div className="main">
-                <ConversationBox
-                    showSettings={this._showSettings}
-                    onSelectConversation={this._onSelectConversation}
-                    />
-                <RightSideBox boxType={this.state.rightBoxType} info={this.state.chatInfo}/>
-            </div>
-        );
+        return <div className="main"><SideBox /><MainBox /></div>;
     }
 });
 

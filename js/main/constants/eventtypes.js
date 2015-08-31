@@ -13,6 +13,7 @@ module.exports = {
     MODIFY_CHAT_MESSAGES: "modifyChatMessages",
     NEW_MESSAGE_RECEIVED: "newMessageReceived",
     OS_QUERY: "osQuery",
+    TOGGLE_SETTINGS_SHOW: "toggleSettingsShow",
     SELECT_CONVERSATION: "selectConversation",
     SELECT_FIRST_CONVERSATION: "selectFirstConversation",
     SELECT_PREVIOUS_CONVERSATION: "selectPreviousConversation",

@@ -9,20 +9,18 @@ var Lang = require('../../../locales/zh-cn');
 var ChatMessageList = require('./chatmessagelist');
 var ChatMessageToolbar = require('./chatmessagetoolbar');
 var ConversationConstants = require('../../../constants/conversationconstants');
-var style = require('../../../style/chatmessage');
-var makeStyle = require('../../../style/styles').makeStyle;
 var MessageStore = require('../../../stores/messagestore');
 var globalEmitter = require('../../../events/globalemitter');
 var groups = require('../../../datamodel/groups');
 var myself = require('../../../datamodel/myself');
 var users = require('../../../datamodel/users');
 var EventTypes = require('../../../constants/eventtypes');
-var Formats = require('../../../utils/formats');
 var MessageActions = require('../../../actions/messageactions');
-var Button = require('../../form/control/Button');
+var UserInfoBox = require('../infoview/userinfobox');
 
 //core module to export
 var ChatMessageBox = React.createClass({
+    displayName: 'ChatMessageBox',
     _pendingMarkAsReadCallback: null,
     getInitialState: function() {
         return {
@@ -143,23 +141,20 @@ var ChatMessageBox = React.createClass({
     },
     componentWillMount: function() {
         var info = this.props.info;
-        console.log('box#willMount: ', info);
         if (info && info.id && info.type) {
             this._updateMessages(info);
         }
     },
     componentDidMount: function() {
-        console.log('box#didMount');
         MessageStore.addChangeListener(this._updateMessages);
         globalEmitter.on(EventTypes.SELECT_CONVERSATION, this._updateMessages);
         globalEmitter.on(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
+        this._scrollToBottom();
     },
     componentDidUpdate: function() {
-        console.log('box#didUpdate');
         this._scrollToBottom();
     },
     componentWillUnmount: function() {
-        console.log('box#willUnmount');
         MessageStore.removeChangeListener(this._updateMessages);
         globalEmitter.removeListener(EventTypes.SELECT_CONVERSATION, this._updateMessages);
         globalEmitter.removeListener(EventTypes.ESCAPE_MESSAGE_INPUT, this._closeCurrentChat);
@@ -199,7 +194,48 @@ var ChatMessageBox = React.createClass({
     }
 });
 
-module.exports = ChatMessageBox;
+var boxType = {
+    settings: 'Settings',
+    messsagebox: 'MessageBox'
+};
+
+module.exports = React.createClass({
+    displayName: 'MainBox',
+    getInitialState: function () {
+        return {
+            boxType: boxType.messsagebox,
+            chatInfo: {}
+        };
+    },
+    _showSettings: function () {
+        this.setState(function (previousState) {
+            if (previousState.boxType === boxType.messsagebox) {
+                return {boxType: boxType.settings}
+            }
+            return {boxType: boxType.messsagebox, chatInfo: previousState.chatInfo};
+        });
+    },
+    _showChatBox: function (event) {
+        this.setState({boxType: boxType.messsagebox, chatInfo: event});
+    },
+    componentDidMount: function () {
+        globalEmitter.on(EventTypes.TOGGLE_SETTINGS_SHOW, this._showSettings);
+        globalEmitter.on(EventTypes.SELECT_CONVERSATION, this._showChatBox);
+    },
+    componentWillUnmount: function () {
+        globalEmitter.removeListener(EventTypes.TOGGLE_SETTINGS_SHOW, this._showSettings);
+        globalEmitter.removeListener(EventTypes.SELECT_CONVERSATION, this._showChatBox);
+    },
+    render: function () {
+        if (this.state.boxType === boxType.settings) {
+            return <UserInfoBox />;
+        }
+        if (this.state.boxType === boxType.messsagebox) {
+            return <ChatMessageBox info={this.state.chatInfo}/>;
+        }
+        return null;
+    }
+});
 
 //private functions
 function _buildGroupRenderObject(item, collector) {
