@@ -25,14 +25,7 @@ module.exports = {
         return !!this._getIpc();
     },
     setBadge: function(app, mainWindow, badge) {
-        // for Mac OS
-        if (app.dock && app.dock.setBadge) {
-            app.dock.setBadge(badge);
-        }
-
-        if (badge && mainWindow.flashFrame) {
-            mainWindow.flashFrame(true);
-        }
+        this._getOsDeps().setBadge(app, mainWindow, badge);
     },
     _getIpc: function() {
         if (this._ipc) {
@@ -46,7 +39,7 @@ module.exports = {
         this._ipc = window.require('ipc');
         return this._ipc;
     },
-    _initOsDeps: function() {
+    _getOsDeps: function() {
         if (!this._osdeps) {
             if (process.platform == "darwin") {
                 this._osdeps = require('./osdeps/osx');
@@ -56,5 +49,7 @@ module.exports = {
                 this._osdeps = require('./osdeps/general');
             }
         }
+
+        return this._osdeps;
     }
 };
