@@ -1,6 +1,13 @@
 body {
     background-color: #E7EBF0;
 }
+body:after {
+    display: inline-block;
+    width: 0;
+    height: 100%;
+    content: '';
+    vertical-align: middle;
+}
 body > .main {
     position: absolute;
     top: 50%;
@@ -8,7 +15,11 @@ body > .main {
     display: table;
     overflow: hidden;
     width: 1000px;
+    min-width: 1000px;
+    max-width: 1000px;
     height: 700px;
+    min-height: 700px;
+    max-height: 700px;
     margin: -350px 0 0 -500px;
     border-radius: 6px;
     background-color: #FFF;
@@ -954,10 +965,12 @@ body > .main > .sidebar > .footer > button.conversation > * {
 }
 body > .main > .sidebar > .footer > button.conversation.unread > sup {
     font-size: 12px;
+    line-height: 1.5;
     top: -1em;
     right: -1em;
-    display: inline;
-    padding: .2em;
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
     color: #FFF;
     border-radius: 50%;
     background-color: red;
