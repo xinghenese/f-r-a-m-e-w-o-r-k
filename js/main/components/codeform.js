@@ -81,7 +81,7 @@ var CodeForm = React.createClass({
                             successMessage={Lang.codeSuccess}
                             controlsToValidate={["sms-code-input"]}
                             validationAtClient={function(code) {
-                                return (/(\d){6,}/).test(code);
+                                return (/(\d){5}/).test(code);
                             }}
                             validationAtServer={_.bind(function(code) {
                                 return promise.create(_.bind(this._awaitSMSCodeValidationResult, this, code));
