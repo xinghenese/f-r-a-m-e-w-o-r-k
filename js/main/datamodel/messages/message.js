@@ -106,7 +106,7 @@ _.assign(Message.prototype, {
     getUserId: function() {
         return parseInt(this._data["msuid"] || -1);
     },
-    getTargetUserIds: function() {
+    getTargetUserId: function() {
         return parseInt(this._data["mstuid"] || -1);
     },
     getAtUserId: function() {

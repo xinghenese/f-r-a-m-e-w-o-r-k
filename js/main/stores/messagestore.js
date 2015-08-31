@@ -419,13 +419,13 @@ function _handleReceivedGroupSystemMessage(data) {
 
 function _handleReceivedTalkMessage(data) {
     var message = Message.create(data);
-    if (objects.containsValuedProp(data, "msrid")) {
+    if (message.getGroupId() != -1) {
         var pending = _handleReceivedGroupSystemMessage(data);
         if (!pending) {
             MessageStore.addGroupMessage(message.getGroupId(), message);
         }
-    } else if (objects.containsValuedProp(data, "msuid")) {
-        MessageStore.addPrivateMessage(message.getUserId(), message);
+    } else if (message.getTargetUserId() != -1) {
+        MessageStore.addPrivateMessage(message.getTargetUserId(), message);
     } else {
         console.error("Unknow type of talk message received");
     }

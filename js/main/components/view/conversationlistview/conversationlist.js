@@ -60,9 +60,9 @@ module.exports = createListClass({
         globalEmitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     componentDidUpdate: function() {
-        var selectItem = React.findDOMNode(this.refs[this.state.selectedKey]);
-        if (!elements.isElementInViewport(selectItem)) {
-            selectItem.scrollIntoView();
+        var selectedItem = React.findDOMNode(this.refs[this.state.selectedKey]);
+        if (selectedItem && !elements.isElementInViewport(selectedItem)) {
+            selectedItem.scrollIntoView();
         }
     },
     preprocessData: function (dataList) {
