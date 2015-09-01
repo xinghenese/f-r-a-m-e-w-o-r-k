@@ -33,6 +33,9 @@ module.exports = _.create(general, {
         var tooltip = strings.format(Lang.youHaveNewMessages, [badge]);
 
         mainWindow.setOverlayIcon(imagePath, tooltip);
-        mainWindow.flashFrame(true);
+
+        if (!mainWindow.isFocused()) {
+            mainWindow.flashFrame(true);
+        }
     }
 });

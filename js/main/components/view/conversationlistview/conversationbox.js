@@ -65,7 +65,6 @@ var ConversationBox = React.createClass({
         })
     },
     _switchList: function(event) {
-        console.info('switch-event: ', event);
         var newType = listType[event.option] || listType.conversation;
         var data;
 

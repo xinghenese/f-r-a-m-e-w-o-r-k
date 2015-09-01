@@ -15,7 +15,7 @@ function User(data) {
 User.emptyUser = new User({});
 
 User.prototype.getUserId = function () {
-    return this._data["uid"];
+    return parseInt(this._data["uid"] || -1);
 };
 
 User.prototype.listedInConversations = function () {

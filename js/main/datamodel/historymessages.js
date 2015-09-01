@@ -6,6 +6,7 @@
 // dependencies
 var _ = require('lodash');
 var Message = require('./messages/message');
+var myself = require('./myself');
 
 // exports
 function HistoryMessages(data) {
@@ -28,7 +29,11 @@ HistoryMessages.prototype.addMessage = function(message) {
         });
         this._messages.splice(lastIndex + 1, 0, message);
     }
-    this._totalUnreadCount++;
+    console.log("msg uid: ", message.getUserId());
+    console.log("my uid: ", myself.uid);
+    if (message.getUserId() !== myself.uid) {
+        this._totalUnreadCount++;
+    }
 };
 
 HistoryMessages.prototype.prependMessages = function(messages) {
