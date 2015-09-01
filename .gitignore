@@ -1,6 +1,5 @@
 .idea
-
-node_modules
-
-dist
 chaoxin-*
+dist
+js/lib
+node_modules
