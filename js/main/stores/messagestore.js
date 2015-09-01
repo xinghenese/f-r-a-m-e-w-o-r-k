@@ -439,7 +439,10 @@ function _handleReceivedTalkMessage(data) {
         console.error("Unknow type of talk message received");
     }
     MessageStore.emitChange();
-    globalEmitter.emit(EventTypes.NEW_MESSAGE_RECEIVED, message);
+
+    if (message.getUserId() !== myself.uid) {
+        globalEmitter.emit(EventTypes.NEW_MESSAGE_RECEIVED, message);
+    }
 }
 
 function _handleSendTalkMessage(action) {

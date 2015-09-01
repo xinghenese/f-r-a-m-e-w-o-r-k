@@ -6,7 +6,9 @@
 // dependencies
 var app = require('app');
 var BrowserWindow = require('browser-window');
+var Lang = require('./js/main/locales/zh-cn');
 var interops = require('./js/desktop/interops');
+var path = require('path');
 
 require('crash-reporter').start();
 
@@ -40,7 +42,8 @@ function _initMainWindow() {
         "height": 725,
         "resizable": false,
         "overlay-scrollbars": true,
-        "icon": "images/logo144.png"
+        "title": Lang.name,
+        "icon": path.join(__dirname, "images/logo144.png")
     });
 
     // and load the index.html of the app.

@@ -154,7 +154,7 @@ function _handleLoginRequest(action) {
 }
 
 function _handleLoginSuccess(response) {
-    objects.copyValuedProp(response, "uid", myself, "uid");
+    myself.uid = parseInt(response["uid"] || -1);
     objects.copyValuedProp(response, "unk", myself, "nickname");
     objects.copyValuedProp(response, "pt", myself, "avatar");
     objects.setTruePropIfNotZero(myself, "hasPassword", response.hp);
