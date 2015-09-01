@@ -130,7 +130,8 @@ function _handleLoginRequest(action) {
     var data = {
         mid: action.phone,
         os: UserAgent.getOS(),
-        di: systems.ipcSync(EventTypes.OS_QUERY, "os", UserAgent.getDeviceInfo()),
+        //di: systems.ipcSync(EventTypes.OS_QUERY, "os", UserAgent.getDeviceInfo()),
+        di: AccountStore.getProfile('di'),
         dv: Config.device
     };
     // code is optional, default to 86

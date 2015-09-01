@@ -11,6 +11,11 @@ var User = require('./user');
 var users = {
     _cursor: "",
     _users: [],
+    create: function(userInfo) {
+        var newUser = new User(userInfo);
+        this.addUser(newUser);
+        return newUser;
+    },
     addUser: function(user) {
         this._users.push(user);
     },
