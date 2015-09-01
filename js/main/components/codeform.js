@@ -6,8 +6,6 @@ var KeyCodes = require('../constants/keycodes');
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
 var errors = require('../constants/errors');
-var style = require('../style/login');
-var makeStyle = require('../style/styles').makeStyle;
 var stores = require('../utils/stores');
 var promise = require('../utils/promise');
 
@@ -18,6 +16,13 @@ var Form = require('./form/Form');
 var CustomValidator = require('./form/validator/CustomValidator');
 
 var CodeForm = React.createClass({
+    _checkSMSCodeSent: function() {
+        var hasSent = AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT;
+        if (!hasSent) {
+            this.props.onBeforeEnterCodeForm();
+        }
+        return hasSent;
+    },
     _focusInput: function() {
         React.findDOMNode(this.refs.smscode || this.refs.form.refs.smscode).focus();
     },
@@ -52,6 +57,9 @@ var CodeForm = React.createClass({
         });
         this._requestSMSCodeValidation(code);
     },
+    componentWillMount: function () {
+        this._checkSMSCodeSent();
+    },
     componentDidMount: function() {
         this._focusInput();
     },
@@ -81,7 +89,7 @@ var CodeForm = React.createClass({
                             successMessage={Lang.codeSuccess}
                             controlsToValidate={["sms-code-input"]}
                             validationAtClient={function(code) {
-                                return (/(\d){5}/).test(code);
+                                return (/^(\d){5}$/).test(code);
                             }}
                             validationAtServer={_.bind(function(code) {
                                 return promise.create(_.bind(this._awaitSMSCodeValidationResult, this, code));
@@ -103,5 +111,3 @@ var CodeForm = React.createClass({
 });
 
 module.exports = CodeForm;
-
-//private functions
