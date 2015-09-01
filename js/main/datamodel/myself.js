@@ -12,7 +12,7 @@ module.exports = {
     nickname: "",
     avatar: "",
     deviceType: 3,
-    deviceInfo: UserAgent.getDeviceInfo(),
+    deviceInfo: 'PC',
     officeSystem: UserAgent.getOS(),
     version: '1.0',
     zip: "1",

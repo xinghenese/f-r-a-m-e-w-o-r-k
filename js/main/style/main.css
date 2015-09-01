@@ -772,11 +772,6 @@ body > .main > .main > .footer {
     padding: 0 26px;
     vertical-align: middle;
 }
-body > .main > .main > .footer:after {
-    display: table;
-    clear: both;
-    content: '';
-}
 body > .main > .main > .header {
     border-top-right-radius: 6px;
 }

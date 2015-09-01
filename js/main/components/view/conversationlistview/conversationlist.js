@@ -25,6 +25,7 @@ var formats = require('../../../utils/formats');
 var style = require('../../../style/conversationlist');
 
 //private fields
+var prefix = {privateType: 'p-', groupType: 'g-'};
 var createListClass = createGenerator({
     mixins: [selectableMixin, hoverableMixin, groupableMixin]
 });
@@ -60,7 +61,7 @@ module.exports = createListClass({
         globalEmitter.removeListener(EventTypes.SELECT_FIRST_CONVERSATION, this._selectFirstConversation);
     },
     componentDidUpdate: function() {
-        var selectedItem = React.findDOMNode(this.refs[this.state.selectedKey]);
+        var selectedItem = this.getSelectedItem();
         if (selectedItem && !elements.isElementInViewport(selectedItem)) {
             selectedItem.scrollIntoView();
         }
@@ -72,8 +73,10 @@ module.exports = createListClass({
         if (this.props.isContacts && !_.isEmpty(dataList.data)) {
             return _.groupBy(dataList.data, function (data) {
                 if (data.type === ConversationConstants.PRIVATE_TYPE) {
+                    data.id = prefix.privateType + data.id;
                     return data.name[0];
                 }
+                data.id = prefix.groupType + data.id;
                 return data.type;
             })
         }

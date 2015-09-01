@@ -26,6 +26,9 @@ module.exports = {
     disableSelect: function () {
         this.setState({enableSelect: false, selectedKey: -1});
     },
+    getSelectedItem: function () {
+        return React.findDOMNode(this.refs[this.state.selectedKey]);
+    },
     checkItemSelected: function (item) {
         return this.state.selectedKey == (item && item.props && item.props[DATA_ITEM_KEY_FIELD] || item);
     },
