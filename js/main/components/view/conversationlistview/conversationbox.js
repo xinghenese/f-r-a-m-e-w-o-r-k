@@ -111,6 +111,7 @@ var ConversationBox = React.createClass({
         globalEmitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
     },
     render: function() {
+        console.info('store: ', this.state.store);
         return (
             <div className="sidebar">
                 <div className="header">
@@ -133,6 +134,7 @@ module.exports = ConversationBox;
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
     var result = [];
+    console.info('lastMessages: ', lastMessages);
     _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
@@ -169,6 +171,7 @@ function _buildGroupRenderObject(item, collector) {
         id: item.groupId,
         type: ConversationConstants.GROUP_TYPE
     });
+    console.info('collector: ', collector);
 }
 
 function _buildUserRenderObject(item, collector) {
@@ -197,4 +200,5 @@ function _buildUserRenderObject(item, collector) {
         id: item.userId,
         type: ConversationConstants.PRIVATE_TYPE
     });
+    console.info('collector: ', collector);
 }

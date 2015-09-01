@@ -36,13 +36,24 @@ module.exports = createGroupableClass({
         var lastGroupTime;
         var lastGroupDate;
 
+        //console.log('data: ', data);
+
         return _(data)
             .sortBy('time')
             .groupBy(function(message, index, data) {
                 // first group by user and minutes
                 var lastMessage = data[index - 1];
 
-                if (!lastMessage || lastMessage.getUserId() !== message.getUserId()
+                //if (lastMessage) {
+                //    console.group('checkUser');
+                //    console.log('lastUser: ', lastMessage.user._data);
+                //    console.log('thisUser: ', message.user._data);
+                //    console.log('lastUser == thisUser: ', lastMessage.user == message.user);
+                //    console.groupEnd();
+                //}
+
+
+                if (!lastMessage || lastMessage.user !== message.user
                     || message.timestamp - lastMessage.timestamp > deltaTime
                     || message.time.getDate() != lastMessage.time.getDate()) {
                     lastGroupTime = formats.formatTime(message.time);

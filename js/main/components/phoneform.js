@@ -13,8 +13,6 @@ var Styles = require('../constants/styles');
 var KeyCodes = require('../constants/keycodes');
 var AccountActions = require('../actions/accountactions');
 var AccountStore = require('../stores/accountstore');
-var style = require('../style/login');
-var makeStyle = require('../style/styles').makeStyle;
 var stores = require('../utils/stores');
 var promise = require('../utils/promise');
 
@@ -70,17 +68,6 @@ var PhoneForm = React.createClass({
             promptInvalidPhone: false
         });
     },
-    _handleRequestCodeResponse: function() {
-        if (AccountStore.getVerificationCodeState() === AccountStore.VerificationCodeState.SENT) {
-            if (AccountStore.hasRegistered()) {
-                this._handleVerificationCodeSent();
-            } else {
-                this._handlePhoneNotRegistered();
-            }
-        } else {
-            this._handleVerificationCodeNotSent();
-        }
-    },
     _handleSubmit: function() {
         if (requested) {
             return;
@@ -88,12 +75,6 @@ var PhoneForm = React.createClass({
         requested = true;
 
         this.props.onVerificationCodeSent();
-    },
-    _handleVerificationCodeNotSent: function() {
-        this.setState({error: AccountStore.getError()});
-    },
-    _handlePhoneNotRegistered: function() {
-        this.handlePhoneNotRegistered(false);
     },
     _getCountryName: function(code) {
         for (var i = 0; i < Countries.length; i++) {
@@ -145,9 +126,6 @@ var PhoneForm = React.createClass({
         if (this.state.verificationState === AccountStore.VerificationCodeState.SENT) {
             this.props.onVerificationCodeSent();
         }
-
-        var login = style.login;
-        var loginForm = login.form;
 
         return (
             <div className="sign-in">

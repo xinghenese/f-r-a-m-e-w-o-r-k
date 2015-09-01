@@ -5,5 +5,6 @@
 
 module.exports = {
     device: 3,
-    resourceDomain: "http://r.chaoxin.im/"
+    //resourceDomain: "http://r.chaoxin.im/",
+    resourceDomain: "http://dev.r.topcmm.net/"
 };

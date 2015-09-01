@@ -19,8 +19,8 @@ var AccountStore = require('../../stores/accountstore');
 var PUBLIC_KEY_FIELD = "pk";
 var UUID_FILED = "uuid";
 var TOKEN_FIELD = "tk";
-//var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
-var DEFAULT_ROOT = "https://api.chaoxin.im/";
+var DEFAULT_ROOT = "http://dev.api.topcmm.net/";
+//var DEFAULT_ROOT = "https://api.chaoxin.im/";
 var DEFAULT_CONFIG = {
     'needEncrypt': true,
     'needDecrypt': true,
@@ -109,13 +109,30 @@ state = State.INITIALIZED;
 //private functions
 function post(url, data, options) {
     console.group('http post -', url);
+    //var defaultTimeout = 2 * 1000;
+    //var isTimeout = false;
+    //var timer;
     return session.write(data, options).then(function (value) {
+        //timer = setTimeout(function () {
+        //    isTimeout = true;
+        //}, options && options.timeout || defaultTimeout);
+        return value;
+    }).then(function (value) {
         return http.post(url, value);
+    }).then(function (value) {
+        //if (isTimeout) {
+        //    throw new Error('response timeout');
+        //}
+        //clearTimeout(timer);
+        return value;
     }).then(function (value) {
         return session.read(value, options);
     }).then(function (data) {
         console.groupEnd();
         return data;
+    }, function (err) {
+        console.groupEnd();
+        throw new Error(err);
     });
 }
 

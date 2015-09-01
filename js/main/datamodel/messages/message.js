@@ -73,13 +73,13 @@ function Message(data) {
     this.group = groupId && groups.getGroup(groupId) || Group.emptyGroup;
 
     var userId = parseInt(this.user);
-    this.user = userId ? users.getUser(userId) || new User({uid: data['msuid'], unk: data['unk']}) : User.emptyUser;
+    this.user = userId ? users.getUser(userId) || users.create({uid: data['msuid'], unk: data['unk']}) : User.emptyUser;
 
     var targetUserId = parseInt(this.targetUser);
-    this.targetUser = targetUserId ? users.getUser(targetUserId) || new User({uid: data['mstuid']}) : User.emptyUser;
+    this.targetUser = targetUserId ? users.getUser(targetUserId) || users.create({uid: data['mstuid']}) : User.emptyUser;
 
     var atUserId = parseInt(this.atUser);
-    this.atUser = atUserId ? users.getUser(atUserId) || new User({uid: data['atuid']}) : User.emptyUser;
+    this.atUser = atUserId ? users.getUser(atUserId) || users.create({uid: data['atuid']}) : User.emptyUser;
 
     // backwards-compat with ../message.js
     this._data = data;

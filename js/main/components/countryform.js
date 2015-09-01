@@ -7,8 +7,6 @@
 var _ = require('lodash');
 var React = require('react');
 var Search = require('./tools/Search');
-var loginStyle = require('../style/login');
-var makeStyle = require('../style/styles').makeStyle;
 var Lang = require('../locales/zh-cn');
 var countries = require('../constants/countries');
 

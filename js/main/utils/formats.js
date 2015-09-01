@@ -15,6 +15,8 @@ module.exports = {
                     ? milliseconds
                     : new Date(milliseconds)
                 : new Date()
-        ).toTimeString().replace(/\s.*$/, '');
+        )
+            .toTimeString()
+            .replace(/\s.*$/, '');
     }
 };

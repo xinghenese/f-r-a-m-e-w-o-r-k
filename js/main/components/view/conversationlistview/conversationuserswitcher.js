@@ -6,9 +6,6 @@
 var _ = require('lodash');
 var React = require('react');
 var classNames = require('classnames');
-var style = require('../../../style/conversationlist');
-var makeStyle = require('../../../style/styles').makeStyle;
-var setStyle = require('../../../style/styles').setStyle;
 var globalEmitter = require('../../../events/globalemitter');
 var EventTypes = require('../../../constants/eventtypes');
 

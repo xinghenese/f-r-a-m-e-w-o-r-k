@@ -25,7 +25,7 @@ var formats = require('../../../utils/formats');
 var style = require('../../../style/conversationlist');
 
 //private fields
-var prefix = {privateType: 'p-', groupType: 'g-'};
+//var prefix = {privateType: 'p-', groupType: 'g-'};
 var createListClass = createGenerator({
     mixins: [selectableMixin, hoverableMixin, groupableMixin]
 });
@@ -70,13 +70,16 @@ module.exports = createListClass({
         if (!dataList || _.isEmpty(dataList)) {
             return null;
         }
+
+        console.log('ConversationList#dataList: ', dataList);
+
         if (this.props.isContacts && !_.isEmpty(dataList.data)) {
             return _.groupBy(dataList.data, function (data) {
                 if (data.type === ConversationConstants.PRIVATE_TYPE) {
-                    data.id = prefix.privateType + data.id;
+                    //data.id = prefix.privateType + data.id;
                     return data.name[0];
                 }
-                data.id = prefix.groupType + data.id;
+                //data.id = prefix.groupType + data.id;
                 return data.type;
             })
         }

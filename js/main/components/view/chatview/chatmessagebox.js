@@ -74,6 +74,9 @@ var ChatMessageBox = React.createClass({
     _updateMessages: function(info) {
         id = info && info.id || this.state.id;
         type = info && info.type || this.state.type;
+
+        console.info('[conversation] id: ', id, ', type: ', type);
+
         if (!id || !type) {
             return;
         }

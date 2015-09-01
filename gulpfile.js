@@ -106,12 +106,12 @@ gulp.task('desktop:build', ['build'], function () {
 // endregion
 
 gulp.task('local-serve', ['watch'], function () {
-    require('gulp-connect').server({
-        root: '.',
-        port: 8000,
-        host: '0.0.0.0',
-        livereload: true
-    });
+    return gulp.src('.')
+        .pipe(require('gulp-webserver')({
+            root: '.',
+            port: 8000,
+            host: '0.0.0.0'
+        }));
 });
 
 gulp.task('default', ['build']);
