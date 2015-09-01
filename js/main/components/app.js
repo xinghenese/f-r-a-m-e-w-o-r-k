@@ -33,6 +33,9 @@ var app = {
     },
     _onProfileLoaded: function () {
         console.log("profile loaded, after login success!");
+    },
+    _handleUnlogin: function () {
+        router.transitionTo("/");
     }
 };
 var WrappedPhoneForm = _wrapComponent(PhoneForm, {
@@ -44,14 +47,18 @@ var WrappedCountryForm = _wrapComponent(CountryForm, {
 });
 var WrappedCodeForm = _wrapComponent(CodeForm, {
     onLoginSuccess: app._handleLoginSuccess,
-    onPhoneNumberReadyToAlter: app._handlePhoneNumberReadyToAlter
+    onPhoneNumberReadyToAlter: app._handlePhoneNumberReadyToAlter,
+    onBeforeEnterCodeForm: app._handleUnlogin
+});
+var WrappedChat = _wrapComponent(Chat, {
+    onBeforeEnterChat: app._handleUnlogin
 });
 var routes = (
     <Route name="app" path="/">
         <Route name="phone" handle={WrappedPhoneForm}/>
         <Route name="country" handler={WrappedCountryForm}/>
         <Route name="code" handler={WrappedCodeForm}/>
-        <Route name="chat" handler={Chat}/>
+        <Route name="chat" handler={WrappedChat}/>
         <DefaultRoute handler={WrappedPhoneForm}/>
     </Route>
 );

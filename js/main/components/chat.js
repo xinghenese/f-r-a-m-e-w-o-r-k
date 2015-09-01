@@ -15,9 +15,17 @@ var SideBox = require('./view/conversationlistview/conversationbox');
 var MainBox = require('./view/chatview/chatmessagebox');
 var EventTypes = require('../constants/eventtypes');
 var MessageActions = require('../actions/messageactions');
+var AccountStore = require('../stores/accountstore');
 
 // exports
 var Chat = React.createClass({
+    _checkLogin: function () {
+        var hasLogIn = AccountStore.getLoginState() === AccountStore.LoginState.SUCCESS;
+        if (!hasLogIn) {
+            this.props.onBeforeEnterChat();
+        }
+        return hasLogIn;
+    },
     _handleGroupsLoaded: function () {
         MessageActions.requestHistoryMessages();
     },
@@ -25,9 +33,12 @@ var Chat = React.createClass({
         ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
     },
     componentWillMount: function () {
-        // 1 for groups, 2 for contacts
-        ConversationAndContactActions.getConversationAndContactList();
-        AccountActions.switchStatus(1);
+        console.log('Chat#WillMount');
+        if (this._checkLogin()) {
+            // 1 for groups, 2 for contacts
+            ConversationAndContactActions.getConversationAndContactList();
+            AccountActions.switchStatus(1);
+        }
     },
     componentWillUnmount: function () {
         ConversationAndContactStore.removeChangeListener(this._handleGroupsLoaded);
