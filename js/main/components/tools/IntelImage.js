@@ -71,9 +71,7 @@ module.exports = React.createClass({
             otherProps.src = this.props.src + '?' + Number(new Date());
         }
 
-        return (
-            <img {...otherProps} onLoad={this._onLoad} onError={this._onError} />
-        )
+        return <img {...otherProps} onLoad={this._onLoad} onError={this._onError} />;
     }
 });
 

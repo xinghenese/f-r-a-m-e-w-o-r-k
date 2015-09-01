@@ -29,13 +29,17 @@ module.exports = React.createClass({
 
         switch (message.type) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
-                return <p>{Strings.template(Lang.invitedIntoGroup, userName, _generateNicknames(message, userId))}</p>;
+                return <span>{Strings.template(Lang.invitedIntoGroup, userName, _generateNicknames(message, userId))}</span>;
             case SystemMessageTypes.USER_INVITED_INTO_GROUP:
-                return <p>{Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, userId))}</p>;
+                return <span>{Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, userId))}</span>;
+            case SystemMessageTypes.USER_KICKED_OUT_GROUP:
+                return <span>{Strings.template(Lang.userKickedOutGroup, _generateNicknames(message, userId))}</span>;
             case SystemMessageTypes.GROUP_NAME_CHANGED:
-                return <p>{Strings.format(Lang.groupNameChanged, [userName, message.referName])}</p>;
+                return <span>{Strings.format(Lang.groupNameChanged, [userName, message.referName])}</span>;
+            case SystemMessageTypes.CONTACT_JOINED:
+                return <span>{Strings.format(Lang.contactJoined, [data.getRemarkName()])}</span>;
             default :
-                return <p>{Lang.systemMessage}</p>;
+                return <span>{Lang.systemMessage}</span>;
         }
     }
 });

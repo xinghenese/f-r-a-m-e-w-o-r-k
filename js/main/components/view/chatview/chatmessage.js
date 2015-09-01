@@ -6,21 +6,16 @@
 // dependencies
 var _ = require('lodash');
 var React = require('react');
-var MessageConstants = require('../../../constants/messageconstants');
-var MessageTypes = MessageConstants.MessageTypes;
-var SystemMessageTypes = MessageConstants.SystemMessageTypes;
+var MessageTypes = require('../../../constants/messageconstants').MessageTypes;
 var Lang = require('../../../locales/zh-cn');
 var setStyle = require('../../../style/styles').setStyle;
-var makeStyle = require('../../../style/styles').makeStyle;
-var Strings = require('../../../utils/strings');
-var config = require('../../../etc/config');
 var Overlay = require('../../box/Overlay');
 var Audio = require('../../tools/IntelAudio');
 var Urls = require('../../../utils/urls');
+var Map = require('../../tools/AMap');
 
 // private fields
 var PICTURE_MAX_WIDTH = 462;
-var RESOURCE_URL = config.resourceDomain;
 
 var TextMessage = React.createClass({
     render: function() {
@@ -89,33 +84,13 @@ var AudioMessage = React.createClass({
     }
 });
 
-var SystemMessage = React.createClass({
-    render: function() {
-        var message = this.props.message;
-        switch (message.type) {
-            case SystemMessageTypes.INVITED_INTO_GROUP:
-                return (<span style={makeStyle(this.props.style)}>{
-                    Strings.template(Lang.invitedIntoGroup, this.props.userName, _generateNicknames(message, this.props.userId))
-                }</span>);
-            case SystemMessageTypes.USER_INVITED_INTO_GROUP:
-                return (<span style={makeStyle(this.props.style)}>{
-                    Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, this.props.userId))
-                }</span>);
-            case SystemMessageTypes.USER_KICKED_OUT_GROUP:
-                return (<span style={makeStyle(this.props.style)}>{
-                    Strings.template(Lang.userKickedOutGroup, _generateNicknames(message, this.props.userId))
-                }</span>);
-            case SystemMessageTypes.GROUP_NAME_CHANGED:
-                return (<span style={makeStyle(this.props.style)}>{
-                    Strings.format(Lang.groupNameChanged, [this.props.userName, this.props.message.referName])
-                }</span>);
-            case SystemMessageTypes.CONTACT_JOINED:
-                return (<span style={makeStyle(this.props.style)}>{
-                    Strings.format(Lang.contactJoined, [this.props.data.getRemarkName()])
-                }</span>);
-            default :
-                return (<span style={makeStyle(this.props.style)}>{Lang.systemMessage}</span>);
-        }
+var LocationMessage = React.createClass({
+    render: function () {
+        return (
+            <div class="content geo-location">
+                <Map longitude={this.props.message.longitude} latitude={this.props.message.latitude}/>
+            </div>
+        );
     }
 });
 
@@ -134,10 +109,8 @@ module.exports = React.createClass({
 
 // private functions
 function _createMessageNode(data) {
-    var type = data.type;
-    var message = data.content;
-    var userId = data.user.getUserId();
-    var userName = data.user.nickname();
+    var type = data && data.type;
+    var message = data && data.content;
 
     if (!message || _.isEmpty(message)) {
         return null;
@@ -150,19 +123,7 @@ function _createMessageNode(data) {
             return <PictureMessage message={message}/>;
         case MessageTypes.AUDIO:
             return <AudioMessage message={message}/>;
-        case MessageTypes.SYSTEM:
-            return <SystemMessage message={message} userId={userId} userName={userName} data={data}/>;
         default:
             return <TextMessage message={message}/>;
     }
-}
-
-function _generateNicknames(message, userId) {
-    return _.reduce(message.referInfo, function(memo, item) {
-        if (!item.referUserId || !item.referUserName || item.referUserId == userId) {
-            return memo;
-        }
-        memo.push(item.referUserName);
-        return memo;
-    }, []).join(Lang.nicknameSeparator);
 }

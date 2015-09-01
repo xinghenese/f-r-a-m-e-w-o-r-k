@@ -4,7 +4,6 @@
 'use strict';
 
 // dependencies
-require('../../style/audio.css');
 var _ = require('lodash');
 var React = require('react');
 var classNames = require('classnames');
