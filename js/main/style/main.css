@@ -828,6 +828,14 @@ body > .main > .sidebar > .main > h2.title {
     color: #000;
     background-color: #FAFAFA;
 }
+body > .main > .sidebar > .main > h2.title.matched {
+    font-size: 14px;
+    line-height: 2.85;
+    height: 2.85em;
+    text-align: center;
+    color: #A2AEC1;
+    background: #EBEEF1;
+}
 body > .main > .sidebar > .main > .item {
     width: 100%;
     padding: 8px 0;
