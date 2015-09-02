@@ -25,7 +25,7 @@ var formats = require('../../../utils/formats');
 var style = require('../../../style/conversationlist');
 
 //private fields
-var prefix = {privateType: 'p-', groupType: 'g-'};
+var prefix = {privateType: 'p-', groupType: 'g-', message: 'msg-'};
 var createListClass = createGenerator({
     mixins: [selectableMixin, hoverableMixin, groupableMixin]
 });
@@ -67,24 +67,31 @@ module.exports = createListClass({
         }
     },
     preprocessData: function (dataList) {
-        if (!dataList || _.isEmpty(dataList)) {
+        if (_.isEmpty(dataList) || (_.isEmpty(dataList.data) && _.isEmpty(dataList.messages))) {
             return null;
         }
+
+        dataList = {data: _.cloneDeep(dataList.data), messages: _.cloneDeep(dataList.messages)};
 
         if (this.props.isContacts && !_.isEmpty(dataList.data)) {
             return _.groupBy(dataList.data, function (data, key) {
                 if (data.type === ConversationConstants.PRIVATE_TYPE) {
-                    data.key = prefix.privateType + (data.key || data.id || key);
-                    return data.name[0];
+                    data.key = prefix.privateType + (data.id || key);
+                    return data.name && data.name[0];
                 }
-                data.key = prefix.groupType + (data.key || data.id || key);
+                data.key = prefix.groupType + (data.id || key);
                 return data.type;
             })
         }
 
-        _.forEach(dataList, function (data, key) {
+        _.forEach(dataList.data, function (data, key) {
             data.key = (ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
-                + (data.key || data.id || key);
+                + (data.id || key);
+        });
+
+        _.forEach(dataList.messages, function (message, key) {
+            message.key = prefix.message + (ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
+                + (message.id || key);
         });
 
         return dataList;
@@ -94,11 +101,7 @@ module.exports = createListClass({
     },
     renderTitle: function (data, key) {
         if (key === 'messages' && data  && !_.isEmpty(data)) {
-            return (
-                <div className="matched-messages-gap" style={style.gap}>
-                    found {_.size(data)} messages
-                </div>
-            );
+            return <h2 className="title matched">found {_.size(data)} messages</h2>;
         }
         if (key !== 'data' && data && !_.isEmpty(data)) {
             return <h2 className="title">{Lang[key] || key}</h2>;

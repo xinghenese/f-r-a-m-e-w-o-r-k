@@ -119,7 +119,7 @@ var ConversationBox = React.createClass({
                             onSearch={this._filterData} onKeyDown={this._onKeyDownInSearchBox} />
                     <input type="button" className="settings" onClick={this._onShowSettings} />
                 </div>
-                <SideList className="main" isContacts={this.state.type === listType.contact}
+                <SideList className="main" isContacts={this.state.type === listType.contact && _.isEmpty(this.state.matchedMessages)}
                           data={{data: this.state.displayData, messages: this.state.matchedMessages}}/>
                 <Switcher className="footer tabs" data={listType} unreadCount={MessageStore.getUnreadCount()}/>
             </div>
