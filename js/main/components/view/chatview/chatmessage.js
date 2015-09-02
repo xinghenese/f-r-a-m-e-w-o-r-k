@@ -123,6 +123,8 @@ function _createMessageNode(data) {
             return <PictureMessage message={message}/>;
         case MessageTypes.AUDIO:
             return <AudioMessage message={message}/>;
+        case MessageTypes.LOCATION:
+            return <LocationMessage message={message}/>;
         default:
             return <TextMessage message={message}/>;
     }

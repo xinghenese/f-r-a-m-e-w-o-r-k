@@ -70,16 +70,23 @@ module.exports = createListClass({
         if (!dataList || _.isEmpty(dataList)) {
             return null;
         }
+
         if (this.props.isContacts && !_.isEmpty(dataList.data)) {
-            return _.groupBy(dataList.data, function (data) {
+            return _.groupBy(dataList.data, function (data, key) {
                 if (data.type === ConversationConstants.PRIVATE_TYPE) {
-                    data.id = prefix.privateType + data.id;
+                    data.key = prefix.privateType + (data.key || data.id || key);
                     return data.name[0];
                 }
-                data.id = prefix.groupType + data.id;
+                data.key = prefix.groupType + (data.key || data.id || key);
                 return data.type;
             })
         }
+
+        _.forEach(dataList, function (data, key) {
+            data.key = (ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
+                + (data.key || data.id || key);
+        });
+
         return dataList;
     },
     renderByDefault: function () {
