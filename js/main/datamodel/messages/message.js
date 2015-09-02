@@ -10,6 +10,7 @@ var React = require('react');
 var KeyInfo = require('../keyinfo');
 var groups = require('../groups');
 var Group = require('../group');
+var myself = require('../myself');
 var users = require('../users');
 var User = require('../user');
 var MessageTypes = require('../../constants/messageconstants').MessageTypes;
@@ -88,6 +89,14 @@ function Message(data) {
 
 module.exports = Message;
 
+Message.OutgoingMessageStatus = {
+    UNKNOWN: -1,
+    SENDING: 0,
+    SENT: 1,
+    READ: 2,
+    FAILED: 3
+};
+
 // module initialization
 _.assign(Message.prototype, {
     toElement: function() {
@@ -100,8 +109,14 @@ _.assign(Message.prototype, {
     dontCount: function() {
         return objects.getBool(this._data["dntcnt"]);
     },
+    fromMe: function() {
+        return this.getUserId() === myself.uid;
+    },
     getGroupId: function() {
         return parseInt(this._data["msrid"] || -1);
+    },
+    getOutgoingStatus: function() {
+        return this._outgoingStatus || Message.OutgoingMessageStatus.UNKNOWN;
     },
     getUserId: function() {
         return parseInt(this._data["msuid"] || -1);
@@ -184,6 +199,9 @@ _.assign(Message.prototype, {
     },
     setStatus: function(status) {
         this._status = status;
+    },
+    setOutgoingStatus: function(status) {
+        this._outgoingStatus = status;
     }
 });
 
