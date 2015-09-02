@@ -97,6 +97,9 @@ _.assign(Message.prototype, {
         }
         return <span>{content}</span>;
     },
+    hashCode: function () {
+        return this.uuid;
+    },
     dontCount: function() {
         return objects.getBool(this._data["dntcnt"]);
     },
