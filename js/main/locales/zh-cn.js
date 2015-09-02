@@ -35,11 +35,12 @@ module.exports = {
     "sendCodeNotice": "我们已将验证码通过短消息发送给您",
     "codeError": "验证码不匹配",
     "codeSuccess": "验证码匹配成功",
+    "loginTimeout": "登陆超时",
     "confirm": "确定",
     "cancel": "取消",
     "search": "搜索",
 
-    "chatBoxTips": "请选择会话",
+    "chatBoxTips": "请选择一位联系人开始使用新版聊聊",
     "group": "群组",
     "contact": "联系人",
 

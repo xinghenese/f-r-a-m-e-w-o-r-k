@@ -85,12 +85,13 @@ module.exports = createListClass({
         }
 
         _.forEach(dataList.data, function (data, key) {
-            data.key = (ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
+            data.key = (data.type === ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
                 + (data.id || key);
         });
 
         _.forEach(dataList.messages, function (message, key) {
-            message.key = prefix.message + (ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
+            message.key = prefix.message
+                + (data.type === ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
                 + (message.id || key);
         });
 

@@ -6,9 +6,8 @@
 var _ = require('lodash');
 var React = require('react');
 var classNames = require('classnames');
-var makeStyle = require('../../../style/styles').makeStyle;
 var promise = require('../../../utils/promise');
-var defaultStyle = require('../../../style/default');
+var errors = require('../../../constants/errors');
 
 //private fields
 var ValidateState = {
@@ -108,7 +107,7 @@ module.exports = {
                 var errType = this.state.errorType;
                 message = _.isObject(errMsg)
                     ? errMsg[errType] || errType || _.values(errMsg)[0]
-                    : errType || errMsg;
+                    : errType && errors[errType] || errType || errMsg;
                 break;
             case ValidateState.SUCCESS:
                 message = this.props.successMessage;
