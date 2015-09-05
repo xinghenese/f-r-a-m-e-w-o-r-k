@@ -87,7 +87,7 @@ var AudioMessage = React.createClass({
 var LocationMessage = React.createClass({
     render: function () {
         return (
-            <div class="content geo-location">
+            <div className="content geo-location">
                 <Map longitude={this.props.message.longitude} latitude={this.props.message.latitude}/>
             </div>
         );
