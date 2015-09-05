@@ -12,7 +12,7 @@ var cipher = require('./cipher');
 var aes = CryptoJS.AES;
 
 //core module to export
-module.exports = cipher.create({
+module.exports = cipher.extend({
     'encrypt': function (text, key) {
         return aes.encrypt(text, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
     },

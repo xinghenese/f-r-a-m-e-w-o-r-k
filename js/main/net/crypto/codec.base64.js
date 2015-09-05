@@ -14,7 +14,7 @@ var WordArray = CryptoJS.lib.WordArray;
 var base64 = CryptoJS.enc.Base64;
 
 //core module to export
-module.exports = codec.create({
+module.exports = codec.extend({
     encodeHex: function (hexText) {
         if (!WordArray.isPrototypeOf(hexText)) {
             hexText = hex.parse(hexText.replace(/[\r\n]/gm, ''));

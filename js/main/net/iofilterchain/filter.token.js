@@ -7,7 +7,7 @@
 var filter = require('./filter');
 
 // exports
-module.exports = filter.create({
+module.exports = filter.extend({
     processWritable: function (value, options) {
         var AccountStore = require('../../stores/accountstore');
 

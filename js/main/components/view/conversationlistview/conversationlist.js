@@ -93,7 +93,7 @@ module.exports = createListClass({
         _.forEach(dataList.messages, function (message, key) {
             if (!message) { return; }
             message.key = prefix.message
-                + (data.type === ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
+                + (message.type === ConversationConstants.PRIVATE_TYPE ? prefix.privateType : prefix.groupType)
                 + (message.id || key);
         });
 

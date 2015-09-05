@@ -6,7 +6,7 @@ var filter = require('./filter');
 var compressor = require('../crypto/factory').createCompressor('gzip');
 
 //core module to export
-module.exports = filter.create({
+module.exports = filter.extend({
     /**
      * decompress the data.
      * @param value

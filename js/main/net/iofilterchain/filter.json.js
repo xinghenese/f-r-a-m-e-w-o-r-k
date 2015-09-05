@@ -8,7 +8,7 @@ var filter = require('./filter');
 var formats = require('../../utils/formats');
 
 //core module to export
-module.exports = filter.create({
+module.exports = filter.extend({
     /**
      * parse the value into a plain object
      * @param value {String}

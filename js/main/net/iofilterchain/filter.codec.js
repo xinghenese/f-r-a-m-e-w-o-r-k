@@ -7,7 +7,7 @@ var _ = require('lodash');
 var filter = require('./filter');
 
 //core module to export
-module.exports = filter.create({
+module.exports = filter.extend({
     'notifyConfig': function (cfg) {
         if (!_.isUndefined(cfg.needEncode)) {
             this.enableWrite = !!cfg.needEncode;
