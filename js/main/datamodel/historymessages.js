@@ -29,8 +29,6 @@ HistoryMessages.prototype.addMessage = function(message) {
         });
         this._messages.splice(lastIndex + 1, 0, message);
     }
-    console.log("msg uid: ", message.getUserId());
-    console.log("my uid: ", myself.uid);
     if (message.getUserId() !== myself.uid) {
         this._totalUnreadCount++;
     }
