@@ -110,8 +110,8 @@ var ChatMessageBox = React.createClass({
                     MessageActions.requestPrivateHistoryMessages(id);
                 }
 
-                data = privateHistoryMessages.getMessages();
                 MessageActions.markPrivateMessagesAsRead(id);
+                data = privateHistoryMessages.getMessages();
             }
         }
 

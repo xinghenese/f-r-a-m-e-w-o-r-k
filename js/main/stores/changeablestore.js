@@ -4,6 +4,7 @@
 'use strict';
 
 // dependencies
+var _ = require('lodash');
 var EventEmitter = require('../utils/eventemitter');
 
 // private fields
@@ -13,11 +14,21 @@ var index = 0;
 
 // exports
 var ChangeableStore = EventEmitter.extend({
+    _pendingEmission: false,
     addChangeListener: function(callback) {
         this.on(CHANGE_EVENT, callback);
     },
     emitChange: function() {
-        this.emit(CHANGE_EVENT);
+        if (this._pendingEmission) {
+            return;
+        } else {
+            this._pendingEmission = true;
+        }
+
+        _.defer(_.bind(function() {
+            this._pendingEmission = false;
+            this.emit(CHANGE_EVENT);
+        }, this));
     },
     removeAllChangeListener: function() {
         this.removeAllListeners(CHANGE_EVENT);
