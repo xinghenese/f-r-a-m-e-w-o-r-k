@@ -7,9 +7,6 @@
 var _ = require('lodash');
 var React = require('react');
 var classNames = require('classnames');
-var commonStyle = require('../style/common');
-var defaultStyle = require('../style/default');
-var makeStyle = require('../style/styles').makeStyle;
 var Image = require('./tools/IntelImage');
 
 //private fields

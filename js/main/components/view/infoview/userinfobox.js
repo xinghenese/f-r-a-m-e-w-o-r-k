@@ -5,8 +5,6 @@
 //dependencies
 var _ = require('lodash');
 var React = require('react');
-var style = require('../../../style/userinfo');
-var makeStyle = require('../../../style/styles').makeStyle;
 var Avatar = require('../../avatar');
 var SwitchButton = require('../../tools/SwitchButton');
 var Button = require('../../form/control/Button');
@@ -22,7 +20,6 @@ var UserInfoBox = React.createClass({
     },
     getDefaultProps: function () {
         return {user: {}};
-
     },
     render: function () {
         return (
