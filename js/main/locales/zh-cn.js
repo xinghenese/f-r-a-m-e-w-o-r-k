@@ -19,6 +19,7 @@ module.exports = {
     "phone": "手机号码",
     "registerFailed": "注册失败，请重试！",
     "requestVerificationCodeFailed": "发送验证码失败，请重试！",
+    "separatorBetweenNameAndMessage": ": ",
     "unknown": "未知",
     "userNotExist": "该用户不存在！",
     "wrongPassword": "密码错误！",
