@@ -57,6 +57,13 @@ function _initMainWindow() {
     // and load the index.html of the app.
     mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
+    // inject desktop class when dom loaded
+    mainWindow.webContents.on('dom-ready', function() {
+        mainWindow.webContents.executeJavaScript(
+            'document.getElementsByTagName("html")[0].setAttribute("class", "desktop");'
+        );
+    });
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
         // Dereference the window object, usually you would store windows
