@@ -250,10 +250,10 @@ function _generateSystemMessageContent(data) {
     switch (type) {
         case MessageConstants.SystemMessageTypes.INVITED_INTO_GROUP:
             var joinedNicknames = _generateJoinedNicknames(data);
-            return strings.format(Lang.invitedIntoGroup, [data["unk"], joinedNicknames]);
+            return strings.format(Lang.invitedIntoGroup, data["unk"], joinedNicknames);
         case MessageConstants.SystemMessageTypes.USER_INVITED_INTO_GROUP:
             var joinedNicknames = _generateJoinedNicknames(data);
-            return strings.format(Lang.userInvitedIntoGroup, [joinedNicknames]);
+            return strings.format(Lang.userInvitedIntoGroup, joinedNicknames);
         default:
             return Lang.systemMessage;
     }

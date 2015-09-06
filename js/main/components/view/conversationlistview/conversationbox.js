@@ -153,8 +153,8 @@ function _buildGroupRenderObject(item, collector) {
     var message = "";
     var time = "";
     if (item.message) {
-        message = strings.format("{0}{1}{2}", [item.message.getUserNickname(),
-            Lang.separatorBetweenNameAndMessage, item.message.getBriefText()]);
+        message = strings.format("{0}{1}{2}", item.message.getUserNickname(),
+            Lang.separatorBetweenNameAndMessage, item.message.getBriefText());
         time = new Date(item.message.getTimestamp());
     }
 

@@ -35,9 +35,9 @@ module.exports = React.createClass({
             case SystemMessageTypes.USER_KICKED_OUT_GROUP:
                 return <p>{Strings.template(Lang.userKickedOutGroup, _generateNicknames(message, userId))}</p>;
             case SystemMessageTypes.GROUP_NAME_CHANGED:
-                return <p>{Strings.format(Lang.groupNameChanged, [userName, message.referName])}</p>;
+                return <p>{Strings.format(Lang.groupNameChanged, userName, message.referName)}</p>;
             case SystemMessageTypes.CONTACT_JOINED:
-                return <p>{Strings.format(Lang.contactJoined, [data.getRemarkName()])}</p>;
+                return <p>{Strings.format(Lang.contactJoined, data.getRemarkName())}</p>;
             default :
                 return <p>{Lang.systemMessage}</p>;
         }

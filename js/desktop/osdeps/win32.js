@@ -28,9 +28,9 @@ module.exports = _.create(general, {
         }
 
         var postfix = parseInt(badge) > 9 ? BADGE_ICON_MORE_POSTFIX : badge;
-        var image = strings.format("{0}{1}.png", [BADGE_ICON_PREFIX, postfix]);
+        var image = strings.format("{0}{1}.png", BADGE_ICON_PREFIX, postfix);
         var imagePath = path.join(dir, BADGE_ICON_PATH, image);
-        var tooltip = strings.format(Lang.youHaveNewMessages, [badge]);
+        var tooltip = strings.format(Lang.youHaveNewMessages, badge);
 
         mainWindow.setOverlayIcon(imagePath, tooltip);
 

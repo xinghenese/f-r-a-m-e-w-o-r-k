@@ -11,7 +11,8 @@ var ArgRegex = new RegExp("{-?[0-9]+}", "g");
 
 // exports
 module.exports = {
-    format: function(str, args) {
+    format: function(str) {
+        var args = _.rest(arguments);
         return str.replace(ArgRegex, function(item) {
             var intVal = parseInt(item.substring(1, item.length - 1));
             var replace;
