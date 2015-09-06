@@ -79,7 +79,7 @@ module.exports = React.createClass({
             audio.addEventListener('ended', events);
         }
     },
-    componentWillMount: function () {
+    componentWillUnmount: function () {
         var audio = React.findDOMNode(this.refs.audio);
         if (audio) {
             var events = this.audioEvents;
