@@ -29,7 +29,8 @@ var Countries = require('../constants/countries');
 
 //private fields
 var codeRegex = /\+86/;
-var phoneRegex = /^0?(13[0-9]|15[0-9]|18[0-9]|14[0-9])[0-9]{8}$/;
+var cnPhoneRegex = /^1[0-9]{10}$/;
+var otherPhoneRegex = /^[0-9]{6,}/;
 var requested = false;
 
 //export
@@ -146,9 +147,6 @@ var PhoneForm = React.createClass({
             this.props.onVerificationCodeSent();
         }
 
-        var login = style.login;
-        var loginForm = login.form;
-
         return (
             <div className="sign-in">
                 <Form className="main step1" ref="form" onSubmit={this._handleSubmit}>
@@ -195,7 +193,10 @@ var PhoneForm = React.createClass({
                             controlsToValidate={["code-input", "phone-input"]}
                             controlToFocus="phone-input"
                             validationAtClient={function(code, phone) {
-                                if (code != "+86" || phoneRegex.test(phone)) {
+                                if (code == "+86" && cnPhoneRegex.test(phone)) {
+                                    return true;
+                                }
+                                if (code != "+86" && otherPhoneRegex.test(phone)) {
                                     return true;
                                 }
                                 throw new Error("invalidPhone");
