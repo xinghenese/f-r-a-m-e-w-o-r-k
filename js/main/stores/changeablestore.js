@@ -14,21 +14,11 @@ var index = 0;
 
 // exports
 var ChangeableStore = EventEmitter.extend({
-    _pendingEmission: false,
     addChangeListener: function(callback) {
         this.on(CHANGE_EVENT, callback);
     },
     emitChange: function() {
-        if (this._pendingEmission) {
-            return;
-        } else {
-            this._pendingEmission = true;
-        }
-
-        _.defer(_.bind(function() {
-            this._pendingEmission = false;
-            this.emit(CHANGE_EVENT);
-        }, this));
+        this.emit(CHANGE_EVENT);
     },
     removeAllChangeListener: function() {
         this.removeAllListeners(CHANGE_EVENT);
