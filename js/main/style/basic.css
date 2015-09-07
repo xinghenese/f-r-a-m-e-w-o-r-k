@@ -210,8 +210,6 @@ figure {
  */
 
 hr {
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
     box-sizing: content-box;
     height: 0;
 }
@@ -335,8 +333,6 @@ input {
 
 input[type="checkbox"],
 input[type="radio"] {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box; /* 1 */
     padding: 0; /* 2 */
 }
@@ -359,8 +355,6 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="search"] {
     -webkit-appearance: textfield; /* 1 */
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
     box-sizing: content-box; /* 2 */
 }
 
@@ -435,11 +429,9 @@ th {
     unicode-range: U+1F300-1F5FF, U+1F600-1F64F, U+1F680-1F6FF, U+2600-26FF;
 }
 html {
-    font-family: 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'Source Han Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans CN', 'Source Han Sans SC', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', NSimHei, 'WenQuanYi Zen Hei Sharp', sans-serif, emoji;
+    font-family: 'SF UI Display', '.PingFang SC', 'PingFang SC', 'Neue Haas Grotesk Text Pro', 'Arial Nova', 'Segoe UI', 'Microsoft YaHei', 'Microsoft JhengHei', 'Helvetica Neue', 'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', 'Noto Sans SC', 'Source Han Sans TC', 'Noto Sans CJK TC', 'Hiragino Sans GB', sans-serif;
 }
 * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-user-select: none;
     -moz-user-select: none;

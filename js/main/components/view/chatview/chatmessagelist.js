@@ -39,7 +39,7 @@ module.exports = createGroupableClass({
         //console.log('data: ', data);
 
         return _(data)
-            .sortBy('time')
+            .sortBy('timestamp')
             .groupBy(function(message, index, data) {
                 // first group by user and minutes
                 var lastMessage = data[index - 1];
@@ -101,7 +101,8 @@ module.exports = createGroupableClass({
 
         var message = messages[0];
 
-        if (message.type == messageConstants.MessageTypes.SYSTEM) {
+        if (message.type == messageConstants.MessageTypes.SYSTEM
+            || message.type === messageConstants.MessageTypes.VIBRATION) {
             return (
                 <div className="message system">
                     <SystemMessage data={message}/>

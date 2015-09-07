@@ -33,7 +33,6 @@ var Chat = React.createClass({
         ConversationAndContactStore.addChangeListener(this._handleGroupsLoaded);
     },
     componentWillMount: function () {
-        console.log('Chat#WillMount');
         if (this._checkLogin()) {
             // 1 for groups, 2 for contacts
             ConversationAndContactActions.getConversationAndContactList();

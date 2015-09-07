@@ -7,7 +7,7 @@ var cipher = require('../crypto/factory').createCipher();
 var bytes = require('../crypto/bytes');
 
 //core module to export
-module.exports = filter.create({
+module.exports = filter.extend({
     /**
      * process the data read from the connection or last filter by encryption.
      * @param value

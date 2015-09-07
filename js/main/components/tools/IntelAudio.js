@@ -70,13 +70,25 @@ module.exports = React.createClass({
     componentDidMount: function () {
         var audio = React.findDOMNode(this.refs.audio);
         if (audio) {
-            var events = {handleEvent: this._handleAudioEvent};
+            var event = this.audioEvents = {handleEvent: this._handleAudioEvent};
 
             audio.addEventListener('canplay', events);
             audio.addEventListener('play', events);
             audio.addEventListener('pause', events);
             audio.addEventListener('timeupdate', events);
             audio.addEventListener('ended', events);
+        }
+    },
+    componentWillUnmount: function () {
+        var audio = React.findDOMNode(this.refs.audio);
+        if (audio) {
+            var events = this.audioEvents;
+
+            audio.removeEventListener('canplay', events);
+            audio.removeEventListener('play', events);
+            audio.removeEventListener('pause', events);
+            audio.removeEventListener('timeupdate', events);
+            audio.removeEventListener('ended', events);
         }
     },
     render: function () {

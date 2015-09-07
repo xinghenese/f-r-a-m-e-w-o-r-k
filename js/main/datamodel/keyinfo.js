@@ -40,4 +40,60 @@ KeyInfo.ARRAY_NOT_SET = [];
 KeyInfo.NUMBER_ZERO = 0;
 KeyInfo.NUMBER_NEG_ONE = -1;
 
-// private functions
+KeyInfo.create = function (fieldName, fieldType, defaultValue) {
+    return new KeyInfo(fieldName, fieldType, defaultValue);
+};
+
+KeyInfo.get = function (candidates) {
+    return function (data) {
+        var result = _.get(data, candidates);
+        if (_.isArray(candidates) && !_.isEmpty(candidates)) {
+            _.forEach(candidates, function (candidate) {
+                if (_.has(data, candidate)) {
+                    result = _.get(data, candidate);
+                    return false;
+                }
+            })
+        }
+        return result;
+    };
+};
+
+KeyInfo.arrayOf = function (type) {
+    return function (data) {
+        return _.map(data, function (item) {
+            return KeyInfo.compose(type)(item);
+        })
+    }
+};
+
+KeyInfo.compose = function (composedInfo) {
+    if (_.isArray(composedInfo)) {
+        return function (data) {
+            return _.map(composedInfo, function (value) {
+                // resolve nested KeyInfo.compose
+                if (_.isFunction(value)) {
+                    return value(data);
+                }
+                return data[value];
+            })
+        }
+    }
+    if (_.isObject(composedInfo)) {
+        return function (data) {
+            return _.mapValues(composedInfo, function (value) {
+                // resolve nested KeyInfo.compose
+                if (_.isFunction(value)) {
+                    return value(data);
+                }
+                return data[value];
+            })
+        }
+    }
+    if (_.isFunction(composedInfo)) {
+        return composedInfo(data);
+    }
+    return function (data) {
+        return data[composedInfo];
+    }
+};

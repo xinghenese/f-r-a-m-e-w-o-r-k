@@ -7,8 +7,13 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var Lang = require('./js/main/locales/zh-cn');
+var globalShortcut = require('global-shortcut');
 var interops = require('./js/desktop/interops');
 var path = require('path');
+
+var WIDTH = 1000;
+var HEIGHT = 725;
+var DEV_WIDTH = 2000;
 
 require('crash-reporter').start();
 
@@ -30,16 +35,19 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
     _initMainWindow();
     interops.init(app, mainWindow, __dirname);
+    _registerShortcuts();
+});
+
+app.on('will-quit', function() {
+    globalShortcut.unregisterAll();
 });
 
 // private functions
-
-
 function _initMainWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        "width": 1000,
-        "height": 725,
+        "width": WIDTH,
+        "height": HEIGHT,
         "resizable": false,
         "overlay-scrollbars": true,
         "title": Lang.name,
@@ -49,8 +57,12 @@ function _initMainWindow() {
     // and load the index.html of the app.
     mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
-    // Open the devtools.
-    //mainWindow.openDevTools();
+    // inject desktop class when dom loaded
+    mainWindow.webContents.on('dom-ready', function() {
+        mainWindow.webContents.executeJavaScript(
+            'document.getElementsByTagName("html")[0].setAttribute("class", "desktop");'
+        );
+    });
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
@@ -58,5 +70,19 @@ function _initMainWindow() {
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null;
+    });
+}
+
+function _registerShortcuts() {
+    globalShortcut.register('ctrl+l', function() {
+        if (mainWindow.isResizable()) {
+            mainWindow.setSize(WIDTH, HEIGHT);
+            mainWindow.setResizable(false);
+            mainWindow.closeDevTools();
+        } else {
+            mainWindow.setSize(DEV_WIDTH, HEIGHT);
+            mainWindow.setResizable(true);
+            mainWindow.openDevTools();
+        }
     });
 }

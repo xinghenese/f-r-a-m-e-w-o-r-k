@@ -21,7 +21,7 @@ var defaultOptions = {
 };
 
 //core module to export
-module.exports = compressor.create({
+module.exports = compressor.extend({
     /**
      * compress the text into a hex string.
      * @param text {string}

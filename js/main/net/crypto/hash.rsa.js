@@ -12,7 +12,7 @@ var hash = require('./hash');
 var CIPHER_DELIMETER = 'l'; // l letter;
 
 //core module to export
-module.exports = hash.create({
+module.exports = hash.extend({
     hashEncode: function (rawText, hashKey) {
         if (!rawText || !hashKey) {
             return '';

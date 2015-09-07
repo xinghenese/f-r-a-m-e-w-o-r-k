@@ -228,6 +228,7 @@ function authorize() {
             return data;
         }, function (err) {
             console.error(err);
+            isAuthorized = false;
             authorizePromise = null;
         });
     }
@@ -273,10 +274,7 @@ function notifyImmediately(tag, data) {
 function _sendPingPacket() {
     return post({
         tag: PING_TAG,
-        data: _.assign(
-            AccountStore.getProfile(['msuid', 'ver']),
-            {msqid: authentication.nextEncodedSequence()}
-        ),
+        data: AccountStore.getProfile(['msuid', 'ver']),
         responseTag: SocketRequestResponseTagMap.getResponseTag(PING_TAG)
     });
 }

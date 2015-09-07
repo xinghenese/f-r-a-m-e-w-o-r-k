@@ -12,7 +12,7 @@ var myself = require('./myself');
 function HistoryMessages(data) {
     this._requested = false;
     this._data = data;
-    this._messages = _parseMessages(this._data["tms"] || []).reverse();
+    this._messages = _parseMessages(this, this._data["tms"] || []).reverse();
     this._totalUnreadCount = _computeTotalUnreadCount(this);
 }
 
@@ -29,8 +29,6 @@ HistoryMessages.prototype.addMessage = function(message) {
         });
         this._messages.splice(lastIndex + 1, 0, message);
     }
-    console.log("msg uid: ", message.getUserId());
-    console.log("my uid: ", myself.uid);
     if (message.getUserId() !== myself.uid) {
         this._totalUnreadCount++;
     }
@@ -89,6 +87,18 @@ HistoryMessages.prototype.markAsReadBeforeCursor = function(cursor) {
     this._data["rcs"] = cursor.toString();
     var previousUnreadCount = this._totalUnreadCount;
     this._totalUnreadCount = _computeUnreadCountFromMessages(this, cursor);
+    var len = this._messages.length;
+    var intCursor = parseInt(cursor);
+    for (var i = len - 1; i >= 0; --i) {
+        var message = this._messages[i];
+        if (message.getOutgoingStatus() === Message.OutgoingMessageStatus.READ) {
+            break;
+        }
+
+        if (message.getCursor() <= intCursor) {
+            message.setOutgoingStatus(Message.OutgoingMessageStatus.READ);
+        }
+    }
     return previousUnreadCount != this._totalUnreadCount;
 };
 
@@ -97,9 +107,19 @@ HistoryMessages.prototype.setRequested = function() {
 };
 
 // private functions
-function _parseMessages(arr) {
+function _parseMessages(historyMessages, arr) {
     return _.map(arr, function(v) {
-        return Message.create(v);
+        var message = Message.create(v);
+
+        if (message.fromMe()) {
+            if (message.getCursor() <= historyMessages.getReadCursor()) {
+                message.setOutgoingStatus(Message.OutgoingMessageStatus.READ);
+            } else {
+                message.setOutgoingStatus(Message.OutgoingMessageStatus.SENT);
+            }
+        }
+
+        return message;
     });
 }
 

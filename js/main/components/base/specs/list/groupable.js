@@ -45,8 +45,9 @@ module.exports = {
             }
 
             return acc.concat(_.map(dataGroup, function (data, key) {
+                if (!data) { return null; }
                 data = Object(data);
-                key = data.key || data.id || key;
+                key = _.isFunction(data.hashCode) && data.hashCode() || data.key || data.id || key;
                 currentItemKey = !isNaN(parseInt(key, 10)) ? parseInt(key, 10) : key;
 
                 // TODO: create keys more reasonably

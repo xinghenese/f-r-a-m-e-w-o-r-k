@@ -7,7 +7,7 @@ var querystring = require('querystring');
 var filter = require('./filter');
 
 //core module to export
-module.exports = filter.create({
+module.exports = filter.extend({
     'processWritable': function (value, options) {
         if (options.needWrap) {
             return queryStringify(value);

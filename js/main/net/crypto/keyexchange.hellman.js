@@ -29,7 +29,7 @@ var g = new BigInteger(BASE, 16, true);
 var priv = new BigInteger(privateKey, 16, true);
 
 //core module to export
-module.exports = keyexchange.create({
+module.exports = keyexchange.extend({
     getLocalKey: function () {
         return g.modPow(priv, p);
     },

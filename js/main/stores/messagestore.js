@@ -307,6 +307,8 @@ function _handleGroupHistoryMessagesRequest(action) {
         return;
     }
 
+    _markGroupHistoryMessagesAsRequested(action.groupId);
+
     var first = _.first(groupHistoryMessages.getMessages());
     socketConnection.request({
         tag: "HM",
@@ -325,7 +327,6 @@ function _handleGroupHistoryMessagesRequest(action) {
         }
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
-        _markGroupHistoryMessagesAsRequested(action.groupId);
         MessageStore.emitChange();
     });
 }
@@ -374,6 +375,8 @@ function _handlePrivateHistoryMessagesRequest(action) {
         return;
     }
 
+    _markPrivateHistoryMessagesAsRequested(action.userId);
+
     var first = _.first(privateHistoryMessages.getMessages());
     socketConnection.request({
         tag: "HM",
@@ -392,7 +395,6 @@ function _handlePrivateHistoryMessagesRequest(action) {
         }
     }).then(function(response) {
         _handleHistoryMessagesResponse(response);
-        _markPrivateHistoryMessagesAsRequested(action.userId);
         MessageStore.emitChange();
     });
 }

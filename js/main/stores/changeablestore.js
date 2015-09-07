@@ -4,6 +4,7 @@
 'use strict';
 
 // dependencies
+var _ = require('lodash');
 var EventEmitter = require('../utils/eventemitter');
 
 // private fields

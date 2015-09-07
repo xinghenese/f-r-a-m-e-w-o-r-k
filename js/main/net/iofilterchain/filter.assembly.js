@@ -6,7 +6,7 @@ var _ = require('lodash');
 var filter = require('./filter');
 var protocolpacket = require('../protocolpacket/protocolpacket');
 
-module.exports = filter.create({
+module.exports = filter.extend({
     'processReadable': function (msg, options) {
         var connectionType = options.connectionType;
         var result;

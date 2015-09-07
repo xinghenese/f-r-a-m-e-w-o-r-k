@@ -2,62 +2,60 @@
  * Created by Administrator on 2015/5/24.
  */
 
-//dependencies
 var _ = require('lodash');
 
-//private fileds
 var DEFAULT_CONSTRUCTOR = new Function();
 
-//core module to export
 module.exports = {
     /**
      * Creates a new object that inherits from this object.
-     * @param adapter {Object}
-     * @param finals {Object|Array}
+     * @param adapteds {Object}
+     * @param finals {Array|Object}
      * @return {Object} The new object.
      * @example
      *     var MyType = origin.extend({
-   *         field: 'value',
-   *         method: function () {
-   *         }
-   *     });
+     *         field: 'value',
+     *         method: function () {
+     *         }
+     *     });
      */
-    extend: function (adapter, finals) {
-        var supertype = DEFAULT_CONSTRUCTOR.prototype = this;
-        var subtype = new DEFAULT_CONSTRUCTOR();
+    extend: function (adapteds, finals) {
+        var superType = DEFAULT_CONSTRUCTOR.prototype = this;
+        var subType = new DEFAULT_CONSTRUCTOR();
 
         // Augment
-        adapter = _.toPlainObject(adapter);
-        finals = _.isObject(finals)
-            ? _.keys(finals)
-            : _.isArray(finals)
-            ? finals
-            : finals && [finals]
-        ;
-//    if(_.isPlainObject(finals)){
-//      finals = _.keys(finals);
-////      adapter = _.assign(adapter, finals);
-//    }
-        //Important to have mixIn and setFinals invoked in such order.
-        subtype._mixIn(_.omit(adapter, this._finals));
-        finals = subtype._finals = _.union(this._finals, finals);
-//    subtype._adapts = _.difference(_.keys(adapter), finals);
-        subtype._adapts = _(adapter).keys().union(this._adapts).difference(finals).value();
+        var implementedMemberMap = _.toPlainObject(adapteds);
+        var implementedMembers = _.union(this._implementedMembers, _.keys(implementedMemberMap));
+        var adaptedMemberMap;
+        var finalMembers;
+
+        if (_.isObject(finals) && !_.isArray(finals)) {
+            _.assign(implementedMemberMap, finals);
+            finalMembers = _.keys(finals);
+        } else if (finals) {
+            finalMembers = _.isArray(finals) ? finals : [finals];
+        }
+        adaptedMemberMap = _.omit(implementedMemberMap, this._finalMembers);
+
+        _.assign(subType, adaptedMemberMap, {
+            _finalMembers: _.union(this._finalMembers, _.intersection(implementedMembers, finalMembers)),
+            _implementedMembers: _.union(this._implementedMembers, implementedMembers)
+        });
 
         // Create default initializer
-        if (!subtype.hasOwnProperty('init')) {
-            subtype.init = function () {
-                return subtype.$super.init.apply(this, arguments);
+        if (!subType.hasOwnProperty('init')) {
+            subType.init = function () {
+                return subType.$super.init.apply(this, arguments);
             };
         }
 
-        // Initializer's prototype is the subtype object
-        subtype.init.prototype = subtype;
+        // Initializer's prototype is the subType object
+        subType.init.prototype = subType;
 
-        // Reference supertype
-        subtype.$super = supertype;
+        // Reference superType
+        subType.$super = superType;
 
-        return subtype;
+        return subType;
     },
 
     /**
@@ -67,46 +65,22 @@ module.exports = {
      * @example
      *     var instance = MyType.create();
      */
-    create: function (overrides) {
-        var initials = _.toArray(arguments);
-        if (_.isPlainObject(overrides)) {
-            overrides = _.pick(overrides, this._adapts);
-            if (!_.isEmpty(overrides)) {
-                initials = initials.slice(1);
-            }
-        } else {
-            overrides = {};
-        }
+    create: function () {
+        var instance = this.extend(null, null);
+        var ret = instance.init.apply(instance, _.toArray(arguments));
 
-        var instance = this.extend(overrides, null);
-        var ret = instance.init.apply(instance, initials);
-        if (this.isPrototypeOf(ret)) {
-            return ret;
-        }
-
-        return instance;
+        return this.isPrototypeOf(ret) ? ret : instance;
     },
 
     init: function () {
 
     },
 
-    _mixIn: function (properties) {
-        _.forOwn(properties, function (property, propertyname) {
-            this[propertyname] = property;
-        }, this);
-
-        // IE won't copy toString using the loop above
-        if (properties.hasOwnProperty('toString')) {
-            this.toString = properties.toString;
-        }
-    },
-
     /**
-     * store names of methods which would not be overriden by subtypes.
+     * store names of methods which would not be overriden by subTypes.
      */
-    _finals: [],
+    _finalMembers: [],
 
-    _adapts: []
+    _implementedMembers: []
 
 };

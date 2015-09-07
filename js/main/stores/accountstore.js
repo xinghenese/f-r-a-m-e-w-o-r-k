@@ -148,7 +148,7 @@ function _handleLoginRequest(action) {
         AccountStore.markLoginSuccess();
         AccountStore.emitChange();
     }, function(statusCode) {
-        AccountStore.markLoginFailure(statusCode);
+        AccountStore.markLoginFailure(String(statusCode.message || statusCode));
         AccountStore.emitChange();
     });
 }

@@ -9,7 +9,7 @@ var ConnectionType = require('../connection/connectiontype');
 var errors = require('../../constants/errors');
 
 //core module to export
-module.exports = filter.create({
+module.exports = filter.extend({
     'processReadable': function (msg, options) {
         var connectionType = options.connectionType;
         var result;

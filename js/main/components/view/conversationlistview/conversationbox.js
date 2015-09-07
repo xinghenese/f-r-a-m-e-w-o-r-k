@@ -17,10 +17,10 @@ var users = require('../../../datamodel/users');
 var ConversationConstants = require('../../../constants/conversationconstants');
 var MessageActions = require('../../../actions/messageactions');
 var MessageStore = require('../../../stores/messagestore');
-
 var ConversationAndContactStore = require('../../../stores/conversationandcontactstore');
 var Switcher = require('./conversationuserswitcher');
 var Settings = require('../../tools/Settings');
+var strings = require('../../../utils/strings');
 
 //private fields
 var listType = {
@@ -120,7 +120,7 @@ var ConversationBox = React.createClass({
                             onSearch={this._filterData} onKeyDown={this._onKeyDownInSearchBox} />
                     <input type="button" className="settings" onClick={this._onShowSettings} />
                 </div>
-                <SideList className="main" isContacts={this.state.type === listType.contact}
+                <SideList className="main" isContacts={this.state.type === listType.contact && _.isEmpty(this.state.matchedMessages)}
                           data={{data: this.state.displayData, messages: this.state.matchedMessages}}/>
                 <Switcher className="footer tabs" data={listType} unreadCount={MessageStore.getUnreadCount()}/>
             </div>
@@ -155,7 +155,8 @@ function _buildGroupRenderObject(item, collector) {
     var message = "";
     var time = "";
     if (item.message) {
-        message = item.message.getBriefText();
+        message = strings.format("{0}{1}{2}", item.message.getUserNickname(),
+            Lang.separatorBetweenNameAndMessage, item.message.getBriefText());
         time = new Date(item.message.getTimestamp());
     }
 
