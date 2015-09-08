@@ -14,8 +14,15 @@ var KeyInfo = module.exports = function (fieldName, fieldType, defaultValue) {
     if (!this instanceof KeyInfo) {
         return new KeyInfo(fieldName, fieldType, defaultValue);
     }
-    this.fieldName = fieldName;
-    this.fieldType = fieldType;
+
+    this.fieldName = _.isFunction(fieldName) ? fieldName
+        : _.isArray(fieldName) ? KeyInfo.get(fieldName)
+        : _.property(fieldName);
+
+    this.fieldType = _.isFunction(fieldType.create) ? fieldType.create
+        : _.isFunction(fieldType) ? (fieldType === Date ? createDate : fieldType)
+        : getSelf;
+
     this.defaultValue = defaultValue;
 
     if (!_.isUndefined(defaultValue)) {
@@ -40,4 +47,78 @@ KeyInfo.ARRAY_NOT_SET = [];
 KeyInfo.NUMBER_ZERO = 0;
 KeyInfo.NUMBER_NEG_ONE = -1;
 
-// private functions
+KeyInfo.create = function (fieldName, fieldType, defaultValue) {
+    return new KeyInfo(fieldName, fieldType, defaultValue);
+};
+
+// resolve evaluation with a candidate list
+KeyInfo.get = function (candidates) {
+    return function (data) {
+        var result = _.get(data, candidates);
+        if (_.isArray(candidates) && !_.isEmpty(candidates)) {
+            _.forEach(candidates, function (candidate) {
+                if (_.has(data, candidate)) {
+                    result = _.get(data, candidate);
+                    return false;
+                }
+            })
+        }
+        return result;
+    };
+};
+
+KeyInfo.arrayOf = function (type) {
+    return function (data) {
+        return _.map(data, function (item) {
+            return KeyInfo.compose(type)(item);
+        })
+    }
+};
+
+KeyInfo.compose = function (composedInfo) {
+    if (_.isArray(composedInfo)) {
+        return function (data) {
+            return _.map(composedInfo, function (value) {
+                // resolve nested KeyInfo.compose
+                if (_.isFunction(value)) {
+                    return value(data);
+                }
+                if (_.isArray(value)) {
+                    return KeyInfo.get(value)(data);
+                }
+                return data[value];
+            })
+        }
+    }
+    if (_.isObject(composedInfo)) {
+        return function (data) {
+            return _.mapValues(composedInfo, function (value) {
+                // resolve nested KeyInfo.compose
+                if (_.isFunction(value)) {
+                    return value(data);
+                }
+                if (_.isArray(value)) {
+                    return KeyInfo.get(value)(data);
+                }
+                return data[value];
+            })
+        }
+    }
+    if (_.isFunction(composedInfo)) {
+        return composedInfo;
+    }
+    return _.property(composedInfo);
+};
+
+function getSelf(value) {
+    return value;
+}
+
+function createInteger(num, radix) {
+    return parseInt(num, radix || 10);
+}
+
+function createDate(date) {
+    date = parseInt(date, 10);
+    return date ? new Date(date) : new Date();
+}
