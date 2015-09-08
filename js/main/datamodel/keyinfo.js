@@ -14,8 +14,15 @@ var KeyInfo = module.exports = function (fieldName, fieldType, defaultValue) {
     if (!this instanceof KeyInfo) {
         return new KeyInfo(fieldName, fieldType, defaultValue);
     }
-    this.fieldName = fieldName;
-    this.fieldType = fieldType;
+
+    this.fieldName = _.isFunction(fieldName) ? fieldName
+        : _.isArray(fieldName) ? KeyInfo.get(fieldName)
+        : _.property(fieldName);
+
+    this.fieldType = _.isFunction(fieldType.create) ? fieldType.create
+        : _.isFunction(fieldType) ? (fieldType === Date ? createDate : fieldType)
+        : getSelf;
+
     this.defaultValue = defaultValue;
 
     if (!_.isUndefined(defaultValue)) {
@@ -44,6 +51,7 @@ KeyInfo.create = function (fieldName, fieldType, defaultValue) {
     return new KeyInfo(fieldName, fieldType, defaultValue);
 };
 
+// resolve evaluation with a candidate list
 KeyInfo.get = function (candidates) {
     return function (data) {
         var result = _.get(data, candidates);
@@ -75,6 +83,9 @@ KeyInfo.compose = function (composedInfo) {
                 if (_.isFunction(value)) {
                     return value(data);
                 }
+                if (_.isArray(value)) {
+                    return KeyInfo.get(value)(data);
+                }
                 return data[value];
             })
         }
@@ -86,14 +97,28 @@ KeyInfo.compose = function (composedInfo) {
                 if (_.isFunction(value)) {
                     return value(data);
                 }
+                if (_.isArray(value)) {
+                    return KeyInfo.get(value)(data);
+                }
                 return data[value];
             })
         }
     }
     if (_.isFunction(composedInfo)) {
-        return composedInfo(data);
+        return composedInfo;
     }
-    return function (data) {
-        return data[composedInfo];
-    }
+    return _.property(composedInfo);
 };
+
+function getSelf(value) {
+    return value;
+}
+
+function createInteger(num, radix) {
+    return parseInt(num, radix || 10);
+}
+
+function createDate(date) {
+    date = parseInt(date, 10);
+    return date ? new Date(date) : new Date();
+}

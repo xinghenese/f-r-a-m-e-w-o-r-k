@@ -3,7 +3,6 @@
  */
 'use strict';
 
-// dependencies
 var _ = require('lodash');
 var React = require('react');
 var KeyInfo = require('../keyinfo');
@@ -12,57 +11,55 @@ var Strings = require('../../utils/strings');
 var Lang = require('../../locales/zh-cn');
 var SystemMessageTypes = require('../../constants/messageconstants').SystemMessageTypes;
 
-// private fields
 var refer = model.extend({
     keyMap: {
-        entity: new KeyInfo(KeyInfo.arrayOf({uid: 'referid', unk: 'refern'}), Object)
+        entity: new KeyInfo(KeyInfo.arrayOf({userId: 'referid', userName: 'refern'}), Object)
     }
 });
 
-// exports
 module.exports = model.extend({
     keyMap: {
         type:           new KeyInfo('type', Number),
         subtype:        new KeyInfo('tp', Number),
         refer:          new KeyInfo('refer', refer),
         userId:         new KeyInfo('uid', Number),
-        userName:       new KeyInfo('unk', String)
+        userName:       new KeyInfo('unk', String),
+        remarkName:     new KeyInfo('rmk', String)
     },
     toString: function () {
         return Lang.systemMessage;
     },
-    toReactElement: function () {
+    toReactElement: function (props) {
+        var text;
         switch (this.subtype) {
             case SystemMessageTypes.INVITED_INTO_GROUP:
-                return <p>{Strings.template(Lang.invitedIntoGroup, this.userName, _generateNicknames(message, this.MuserId))}</p>;
+                text = Strings.template(Lang.invitedIntoGroup, this.userName, _generateNicknames(this.refer, this.userId));
+                break;
             case SystemMessageTypes.USER_INVITED_INTO_GROUP:
-                return <p>{Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(message, this.userId))}</p>;
+                text = Strings.template(Lang.userInvitedIntoGroup, _generateNicknames(this.refer, this.userId));
+                break;
             case SystemMessageTypes.USER_KICKED_OUT_GROUP:
-                return <p>{Strings.template(Lang.userKickedOutGroup, _generateNicknames(message, this.userId))}</p>;
+                text = Strings.template(Lang.userKickedOutGroup, _generateNicknames(this.refer, this.userId));
+                break;
             case SystemMessageTypes.GROUP_NAME_CHANGED:
-                return <p>{Strings.format(Lang.groupNameChanged, this.userName, message.referName)}</p>;
+                text = Strings.format(Lang.groupNameChanged, this.userName, this.refer);
+                break;
             case SystemMessageTypes.CONTACT_JOINED:
-                return <p>{Strings.format(Lang.contactJoined, data.getRemarkName())}</p>;
+                text = Strings.format(Lang.contactJoined, this.remarkName);
+                break;
             default :
-                return <p>{Lang.systemMessage}</p>;
+                text = Lang.systemMessage;
         }
+        return <p {...props}>{text}</p>;
     }
 });
 
-// module initialization
-
-
-// private functions
-function ReferInfo() {
-
-}
-
 function _generateNicknames(message, userId) {
-    return _.reduce(message.referInfo, function (memo, item) {
-        if (!item.referUserId || !item.referUserName || item.referUserId == userId) {
+    return _.reduce(message.entity, function (memo, item) {
+        if (!item.userId || !item.userName || item.userId == userId) {
             return memo;
         }
-        memo.push(item.referUserName);
+        memo.push(item.userName);
         return memo;
     }, []).join(Lang.nicknameSeparator);
 }

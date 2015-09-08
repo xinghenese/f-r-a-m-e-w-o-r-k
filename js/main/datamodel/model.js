@@ -27,45 +27,19 @@ module.exports = origin.extend({
                 var fieldType = sourceKeyInfo.fieldType;
                 var sourceFieldName = sourceKeyInfo.fieldName;
                 var defaultValue = sourceKeyInfo.defaultValue;
-                var sourceValue;
+                var sourceValue = _.isFunction(sourceFieldName) ? sourceFieldName(data) : _.get(data, sourceFieldName);
 
-                if (_.isFunction(sourceFieldName)) {
-                    // resolve KeyInfo.compose
-                    sourceValue = sourceFieldName(data);
-                } else if (_.isArray(sourceFieldName)) {
-                    // resolve evaluation with a candidate list
-                    _.forEach(sourceFieldName, function (field) {
-                        if (_.has(data, field)) {
-                            sourceValue = _.get(data, field);
-                            return false;
-                        }
-                    })
-                } else {
-                    // resolve simple evaluation: data[sourceFieldName]
-                    sourceValue = _.get(data, sourceFieldName);
-                }
                 sourceValue = _.isUndefined(sourceValue) || _.isNaN(sourceValue) ? defaultValue : sourceValue;
-
-                if (!fieldType) {
-                    this[targetKey] = sourceValue;
-                } else if (_.isFunction(fieldType.create)) {
-                    this[targetKey] = fieldType.create(sourceValue);
-                } else if (_.isFunction(fieldType)) {
-                    if (fieldType === Date) {
-                        sourceValue = parseInt(sourceValue);
-                        this[targetKey] = sourceValue ? new Date(sourceValue) : new Date();
-                    } else {
-                        this[targetKey] = fieldType(sourceValue);
-                    }
-                }
+                this[targetKey] = _.isFunction(fieldType) ? fieldType(sourceValue) : sourceValue;
             } else {
-                this[targetKey] = data[sourceKeyInfo];
+                this[targetKey] = _.get(data, sourceKeyInfo);
             }
         }, this);
     },
     extend: function (adapteds, finals) {
         var subType = origin.extend.call(this, adapteds, finals);
         if (subType.hasOwnProperty('keyMap')) {
+            // inherit and merge keyMap
             subType.keyMap = _.assign({}, this.keyMap, subType.keyMap);
         }
         return subType;

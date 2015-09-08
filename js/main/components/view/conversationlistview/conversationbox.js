@@ -96,6 +96,11 @@ var ConversationBox = React.createClass({
             });
         }
     },
+    _assembleListTypeForSwitcher: function() {
+        return _.mapValues(listType, function(type) {
+            return {name: type, unreadCount: (type === listType.conversation ? MessageStore.getUnreadCount() : 0)};
+        })
+    },
     componentDidMount: function() {
         ConversationAndContactStore.addChangeListener(this._onGroupsAndContactsChanged);
         MessageStore.addChangeListener(this._updateMessages);
@@ -111,7 +116,11 @@ var ConversationBox = React.createClass({
         globalEmitter.removeListener(EventTypes.SWITCH_CONVERSATIONS_OR_CONTACTS, this._switchList);
     },
     render: function() {
-        console.info('store: ', this.state.store);
+        console.group('ConversationBox#render');
+        console.log('listType: ', this.state.type);
+        console.log('store: ', this.state.store);
+        console.log('displayData: ', this.state.displayData);
+        console.groupEnd();
         return (
             <div className="sidebar">
                 <div className="header">
@@ -122,7 +131,7 @@ var ConversationBox = React.createClass({
                 </div>
                 <SideList className="main" isContacts={this.state.type === listType.contact && _.isEmpty(this.state.matchedMessages)}
                           data={{data: this.state.displayData, messages: this.state.matchedMessages}}/>
-                <Switcher className="footer tabs" data={listType} unreadCount={MessageStore.getUnreadCount()}/>
+                <Switcher className="footer tabs" data={this._assembleListTypeForSwitcher()}/>
             </div>
         )
     }
@@ -134,7 +143,6 @@ module.exports = ConversationBox;
 function _getLastMessages() {
     var lastMessages = MessageStore.getLastMessages();
     var result = [];
-    console.info('lastMessages: ', lastMessages);
     _.forEach(lastMessages, function(item) {
         if ("groupId" in item) {
             _buildGroupRenderObject(item, result);
@@ -172,7 +180,6 @@ function _buildGroupRenderObject(item, collector) {
         id: item.groupId,
         type: ConversationConstants.GROUP_TYPE
     });
-    console.info('collector: ', collector);
 }
 
 function _buildUserRenderObject(item, collector) {
@@ -201,5 +208,4 @@ function _buildUserRenderObject(item, collector) {
         id: item.userId,
         type: ConversationConstants.PRIVATE_TYPE
     });
-    console.info('collector: ', collector);
 }

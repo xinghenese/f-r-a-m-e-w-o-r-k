@@ -13,7 +13,6 @@ var Group = require('../group');
 var myself = require('../myself');
 var users = require('../users');
 var User = require('../user');
-var MessageTypes = require('../../constants/messageconstants').MessageTypes;
 
 var MessageConstants = require('../../constants/messageconstants');
 var model = require('../model');
@@ -28,7 +27,8 @@ module.exports = model.extend({
         // user
         userId:         new KeyInfo('msuid', Number),
         userNickname:   new KeyInfo('unk', String),
-        user:           new KeyInfo(KeyInfo.compose({uid: 'msuid', unk: 'unk'}), users, users.emptyUser),
+        userRemarkname: new KeyInfo('rmk', String),
+        user:           new KeyInfo(KeyInfo.compose({uid: 'msuid', unk: 'unk', rmk: 'rmk'}), users, users.emptyUser),
         // targetUser
         targetUserId:   new KeyInfo('mstuid', Number),
         targetUser:     new KeyInfo(KeyInfo.compose({uid: 'mstuid'}), users, users.emptyUser),
@@ -49,7 +49,7 @@ module.exports = model.extend({
         type:           new KeyInfo('msgtp', Number),
         dontCount:      new KeyInfo('dntcnt', Boolean),
         // content
-        content:        new KeyInfo(KeyInfo.compose({type: 'msgtp', tp: 'tp', msg: 'msg', uid: 'msuid', unk: 'unk', refer: KeyInfo.get(['referobj', 'refern'])}), MessageContent),
+        content:        new KeyInfo(KeyInfo.compose({type: 'msgtp', tp: 'tp', msg: 'msg', uid: 'msuid', unk: 'unk', rmk: 'rmk', refer: ['referobj', 'refern']}), MessageContent),
         subtype:        new KeyInfo('tp', Number)
     },
     hashCode: function () {

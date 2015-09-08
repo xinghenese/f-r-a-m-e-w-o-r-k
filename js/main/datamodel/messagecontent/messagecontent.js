@@ -3,20 +3,25 @@
  */
 'use strict';
 
-// dependencies
-var _ = require('lodash');
-var origin = require('../../net/base/origin');
+module.exports = function (message) {
+    var MessageTypes = require('../../constants/messageconstants').MessageTypes;
 
-// private fields
-var NUMBER_NOT_SET = -1;
-var STRING_NOT_SET = '';
+    if (!message) {
+        return;
+    }
 
-// exports
-module.exports = function (type, message) {
-
+    switch (message.type) {
+        case MessageTypes.TEXT:
+            return require('./textmessagecontent').create(message);
+        case MessageTypes.PICTURE:
+            return require('./picturemessagecontent').create(message);
+        case MessageTypes.AUDIO:
+            return require('./voicemessagecontent').create(message);
+        case MessageTypes.LOCATION:
+            return require('./locationmessagecontent').create(message);
+        case MessageTypes.SYSTEM:
+            return require('./systemmessagecontent').create(message);
+        default :
+            return require('./textmessagecontent').create(message);
+    }
 };
-
-// module initialization
-
-
-// private functions
