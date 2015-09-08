@@ -13,6 +13,11 @@ gulp.task('clean', function (done) {
     require('del')(['dist', 'chaoxin-*'], done);
 });
 
+gulp.task('static', ['clean'], function () {
+   return gulp.src('./index.html')
+        .pipe(gulp.dest('./dist'));
+});
+
 // region bundle
 var browserifyOptions = {
     entries: ['./main.js'],
@@ -38,9 +43,9 @@ function bundlePayload(bundler) {
     };
 }
 
-gulp.task('build', ['clean'], bundlePayload(require('browserify')(browserifyOptions)));
+gulp.task('build', ['static'], bundlePayload(require('browserify')(browserifyOptions)));
 
-gulp.task('watch', ['clean'], function () {
+gulp.task('watch', ['static'], function () {
     var moment = require('moment');
     var watchify = require('watchify');
     var browserify = require('browserify');
@@ -121,12 +126,12 @@ gulp.task('desktop:build', ['build'], function () {
 // endregion
 
 gulp.task('local-serve', ['watch'], function () {
-    require('gulp-connect').server({
-        root: '.',
-        port: 8000,
-        host: '0.0.0.0',
-        livereload: true
-    });
+    return gulp.src('./dist')
+        .pipe(require('gulp-webserver')({
+            root: '.',
+            port: 8000,
+            host: '0.0.0.0'
+        }));
 });
 
 gulp.task('default', ['build']);
