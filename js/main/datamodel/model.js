@@ -14,6 +14,11 @@ var KeyInfo = require('./keyinfo');
 // exports
 module.exports = origin.extend({
     keyMap: {},
+    arrayOf: function (model) {
+        return function (data) {
+            return _.map(data, KeyInfo.makeFieldType(model));
+        }
+    },
     init: function (data) {
         var keyMap = this.keyMap = _.toPlainObject(this.keyMap);
         this._data = data;

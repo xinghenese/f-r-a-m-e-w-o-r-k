@@ -3,7 +3,6 @@
  */
 'use strict';
 
-// dependencies
 var _ = require('lodash');
 var React = require('react');
 
@@ -18,7 +17,6 @@ var MessageConstants = require('../../constants/messageconstants');
 var model = require('../model');
 var MessageContent = require('../messagecontent/messagecontent');
 
-// exports
 module.exports = model.extend({
     keyMap: {
         // group
@@ -58,7 +56,22 @@ module.exports = model.extend({
     fromMe: function() {
         return this.userId === myself.uid;
     },
-    toElement: function() {
+    markSendingStatus: function () {
+        this.status = MessageConstants.Status.SENDING;
+    },
+    markReceivedStatus: function () {
+        this.status = MessageConstants.Status.RECEIVED;
+    },
+    markReadStatus: function () {
+        this.status = MessageConstants.Status.READ;
+    },
+    markFailedStatus: function () {
+        this.status = MessageConstants.Status.FAILED;
+    },
+    markSentStatus: function () {
+        this.status = MessageConstants.Status.SENT;
+    },
+    toReactElement: function() {
         var content = String(this.content);
         if (_.isObject(this.content)) {
             content = JSON.stringify(this.content);

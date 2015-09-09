@@ -19,10 +19,7 @@ var KeyInfo = module.exports = function (fieldName, fieldType, defaultValue) {
         : _.isArray(fieldName) ? KeyInfo.get(fieldName)
         : _.property(fieldName);
 
-    this.fieldType = _.isFunction(fieldType.create) ? fieldType.create
-        : _.isFunction(fieldType) ? (fieldType === Date ? createDate : fieldType)
-        : getSelf;
-
+    this.fieldType = KeyInfo.makeFieldType(fieldType);
     this.defaultValue = defaultValue;
 
     if (!_.isUndefined(defaultValue)) {
@@ -67,11 +64,15 @@ KeyInfo.get = function (candidates) {
     };
 };
 
+KeyInfo.makeFieldType = function (fieldType) {
+    return _.isFunction(fieldType.create) ? _.bind(fieldType.create, fieldType)
+        : _.isFunction(fieldType) ? (fieldType === Date ? createDate : fieldType)
+        : getSelf;
+};
+
 KeyInfo.arrayOf = function (type) {
     return function (data) {
-        return _.map(data, function (item) {
-            return KeyInfo.compose(type)(item);
-        })
+        return _.map(data, KeyInfo.compose(type));
     }
 };
 
